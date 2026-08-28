@@ -1795,23 +1795,40 @@
             document.getElementById('modalHafalanKemarinText').innerText = s.lastHafalan || 'Belum ada data sebelumnya';
             document.getElementById('modalHafalanKemarinDate').innerText = s.lastDate ? `(${s.lastDate})` : '';
 
+            // Reset collapsible canvas states on open to keep modal light
+            ['bacaan', 'hafalan'].forEach(t => {
+                const wrap = document.getElementById(`canvasWrapper-${t}`);
+                const btnText = document.getElementById(`btnToggleText-${t}`);
+                if (wrap) wrap.classList.add('hidden');
+                if (btnText) btnText.innerText = "Buka Coretan";
+            });
+
             document.getElementById('setoranModal').classList.remove('hidden');
-            setTimeout(() => {
-                window.initCanvas('bacaan');
-                window.initCanvas('hafalan');
-            }, 50);
         };
 
-        window.closeEditModal = function() {
-            document.getElementById('setoranModal').classList.add('hidden');
-        };
-
-        window.handleKondisiPhotoUpload = function(input) {
+        window.handleCanvasImageUpload = function(type, input) {
             if (!input.files || !input.files[0]) return;
+            const wrap = document.getElementById(`canvasWrapper-${type}`);
+            const btnText = document.getElementById(`btnToggleText-${type}`);
+            if (wrap && wrap.classList.contains('hidden')) {
+                wrap.classList.remove('hidden');
+                if (btnText) btnText.innerText = "Tutup Coretan";
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('kondisiPhotoPreview').src = e.target.result;
-                document.getElementById('kondisiPhotoPreviewWrapper').classList.remove('hidden');
+                setTimeout(() => {
+                    window.initCanvas(type);
+                    const canvas = document.getElementById(`${type}Canvas`);
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        window.canvasState[type].history.push(canvas.toDataURL());
+                    };
+                }, 60);
             };
             reader.readAsDataURL(input.files[0]);
         };
