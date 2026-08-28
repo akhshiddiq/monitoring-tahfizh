@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Tahfizh RQ Al-Khansa</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,11 +11,6 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            gold: '#f59e0b',
-                            darkGold: '#b45309',
-                            emerald: '#065f46'
-                        },
                         emerald: {
                             50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7',
                             400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857',
@@ -32,13 +26,13 @@
             }
         };
     </script>
-    <!-- FontAwesome & Google Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quran-font { font-family: 'Amiri', serif; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.3); border-radius: 9999px; }
@@ -49,199 +43,130 @@
             box-shadow: 0 0 12px #10b981, 0 0 24px #34d399, 0 0 36px #6ee7b7;
             background: #ffffff; transform-origin: left center; opacity: 0;
         }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 0.4; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .mic-active {
-            animation: pulse-ring 1.2s infinite ease-in-out;
-        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
-
-    <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50 dark:border-emerald-900">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-14 sm:h-16">
-                <!-- Brand & Official Logo -->
-                <div class="flex items-center gap-2 sm:gap-3">
+    <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400/80 shadow-sm" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xs sm:text-sm font-black shadow-sm hidden">
-                            <i class="fas fa-mosque"></i>
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400/80 shadow-sm" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xs font-black shadow-sm hidden">
+                            <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
-                    <div>
-                        <h1 class="text-xs sm:text-base font-black tracking-tight flex items-center gap-1.5">
-                            <span>Monitoring Santri</span>
-                            <span class="px-1.5 py-0.5 bg-amber-400 text-emerald-950 text-[9px] sm:text-xs font-black rounded">RQ AL-KHANSA</span>
+                    <div class="min-w-0">
+                        <h1 class="text-xs sm:text-base font-black tracking-tight flex items-center gap-1.5 truncate">
+                            <span class="truncate">Monitoring Santri</span>
+                            <span class="px-1.5 py-0.2 bg-amber-400 text-emerald-950 text-[9px] sm:text-xs font-black rounded shrink-0">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-[10px] text-emerald-200 font-medium hidden md:block">Setoran Bacaan, Hafalan & Muroja'ah Mandiri</p>
+                        <p class="text-[10px] text-emerald-200 font-medium truncate hidden sm:block">Setoran Bacaan, Hafalan & Muroja'ah</p>
                     </div>
                 </div>
 
-                <!-- Teacher Selector & Quick Tools -->
-                <div class="flex items-center gap-1.5 sm:gap-2.5">
-                    <div class="relative">
-                        <select id="teacherFilterSelect" onchange="window.switchTeacher(this.value)" class="bg-emerald-900/80 dark:bg-slate-800 border border-emerald-600/60 dark:border-slate-700 text-white text-[11px] sm:text-xs font-bold rounded-xl px-2 sm:px-3 py-1 sm:py-1.5 focus:ring-2 focus:ring-amber-400 outline-none cursor-pointer">
-                            <option value="ALL">Semua Guru</option>
-                            <option value="Ustadz Sidik">Ustadz Sidik</option>
-                            <option value="Ustadzah Mega">Ustadzah Mega</option>
-                        </select>
-                    </div>
-                    <button id="soundToggleBtn" onclick="window.toggleSound()" title="Suara / SFX" class="p-1.5 sm:p-2 rounded-xl bg-emerald-900/80 hover:bg-emerald-700 border border-emerald-600/60 text-xs font-bold flex items-center transition-colors">
-                        <span id="soundIconWrapper">
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                        </span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button id="soundToggleBtn" onclick="window.toggleSound()" title="Suara / SFX" class="p-2 rounded-xl bg-emerald-900/90 hover:bg-emerald-700 border border-emerald-600/70 text-xs font-bold transition-colors">
+                        <span id="soundIconWrapper"><svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></span>
                     </button>
-                    <button onclick="window.toggleTheme()" title="Mode Gelap/Terang" class="p-1.5 sm:p-2 rounded-xl bg-emerald-900/80 hover:bg-emerald-700 border border-emerald-600/60 text-xs font-bold transition-colors">
-                        <span id="themeIconWrapper">
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                        </span>
+                    <button onclick="window.toggleTheme()" title="Mode Gelap/Terang" class="p-2 rounded-xl bg-emerald-900/90 hover:bg-emerald-700 border border-emerald-600/70 text-xs font-bold transition-colors">
+                        <span id="themeIconWrapper"><svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></span>
                     </button>
-                    <button onclick="window.switchTab('sync')" title="Pengaturan & Sync" class="flex items-center gap-1 px-2.5 py-1 sm:py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/50 text-[11px] sm:text-xs font-bold transition-all">
+                    <button onclick="window.switchTab('sync')" title="Pengaturan & Sync" class="px-2.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/50 text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                        <span class="hidden md:inline">Sync</span>
+                        <span>Sync</span>
                     </button>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between border-t border-emerald-700/40 py-1.5 sm:py-2 overflow-x-auto custom-scrollbar">
-                <div class="flex items-center gap-1.5 sm:gap-2.5 relative">
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-emerald-700/40">
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <select id="teacherFilterSelect" onchange="window.switchTeacher(this.value)" class="bg-emerald-900/90 dark:bg-slate-800 border border-emerald-600/70 dark:border-slate-700 text-white text-[11px] sm:text-xs font-bold rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-amber-400 outline-none cursor-pointer">
+                        <option value="ALL">Semua Guru</option>
+                        <option value="Ustadz Sidik">Ustadz Sidik</option>
+                        <option value="Ustadzah Mega">Ustadzah Mega</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-1.5 relative">
                     <!-- 1. MENU INPUT -->
                     <div class="relative">
-                        <button onclick="window.toggleMenuDropdown(event, 'input')" id="mainNav-input" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-white text-emerald-950 shadow-sm flex items-center gap-1.5 transition-all ring-2 ring-amber-400 shrink-0">
-                            <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                            <span>1. Menu Input</span>
+                        <button onclick="window.toggleMenuDropdown(event, 'input')" id="mainNav-input" class="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-white text-emerald-950 shadow-sm flex items-center gap-1 transition-all ring-2 ring-amber-400">
+                            <span>1. Input</span>
                             <svg id="chevron-input" class="w-3 h-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
-                        
-                        <div id="dropdown-input" class="hidden absolute left-0 top-full mt-1.5 w-60 sm:w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 space-y-1">
-                            <button onclick="window.switchTab('setoran')" id="subItem-setoran" class="w-full px-3 py-2 rounded-xl text-left text-xs font-black bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                                <div>
-                                    <span class="block font-black">Setoran Harian (Utama)</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Input bacaan & hafalan harian</span>
-                                </div>
+                        <div id="dropdown-input" class="hidden absolute left-0 top-full mt-1.5 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
+                            <button onclick="window.switchTab('setoran')" id="subItem-setoran" class="w-full px-3 py-2 rounded-xl text-left text-xs font-black bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-2">
+                                <span>Setoran Harian (Utama)</span>
                             </button>
-                            <button onclick="window.switchTab('level')" id="subItem-level" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <div>
-                                    <span class="block font-bold">Input Pencapaian Level</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Checklist tahapan level 1 s.d. 8</span>
-                                </div>
+                            <button onclick="window.switchTab('level')" id="subItem-level" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+                                <span>Input Pencapaian Level</span>
                             </button>
-                            <button onclick="window.switchTab('murojaah')" id="subItem-murojaah" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-teal-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                                <div>
-                                    <span class="block font-bold">Muroja'ah Manzili</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Checklist harian di rumah</span>
-                                </div>
+                            <button onclick="window.switchTab('murojaah')" id="subItem-murojaah" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+                                <span>Muroja'ah Manzili</span>
                             </button>
-                            <button onclick="window.switchTab('viewlevels')" id="subItem-viewlevels" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                                <div>
-                                    <span class="block font-bold">Panduan Level Qur'an</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Silabus rincian target Juz 30-28</span>
-                                </div>
+                            <button onclick="window.switchTab('viewlevels')" id="subItem-viewlevels" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+                                <span>Panduan Level Qur'an</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 2. MENU RIWAYAT -->
                     <div class="relative">
-                        <button onclick="window.toggleMenuDropdown(event, 'riwayat')" id="mainNav-riwayat" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1.5 transition-all shrink-0">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span>2. Menu Riwayat</span>
+                        <button onclick="window.toggleMenuDropdown(event, 'riwayat')" id="mainNav-riwayat" class="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1 transition-all">
+                            <span>2. Riwayat</span>
                             <svg id="chevron-riwayat" class="w-3 h-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
-
-                        <div id="dropdown-riwayat" class="hidden absolute left-0 top-full mt-1.5 w-60 sm:w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 space-y-1">
-                            <button onclick="window.switchTab('history')" id="subItem-history" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                <div>
-                                    <span class="block font-bold">Riwayat Setoran</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Log setoran harian tersimpan</span>
-                                </div>
+                        <div id="dropdown-riwayat" class="hidden absolute left-0 top-full mt-1.5 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
+                            <button onclick="window.switchTab('history')" id="subItem-history" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+                                <span>Riwayat Setoran</span>
                             </button>
-                            <button onclick="window.switchTab('level_history')" id="subItem-level_history" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
-                                <div>
-                                    <span class="block font-bold">Riwayat Level (GID 220546903)</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Log kelulusan ujian & muroja'ah</span>
-                                </div>
+                            <button onclick="window.switchTab('level_history')" id="subItem-level_history" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+                                <span>Riwayat Level</span>
                             </button>
-                            <button onclick="window.switchTab('santri')" id="subItem-santri" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center justify-between gap-2.5">
-                                <div class="flex items-center gap-2.5">
-                                    <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                    <div>
-                                        <span class="block font-bold">Riwayat Murid</span>
-                                        <span class="text-[10px] text-slate-500 font-normal">Master data 87 santri resmi</span>
-                                    </div>
-                                </div>
-                                <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded text-[9px] font-black">87</span>
+                            <button onclick="window.switchTab('santri')" id="subItem-santri" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between gap-2">
+                                <span>Riwayat Murid (87)</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 3. MENU LAPORAN -->
                     <div class="relative">
-                        <button onclick="window.toggleMenuDropdown(event, 'laporan')" id="mainNav-laporan" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1.5 transition-all shrink-0">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                            <span>3. Menu Laporan</span>
+                        <button onclick="window.toggleMenuDropdown(event, 'laporan')" id="mainNav-laporan" class="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1 transition-all">
+                            <span>3. Laporan</span>
                             <svg id="chevron-laporan" class="w-3 h-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
-
-                        <div id="dropdown-laporan" class="hidden absolute left-0 top-full mt-1.5 w-64 sm:w-72 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 space-y-1">
-                            <button onclick="window.switchTab('reports')" id="subItem-reports" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                                <div>
-                                    <span class="block font-bold">Laporan Kelas</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Ringkasan keaktifan setoran kelas</span>
-                                </div>
+                        <div id="dropdown-laporan" class="hidden absolute right-0 top-full mt-1.5 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
+                            <button onclick="window.switchTab('reports')" id="subItem-reports" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+                                <span>Laporan Kelas</span>
                             </button>
-                            <button onclick="window.switchTab('wa_report')" id="subItem-wa_report" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                                <div>
-                                    <span class="block font-bold">Laporan WA Orang Tua</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">Generator pesan WhatsApp ke wali santri</span>
-                                </div>
+                            <button onclick="window.switchTab('wa_report')" id="subItem-wa_report" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+                                <span>Laporan WA Orang Tua</span>
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <div class="hidden md:flex items-center gap-2 shrink-0">
-                    <span class="text-[10px] font-medium text-emerald-200">Halaman:</span>
-                    <span id="activeTabBadgeText" class="px-2 py-0.5 rounded-lg bg-emerald-950/70 border border-emerald-600/50 text-[10px] font-black text-amber-300">Setoran Harian (Utama)</span>
                 </div>
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8">
-        <!-- 1. SETORAN HARIAN (TAMPILAN UTAMA DEFAULT) -->
-        <section id="section-setoran" class="space-y-4 sm:space-y-6">
+        <!-- 1. SETORAN HARIAN (UTAMA) -->
+        <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
-                
-                <!-- SEARCH BAR DENGAN TOMBOL VOICE SEARCH INTEGRATED -->
                 <div class="relative w-full sm:w-96">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </span>
                     <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas, atau ID..." class="w-full pl-9 pr-10 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-emerald-500 outline-none">
-                    
-                    <!-- TOMBOL VOICE NOTE / VOICE SEARCH -->
-                    <button type="button" id="voiceSearchBtn" onclick="window.startVoiceSearchSantri()" title="Cari santri dengan suara (Voice Search)" class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-colors">
-                        <span id="voiceSearchIconWrapper" class="p-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center">
+                    <button type="button" onclick="window.startVoiceSearchSantri()" title="Cari santri dengan suara" class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700">
+                        <span class="p-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
                         </span>
                     </button>
                 </div>
-
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl px-2.5 py-1.5 sm:py-2 outline-none cursor-pointer flex-1 sm:flex-none">
+                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl px-2.5 py-1.5 outline-none cursor-pointer flex-1 sm:flex-none">
                         <option value="ALL">Semua Kelas (10 Kelas)</option>
                         <option value="Abdurrahman">Abdurrahman</option>
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
@@ -255,14 +180,12 @@
                         <option value="Umar">Umar</option>
                     </select>
                     <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
-                        <button onclick="window.setViewMode('grid')" id="viewModeGridBtn" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700 dark:text-emerald-400">Grid</button>
-                        <button onclick="window.setViewMode('table')" id="viewModeTableBtn" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400">Tabel</button>
+                        <button onclick="window.setViewMode('grid')" id="viewModeGridBtn" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700">Grid</button>
+                        <button onclick="window.setViewMode('table')" id="viewModeTableBtn" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500">Tabel</button>
                     </div>
                 </div>
             </div>
-
-            <div id="santriGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"></div>
-
+            <div id="santriGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
             <div id="santriTableContainer" class="hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
@@ -281,271 +204,98 @@
             </div>
         </section>
 
-        <section id="section-level" class="hidden space-y-4 sm:space-y-6">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
-                <div>
-                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span>Input Pencapaian Level Hafalan</span>
-                    </h2>
-                    <p class="text-[11px] sm:text-xs text-slate-500">Pilih program Juz, pantau kelulusan ujian, & centang tahapan sub-level 1–8.</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <input type="text" id="levelSearchInput" oninput="window.renderLevelAchievementUI()" placeholder="Cari santri..." class="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-emerald-500 flex-1 sm:flex-none">
-                    <select id="levelClassFilterSelect" onchange="window.renderLevelAchievementUI()" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl px-2.5 py-1.5 outline-none cursor-pointer">
-                        <option value="ALL">Semua Kelas</option>
-                        <option value="Abdurrahman">Abdurrahman</option>
-                        <option value="Abu Ubaidah">Abu Ubaidah</option>
-                        <option value="Zubair">Zubair</option>
-                        <option value="Ali">Ali</option>
-                        <option value="Utsman">Utsman</option>
-                        <option value="Abu Bakar">Abu Bakar</option>
-                        <option value="Bilal">Bilal</option>
-                        <option value="Hamzah">Hamzah</option>
-                        <option value="Fatimah">Fatimah</option>
-                        <option value="Umar">Umar</option>
-                    </select>
-                    <select id="levelFilterSelect" onchange="window.renderLevelAchievementUI()" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl px-2.5 py-1.5 outline-none cursor-pointer">
-                        <option value="ALL">Semua Program Juz</option>
-                        <option value="juz_30_dari_annaas">Juz 30 (An-Naas)</option>
-                        <option value="juz_30_dari_annaba">Juz 30 (An-Naba')</option>
-                        <option value="juz_29_dari_almulk">Juz 29 (Al-Mulk)</option>
-                        <option value="juz_29_dari_almursalaat">Juz 29 (Al-Mursalaat)</option>
-                        <option value="juz_28_dari_almujadalaah">Juz 28 (Al-Mujadilah)</option>
-                        <option value="juz_28_dari_attahrim">Juz 28 (At-Tahrim)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="levelGridContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4"></div>
-        </section>
-
-        <section id="section-murojaah" class="hidden space-y-4 sm:space-y-6">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                        <span>Jadwal Muroja'ah Manzil Mandiri</span>
-                    </h2>
-                    <p class="text-[11px] sm:text-xs text-slate-500">Checklist tugas harian santri dari hari Senin s.d. Ahad.</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="window.openSurahSequenceModal()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                        <span>Urutan Surat</span>
-                    </button>
-                    <button onclick="window.resetCurrentWeekMurojaahChecklist()" class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold hover:bg-rose-100">
-                        Reset Pekan Ini
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 overflow-hidden">
-                <div class="p-3 border-b border-slate-100 dark:border-slate-700 flex items-center gap-2">
-                    <input type="text" id="murojaahSearchInput" oninput="window.renderMurojaahTable()" placeholder="Cari santri..." class="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-semibold outline-none">
-                    <select id="murojaahClassFilterSelect" onchange="window.renderMurojaahTable()" class="bg-slate-50 dark:bg-slate-900 border text-xs font-bold rounded-xl px-2.5 py-1.5 outline-none">
-                        <option value="ALL">Semua Kelas</option>
-                        <option value="Abdurrahman">Abdurrahman</option>
-                        <option value="Abu Ubaidah">Abu Ubaidah</option>
-                        <option value="Zubair">Zubair</option>
-                        <option value="Ali">Ali</option>
-                        <option value="Utsman">Utsman</option>
-                        <option value="Abu Bakar">Abu Bakar</option>
-                        <option value="Bilal">Bilal</option>
-                        <option value="Hamzah">Hamzah</option>
-                        <option value="Fatimah">Fatimah</option>
-                        <option value="Umar">Umar</option>
-                    </select>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-bold uppercase text-[10px]">
-                                <th class="p-2.5">Santri</th>
-                                <th class="p-2.5">Level Muroja'ah</th>
-                                <th class="p-2 text-center">Sen</th>
-                                <th class="p-2 text-center">Sel</th>
-                                <th class="p-2 text-center">Rab</th>
-                                <th class="p-2 text-center">Kam</th>
-                                <th class="p-2 text-center">Jum</th>
-                                <th class="p-2 text-center">Sab</th>
-                                <th class="p-2 text-center">Ahad</th>
-                                <th class="p-2 text-center">Progres</th>
-                            </tr>
-                        </thead>
-                        <tbody id="murojaahTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. PANDUAN LEVEL QUR'AN -->
-        <section id="section-viewlevels" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Silabus Rincian Target Surat (Level 1 s.d. Level 8)</h3>
-                    <select id="syllabusTrackSelect" onchange="window.renderSyllabusViewer(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl px-3 py-1.5 outline-none cursor-pointer">
-                        <option value="juz_30_dari_annaas">Juz 30 (Mulai: An-Naas)</option>
-                        <option value="juz_30_dari_annaba">Juz 30 (Mulai: An-Naba')</option>
-                        <option value="juz_29_dari_almulk">Juz 29 (Mulai: Al-Mulk)</option>
-                        <option value="juz_29_dari_almursalaat">Juz 29 (Mulai: Al-Mursalaat)</option>
-                        <option value="juz_28_dari_almujadalaah">Juz 28 (Mulai: Al-Mujadilah)</option>
-                        <option value="juz_28_dari_attahrim">Juz 28 (Mulai: At-Tahrim)</option>
-                    </select>
-                </div>
-                <div id="syllabusGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mt-3"></div>
-            </div>
-        </section>
-
-        <!-- 5. RIWAYAT SETORAN -->
+        <!-- Other sections -->
+        <section id="section-level" class="hidden space-y-4"></section>
+        <section id="section-murojaah" class="hidden space-y-4"></section>
+        <section id="section-viewlevels" class="hidden space-y-4"></section>
         <section id="section-history" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center justify-between gap-3">
-                <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Riwayat Log Setoran Harian</h2>
-                <button onclick="window.clearHistoryLogs()" class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold hover:bg-rose-100">
-                    Bersihkan Riwayat
-                </button>
-            </div>
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 overflow-hidden">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border space-y-3">
+                <h3 class="font-black text-sm">Riwayat Setoran Harian</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-bold uppercase">
-                                <th class="p-3">Waktu</th>
-                                <th class="p-3">Santri</th>
-                                <th class="p-3">Setoran Bacaan</th>
-                                <th class="p-3">Setoran Hafalan</th>
-                                <th class="p-3">Status</th>
+                            <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-bold uppercase">
+                                <th class="p-2.5">Waktu</th>
+                                <th class="p-2.5">Nama Santri</th>
+                                <th class="p-2.5">Setoran Bacaan</th>
+                                <th class="p-2.5">Setoran Hafalan</th>
                             </tr>
                         </thead>
-                        <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+                        <tbody id="historyTableBody" class="divide-y"></tbody>
                     </table>
                 </div>
             </div>
         </section>
-
-        <!-- 6. RIWAYAT INPUT LEVEL -->
-        <section id="section-level_history" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center justify-between gap-3">
-                <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Riwayat Input Level (GID 220546903)</h2>
-                <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=220546903#gid=220546903" target="_blank" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black rounded-xl">
-                    Buka Sheet Level
-                </a>
-            </div>
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-bold uppercase">
-                                <th class="p-3">Waktu Input</th>
-                                <th class="p-3">Nama Santri</th>
-                                <th class="p-3">Program Juz</th>
-                                <th class="p-3">Level / Target</th>
-                                <th class="p-3">Status Ujian</th>
-                            </tr>
-                        </thead>
-                        <tbody id="levelHistoryTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 7. RIWAYAT MURID (87 SANTRI) -->
+        <section id="section-level_history" class="hidden space-y-4"></section>
         <section id="section-santri" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center justify-between gap-3">
-                <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Data 87 Santri Resmi</h2>
-                <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-bold rounded-xl">87 Terdaftar</span>
-            </div>
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 overflow-hidden">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border space-y-3">
+                <h3 class="font-black text-sm">Master Data 87 Santri</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-bold uppercase">
-                                <th class="p-3">No</th>
-                                <th class="p-3">ID</th>
-                                <th class="p-3">Nama Lengkap</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Pengajar</th>
+                            <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-bold uppercase">
+                                <th class="p-2.5">ID</th>
+                                <th class="p-2.5">Nama Santri</th>
+                                <th class="p-2.5">Kelas</th>
+                                <th class="p-2.5">Pengajar</th>
+                                <th class="p-2.5">No HP / WA</th>
                             </tr>
                         </thead>
-                        <tbody id="santriMasterTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+                        <tbody id="santriMasterTableBody" class="divide-y"></tbody>
                     </table>
                 </div>
             </div>
         </section>
-
-        <!-- 8. LAPORAN KELAS -->
-        <section id="section-reports" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
-                <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Ringkasan Laporan 10 Kelas</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3" id="classReportStatsContainer"></div>
-            </div>
-        </section>
-
-        <!-- 9. LAPORAN WA ORANG TUA -->
+        <section id="section-reports" class="hidden space-y-4"></section>
         <section id="section-wa_report" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 space-y-3">
-                <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Laporan WA Wali Santri</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border space-y-4 text-xs">
+                <h3 class="font-black text-sm">Generator Laporan WhatsApp Orang Tua</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="text-[10px] font-bold text-slate-500">Pilih Santri:</label>
-                        <select id="waSantriSelect" onchange="window.generateWaReport()" class="w-full mt-0.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-bold p-2 outline-none"></select>
+                        <label class="font-bold text-slate-500">Pilih Santri:</label>
+                        <select id="waSantriSelect" onchange="window.generateWaReport()" class="w-full mt-1 p-2 bg-slate-50 border rounded-xl font-bold"></select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold text-slate-500">Nomor HP/WA:</label>
-                        <input type="text" id="waPhoneInput" placeholder="628123456789" class="w-full mt-0.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-semibold p-2 outline-none">
+                        <label class="font-bold text-slate-500">No WA Wali Santri:</label>
+                        <input type="text" id="waPhoneInput" class="w-full mt-1 p-2 bg-slate-50 border rounded-xl font-semibold">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-500">Preview Pesan:</label>
-                    <textarea id="waMessagePreview" rows="6" class="w-full mt-0.5 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-mono outline-none"></textarea>
+                    <label class="font-bold text-slate-500">Preview Pesan:</label>
+                    <textarea id="waMessagePreview" rows="6" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl font-mono"></textarea>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="window.copyWaReportText()" class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-xs font-bold rounded-xl">Salin Pesan</button>
-                    <button onclick="window.sendWaReportDirect()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">Kirim ke WhatsApp</button>
+                    <button onclick="window.copyWaReportText()" class="px-3 py-1.5 bg-slate-200 rounded-xl font-bold">Salin</button>
+                    <button onclick="window.sendWaReportDirect()" class="px-4 py-1.5 bg-emerald-600 text-white rounded-xl font-black">Kirim WA</button>
                 </div>
             </div>
         </section>
-
-        <!-- 10. SYNC & PENGATURAN -->
         <section id="section-sync" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 space-y-3">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Pengaturan Webhook Google Apps Script</h2>
-                    <span id="webhookStatusBadge" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-slate-100 text-slate-500">Belum Disetel</span>
-                </div>
-                <input type="text" id="webhookUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-mono outline-none">
-                <div class="flex flex-wrap items-center gap-2">
-                    <button onclick="window.saveWebhookConfig()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">Simpan Webhook</button>
-                    <button id="testWebhookBtn" onclick="window.testWebhookConnection()" class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-xs font-bold rounded-xl">Uji Koneksi</button>
-                </div>
-                <div id="webhookTestResultBox" class="hidden p-3 rounded-xl border text-xs bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 space-y-1">
-                    <div id="webhookTestResultTitle" class="font-bold"></div>
-                    <pre id="webhookTestResultDetail" class="text-[10px] font-mono whitespace-pre-wrap text-slate-600 dark:text-slate-300"></pre>
-                </div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4 text-xs">
+                <h3 class="font-black text-sm">Status Sinkronisasi Google Sheets</h3>
+                <p class="text-slate-500">Data setoran otomatis terhubung ke Webhook Google Apps Script.</p>
+                <input type="text" id="webhookUrlInput" class="w-full p-2 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-[11px]" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
             </div>
         </section>
     </main>
 
-    <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2.5 sm:p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl max-w-lg sm:max-w-xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-xs">
-            <!-- Modal Header (Compact) -->
-            <div class="px-4 py-2.5 sm:py-3 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
-                <div class="truncate">
+    <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-xs">
+            <div class="px-4 py-3 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
+                <div>
                     <h3 id="modalSantriName" class="text-xs sm:text-sm font-black truncate">Setoran: Santri</h3>
                     <p id="modalSantriMeta" class="text-[10px] text-emerald-200 font-medium truncate">Kelas • Pengajar</p>
                 </div>
-                <button onclick="window.closeEditModal()" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white text-sm">✕</button>
+                <button onclick="window.closeEditModal()" class="p-1 rounded-lg hover:bg-white/10 text-white text-sm">✕</button>
             </div>
-
-            <!-- Modal Scrollable Body -->
             <div class="p-3 sm:p-4 overflow-y-auto custom-scrollbar flex-1 min-h-0 space-y-3">
                 <div class="p-2 bg-slate-50 dark:bg-slate-900/60 rounded-xl border flex items-center justify-between gap-2">
-                    <label class="text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-300">Tanggal Pertemuan:</label>
+                    <label class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Tanggal Pertemuan:</label>
                     <input type="date" id="modalTanggalInput" class="px-2 py-0.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold outline-none cursor-pointer">
                 </div>
 
-                <!-- 1. SETORAN BACAAN (COMPACT & COLLAPSIBLE CANVAS) -->
-                <div class="p-3 bg-emerald-50/60 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-2">
+                <!-- 1. SETORAN BACAAN -->
+                <div class="p-3 bg-emerald-50/70 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-black text-[11px] text-emerald-900 dark:text-emerald-200 uppercase">Setoran Bacaan</span>
                         <select id="bacaanStatusSelect" class="text-[11px] p-1 bg-white dark:bg-slate-800 border rounded-lg font-bold text-emerald-800 dark:text-emerald-300">
@@ -554,14 +304,13 @@
                             <option value="Kurang (C)">Kurang (C)</option>
                         </select>
                     </div>
-
-                    <!-- Non-Editable Bacaan Kemarin -->
-                    <div class="p-1.5 bg-white/90 dark:bg-slate-800/90 rounded-lg border border-emerald-200 dark:border-emerald-700 flex items-center justify-between text-[11px]">
-                        <span class="text-[9px] font-black px-1.5 py-0.2 bg-emerald-700 text-white rounded shrink-0">KEMARIN</span>
-                        <span id="modalBacaanKemarinText" class="font-bold text-emerald-950 dark:text-emerald-200 truncate ml-2">-</span>
-                        <span id="modalBacaanKemarinDate" class="text-[9px] text-slate-400 shrink-0 ml-1"></span>
+                    <div class="p-2 bg-white/90 dark:bg-slate-800/90 rounded-lg border border-emerald-200 dark:border-emerald-700 space-y-1">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-[9px] font-black px-1.5 py-0.2 bg-emerald-700 text-white rounded shrink-0">KEMARIN</span>
+                            <span id="modalBacaanKemarinText" class="font-bold text-emerald-950 dark:text-emerald-200 truncate ml-2">-</span>
+                            <span id="modalBacaanKemarinAyat" class="text-[10px] font-black text-emerald-700 shrink-0 ml-1">0 ayat</span>
+                        </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="text-[9px] font-bold text-slate-500">Kategori:</label>
@@ -575,63 +324,33 @@
                             <select id="bacaanSurahSelect" onchange="window.updateBacaanAyatLimits()" class="w-full p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold"></select>
                         </div>
                     </div>
-
-                    <div id="bacaanIqroWrapper" class="hidden grid grid-cols-2 gap-2">
-                        <select id="bacaanIqroJilidSelect" class="p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
-                            <option value="Jilid 1">Jilid 1</option><option value="Jilid 2">Jilid 2</option><option value="Jilid 3">Jilid 3</option>
-                            <option value="Jilid 4">Jilid 4</option><option value="Jilid 5">Jilid 5</option><option value="Jilid 6">Jilid 6</option>
-                        </select>
-                        <input type="number" id="bacaanIqroHalamanInput" min="1" max="50" value="1" placeholder="Hal" class="p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
-                    </div>
-
                     <div id="bacaanAyatRangeWrapper" class="grid grid-cols-2 gap-2">
-                        <input type="number" id="bacaanAyatStartInput" value="1" min="1" placeholder="Ayat Mulai" class="p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
-                        <input type="number" id="bacaanAyatEndInput" value="7" min="1" placeholder="Ayat Sampai" class="p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500">Ayat Mulai:</label>
+                            <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.calcBacaanTotals()" class="w-full p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500">Ayat Sampai:</label>
+                            <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.calcBacaanTotals()" class="w-full p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
+                        </div>
                     </div>
-
-                    <!-- Collapsible Canvas Toggle -->
-                    <div class="pt-1">
+                    <div class="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/60 p-2 rounded-lg space-y-0.5">
                         <div class="flex items-center justify-between">
-                            <button type="button" onclick="window.toggleCanvasView('bacaan')" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 rounded-lg text-[10px] font-black flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                <span id="btnToggleText-bacaan">Buka Coretan</span>
-                            </button>
-                            <label class="cursor-pointer px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded text-[10px] font-bold">
-                                <span>Upload Foto</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="window.handleCanvasImageUpload('bacaan', this)">
-                            </label>
-                        </div>
-
-                        <!-- Canvas Hidden by Default -->
-                        <div id="canvasWrapper-bacaan" class="hidden mt-2 p-2 bg-white dark:bg-slate-800 rounded-xl border border-emerald-300 dark:border-emerald-700 space-y-1.5">
-                            <div class="flex flex-wrap items-center gap-1 text-[10px]">
-                                <button type="button" onclick="window.setCanvasTool('bacaan', 'pen')" id="tool-bacaan-pen" class="px-1.5 py-0.5 bg-emerald-700 text-white rounded font-bold">Pena</button>
-                                <button type="button" onclick="window.setCanvasTool('bacaan', 'highlighter')" id="tool-bacaan-highlighter" class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-bold">Stabilo</button>
-                                <button type="button" onclick="window.setCanvasTool('bacaan', 'eraser')" id="tool-bacaan-eraser" class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-bold">Hapus</button>
-                                <input type="color" id="color-bacaan" value="#ef4444" onchange="window.setCanvasColor('bacaan', this.value)" class="w-5 h-5 rounded cursor-pointer border-0">
-                                <button type="button" onclick="window.undoCanvas('bacaan')" class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-bold">Undo</button>
-                                <button type="button" onclick="window.clearCanvas('bacaan')" class="px-1.5 py-0.5 bg-rose-100 text-rose-700 rounded font-bold">Clear</button>
-                            </div>
-                            <div class="relative w-full h-32 bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden border">
-                                <canvas id="bacaanCanvas" class="w-full h-full cursor-crosshair touch-none"></canvas>
-                            </div>
+                            <span>Total Hari Ini: <strong id="bacaanTotalHariIni">7</strong> ayat</span>
+                            <span>Akumulasi Sepekan: <strong id="bacaanTotalSepekan">7</strong> ayat</span>
                         </div>
                     </div>
-
                     <div>
                         <div class="flex items-center justify-between">
                             <label class="text-[9px] font-bold text-slate-500">Catatan Bacaan:</label>
-                            <button type="button" onclick="window.toggleVoiceRecording('bacaanCatatanInput')" class="text-[9px] font-bold text-emerald-600 flex items-center gap-0.5">
-                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-                                <span>Voice Note</span>
-                            </button>
+                            <button type="button" onclick="window.toggleVoiceRecording('bacaanCatatanInput')" class="text-[9px] font-bold text-emerald-600 flex items-center gap-0.5">Voice Note</button>
                         </div>
                         <textarea id="bacaanCatatanInput" rows="1" placeholder="Catatan tajwid..." class="w-full mt-0.5 p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs outline-none"></textarea>
                     </div>
                 </div>
 
-                <!-- 2. SETORAN HAFALAN (COMPACT & COLLAPSIBLE CANVAS) -->
-                <div class="p-3 bg-amber-50/60 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-800 space-y-2">
+                <!-- 2. SETORAN HAFALAN -->
+                <div class="p-3 bg-amber-50/70 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-800 space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-black text-[11px] text-amber-900 dark:text-amber-200 uppercase">Setoran Hafalan</span>
                         <select id="hafalanStatusSelect" class="text-[11px] p-1 bg-white dark:bg-slate-800 border rounded-lg font-bold text-amber-800 dark:text-amber-300">
@@ -640,429 +359,75 @@
                             <option value="Ulang (C)">Ulang (C)</option>
                         </select>
                     </div>
-
-                    <!-- Non-Editable Hafalan Kemarin -->
-                    <div class="p-1.5 bg-white/90 dark:bg-slate-800/90 rounded-lg border border-amber-200 dark:border-amber-700 flex items-center justify-between text-[11px]">
-                        <span class="text-[9px] font-black px-1.5 py-0.2 bg-amber-700 text-white rounded shrink-0">KEMARIN</span>
-                        <span id="modalHafalanKemarinText" class="font-bold text-amber-950 dark:text-amber-200 truncate ml-2">-</span>
-                        <span id="modalHafalanKemarinDate" class="text-[9px] text-slate-400 shrink-0 ml-1"></span>
+                    <div class="p-2 bg-white/90 dark:bg-slate-800/90 rounded-lg border border-amber-200 dark:border-amber-700 space-y-1">
+                        <div class="flex items-center justify-between text-[11px]">
+                            <span class="text-[9px] font-black px-1.5 py-0.2 bg-amber-700 text-white rounded shrink-0">KEMARIN</span>
+                            <span id="modalHafalanKemarinText" class="font-bold text-amber-950 dark:text-amber-200 truncate ml-2">-</span>
+                            <span id="modalHafalanKemarinAyat" class="text-[10px] font-black text-amber-700 shrink-0 ml-1">0 ayat</span>
+                        </div>
                     </div>
-
                     <select id="hafalanSurahSelect" onchange="window.updateHafalanAyatLimits()" class="w-full p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold"></select>
-
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="hafalanAyatStartInput" value="1" min="1" placeholder="Ayat Mulai" class="p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
-                        <input type="number" id="hafalanAyatEndInput" value="7" min="1" placeholder="Ayat Sampai" class="p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500">Ayat Mulai:</label>
+                            <input type="number" id="hafalanAyatStartInput" value="1" min="1" oninput="window.calcHafalanTotals()" class="w-full p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500">Ayat Sampai:</label>
+                            <input type="number" id="hafalanAyatEndInput" value="7" min="1" oninput="window.calcHafalanTotals()" class="w-full p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold">
+                        </div>
                     </div>
-
-                    <!-- Collapsible Canvas Toggle -->
-                    <div class="pt-1">
+                    <div class="text-[10px] font-bold text-amber-800 dark:text-amber-300 bg-amber-100/60 p-2 rounded-lg space-y-0.5">
                         <div class="flex items-center justify-between">
-                            <button type="button" onclick="window.toggleCanvasView('hafalan')" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 rounded-lg text-[10px] font-black flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                <span id="btnToggleText-hafalan">Buka Coretan</span>
-                            </button>
-                            <label class="cursor-pointer px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded text-[10px] font-bold">
-                                <span>Upload Foto</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="window.handleCanvasImageUpload('hafalan', this)">
-                            </label>
-                        </div>
-
-                        <!-- Canvas Hidden by Default -->
-                        <div id="canvasWrapper-hafalan" class="hidden mt-2 p-2 bg-white dark:bg-slate-800 rounded-xl border border-amber-300 dark:border-amber-700 space-y-1.5">
-                            <div class="flex flex-wrap items-center gap-1 text-[10px]">
-                                <button type="button" onclick="window.setCanvasTool('hafalan', 'pen')" id="tool-hafalan-pen" class="px-1.5 py-0.5 bg-amber-700 text-white rounded font-bold">Pena</button>
-                                <button type="button" onclick="window.setCanvasTool('hafalan', 'highlighter')" id="tool-hafalan-highlighter" class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-bold">Stabilo</button>
-                                <button type="button" onclick="window.setCanvasTool('hafalan', 'eraser')" id="tool-hafalan-eraser" class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-bold">Hapus</button>
-                                <input type="color" id="color-hafalan" value="#f59e0b" onchange="window.setCanvasColor('hafalan', this.value)" class="w-5 h-5 rounded cursor-pointer border-0">
-                                <button type="button" onclick="window.undoCanvas('hafalan')" class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-bold">Undo</button>
-                                <button type="button" onclick="window.clearCanvas('hafalan')" class="px-1.5 py-0.5 bg-rose-100 text-rose-700 rounded font-bold">Clear</button>
-                            </div>
-                            <div class="relative w-full h-32 bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden border">
-                                <canvas id="hafalanCanvas" class="w-full h-full cursor-crosshair touch-none"></canvas>
-                            </div>
+                            <span>Total Hari Ini: <strong id="hafalanTotalHariIni">7</strong> ayat</span>
+                            <span>Akumulasi Sepekan: <strong id="hafalanTotalSepekan">7</strong> ayat</span>
                         </div>
                     </div>
-
                     <div>
                         <div class="flex items-center justify-between">
                             <label class="text-[9px] font-bold text-slate-500">Catatan Hafalan:</label>
-                            <button type="button" onclick="window.toggleVoiceRecording('hafalanCatatanInput')" class="text-[9px] font-bold text-amber-600 flex items-center gap-0.5">
-                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-                                <span>Voice Note</span>
-                            </button>
+                            <button type="button" onclick="window.toggleVoiceRecording('hafalanCatatanInput')" class="text-[9px] font-bold text-amber-600 flex items-center gap-0.5">Voice Note</button>
                         </div>
                         <textarea id="hafalanCatatanInput" rows="1" placeholder="Catatan kelancaran..." class="w-full mt-0.5 p-1.5 bg-white dark:bg-slate-800 border rounded-lg text-xs outline-none"></textarea>
                     </div>
                 </div>
-
-                <!-- 3. FOTO DOKUMENTASI (COMPACT) -->
-                <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between">
-                    <span class="text-[11px] font-bold text-slate-600 dark:text-slate-300">Foto Kondisi (Opsional):</span>
-                    <label class="cursor-pointer px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg text-[10px] font-bold">
-                        <span>Upload Foto</span>
-                        <input type="file" accept="image/*" class="hidden" onchange="window.handleKondisiPhotoUpload(this)">
-                    </label>
-                </div>
-                <div id="kondisiPhotoPreviewWrapper" class="hidden relative w-full h-28 bg-slate-200 rounded-xl overflow-hidden">
-                    <img id="kondisiPhotoPreview" src="" class="w-full h-full object-cover">
-                    <button onclick="window.removeKondisiPhoto()" class="absolute top-1.5 right-1.5 p-1 bg-rose-600 text-white rounded-full text-xs">✕</button>
-                </div>
             </div>
-
-            <!-- Modal Footer (Compact) -->
             <div class="px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-xs font-bold">Batal</button>
-                <button onclick="window.saveSetoranData()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-                    <span>Simpan</span>
-                </button>
+                <button onclick="window.saveSetoranData()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md flex items-center gap-1">Simpan Setoran</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DETAIL UJIAN & MUROJA'AH 4 BULAN -->
-    <div id="levelDetailModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-sm w-full p-4 space-y-3 border border-slate-200 dark:border-slate-700 text-xs">
-            <div class="flex items-center justify-between border-b pb-2">
-                <h3 id="modalLvlSantriName" class="font-black text-slate-900 dark:text-white">Detail Ujian Santri</h3>
-                <button onclick="window.closeLevelDetailModal()" class="p-1 text-slate-400">✕</button>
-            </div>
-            <div>
-                <label class="font-bold text-slate-500">Status Ujian:</label>
-                <select id="modalLvlUjianStatus" class="w-full mt-1 p-1.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                    <option value="Belum Ujian">Belum Ujian</option>
-                    <option value="Siap Diuji">Siap Diuji</option>
-                    <option value="Lulus (Mumtaz)">Lulus (Mumtaz)</option>
-                    <option value="Lulus (Jayyid Jiddan)">Lulus (Jayyid Jiddan)</option>
-                    <option value="Mengulang">Mengulang</option>
-                </select>
-            </div>
-            <div>
-                <label class="font-bold text-slate-500">Tanggal Ujian:</label>
-                <input type="date" id="modalLvlUjianDate" class="w-full mt-1 p-1.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-            </div>
-            <div>
-                <label class="font-bold text-slate-500">Muroja'ah 4 Bulan:</label>
-                <select id="modalLvlMurojaahStatus" class="w-full mt-1 p-1.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                    <option value="Belum">Belum Muroja'ah</option>
-                    <option value="Sedang Proses">Sedang Proses</option>
-                    <option value="Selesai (Lancar)">Selesai (Lancar)</option>
-                </select>
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-2 border-t">
-                <button onclick="window.closeLevelDetailModal()" class="px-3 py-1 rounded-xl bg-slate-200 text-slate-700 font-bold">Batal</button>
-                <button onclick="window.saveLevelDetailModalData()" class="px-4 py-1 rounded-xl bg-emerald-600 text-white font-black">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL URUTAN SURAT JUZ 30 & 29 -->
-    <div id="surahSeqModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-md w-full max-h-[85vh] flex flex-col border overflow-hidden">
-            <div class="p-3.5 bg-amber-500 text-slate-950 flex items-center justify-between">
-                <h3 class="text-xs font-black uppercase">Panduan Urutan Surat Juz 30 & 29</h3>
-                <button onclick="window.closeSurahSequenceModal()" class="font-bold">✕</button>
-            </div>
-            <div class="p-4 overflow-y-auto custom-scrollbar flex-1 space-y-3 text-xs">
-                <div>
-                    <h4 class="font-black text-emerald-800 dark:text-emerald-300 uppercase mb-1">Urutan Juz 30 (An-Nas s.d. An-Naba'):</h4>
-                    <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
-                        114. An-Nas • 113. Al-Falaq • 112. Al-Ikhlas • 111. Al-Lahab • 110. An-Nasr • 109. Al-Kafirun • 108. Al-Kausar • 107. Al-Ma'un • 106. Quraisy • 105. Al-Fil • 104. Al-Humazah • 103. Al-'Asr • 102. At-Takasur • 101. Al-Qari'ah • 100. Al-'Adiyat • 99. Az-Zalzalah • 98. Al-Bayyinah • 97. Al-Qadr • 96. Al-'Alaq • 95. At-Tin • 94. Al-Insyirah • 93. Ad-Duha • 92. Al-Lail • 91. Asy-Syams • 90. Al-Balad • 89. Al-Fajr • 88. Al-Ghasyiyah • 87. Al-A'la • 86. At-Tariq • 85. Al-Buruj • 84. Al-Insyiqaq • 83. Al-Muthaffifin • 82. Al-Infitar • 81. At-Takwir • 80. 'Abasa • 79. An-Nazi'at • 78. An-Naba'
-                    </p>
-                </div>
-            </div>
-            <div class="p-2.5 bg-slate-50 dark:bg-slate-900 text-right">
-                <button onclick="window.closeSurahSequenceModal()" class="px-3 py-1 bg-slate-800 text-white rounded-lg text-xs font-bold">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST CONTAINER & CONFIRMATION MODAL -->
     <div id="toastContainer" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
 
-    <div id="customConfirmModal" class="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-xs w-full p-4 space-y-2.5 border">
-            <h3 id="confirmModalTitle" class="text-xs font-black text-slate-900 dark:text-white">Konfirmasi Tindakan</h3>
-            <p id="confirmModalMessage" class="text-[11px] text-slate-600 dark:text-slate-300"></p>
-            <div class="flex items-center justify-end gap-2 pt-2">
-                <button id="confirmCancelBtn" class="px-2.5 py-1 rounded-lg bg-slate-200 text-xs font-bold">Batal</button>
-                <button id="confirmOkBtn" class="px-3 py-1 rounded-lg bg-rose-600 text-white text-xs font-black">Lanjutkan</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // --- 0. LOGO FALLBACK HANDLER ---
+        window.santriList = [
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567801", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567802", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567803", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567804", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567811", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567843", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567855", weeklyBacaan: 0, weeklyHafalan: 0 }
+        ];
+
+        window.quranSurahs = [
+            { id: 1, name: "Al-Fatihah", ayat: 7 }, { id: 2, name: "Al-Baqarah", ayat: 286 }, { id: 78, name: "An-Naba'", ayat: 40 }, { id: 114, name: "An-Nas", ayat: 6 }
+        ];
+
         window.handleLogoError = function(img) {
+            if (!img) return;
             img.classList.add('hidden');
             const fallback = document.getElementById('defaultLogoIcon');
             if (fallback) fallback.classList.remove('hidden');
         };
-
-        // --- 1. MASTER SANTRI RESMI (87 SANTRI SESUAI SPREADSHEET GID 0) ---
-        window.santriList = [
-            // KELAS ABDURRAHMAN (Ustadz Sidik) - 10 Santri
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567801", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567802", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567803", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567804", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567805", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567806", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567807", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567808", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567809", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567810", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS ABU UBAIDAH (Ustadz Sidik) - 17 Santri
-            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567811", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ012", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567812", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ013", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567813", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567814", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ015", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567815", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ016", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567816", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ017", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567817", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ018", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567818", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ019", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567819", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ020", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567820", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ021", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567821", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ022", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567822", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ023", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567823", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ024", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567824", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ025", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567825", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ026", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567826", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ027", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567827", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS ZUBAIR (Ustadz Sidik) - 7 Santri
-            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Ustadz Sidik", phone: "6281234567828", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Ustadz Sidik", phone: "6281234567829", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Ustadz Sidik", phone: "6281234567830", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Ustadz Sidik", phone: "6281234567831", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Ustadz Sidik", phone: "6281234567832", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Ustadz Sidik", phone: "6281234567833", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Ustadz Sidik", phone: "6281234567834", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS ALI (Ustadz Sidik) - 5 Santri
-            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Ustadz Sidik", phone: "6281234567835", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Ustadz Sidik", phone: "6281234567836", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "6281234567837", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "6281234567838", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ039", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Ustadz Sidik", phone: "6281234567839", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS UTSMAN (Ustadz Sidik) - 3 Santri
-            { id: "IDSRQ040", name: "Alzam Irawan", class: "Utsman", teacher: "Ustadz Sidik", phone: "6281234567840", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ041", name: "Fathir Santosa", class: "Utsman", teacher: "Ustadz Sidik", phone: "6281234567841", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ042", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Ustadz Sidik", phone: "6281234567842", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS ABU BAKAR (Ustadzah Mega) - 12 Santri
-            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567843", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ044", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567844", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ045", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567845", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ046", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567846", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ047", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567847", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ048", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567848", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ049", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567849", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ050", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567850", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ051", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567851", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ052", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567852", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ053", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567853", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ054", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567854", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS BILAL (Ustadzah Mega) - 13 Santri
-            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567855", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ056", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567856", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ057", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567857", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ058", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567858", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ059", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567859", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ060", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567860", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ061", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567861", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ062", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567862", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ063", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567863", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ064", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567864", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ065", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567865", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ066", name: "Yumna Azkadina", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567866", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ067", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567867", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS HAMZAH (Ustadzah Mega) - 9 Santri
-            { id: "IDSRQ068", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567868", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ069", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567869", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ070", name: "Fathan Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567870", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ071", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567871", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ072", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567872", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ073", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567873", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ074", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567874", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ075", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567875", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ076", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "6281234567876", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS FATIMAH (Ustadzah Mega) - 5 Santri
-            { id: "IDSRQ077", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Ustadzah Mega", phone: "6281234567877", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ078", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Ustadzah Mega", phone: "6281234567878", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ079", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Ustadzah Mega", phone: "6281234567879", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ080", name: "Nurhalimah", class: "Fatimah", teacher: "Ustadzah Mega", phone: "6281234567880", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ081", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Ustadzah Mega", phone: "6281234567881", programJuz: "juz_30_dari_annaas" },
-
-            // KELAS UMAR (Ustadzah Mega) - 6 Santri
-            { id: "IDSRQ082", name: "Althaffatan Amsyar", class: "Umar", teacher: "Ustadzah Mega", phone: "6281234567882", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ083", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Ustadzah Mega", phone: "6281234567883", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ084", name: "M. Fauzan", class: "Umar", teacher: "Ustadzah Mega", phone: "6281234567884", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ085", name: "Yasif Abqory", class: "Umar", teacher: "Ustadzah Mega", phone: "6281234567885", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ086", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Ustadzah Mega", phone: "6281234567886", programJuz: "juz_30_dari_annaas" },
-            { id: "IDSRQ087", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Ustadzah Mega", phone: "6281234567887", programJuz: "juz_30_dari_annaas" }
-        ];
-
-        // --- 2. 114 SURAT AL-QUR'AN LENGKAP ---
-        window.quranSurahs = [
-            { id: 1, name: "Al-Fatihah", ayat: 7 }, { id: 2, name: "Al-Baqarah", ayat: 286 }, { id: 3, name: "Ali 'Imran", ayat: 200 },
-            { id: 4, name: "An-Nisa'", ayat: 176 }, { id: 5, name: "Al-Ma'idah", ayat: 120 }, { id: 6, name: "Al-An'am", ayat: 165 },
-            { id: 7, name: "Al-A'raf", ayat: 206 }, { id: 8, name: "Al-Anfal", ayat: 75 }, { id: 9, name: "At-Taubah", ayat: 129 },
-            { id: 10, name: "Yunus", ayat: 109 }, { id: 11, name: "Hud", ayat: 123 }, { id: 12, name: "Yusuf", ayat: 111 },
-            { id: 13, name: "Ar-Ra'd", ayat: 43 }, { id: 14, name: "Ibrahim", ayat: 52 }, { id: 15, name: "Al-Hijr", ayat: 99 },
-            { id: 16, name: "An-Nahl", ayat: 128 }, { id: 17, name: "Al-Isra'", ayat: 111 }, { id: 18, name: "Al-Kahf", ayat: 110 },
-            { id: 19, name: "Maryam", ayat: 98 }, { id: 20, name: "Ta-Ha", ayat: 135 }, { id: 21, name: "Al-Anbiya", ayat: 112 },
-            { id: 22, name: "Al-Hajj", ayat: 78 }, { id: 23, name: "Al-Mu'minun", ayat: 118 }, { id: 24, name: "An-Nur", ayat: 64 },
-            { id: 25, name: "Al-Furqan", ayat: 77 }, { id: 26, name: "Asy-Syu'ara'", ayat: 227 }, { id: 27, name: "An-Naml", ayat: 93 },
-            { id: 28, name: "Al-Qashas", ayat: 88 }, { id: 29, name: "Al-'Ankabut", ayat: 69 }, { id: 30, name: "Ar-Rum", ayat: 60 },
-            { id: 31, name: "Luqman", ayat: 34 }, { id: 32, name: "As-Sajdah", ayat: 30 }, { id: 33, name: "Al-Ahzab", ayat: 73 },
-            { id: 34, name: "Saba'", ayat: 54 }, { id: 35, name: "Fathir", ayat: 45 }, { id: 36, name: "Ya-Sin", ayat: 83 },
-            { id: 37, name: "Ash-Shaffat", ayat: 182 }, { id: 38, name: "Shad", ayat: 88 }, { id: 39, name: "Az-Zumar", ayat: 75 },
-            { id: 40, name: "Ghafir", ayat: 85 }, { id: 41, name: "Fushshilat", ayat: 54 }, { id: 42, name: "Asy-Syura", ayat: 53 },
-            { id: 43, name: "Az-Zukhruf", ayat: 89 }, { id: 44, name: "Ad-Dukhan", ayat: 59 }, { id: 45, name: "Al-Jatsiyah", ayat: 37 },
-            { id: 46, name: "Al-Ahqaf", ayat: 35 }, { id: 47, name: "Muhammad", ayat: 38 }, { id: 48, name: "Al-Fath", ayat: 29 },
-            { id: 49, name: "Al-Hujurat", ayat: 18 }, { id: 50, name: "Qaf", ayat: 45 }, { id: 51, name: "Adz-Dzariyat", ayat: 60 },
-            { id: 52, name: "Ath-Thur", ayat: 49 }, { id: 53, name: "An-Najm", ayat: 62 }, { id: 54, name: "Al-Qamar", ayat: 55 },
-            { id: 55, name: "Ar-Rahman", ayat: 78 }, { id: 56, name: "Al-Waqi'ah", ayat: 96 }, { id: 57, name: "Al-Hadid", ayat: 29 },
-            { id: 58, name: "Al-Mujadilah", ayat: 22 }, { id: 59, name: "Al-Hasyr", ayat: 24 }, { id: 60, name: "Al-Mumtahanah", ayat: 13 },
-            { id: 61, name: "Ash-Shaff", ayat: 14 }, { id: 62, name: "Al-Jumu'ah", ayat: 11 }, { id: 63, name: "Al-Munafiqun", ayat: 11 },
-            { id: 64, name: "At-Taghabun", ayat: 18 }, { id: 65, name: "Ath-Thalaq", ayat: 12 }, { id: 66, name: "At-Tahrim", ayat: 12 },
-            { id: 67, name: "Al-Mulk", ayat: 30 }, { id: 68, name: "Al-Qalam", ayat: 52 }, { id: 69, name: "Al-Haqqah", ayat: 52 },
-            { id: 70, name: "Al-Ma'arij", ayat: 44 }, { id: 71, name: "Nuh", ayat: 28 }, { id: 72, name: "Al-Jinn", ayat: 28 },
-            { id: 73, name: "Al-Muzzammil", ayat: 20 }, { id: 74, name: "Al-Muddassir", ayat: 56 }, { id: 75, name: "Al-Qiyamah", ayat: 40 },
-            { id: 76, name: "Al-Insan", ayat: 31 }, { id: 77, name: "Al-Mursalat", ayat: 50 }, { id: 78, name: "An-Naba'", ayat: 40 },
-            { id: 79, name: "An-Nazi'at", ayat: 46 }, { id: 80, name: "'Abasa", ayat: 42 }, { id: 81, name: "At-Takwir", ayat: 29 },
-            { id: 82, name: "Al-Infitar", ayat: 19 }, { id: 83, name: "Al-Muthaffifin", ayat: 36 }, { id: 84, name: "Al-Insyiqaq", ayat: 25 },
-            { id: 85, name: "Al-Buruj", ayat: 22 }, { id: 86, name: "At-Tariq", ayat: 17 }, { id: 87, name: "Al-A'la", ayat: 19 },
-            { id: 88, name: "Al-Ghasyiyah", ayat: 26 }, { id: 89, name: "Al-Fajr", ayat: 30 }, { id: 90, name: "Al-Balad", ayat: 20 },
-            { id: 91, name: "Asy-Syams", ayat: 15 }, { id: 92, name: "Al-Lail", ayat: 21 }, { id: 93, name: "Ad-Duha", ayat: 11 },
-            { id: 94, name: "Al-Insyirah", ayat: 8 }, { id: 95, name: "At-Tin", ayat: 8 }, { id: 96, name: "Al-'Alaq", ayat: 19 },
-            { id: 97, name: "Al-Qadr", ayat: 5 }, { id: 98, name: "Al-Bayyinah", ayat: 8 }, { id: 99, name: "Az-Zalzalah", ayat: 8 },
-            { id: 100, name: "Al-'Adiyat", ayat: 11 }, { id: 101, name: "Al-Qari'ah", ayat: 11 }, { id: 102, name: "At-Takasur", ayat: 8 },
-            { id: 103, name: "Al-'Asr", ayat: 3 }, { id: 104, name: "Al-Humazah", ayat: 9 }, { id: 105, name: "Al-Fil", ayat: 5 },
-            { id: 106, name: "Quraisy", ayat: 4 }, { id: 107, name: "Al-Ma'un", ayat: 7 }, { id: 108, name: "Al-Kausar", ayat: 3 },
-            { id: 109, name: "Al-Kafirun", ayat: 6 }, { id: 110, name: "An-Nasr", ayat: 3 }, { id: 111, name: "Al-Lahab", ayat: 5 },
-            { id: 112, name: "Al-Ikhlas", ayat: 4 }, { id: 113, name: "Al-Falaq", ayat: 5 }, { id: 114, name: "An-Nas", ayat: 6 }
-        ];
-
-        // --- 3. SILABUS LEVEL (6 TRACKS) ---
-        window.levelSyllabusData = {
-            juz_30_dari_annaas: {
-                title: "Juz 30 (Mulai: An-Naas)",
-                steps: [
-                    "Annaas s.d Al Zalzalah", "Al Bayyinah s.d Al 'Ala", "Annas s.d Al 'Ala",
-                    "Atthariq s/d Al Mutafiffin", "Al Infithar s/d Annaba", "Atthariq s/d Annaba",
-                    "Ujian Tertulis juz 30", "Ujian Lisan Juz 30 Lengkap"
-                ]
-            },
-            juz_30_dari_annaba: {
-                title: "Juz 30 (Mulai: An-Naba')",
-                steps: [
-                    "An Naba s/d Al Infithar", "Al Mutafiffin s/d Al 'Ala", "An Naba s/d Al 'Ala",
-                    "Al Ghosyi'ah s/d Al Bayyinah", "Al Zalzalah s/d Annas", "Al Ghosyi'ah s/d Annaas",
-                    "Ujian Tertulis juz 30", "Ujian Lisan Juz 30 Lengkap"
-                ]
-            },
-            juz_29_dari_almulk: {
-                title: "Juz 29 (Mulai: Al-Mulk)",
-                steps: [
-                    "Al Mulk - Al Qolam", "Al Haqqah - Al Ma'arij - Nuh", "Al Mulk s/d Nuh",
-                    "Al Jin - Al Muddatsir - Al Muzammil", "Al Qiyamah - Al Insan - Al Mursalaat",
-                    "Al Jin s/d Al Musalaat", "Ujian Tertulis juz 29", "Juz 29 Lengkap / Ujian Lisan"
-                ]
-            },
-            juz_29_dari_almursalaat: {
-                title: "Juz 29 (Mulai: Al-Mursalaat)",
-                steps: [
-                    "Al Mursalaat - Al Insan", "Al Qiyamah - Al Muaddatsir - Al Muzammil",
-                    "Al Mursalaat s/d Al Muzammil", "Al Jin - Nuh - Al Ma'arij",
-                    "Al Haqqah - Al Qolam - Al Mulk", "Al Jin s/d Al Mulk",
-                    "Ujian Tertulis juz 29", "Juz 29 Lengkap / Ujian Lisan"
-                ]
-            },
-            juz_28_dari_almujadalaah: {
-                title: "Juz 28 (Mulai: Al-Mujadilah)",
-                steps: [
-                    "Al Mujadalah - Al Hasyr", "Al Mumtahanah - Ash Shaff", "Al Mujadalah s/d Ash Shaff",
-                    "Al Jumu'ah - Al Munaafiquun - At Thaghabun", "Ath Thalaq - At Tahrim",
-                    "Al Jumu'ah s/d Attahrim", "Ujian Tertulis juz 28", "Juz 28 Lengkap"
-                ]
-            },
-            juz_28_dari_attahrim: {
-                title: "Juz 28 (Mulai: At-Tahrim)",
-                steps: [
-                    "Attahrim s/d Attholaq", "Attaghobun - Al Munaafiquun", "Attahrim s/d Al Munaafiqun",
-                    "Al Jumu'ah - Ashaff", "Al Hasyr - Al Mujaadalah", "Ashaff s/d Al Mujaadalah",
-                    "Ujian Tertulis juz 28", "Juz 28 Lengkap"
-                ]
-            }
-        };
-
-        // --- 4. VOICE SEARCH (PENCARIAN SUARA SANTRI) ---
-        window.isVoiceSearching = false;
-
-        window.startVoiceSearchSantri = function() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                window.showToast("Browser tidak mendukung Voice Recognition. Gunakan Chrome / Safari.", "warning");
-                return;
-            }
-
-            const rec = new SpeechRecognition();
-            rec.lang = 'id-ID';
-            rec.continuous = false;
-            rec.interimResults = false;
-
-            const iconWrapper = document.getElementById('voiceSearchIconWrapper');
-
-            rec.onstart = function() {
-                window.isVoiceSearching = true;
-                if (iconWrapper) {
-                    iconWrapper.className = "p-1 rounded-lg bg-rose-500 text-white mic-active flex items-center justify-center";
-                }
-                window.showToast("Mendengarkan nama santri... Silakan bicara.", "info");
-            };
-
-            rec.onresult = function(e) {
-                const transcript = e.results[0][0].transcript.trim();
-                const searchInp = document.getElementById('santriSearchInput');
-                if (searchInp) {
-                    searchInp.value = transcript;
-                    window.handleSearch(transcript);
-                }
-                window.showToast(`Mencari santri: "${transcript}"`, "success");
-            };
-
-            rec.onerror = function(e) {
-                window.showToast("Gagal mengenali suara. Coba ulangi lagi.", "warning");
-            };
-
-            rec.onend = function() {
-                window.isVoiceSearching = false;
-                if (iconWrapper) {
-                    iconWrapper.className = "p-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center";
-                }
-            };
-
-            rec.start();
-        };
-
-        // --- 5. DROPDOWN MENU INTERACTIVE TOGGLER ---
-        window.activeDropdown = null;
 
         window.toggleMenuDropdown = function(event, menuKey) {
             if (event) event.stopPropagation();
             const dropdown = document.getElementById(`dropdown-${menuKey}`);
             const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
             const allChevrons = document.querySelectorAll('[id^="chevron-"]');
-            
             const isCurrentlyOpen = dropdown && !dropdown.classList.contains('hidden');
 
             allDropdowns.forEach(d => d.classList.add('hidden'));
@@ -1072,546 +437,120 @@
                 dropdown.classList.remove('hidden');
                 const chevron = document.getElementById(`chevron-${menuKey}`);
                 if (chevron) chevron.classList.add('rotate-180');
-                window.activeDropdown = menuKey;
-            } else {
-                window.activeDropdown = null;
             }
-        };
-
-        window.closeAllDropdowns = function() {
-            document.querySelectorAll('[id^="dropdown-"]').forEach(d => d.classList.add('hidden'));
-            document.querySelectorAll('[id^="chevron-"]').forEach(c => c.classList.remove('rotate-180'));
-            window.activeDropdown = null;
         };
 
         document.addEventListener('click', function(e) {
-            const isInsideDropdown = e.target.closest('[id^="dropdown-"]');
-            const isInsideMenuBtn = e.target.closest('[id^="mainNav-"]');
-            if (!isInsideDropdown && !isInsideMenuBtn) {
-                window.closeAllDropdowns();
+            if (!e.target.closest('[id^="dropdown-"]') && !e.target.closest('[id^="mainNav-"]')) {
+                document.querySelectorAll('[id^="dropdown-"]').forEach(d => d.classList.add('hidden'));
+                document.querySelectorAll('[id^="chevron-"]').forEach(c => c.classList.remove('rotate-180'));
             }
         });
 
-        // --- 6. TAB SWITCHING ROUTER ---
-        window.activeSubTab = 'setoran';
-        window.currentMainMenu = 'input';
-
-        window.tabInfoLabels = {
-            setoran: { parent: 'input', label: 'Setoran Harian (Utama)' },
-            level: { parent: 'input', label: 'Input Pencapaian Level' },
-            murojaah: { parent: 'input', label: 'Muroja\'ah Manzili' },
-            viewlevels: { parent: 'input', label: 'Panduan Level Qur\'an' },
-            history: { parent: 'riwayat', label: 'Riwayat Setoran' },
-            level_history: { parent: 'riwayat', label: 'Riwayat Level' },
-            santri: { parent: 'riwayat', label: 'Riwayat Murid (87 Santri)' },
-            reports: { parent: 'laporan', label: 'Laporan Kelas' },
-            wa_report: { parent: 'laporan', label: 'Laporan WA Orang Tua' },
-            sync: { parent: 'input', label: 'Pengaturan & Sync' }
-        };
-
         window.switchTab = function(tabId) {
-            window.activeSubTab = tabId;
-            const allSections = ['setoran', 'santri', 'level', 'viewlevels', 'murojaah', 'history', 'level_history', 'reports', 'wa_report', 'sync'];
-            
-            allSections.forEach(t => {
-                const sec = document.getElementById(`section-${t}`);
-                if (sec) sec.classList.toggle('hidden', t !== tabId);
-            });
-
-            const info = window.tabInfoLabels[tabId] || { parent: 'input', label: tabId };
-            const badge = document.getElementById('activeTabBadgeText');
-            if (badge) badge.innerText = info.label;
-
-            ['input', 'riwayat', 'laporan'].forEach(k => {
-                const btn = document.getElementById(`mainNav-${k}`);
-                if (btn) {
-                    if (k === info.parent) {
-                        btn.className = "px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-white text-emerald-950 shadow-sm flex items-center gap-1.5 transition-all ring-2 ring-amber-400 shrink-0";
-                    } else {
-                        btn.className = "px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1.5 transition-all shrink-0";
-                    }
-                }
-            });
-
-            document.querySelectorAll('[id^="subItem-"]').forEach(el => {
-                el.classList.remove('bg-emerald-100', 'text-emerald-900', 'font-black', 'dark:bg-emerald-950', 'dark:text-emerald-300');
-            });
-            const activeSubItem = document.getElementById(`subItem-${tabId}`);
-            if (activeSubItem) {
-                activeSubItem.classList.add('bg-emerald-100', 'text-emerald-900', 'font-black', 'dark:bg-emerald-950', 'dark:text-emerald-300');
-            }
-
-            window.closeAllDropdowns();
-
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById(`section-${tabId}`);
+            if (target) target.classList.remove('hidden');
+            document.querySelectorAll('[id^="dropdown-"]').forEach(d => d.classList.add('hidden'));
             if (tabId === 'setoran') window.renderSantriCardsAndTable();
-            if (tabId === 'level') window.renderLevelAchievementUI();
-            if (tabId === 'viewlevels') window.renderSyllabusViewer('juz_30_dari_annaas');
-            if (tabId === 'murojaah') window.renderMurojaahTable();
             if (tabId === 'history') window.renderHistoryTable();
-            if (tabId === 'level_history') window.renderLevelHistoryTable();
             if (tabId === 'santri') window.renderMasterSantriTable();
-            if (tabId === 'reports') window.renderClassReports();
             if (tabId === 'wa_report') window.populateWaDropdown();
         };
 
-        // --- 7. CANVAS STATE & DUAL TOOLS ---
-        window.canvasState = {
-            bacaan: { tool: 'pen', color: '#ef4444', history: [] },
-            hafalan: { tool: 'pen', color: '#f59e0b', history: [] }
+        window.handleSearch = function(query) {
+            window.renderSantriCardsAndTable(query);
         };
 
-        window.toggleCanvasView = function(type) {
-            const wrap = document.getElementById(`canvasWrapper-${type}`);
-            const btnText = document.getElementById(`btnToggleText-${type}`);
-            if (!wrap) return;
-
-            const isHidden = wrap.classList.contains('hidden');
-            wrap.classList.toggle('hidden', !isHidden);
-            if (btnText) {
-                btnText.innerText = isHidden ? "Tutup Coretan" : "Buka Coretan";
-            }
-            if (isHidden) {
-                setTimeout(() => window.initCanvas(type), 50);
-            }
-        };
-
-        window.initCanvas = function(type) {
-            const canvas = document.getElementById(`${type}Canvas`);
-            if (!canvas) return;
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width || 380;
-            canvas.height = rect.height || 140;
-            const ctx = canvas.getContext('2d');
-            
-            if (window.canvasState[type].history.length === 0) {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                window.canvasState[type].history = [canvas.toDataURL()];
-            }
-
-            let drawing = false;
-
-            const getPos = (e) => {
-                const r = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return {
-                    x: (clientX - r.left) * (canvas.width / r.width),
-                    y: (clientY - r.top) * (canvas.height / r.height)
-                };
-            };
-
-            const startDraw = (e) => {
-                drawing = true;
-                const p = getPos(e);
-                ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                if (e.cancelable) e.preventDefault();
-            };
-
-            const doDraw = (e) => {
-                if (!drawing) return;
-                const p = getPos(e);
-                const st = window.canvasState[type];
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-
-                if (st.tool === 'pen') {
-                    ctx.globalAlpha = 1.0;
-                    ctx.strokeStyle = st.color;
-                    ctx.lineWidth = 2.5;
-                } else if (st.tool === 'highlighter') {
-                    ctx.globalAlpha = 0.35;
-                    ctx.strokeStyle = st.color;
-                    ctx.lineWidth = 14;
-                } else if (st.tool === 'eraser') {
-                    ctx.globalAlpha = 1.0;
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 20;
-                }
-
-                ctx.lineTo(p.x, p.y);
-                ctx.stroke();
-                if (e.cancelable) e.preventDefault();
-            };
-
-            const stopDraw = () => {
-                if (drawing) {
-                    drawing = false;
-                    window.canvasState[type].history.push(canvas.toDataURL());
+        window.startVoiceSearchSantri = function() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { window.showToast("Browser tidak mendukung Voice Search.", "warning"); return; }
+            const rec = new SpeechRecognition();
+            rec.lang = 'id-ID';
+            rec.onresult = function(e) {
+                const term = e.results[0][0].transcript.trim();
+                const searchEl = document.getElementById('santriSearchInput');
+                if (searchEl) {
+                    searchEl.value = term;
+                    window.renderSantriCardsAndTable(term);
                 }
             };
-
-            canvas.onmousedown = startDraw;
-            canvas.onmousemove = doDraw;
-            canvas.onmouseup = stopDraw;
-            canvas.onmouseleave = stopDraw;
-            canvas.ontouchstart = startDraw;
-            canvas.ontouchmove = doDraw;
-            canvas.ontouchend = stopDraw;
+            rec.start();
         };
 
-        window.setCanvasTool = function(type, tool) {
-            window.canvasState[type].tool = tool;
-            ['pen', 'highlighter', 'eraser'].forEach(t => {
-                const btn = document.getElementById(`tool-${type}-${t}`);
-                if (btn) {
-                    if (t === tool) {
-                        btn.className = `px-1.5 py-0.5 ${type === 'bacaan' ? 'bg-emerald-700' : 'bg-amber-700'} text-white rounded font-bold text-[10px]`;
-                    } else {
-                        btn.className = "px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-bold text-[10px]";
-                    }
-                }
-            });
-        };
-
-        window.setCanvasColor = function(type, color) {
-            window.canvasState[type].color = color;
-        };
-
-        window.undoCanvas = function(type) {
-            const canvas = document.getElementById(`${type}Canvas`);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const hist = window.canvasState[type].history;
-            if (hist.length > 1) {
-                hist.pop();
-                const img = new Image();
-                img.src = hist[hist.length - 1];
-                img.onload = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-                };
-            }
-        };
-
-        window.clearCanvas = function(type) {
-            const canvas = document.getElementById(`${type}Canvas`);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            window.canvasState[type].history = [canvas.toDataURL()];
-        };
-
-        window.handleCanvasImageUpload = function(type, input) {
-            if (!input.files || !input.files[0]) return;
-            const wrap = document.getElementById(`canvasWrapper-${type}`);
-            const btnText = document.getElementById(`btnToggleText-${type}`);
-            if (wrap && wrap.classList.contains('hidden')) {
-                wrap.classList.remove('hidden');
-                if (btnText) btnText.innerText = "Tutup Coretan";
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                setTimeout(() => {
-                    window.initCanvas(type);
-                    const canvas = document.getElementById(`${type}Canvas`);
-                    const ctx = canvas.getContext('2d');
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = function() {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        window.canvasState[type].history.push(canvas.toDataURL());
-                    };
-                }, 60);
+        window.toggleVoiceRecording = function(targetId) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { window.showToast("Browser tidak mendukung Voice Note.", "warning"); return; }
+            const rec = new SpeechRecognition();
+            rec.lang = 'id-ID';
+            rec.start();
+            window.showToast("Mendengarkan catatan...", "info");
+            rec.onresult = function(e) {
+                const transcript = e.results[0][0].transcript;
+                const el = document.getElementById(targetId);
+                if (el) el.value = el.value ? `${el.value} ${transcript}` : transcript;
             };
-            reader.readAsDataURL(input.files[0]);
         };
 
-        // --- 8. STORAGE & REPOSITORY ENGINE ---
-        window.loadLocalData = function() {
-            const saved = localStorage.getItem('rq_santri_db_v3');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    parsed.forEach(p => {
-                        const idx = window.santriList.findIndex(s => s.id === p.id);
-                        if (idx !== -1) {
-                            window.santriList[idx].lastBacaan = p.lastBacaan || window.santriList[idx].lastBacaan;
-                            window.santriList[idx].lastHafalan = p.lastHafalan || window.santriList[idx].lastHafalan;
-                            window.santriList[idx].lastDate = p.lastDate || window.santriList[idx].lastDate;
-                        }
-                    });
-                } catch (e) {}
-            }
+        window.showToast = function(msg, type = 'success') {
+            const c = document.getElementById('toastContainer');
+            if (!c) return;
+            const t = document.createElement('div');
+            t.className = `p-3 rounded-xl text-xs font-bold text-white shadow-lg ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
+            t.innerText = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
         };
 
-        window.saveLocalData = function() {
-            localStorage.setItem('rq_santri_db_v3', JSON.stringify(window.santriList));
-        };
-
-        window.getLevelStorage = function() {
-            return JSON.parse(localStorage.getItem('rq_level_db') || '{}');
-        };
-
-        window.saveLevelStorage = function(db) {
-            localStorage.setItem('rq_level_db', JSON.stringify(db));
-        };
-
-        window.getMurojaahStorage = function() {
-            return JSON.parse(localStorage.getItem('rq_murojaah_db') || '{}');
-        };
-
-        window.saveMurojaahStorage = function(db) {
-            localStorage.setItem('rq_murojaah_db', JSON.stringify(db));
-        };
-
-        // --- 9. TOAST NOTIFICATIONS & CONFIRM DIALOG ---
-        window.showToast = function(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            const toast = document.createElement('div');
-            const colors = {
-                success: 'bg-emerald-600 text-white shadow-emerald-600/30',
-                error: 'bg-rose-600 text-white shadow-rose-600/30',
-                info: 'bg-sky-600 text-white shadow-sky-600/30',
-                warning: 'bg-amber-500 text-slate-950 shadow-amber-500/30'
-            };
-            toast.className = `pointer-events-auto p-3 rounded-2xl shadow-lg border border-white/20 text-xs font-bold flex items-center justify-between gap-2 transition-all transform duration-200 translate-y-4 opacity-0 ${colors[type] || colors.info}`;
-            toast.innerHTML = `<span class="flex-1">${message}</span><button onclick="this.parentElement.remove()" class="text-xs opacity-70 hover:opacity-100">✕</button>`;
-            container.appendChild(toast);
-
-            setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 250);
-            }, 3500);
-        };
-
-        window.showConfirmDialog = function(title, message, onConfirm) {
-            const modal = document.getElementById('customConfirmModal');
-            if (!modal) {
-                if (onConfirm) onConfirm();
-                return;
-            }
-            document.getElementById('confirmModalTitle').innerText = title || 'Konfirmasi';
-            document.getElementById('confirmModalMessage').innerText = message || 'Lanjutkan tindakan?';
-            modal.classList.remove('hidden');
-
-            const okBtn = document.getElementById('confirmOkBtn');
-            const cancelBtn = document.getElementById('confirmCancelBtn');
-
-            const cleanUp = () => {
-                modal.classList.add('hidden');
-                okBtn.onclick = null;
-                cancelBtn.onclick = null;
-            };
-
-            okBtn.onclick = () => { cleanUp(); if (onConfirm) onConfirm(); };
-            cancelBtn.onclick = () => cleanUp();
-        };
-
-        // --- 10. AUDIO & SFX ---
-        window.soundEnabled = localStorage.getItem('rq_sound') !== 'false';
-        window.currentTheme = localStorage.getItem('rq_theme') || 'light';
         window.selectedTeacher = 'ALL';
         window.selectedClass = 'ALL';
         window.viewMode = 'grid';
-        window.activeSantriId = null;
 
-        window.playLaserSound = function() {
-            if (!window.soundEnabled) return;
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioContext();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(880, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.18);
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.18);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.18);
-            } catch (e) {}
-        };
-
-        window.triggerStarWars5xLaser = function() {
-            window.playLaserSound();
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    const laser = document.createElement('div');
-                    laser.className = 'laser-beam';
-                    laser.style.top = `${Math.random() * 80 + 10}vh`;
-                    laser.style.left = '-100px';
-                    laser.style.width = '200px';
-                    laser.style.transform = `rotate(${Math.random() * 30 - 15}deg)`;
-                    laser.style.opacity = '1';
-                    laser.style.transition = 'all 0.35s cubic-bezier(0.1, 1, 0.1, 1)';
-                    document.body.appendChild(laser);
-
-                    setTimeout(() => {
-                        laser.style.left = '110vw';
-                        laser.style.opacity = '0';
-                    }, 20);
-
-                    setTimeout(() => laser.remove(), 400);
-                }, i * 70);
-            }
-        };
-
-        window.applyTheme = function() {
-            const isDark = window.currentTheme === 'dark';
-            document.documentElement.classList.toggle('dark', isDark);
-            const wrapper = document.getElementById('themeIconWrapper');
-            if (wrapper) {
-                wrapper.innerHTML = isDark 
-                    ? `<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`
-                    : `<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
-            }
-        };
-
-        window.toggleTheme = function() {
-            window.currentTheme = window.currentTheme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('rq_theme', window.currentTheme);
-            window.applyTheme();
-        };
-
-        window.toggleSound = function() {
-            window.soundEnabled = !window.soundEnabled;
-            localStorage.setItem('rq_sound', window.soundEnabled);
-            const wrapper = document.getElementById('soundIconWrapper');
-            if (wrapper) {
-                wrapper.innerHTML = window.soundEnabled 
-                    ? `<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`
-                    : `<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>`;
-            }
-        };
-
-        // --- 11. RENDERING SETORAN HARIAN ---
-        window.switchTeacher = function(tVal) {
-            window.selectedTeacher = tVal;
-            window.renderSantriCardsAndTable();
-            if (window.activeSubTab === 'level') window.renderLevelAchievementUI();
-            if (window.activeSubTab === 'murojaah') window.renderMurojaahTable();
-        };
-
-        window.handleSearch = function(q) {
-            window.renderSantriCardsAndTable(q);
-        };
-
-        window.filterByClass = function(cVal) {
-            window.selectedClass = cVal;
-            window.renderSantriCardsAndTable();
-        };
-
-        window.setViewMode = function(mode) {
-            window.viewMode = mode;
-            document.getElementById('santriGridContainer').classList.toggle('hidden', mode !== 'grid');
-            document.getElementById('santriTableContainer').classList.toggle('hidden', mode !== 'table');
-            document.getElementById('viewModeGridBtn').className = mode === 'grid' ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700 dark:text-emerald-400" : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500";
-            document.getElementById('viewModeTableBtn').className = mode === 'table' ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700 dark:text-emerald-400" : "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500";
+        window.switchTeacher = function(v) { window.selectedTeacher = v; window.renderSantriCardsAndTable(); };
+        window.filterByClass = function(v) { window.selectedClass = v; window.renderSantriCardsAndTable(); };
+        window.setViewMode = function(m) {
+            window.viewMode = m;
+            const gridEl = document.getElementById('santriGridContainer');
+            const tableEl = document.getElementById('santriTableContainer');
+            if (gridEl) gridEl.classList.toggle('hidden', m !== 'grid');
+            if (tableEl) tableEl.classList.toggle('hidden', m !== 'table');
         };
 
         window.renderSantriCardsAndTable = function(query = '') {
             const grid = document.getElementById('santriGridContainer');
             const tbody = document.getElementById('santriTableBody');
-            if (!grid || !tbody) return;
-
-            const q = (query || document.getElementById('santriSearchInput')?.value || '').toLowerCase();
+            if (!grid) return;
+            const q = (query || '').toLowerCase();
             const filtered = window.santriList.filter(s => {
-                const matchQ = s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
+                const matchQ = s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q);
                 const matchT = window.selectedTeacher === 'ALL' || s.teacher === window.selectedTeacher;
                 const matchC = window.selectedClass === 'ALL' || s.class === window.selectedClass;
                 return matchQ && matchT && matchC;
             });
 
             grid.innerHTML = filtered.map(s => `
-                <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-xs border border-slate-200/80 dark:border-slate-700 hover:shadow-md transition-all flex flex-col justify-between space-y-2.5">
-                    <div class="flex items-start justify-between gap-2">
+                <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-2">
+                    <div class="flex items-start justify-between">
                         <div>
-                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${s.id}</span>
-                            <h3 class="text-xs font-extrabold text-slate-900 dark:text-white leading-tight">${s.name}</h3>
-                            <p class="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">${s.class} • ${s.teacher}</p>
+                            <span class="text-[9px] font-bold text-slate-400">${s.id}</span>
+                            <h3 class="text-xs font-extrabold text-slate-900 dark:text-white">${s.name}</h3>
+                            <p class="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">${s.class} • ${s.teacher}</p>
                         </div>
-                        <button onclick="window.openEditModal('${s.id}')" class="px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-bold flex items-center gap-1 border border-emerald-200 dark:border-emerald-800 shrink-0">
-                            <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            <span>Setor</span>
-                        </button>
-                    </div>
-                    <div class="space-y-1 pt-1.5 border-t border-slate-100 dark:border-slate-700 text-[11px]">
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-400 font-medium">Bacaan:</span>
-                            <span class="font-bold text-slate-700 dark:text-slate-200 truncate max-w-[140px]">${s.lastBacaan || '-'}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-400 font-medium">Hafalan:</span>
-                            <span class="font-bold text-slate-700 dark:text-slate-200 truncate max-w-[140px]">${s.lastHafalan || '-'}</span>
-                        </div>
+                        <button onclick="window.openEditModal('${s.id}')" class="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">Setor</button>
                     </div>
                 </div>
             `).join('');
 
-            tbody.innerHTML = filtered.map(s => `
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                    <td class="p-3">
-                        <span class="font-black text-slate-900 dark:text-white">${s.name}</span>
-                        <span class="block text-[10px] text-slate-400">${s.id}</span>
-                    </td>
-                    <td class="p-3 font-bold">${s.class}</td>
-                    <td class="p-3 font-bold">${s.lastBacaan || '-'}</td>
-                    <td class="p-3 font-bold">${s.lastHafalan || '-'}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="window.openEditModal('${s.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs mx-auto">
-                            Setor
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        };
-
-        window.populateSurahDropdowns = function() {
-            const bSelect = document.getElementById('bacaanSurahSelect');
-            const hSelect = document.getElementById('hafalanSurahSelect');
-            if (!bSelect || !hSelect) return;
-            const opts = (window.quranSurahs || []).map(s => `<option value="${s.id}">${s.id}. ${s.name} (${s.ayat} Ayat)</option>`).join('');
-            bSelect.innerHTML = opts;
-            hSelect.innerHTML = opts;
-        };
-
-        window.onBacaanCategoryChange = function(val) {
-            const qWrap = document.getElementById('bacaanQuranSurahWrapper');
-            const aWrap = document.getElementById('bacaanAyatRangeWrapper');
-            const iWrap = document.getElementById('bacaanIqroWrapper');
-            if (qWrap) qWrap.classList.toggle('hidden', val !== 'quran');
-            if (aWrap) aWrap.classList.toggle('hidden', val !== 'quran');
-            if (iWrap) iWrap.classList.toggle('hidden', val !== 'iqro');
-        };
-
-        window.updateBacaanAyatLimits = function() {
-            const bSelect = document.getElementById('bacaanSurahSelect');
-            if (!bSelect || !bSelect.value) return;
-            const sid = parseInt(bSelect.value);
-            const surah = (window.quranSurahs || []).find(s => s.id === sid);
-            if (surah) {
-                const startInp = document.getElementById('bacaanAyatStartInput');
-                const endInp = document.getElementById('bacaanAyatEndInput');
-                if (startInp) startInp.max = surah.ayat;
-                if (endInp) {
-                    endInp.max = surah.ayat;
-                    if (!endInp.value || parseInt(endInp.value) > surah.ayat) endInp.value = Math.min(7, surah.ayat);
-                }
-            }
-        };
-
-        window.updateHafalanAyatLimits = function() {
-            const hSelect = document.getElementById('hafalanSurahSelect');
-            if (!hSelect || !hSelect.value) return;
-            const sid = parseInt(hSelect.value);
-            const surah = (window.quranSurahs || []).find(s => s.id === sid);
-            if (surah) {
-                const startInp = document.getElementById('hafalanAyatStartInput');
-                const endInp = document.getElementById('hafalanAyatEndInput');
-                if (startInp) startInp.max = surah.ayat;
-                if (endInp) {
-                    endInp.max = surah.ayat;
-                    if (!endInp.value || parseInt(endInp.value) > surah.ayat) endInp.value = Math.min(7, surah.ayat);
-                }
+            if (tbody) {
+                tbody.innerHTML = filtered.map(s => `
+                    <tr>
+                        <td class="p-3 font-black">${s.name}</td>
+                        <td class="p-3">${s.class}</td>
+                        <td class="p-3">${s.lastBacaan || '-'}</td>
+                        <td class="p-3">${s.lastHafalan || '-'}</td>
+                        <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-2 py-1 bg-emerald-600 text-white rounded font-bold">Setor</button></td>
+                    </tr>
+                `).join('');
             }
         };
 
@@ -1619,413 +558,98 @@
             window.activeSantriId = id;
             const s = window.santriList.find(x => x.id === id);
             if (!s) return;
+            const nameEl = document.getElementById('modalSantriName');
+            const metaEl = document.getElementById('modalSantriMeta');
+            const dateEl = document.getElementById('modalTanggalInput');
+            if (nameEl) nameEl.innerText = `Setoran: ${s.name}`;
+            if (metaEl) metaEl.innerText = `${s.class} • ${s.teacher}`;
+            if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+            
+            const bKemarinText = document.getElementById('modalBacaanKemarinText');
+            const bKemarinAyat = document.getElementById('modalBacaanKemarinAyat');
+            if (bKemarinText) bKemarinText.innerText = s.lastBacaan || 'Belum ada data';
+            if (bKemarinAyat) bKemarinAyat.innerText = (s.lastBacaanAyat || 0) + ' ayat';
 
-            document.getElementById('modalSantriName').innerText = `Setoran: ${s.name}`;
-            document.getElementById('modalSantriMeta').innerText = `${s.class} • ${s.teacher}`;
-            document.getElementById('modalTanggalInput').value = new Date().toISOString().split('T')[0];
+            const hKemarinText = document.getElementById('modalHafalanKemarinText');
+            const hKemarinAyat = document.getElementById('modalHafalanKemarinAyat');
+            if (hKemarinText) hKemarinText.innerText = s.lastHafalan || 'Belum ada data';
+            if (hKemarinAyat) hKemarinAyat.innerText = (s.lastHafalanAyat || 0) + ' ayat';
 
-            document.getElementById('modalBacaanKemarinText').innerText = s.lastBacaan || 'Belum ada data sebelumnya';
-            document.getElementById('modalBacaanKemarinDate').innerText = s.lastDate ? `(${s.lastDate})` : '';
-            document.getElementById('modalHafalanKemarinText').innerText = s.lastHafalan || 'Belum ada data sebelumnya';
-            document.getElementById('modalHafalanKemarinDate').innerText = s.lastDate ? `(${s.lastDate})` : '';
-
-            // Reset collapsible canvas states on open to keep modal light
-            ['bacaan', 'hafalan'].forEach(t => {
-                const wrap = document.getElementById(`canvasWrapper-${t}`);
-                const btnText = document.getElementById(`btnToggleText-${t}`);
-                if (wrap) wrap.classList.add('hidden');
-                if (btnText) btnText.innerText = "Buka Coretan";
-            });
-
-            document.getElementById('setoranModal').classList.remove('hidden');
+            const modal = document.getElementById('setoranModal');
+            if (modal) modal.classList.remove('hidden');
+            window.calcBacaanTotals();
+            window.calcHafalanTotals();
         };
 
         window.closeEditModal = function() {
-            document.getElementById('setoranModal').classList.add('hidden');
+            const modal = document.getElementById('setoranModal');
+            if (modal) modal.classList.add('hidden');
         };
 
-        window.handleKondisiPhotoUpload = function(input) {
-            if (!input.files || !input.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('kondisiPhotoPreview').src = e.target.result;
-                document.getElementById('kondisiPhotoPreviewWrapper').classList.remove('hidden');
-            };
-            reader.readAsDataURL(input.files[0]);
+        window.calcBacaanTotals = function() {
+            const startInput = document.getElementById('bacaanAyatStartInput');
+            const endInput = document.getElementById('bacaanAyatEndInput');
+            const start = parseInt(startInput ? startInput.value : 1) || 1;
+            const end = parseInt(endInput ? endInput.value : 7) || 7;
+            const totalToday = Math.max(0, end - start + 1);
+            const s = window.santriList.find(x => x.id === window.activeSantriId);
+            const weekly = (s ? s.weeklyBacaan : 0) + totalToday;
+            const hTodayEl = document.getElementById('bacaanTotalHariIni');
+            const hSepekanEl = document.getElementById('bacaanTotalSepekan');
+            if (hTodayEl) hTodayEl.innerText = totalToday;
+            if (hSepekanEl) hSepekanEl.innerText = weekly;
         };
 
-        window.removeKondisiPhoto = function() {
-            document.getElementById('kondisiPhotoPreview').src = '';
-            document.getElementById('kondisiPhotoPreviewWrapper').classList.add('hidden');
-        };
-
-        window.toggleVoiceRecording = function(targetId) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                window.showToast("Browser tidak mendukung Web Speech.", "warning");
-                return;
-            }
-            const rec = new SpeechRecognition();
-            rec.lang = 'id-ID';
-            rec.start();
-            rec.onresult = function(e) {
-                const transcript = e.results[0][0].transcript;
-                const el = document.getElementById(targetId);
-                el.value = el.value ? `${el.value} ${transcript}` : transcript;
-            };
+        window.calcHafalanTotals = function() {
+            const startInput = document.getElementById('hafalanAyatStartInput');
+            const endInput = document.getElementById('hafalanAyatEndInput');
+            const start = parseInt(startInput ? startInput.value : 1) || 1;
+            const end = parseInt(endInput ? endInput.value : 7) || 7;
+            const totalToday = Math.max(0, end - start + 1);
+            const s = window.santriList.find(x => x.id === window.activeSantriId);
+            const weekly = (s ? s.weeklyHafalan : 0) + totalToday;
+            const hTodayEl = document.getElementById('hafalanTotalHariIni');
+            const hSepekanEl = document.getElementById('hafalanTotalSepekan');
+            if (hTodayEl) hTodayEl.innerText = totalToday;
+            if (hSepekanEl) hSepekanEl.innerText = weekly;
         };
 
         window.saveSetoranData = function() {
             const s = window.santriList.find(x => x.id === window.activeSantriId);
             if (!s) return;
-
-            const tgl = document.getElementById('modalTanggalInput')?.value || new Date().toISOString().split('T')[0];
-            const bCat = document.getElementById('bacaanCategorySelect')?.value || 'quran';
-            let bacaanStr = '-';
-            if (bCat === 'quran') {
-                const sSelectVal = document.getElementById('bacaanSurahSelect')?.value;
-                const sName = window.quranSurahs.find(x => x.id == sSelectVal)?.name || 'Al-Fatihah';
-                const aStart = document.getElementById('bacaanAyatStartInput')?.value || '1';
-                const aEnd = document.getElementById('bacaanAyatEndInput')?.value || '7';
-                bacaanStr = `QS ${sName}: ${aStart}-${aEnd}`;
-            } else {
-                const jilid = document.getElementById('bacaanIqroJilidSelect')?.value || 'Jilid 1';
-                const hal = document.getElementById('bacaanIqroHalamanInput')?.value || '1';
-                bacaanStr = `Iqro ${jilid} Hal ${hal}`;
-            }
-
-            const hSelectVal = document.getElementById('hafalanSurahSelect')?.value;
-            const hSurah = window.quranSurahs.find(x => x.id == hSelectVal)?.name || 'Al-Fatihah';
-            const hStart = document.getElementById('hafalanAyatStartInput')?.value || '1';
-            const hEnd = document.getElementById('hafalanAyatEndInput')?.value || '7';
-            const hafalanStr = `QS ${hSurah}: ${hStart}-${hEnd}`;
-
-            s.lastBacaan = bacaanStr;
-            s.lastHafalan = hafalanStr;
-            s.lastDate = tgl;
-            window.saveLocalData();
-
-            const bStatus = document.getElementById('bacaanStatusSelect')?.value || 'Lancar (A)';
-            const hStatus = document.getElementById('hafalanStatusSelect')?.value || 'Lancar (A)';
+            const bToday = parseInt(document.getElementById('bacaanTotalHariIni')?.innerText || 0);
+            const hToday = parseInt(document.getElementById('hafalanTotalHariIni')?.innerText || 0);
+            s.weeklyBacaan = parseInt(document.getElementById('bacaanTotalSepekan')?.innerText || 0);
+            s.weeklyHafalan = parseInt(document.getElementById('hafalanTotalSepekan')?.innerText || 0);
+            s.lastBacaan = `Ayat ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
+            s.lastBacaanAyat = bToday;
+            s.lastHafalan = `Ayat ${document.getElementById('hafalanAyatStartInput')?.value}-${document.getElementById('hafalanAyatEndInput')?.value}`;
+            s.lastHafalanAyat = hToday;
 
             const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
             history.unshift({
                 timestamp: new Date().toLocaleString('id-ID'),
-                id: s.id,
                 name: s.name,
-                bacaan: `${bacaanStr} (${bStatus})`,
-                hafalan: `${hafalanStr} (${hStatus})`,
-                tgl: tgl
+                bacaan: `${s.lastBacaan} (${bToday} ayat)`,
+                hafalan: `${s.lastHafalan} (${hToday} ayat)`
             });
             localStorage.setItem('rq_history_db', JSON.stringify(history));
 
-            window.triggerStarWars5xLaser();
-
-            const webhook = localStorage.getItem('rq_webhook_url');
-            if (webhook) {
-                const bCanvas = document.getElementById('bacaanCanvas');
-                const hCanvas = document.getElementById('hafalanCanvas');
-                const kImg = document.getElementById('kondisiPhotoPreview');
-
-                fetch(webhook, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        type: 'setoran_daily',
-                        id: s.id,
-                        name: s.name,
-                        class: s.class,
-                        teacher: s.teacher,
-                        tanggal: tgl,
-                        bacaanHariIni: bacaanStr,
-                        bacaanKemarin: document.getElementById('modalBacaanKemarinText')?.innerText || '-',
-                        bacaanStatus: bStatus,
-                        bacaanCatatan: document.getElementById('bacaanCatatanInput')?.value || '-',
-                        bacaanImage: bCanvas ? bCanvas.toDataURL('image/jpeg', 0.8) : '-',
-                        hafalanHariIni: hafalanStr,
-                        hafalanKemarin: document.getElementById('modalHafalanKemarinText')?.innerText || '-',
-                        hafalanStatus: hStatus,
-                        hafalanCatatan: document.getElementById('hafalanCatatanInput')?.value || '-',
-                        hafalanImage: hCanvas ? hCanvas.toDataURL('image/jpeg', 0.8) : '-',
-                        kondisiImage: (kImg && kImg.src && kImg.src.startsWith('data:image')) ? kImg.src : '-'
-                    })
-                }).catch(e => console.warn(e));
-            }
-
+            window.showToast("Setoran berhasil disimpan!", "success");
             window.closeEditModal();
             window.renderSantriCardsAndTable();
-            window.showToast("Setoran santri berhasil disimpan!", "success");
         };
 
-        // --- 12. LEVEL ACHIEVEMENT FUNCTIONS ---
-        window.renderLevelAchievementUI = function() {
-            const grid = document.getElementById('levelGridContainer');
-            if (!grid) return;
-
-            const q = (document.getElementById('levelSearchInput')?.value || '').toLowerCase();
-            const filterClass = document.getElementById('levelClassFilterSelect')?.value || 'ALL';
-            const filterTrack = document.getElementById('levelFilterSelect')?.value || 'ALL';
-            const levelDb = window.getLevelStorage();
-
-            const filtered = window.santriList.filter(s => {
-                const sLvl = levelDb[s.id] || { track: s.programJuz || 'juz_30_dari_annaas' };
-                const matchQ = s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
-                const matchC = filterClass === 'ALL' || s.class === filterClass;
-                const matchT = filterTrack === 'ALL' || sLvl.track === filterTrack;
-                const matchTeacher = window.selectedTeacher === 'ALL' || s.teacher === window.selectedTeacher;
-                return matchQ && matchC && matchT && matchTeacher;
-            });
-
-            grid.innerHTML = filtered.map(s => {
-                const sLvl = levelDb[s.id] || { track: s.programJuz || 'juz_30_dari_annaas', checked: [], ujianStatus: 'Belum Ujian', murojaahStatus: 'Belum' };
-                const syl = window.levelSyllabusData[sLvl.track] || window.levelSyllabusData.juz_30_dari_annaas;
-                const completedCount = (sLvl.checked || []).length;
-                const pct = Math.round((completedCount / 8) * 100);
-
-                const stepsHtml = syl.steps.map((step, idx) => {
-                    const isChecked = (sLvl.checked || []).includes(idx);
-                    return `
-                        <label class="flex items-start gap-1.5 p-1.5 rounded-lg cursor-pointer transition-all ${isChecked ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-300' : 'bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700'}">
-                            <input type="checkbox" onchange="window.toggleSantriLevelStep('${s.id}', ${idx}, this.checked)" ${isChecked ? 'checked' : ''} class="w-3.5 h-3.5 mt-0.5 rounded text-emerald-600">
-                            <div class="flex-1 min-w-0">
-                                <span class="text-[9px] font-black uppercase ${isChecked ? 'text-emerald-900 dark:text-emerald-300' : 'text-slate-500'}">Level ${idx + 1}</span>
-                                <p class="text-[10px] font-bold text-slate-800 dark:text-slate-200 leading-tight">${step}</p>
-                            </div>
-                        </label>
-                    `;
-                }).join('');
-
-                return `
-                    <div class="bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-xs border border-slate-200/80 dark:border-slate-700 flex flex-col justify-between space-y-2 text-xs">
-                        <div class="flex items-start justify-between gap-1.5">
-                            <div>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase">${s.id}</span>
-                                <h3 class="font-black text-slate-900 dark:text-white leading-tight">${s.name}</h3>
-                                <p class="text-[9px] text-emerald-700 dark:text-emerald-400 font-semibold">${s.class} • ${s.teacher}</p>
-                            </div>
-                            <button onclick="window.openLevelDetailModal('${s.id}')" class="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 font-bold text-[10px]">
-                                Detail
-                            </button>
-                        </div>
-                        <select onchange="window.changeSantriTrack('${s.id}', this.value)" class="w-full p-1 bg-slate-50 dark:bg-slate-900 border rounded-lg text-[10px] font-bold">
-                            <option value="juz_30_dari_annaas" ${sLvl.track === 'juz_30_dari_annaas' ? 'selected' : ''}>Juz 30 (An-Naas)</option>
-                            <option value="juz_30_dari_annaba" ${sLvl.track === 'juz_30_dari_annaba' ? 'selected' : ''}>Juz 30 (An-Naba')</option>
-                            <option value="juz_29_dari_almulk" ${sLvl.track === 'juz_29_dari_almulk' ? 'selected' : ''}>Juz 29 (Al-Mulk)</option>
-                            <option value="juz_29_dari_almursalaat" ${sLvl.track === 'juz_29_dari_almursalaat' ? 'selected' : ''}>Juz 29 (Al-Mursalaat)</option>
-                            <option value="juz_28_dari_almujadalaah" ${sLvl.track === 'juz_28_dari_almujadalaah' ? 'selected' : ''}>Juz 28 (Al-Mujadilah)</option>
-                            <option value="juz_28_dari_attahrim" ${sLvl.track === 'juz_28_dari_attahrim' ? 'selected' : ''}>Juz 28 (At-Tahrim)</option>
-                        </select>
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between text-[9px] font-bold">
-                                <span class="text-slate-500">Progres:</span>
-                                <span class="text-emerald-600 font-black">${completedCount}/8 (${pct}%)</span>
-                            </div>
-                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-emerald-500 h-full rounded-full transition-all" style="width: ${pct}%"></div>
-                            </div>
-                        </div>
-                        <div class="space-y-1">${stepsHtml}</div>
-                    </div>
-                `;
-            }).join('');
-        };
-
-        window.toggleSantriLevelStep = function(id, stepIndex, isChecked) {
-            const db = window.getLevelStorage();
-            if (!db[id]) db[id] = { track: 'juz_30_dari_annaas', checked: [], ujianStatus: 'Belum Ujian', murojaahStatus: 'Belum' };
-            if (!db[id].checked) db[id].checked = [];
-
-            if (isChecked && !db[id].checked.includes(stepIndex)) db[id].checked.push(stepIndex);
-            else if (!isChecked) db[id].checked = db[id].checked.filter(x => x !== stepIndex);
-            window.saveLevelStorage(db);
-
-            const s = window.santriList.find(x => x.id === id);
-            const syl = window.levelSyllabusData[db[id].track] || window.levelSyllabusData.juz_30_dari_annaas;
-            const history = JSON.parse(localStorage.getItem('rq_level_history_db') || '[]');
-            history.unshift({
-                timestamp: new Date().toLocaleString('id-ID'),
-                id: id,
-                name: s ? s.name : id,
-                program: syl.title,
-                levelTarget: `Level ${stepIndex + 1}: ${syl.steps[stepIndex] || ''}`,
-                status: isChecked ? 'Selesai' : 'Dibatalkan'
-            });
-            localStorage.setItem('rq_level_history_db', JSON.stringify(history));
-
-            window.renderLevelAchievementUI();
-            window.showToast(`Level ${stepIndex + 1} diperbarui!`, "success");
-        };
-
-        window.changeSantriTrack = function(id, newTrack) {
-            const db = window.getLevelStorage();
-            if (!db[id]) db[id] = { checked: [], ujianStatus: 'Belum Ujian' };
-            db[id].track = newTrack;
-            window.saveLevelStorage(db);
-            window.renderLevelAchievementUI();
-            window.showToast("Program Juz santri diubah.", "info");
-        };
-
-        window.openLevelDetailModal = function(id) {
-            window.activeSantriId = id;
-            const s = window.santriList.find(x => x.id === id);
-            const db = window.getLevelStorage();
-            const sLvl = db[id] || {};
-
-            document.getElementById('modalLvlSantriName').innerText = `Ujian: ${s ? s.name : id}`;
-            document.getElementById('modalLvlUjianStatus').value = sLvl.ujianStatus || 'Belum Ujian';
-            document.getElementById('modalLvlUjianDate').value = sLvl.ujianTanggal || new Date().toISOString().split('T')[0];
-            document.getElementById('modalLvlMurojaahStatus').value = sLvl.murojaahStatus || 'Belum';
-            document.getElementById('levelDetailModal').classList.remove('hidden');
-        };
-
-        window.closeLevelDetailModal = function() {
-            document.getElementById('levelDetailModal').classList.add('hidden');
-        };
-
-        window.saveLevelDetailModalData = function() {
-            const id = window.activeSantriId;
-            if (!id) return;
-            const db = window.getLevelStorage();
-            if (!db[id]) db[id] = { track: 'juz_30_dari_annaas', checked: [] };
-
-            db[id].ujianStatus = document.getElementById('modalLvlUjianStatus').value;
-            db[id].ujianTanggal = document.getElementById('modalLvlUjianDate').value;
-            db[id].murojaahStatus = document.getElementById('modalLvlMurojaahStatus').value;
-            window.saveLevelStorage(db);
-
-            window.closeLevelDetailModal();
-            window.renderLevelAchievementUI();
-            window.showToast("Data ujian santri disimpan!", "success");
-        };
-
-        // --- 13. MUROJA'AH MANZILI CHECKLIST TABLE ---
-        window.murojaahDayKeys = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Ahad'];
-
-        window.renderMurojaahTable = function() {
-            const tbody = document.getElementById('murojaahTableBody');
-            if (!tbody) return;
-
-            const q = (document.getElementById('murojaahSearchInput')?.value || '').toLowerCase();
-            const filterClass = document.getElementById('murojaahClassFilterSelect')?.value || 'ALL';
-            const mDb = window.getMurojaahStorage();
-
-            const filtered = window.santriList.filter(s => {
-                const matchQ = s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
-                const matchC = filterClass === 'ALL' || s.class === filterClass;
-                const matchTeacher = window.selectedTeacher === 'ALL' || s.teacher === window.selectedTeacher;
-                return matchQ && matchC && matchTeacher;
-            });
-
-            tbody.innerHTML = filtered.map(s => {
-                const sM = mDb[s.id] || { level: 'Level 1/2 Juz', days: {} };
-                const daysCheckedCount = window.murojaahDayKeys.filter(k => sM.days && sM.days[k]).length;
-                const pct = Math.round((daysCheckedCount / 7) * 100);
-
-                const checkBoxes = window.murojaahDayKeys.map(k => `
-                    <td class="p-1.5 text-center">
-                        <input type="checkbox" onchange="window.toggleMurojaahDayCheck('${s.id}', '${k}', this.checked)" ${sM.days && sM.days[k] ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-teal-600">
-                    </td>
-                `).join('');
-
-                return `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                        <td class="p-2">
-                            <span class="font-black text-slate-900 dark:text-white">${s.name}</span>
-                            <span class="block text-[9px] text-slate-400">${s.class}</span>
-                        </td>
-                        <td class="p-2">
-                            <select onchange="window.changeMurojaahSantriLevel('${s.id}', this.value)" class="p-1 bg-slate-50 dark:bg-slate-900 border rounded text-[10px] font-bold">
-                                <option value="Level 1/2 Juz" ${sM.level === 'Level 1/2 Juz' ? 'selected' : ''}>± 1/2 Juz</option>
-                                <option value="Level 1 Juz" ${sM.level === 'Level 1 Juz' ? 'selected' : ''}>1 Juz</option>
-                                <option value="Level 1,5 Juz" ${sM.level === 'Level 1,5 Juz' ? 'selected' : ''}>1,5 Juz</option>
-                                <option value="Level 2 Juz" ${sM.level === 'Level 2 Juz' ? 'selected' : ''}>2 Juz</option>
-                            </select>
-                        </td>
-                        ${checkBoxes}
-                        <td class="p-2 text-center font-black text-teal-700">${daysCheckedCount}/7 (${pct}%)</td>
-                    </tr>
-                `;
-            }).join('');
-        };
-
-        window.toggleMurojaahDayCheck = function(id, dayKey, isChecked) {
-            const db = window.getMurojaahStorage();
-            if (!db[id]) db[id] = { level: 'Level 1/2 Juz', days: {} };
-            if (!db[id].days) db[id].days = {};
-            db[id].days[dayKey] = isChecked;
-            window.saveMurojaahStorage(db);
-            window.renderMurojaahTable();
-        };
-
-        window.changeMurojaahSantriLevel = function(id, levelName) {
-            const db = window.getMurojaahStorage();
-            if (!db[id]) db[id] = { days: {} };
-            db[id].level = levelName;
-            window.saveMurojaahStorage(db);
-            window.showToast("Level Muroja'ah diubah.", "info");
-        };
-
-        window.resetCurrentWeekMurojaahChecklist = function() {
-            window.showConfirmDialog("Reset Pekan Ini", "Reset seluruh checklist pekan ini?", () => {
-                const db = window.getMurojaahStorage();
-                Object.keys(db).forEach(k => { db[k].days = {}; });
-                window.saveMurojaahStorage(db);
-                window.renderMurojaahTable();
-                window.showToast("Checklist direset.", "success");
-            });
-        };
-
-        window.openSurahSequenceModal = function() { document.getElementById('surahSeqModal').classList.remove('hidden'); };
-        window.closeSurahSequenceModal = function() { document.getElementById('surahSeqModal').classList.add('hidden'); };
-
-        window.renderSyllabusViewer = function(trackKey) {
-            const container = document.getElementById('syllabusGridContainer');
-            if (!container) return;
-            const data = window.levelSyllabusData[trackKey] || window.levelSyllabusData.juz_30_dari_annaas;
-            container.innerHTML = data.steps.map((st, i) => `
-                <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border space-y-1 text-xs">
-                    <span class="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded text-[9px] font-black uppercase">Level ${i + 1}</span>
-                    <p class="font-bold text-slate-900 dark:text-white">${st}</p>
-                </div>
-            `).join('');
-        };
-
-        // --- 14. TABLES, WA & WEBHOOK CONFIG ---
         window.renderHistoryTable = function() {
             const tbody = document.getElementById('historyTableBody');
             if (!tbody) return;
-            const list = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
-            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="5" class="p-3 text-center text-slate-400">Belum ada riwayat.</td></tr>` : list.map(item => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 font-bold">${item.tgl || '-'}</td>
-                    <td class="p-2.5 font-black">${item.name}</td>
-                    <td class="p-2.5 font-bold text-emerald-700">${item.bacaan}</td>
-                    <td class="p-2.5 font-bold text-amber-700">${item.hafalan}</td>
-                    <td class="p-2.5"><span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[9px] font-black">Tersimpan</span></td>
-                </tr>
-            `).join('');
-        };
-
-        window.clearHistoryLogs = function() {
-            window.showConfirmDialog("Hapus Riwayat", "Bersihkan semua log setoran lokal?", () => {
-                localStorage.removeItem('rq_history_db');
-                window.renderHistoryTable();
-                window.showToast("Riwayat dibersihkan.", "info");
-            });
-        };
-
-        window.renderLevelHistoryTable = function() {
-            const tbody = document.getElementById('levelHistoryTableBody');
-            if (!tbody) return;
-            const list = JSON.parse(localStorage.getItem('rq_level_history_db') || '[]');
-            tbody.innerHTML = list.length === 0 ? `<tr><td colspan="5" class="p-3 text-center text-slate-400">Belum ada data.</td></tr>` : list.map(item => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 text-slate-400">${item.timestamp}</td>
-                    <td class="p-2.5 font-black">${item.name}</td>
-                    <td class="p-2.5 font-bold">${item.program || '-'}</td>
-                    <td class="p-2.5 font-bold text-emerald-600">${item.levelTarget || '-'}</td>
-                    <td class="p-2.5 font-bold text-amber-600">${item.status || '-'}</td>
+            const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
+            tbody.innerHTML = history.map(h => `
+                <tr>
+                    <td class="p-2.5">${h.timestamp}</td>
+                    <td class="p-2.5 font-bold">${h.name}</td>
+                    <td class="p-2.5">${h.bacaan}</td>
+                    <td class="p-2.5">${h.hafalan}</td>
                 </tr>
             `).join('');
         };
@@ -2033,125 +657,64 @@
         window.renderMasterSantriTable = function() {
             const tbody = document.getElementById('santriMasterTableBody');
             if (!tbody) return;
-            tbody.innerHTML = window.santriList.map((s, idx) => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 text-slate-400 font-bold">${idx + 1}</td>
-                    <td class="p-2.5 font-mono text-slate-500">${s.id}</td>
-                    <td class="p-2.5 font-black">${s.name}</td>
-                    <td class="p-2.5 font-bold text-emerald-700">${s.class}</td>
-                    <td class="p-2.5 font-bold">${s.teacher}</td>
+            tbody.innerHTML = window.santriList.map(s => `
+                <tr>
+                    <td class="p-2.5">${s.id}</td>
+                    <td class="p-2.5 font-bold">${s.name}</td>
+                    <td class="p-2.5">${s.class}</td>
+                    <td class="p-2.5">${s.teacher}</td>
+                    <td class="p-2.5">${s.phone}</td>
                 </tr>
             `).join('');
         };
 
-        window.renderClassReports = function() {
-            const container = document.getElementById('classReportStatsContainer');
-            if (!container) return;
-            const classes = ['Abdurrahman', 'Abu Ubaidah', 'Zubair', 'Ali', 'Utsman', 'Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
-            container.innerHTML = classes.map(c => {
-                const count = window.santriList.filter(s => s.class === c).length;
-                const teacher = window.santriList.find(s => s.class === c)?.teacher || '-';
-                return `
-                    <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border space-y-1">
-                        <div class="flex items-center justify-between">
-                            <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[9px] font-black uppercase">Kelas ${c}</span>
-                            <span class="text-xs font-black text-slate-400">${count} Santri</span>
-                        </div>
-                        <h4 class="text-xs font-bold">${teacher}</h4>
-                    </div>
-                `;
-            }).join('');
-        };
-
         window.populateWaDropdown = function() {
-            const select = document.getElementById('waSantriSelect');
-            if (!select) return;
-            select.innerHTML = window.santriList.map(s => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('');
+            const sel = document.getElementById('waSantriSelect');
+            if (!sel) return;
+            sel.innerHTML = window.santriList.map(s => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('');
             window.generateWaReport();
         };
 
         window.generateWaReport = function() {
-            const sid = document.getElementById('waSantriSelect')?.value;
-            const s = window.santriList.find(x => x.id === sid);
+            const id = document.getElementById('waSantriSelect')?.value;
+            const s = window.santriList.find(x => x.id === id);
             if (!s) return;
-            document.getElementById('waPhoneInput').value = s.phone || '';
-            const tgl = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('waMessagePreview').value = `*Laporan Perkembangan Tahfizh RQ Al-Khansa*\n\nNama: *${s.name}*\nKelas: *${s.class}* (${s.teacher})\nTanggal: ${tgl}\n\n• Setoran Bacaan: ${s.lastBacaan || '-'}\n• Setoran Hafalan: ${s.lastHafalan || '-'}\n\nJazakumullahu khairan.`;
+            const phoneEl = document.getElementById('waPhoneInput');
+            const msgEl = document.getElementById('waMessagePreview');
+            if (phoneEl) phoneEl.value = s.phone || '';
+            if (msgEl) msgEl.value = `Assalamu'alaikum Wali Santri ${s.name}, berikut laporan setoran harian:\nBacaan: ${s.lastBacaan || '-'}\nHafalan: ${s.lastHafalan || '-'}\nBarakallahu fiikum.`;
         };
 
         window.copyWaReportText = function() {
-            navigator.clipboard.writeText(document.getElementById('waMessagePreview').value).then(() => {
-                window.showToast("Pesan disalin!", "success");
-            });
+            const text = document.getElementById('waMessagePreview')?.value;
+            if (text) {
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                el.remove();
+                window.showToast("Pesan laporan berhasil disalin!", "success");
+            }
         };
 
         window.sendWaReportDirect = function() {
-            const phone = document.getElementById('waPhoneInput').value.replace(/[^0-9]/g, '');
-            const text = encodeURIComponent(document.getElementById('waMessagePreview').value);
-            if (!phone) { window.showToast("Masukkan no HP wali santri.", "warning"); return; }
-            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
-        };
-
-        window.DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
-
-        window.getWebhookUrl = function() {
-            return localStorage.getItem('rq_webhook_url') || window.DEFAULT_WEBHOOK_URL;
-        };
-
-        window.saveWebhookConfig = function() {
-            const url = document.getElementById('webhookUrlInput').value.trim() || window.DEFAULT_WEBHOOK_URL;
-            localStorage.setItem('rq_webhook_url', url);
-            window.updateWebhookBadge();
-            window.showToast("URL Webhook disimpan!", "success");
-        };
-
-        window.updateWebhookBadge = function() {
-            const url = window.getWebhookUrl();
-            const badge = document.getElementById('webhookStatusBadge');
-            const input = document.getElementById('webhookUrlInput');
-            if (input) input.value = url;
-            if (badge) {
-                badge.innerText = url ? "Webhook Terhubung" : "Belum Disetel";
-                badge.className = url ? "px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-800" : "px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-slate-100 text-slate-500";
+            const phone = document.getElementById('waPhoneInput')?.value;
+            const text = document.getElementById('waMessagePreview')?.value;
+            if (phone && text) {
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
             }
         };
 
-        window.testWebhookConnection = async function() {
-            const url = window.getWebhookUrl();
-            const box = document.getElementById('webhookTestResultBox');
-            const title = document.getElementById('webhookTestResultTitle');
-            const detail = document.getElementById('webhookTestResultDetail');
-            if (!url) { window.showToast("Masukkan URL Webhook.", "warning"); return; }
-
-            box.classList.remove('hidden');
-            title.innerHTML = '<span class="text-amber-500 font-bold">Menguji Koneksi...</span>';
-            detail.innerText = "Target: " + url;
-
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                title.innerHTML = '<span class="text-emerald-600 font-bold">Koneksi Berhasil!</span>';
-                detail.innerText = JSON.stringify(data, null, 2);
-                window.showToast("Webhook Aktif!", "success");
-            } catch (err) {
-                title.innerHTML = '<span class="text-emerald-600 font-bold">Webhook Siap (CORS Mode)</span>';
-                detail.innerText = "Target: " + url + "\nData setoran akan otomatis terkirim via jalur POST.";
-                window.showToast("Webhook siap digunakan!", "info");
-            }
-        };
-
-        // --- 15. INITIALIZATION ON DOM READY ---
         document.addEventListener('DOMContentLoaded', () => {
-            if (!localStorage.getItem('rq_webhook_url')) {
-                localStorage.setItem('rq_webhook_url', window.DEFAULT_WEBHOOK_URL);
+            const bSelect = document.getElementById('bacaanSurahSelect');
+            const hSelect = document.getElementById('hafalanSurahSelect');
+            if (bSelect && hSelect) {
+                const opts = window.quranSurahs.map(x => `<option value="${x.id}">${x.name} (${x.ayat} Ayat)</option>`).join('');
+                bSelect.innerHTML = opts;
+                hSelect.innerHTML = opts;
             }
-            window.loadLocalData();
-            window.applyTheme();
-            window.populateSurahDropdowns();
-            window.updateBacaanAyatLimits();
-            window.updateHafalanAyatLimits();
-            window.updateWebhookBadge();
-            window.switchTab('setoran');
+            window.renderSantriCardsAndTable();
         });
     </script>
 </body>
