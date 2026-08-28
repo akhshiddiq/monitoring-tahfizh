@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Tahfizh RQ Al-Khansa</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -61,7 +62,7 @@
                             <span class="truncate">Monitoring Santri</span>
                             <span class="px-1.5 py-0.2 bg-amber-400 text-emerald-950 text-[9px] sm:text-xs font-black rounded shrink-0">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-[10px] text-emerald-200 font-medium truncate hidden sm:block">Setoran Bacaan, Hafalan & Muroja'ah</p>
+                        <p class="text-[10px] text-emerald-200 font-medium truncate hidden sm:block">Setoran Bacaan, Hafalan & Muroja'ah Mandiri</p>
                     </div>
                 </div>
 
@@ -257,7 +258,7 @@
                     </div>
                     <div>
                         <label class="font-bold text-slate-500">No WA Wali Santri:</label>
-                        <input type="text" id="waPhoneInput" class="w-full mt-1 p-2 bg-slate-50 border rounded-xl font-semibold">
+                        <input type="text" id="waPhoneInput" class="w-full mt-1 p-2 bg-slate-50 border rounded-xl font-semibold" value="085774042121">
                     </div>
                 </div>
                 <div>
@@ -403,13 +404,112 @@
 
     <script>
         window.santriList = [
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567801", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567802", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567803", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "6281234567804", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "6281234567811", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "6281234567843", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "6281234567855", weeklyBacaan: 0, weeklyHafalan: 0 }
+            // KELAS ABDURRAHMAN
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS ABU UBAIDAH
+            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ012", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ013", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ015", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ016", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ017", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ018", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ019", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ020", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ021", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ022", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ023", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ024", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ025", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ026", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ027", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS ZUBAIR
+            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS ALI
+            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ039", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS UTSMAN
+            { id: "IDSRQ040", name: "Alzam Irawan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ041", name: "Fathir Santosa", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ042", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS ABU BAKAR
+            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ044", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ045", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ046", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ047", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ048", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ049", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ050", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ051", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ052", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ053", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ054", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS BILAL
+            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ056", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ057", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ058", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ059", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ060", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ061", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ062", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ063", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ064", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ065", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ066", name: "Yumna Azkadina", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ067", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS HAMZAH
+            { id: "IDSRQ068", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ069", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ070", name: "Fathan Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ071", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ072", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ073", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ074", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ075", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ076", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS FATIMAH
+            { id: "IDSRQ077", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ078", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ079", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ080", name: "Nurhalimah", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ081", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+
+            // KELAS UMAR
+            { id: "IDSRQ082", name: "Althaffatan Amsyar", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ083", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ084", name: "M. Fauzan", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ085", name: "Yasif Abqory", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ086", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
+            { id: "IDSRQ087", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 }
         ];
 
         window.quranSurahs = [
@@ -635,7 +735,30 @@
             });
             localStorage.setItem('rq_history_db', JSON.stringify(history));
 
-            window.showToast("Setoran berhasil disimpan!", "success");
+            const webhook = "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
+            fetch(webhook, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    type: 'setoran_daily',
+                    id: s.id,
+                    name: s.name,
+                    class: s.class,
+                    teacher: s.teacher,
+                    tanggal: document.getElementById('modalTanggalInput')?.value || new Date().toISOString().split('T')[0],
+                    bacaanHariIni: s.lastBacaan,
+                    bacaanKemarin: document.getElementById('modalBacaanKemarinText')?.innerText || '-',
+                    bacaanStatus: document.getElementById('bacaanStatusSelect')?.value || 'Lancar (A)',
+                    bacaanCatatan: document.getElementById('bacaanCatatanInput')?.value || '-',
+                    hafalanHariIni: s.lastHafalan,
+                    hafalanKemarin: document.getElementById('modalHafalanKemarinText')?.innerText || '-',
+                    hafalanStatus: document.getElementById('hafalanStatusSelect')?.value || 'Lancar (A)',
+                    hafalanCatatan: document.getElementById('hafalanCatatanInput')?.value || '-'
+                })
+            }).catch(e => console.warn(e));
+
+            window.showToast("Setoran berhasil disimpan & disinkronkan!", "success");
             window.closeEditModal();
             window.renderSantriCardsAndTable();
         };
@@ -657,9 +780,10 @@
         window.renderMasterSantriTable = function() {
             const tbody = document.getElementById('santriMasterTableBody');
             if (!tbody) return;
-            tbody.innerHTML = window.santriList.map(s => `
+            tbody.innerHTML = window.santriList.map((s, idx) => `
                 <tr>
-                    <td class="p-2.5">${s.id}</td>
+                    <td class="p-2.5">${idx + 1}</td>
+                    <td class="p-2.5 font-bold">${s.id}</td>
                     <td class="p-2.5 font-bold">${s.name}</td>
                     <td class="p-2.5">${s.class}</td>
                     <td class="p-2.5">${s.teacher}</td>
@@ -681,7 +805,7 @@
             if (!s) return;
             const phoneEl = document.getElementById('waPhoneInput');
             const msgEl = document.getElementById('waMessagePreview');
-            if (phoneEl) phoneEl.value = s.phone || '';
+            if (phoneEl) phoneEl.value = s.phone || '085774042121';
             if (msgEl) msgEl.value = `Assalamu'alaikum Wali Santri ${s.name}, berikut laporan setoran harian:\nBacaan: ${s.lastBacaan || '-'}\nHafalan: ${s.lastHafalan || '-'}\nBarakallahu fiikum.`;
         };
 
@@ -699,9 +823,9 @@
         };
 
         window.sendWaReportDirect = function() {
-            const phone = document.getElementById('waPhoneInput')?.value;
+            const phone = document.getElementById('waPhoneInput')?.value || '085774042121';
             const text = document.getElementById('waMessagePreview')?.value;
-            if (phone && text) {
+            if (text) {
                 window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
             }
         };
