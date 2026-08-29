@@ -32,7 +32,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; }
         .quran-font { font-family: 'Amiri', serif; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
@@ -45,86 +45,86 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200 text-lg sm:text-xl">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200 text-base sm:text-lg">
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3.5 space-y-3">
+        <div class="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 space-y-2 sm:space-y-3">
             <!-- Top Row: Logo & Controls -->
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3.5 min-w-0">
+            <div class="flex items-center justify-between gap-2 sm:gap-3">
+                <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-12 h-12 sm:w-14 sm:h-14 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-lg font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-10 h-10 sm:w-14 sm:h-14 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-base sm:text-lg font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
                     <div class="min-w-0">
-                        <h1 class="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2.5 truncate">
+                        <h1 class="text-base sm:text-2xl font-black tracking-tight flex items-center gap-2 truncate">
                             <span class="truncate">Monitoring Santri</span>
-                            <span class="px-2.5 py-1 bg-amber-400 text-emerald-950 text-xs sm:text-sm font-black rounded shrink-0 shadow-xs">RQ AL-KHANSA</span>
+                            <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-[10px] sm:text-sm font-black rounded shrink-0 shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-sm sm:text-base text-emerald-200 font-bold truncate">Setoran Bacaan & Hafalan Harian</p>
+                        <p class="text-xs sm:text-base text-emerald-200 font-bold truncate">Setoran Bacaan & Hafalan Harian</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 shrink-0">
-                    <button id="soundToggleBtn" onclick="window.toggleSound()" title="Suara / SFX" class="p-2.5 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-base font-bold transition-colors">
-                        <span id="soundIconWrapper"><svg class="w-5 h-5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></span>
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <button id="soundToggleBtn" onclick="window.toggleSound()" title="Suara / SFX" class="p-2 sm:p-2.5 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-sm sm:text-base font-bold transition-colors">
+                        <span id="soundIconWrapper"><svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></span>
                     </button>
-                    <button onclick="window.toggleTheme()" title="Mode Gelap/Terang" class="p-2.5 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-base font-bold transition-colors">
-                        <span id="themeIconWrapper"><svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></span>
+                    <button onclick="window.toggleTheme()" title="Mode Gelap/Terang" class="p-2 sm:p-2.5 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-sm sm:text-base font-bold transition-colors">
+                        <span id="themeIconWrapper"><svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></span>
                     </button>
-                    <button onclick="window.switchTab('sync')" title="Pengaturan & Sync" class="px-3.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/50 text-sm sm:text-base font-bold transition-all flex items-center gap-1.5 shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    <button onclick="window.switchTab('sync')" title="Pengaturan & Sync" class="px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/50 text-xs sm:text-base font-bold transition-all flex items-center gap-1 shadow-sm">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                         <span class="hidden sm:inline">Sync</span>
                     </button>
                 </div>
             </div>
 
             <!-- Bottom Row: Teacher Selector & Nav Menus -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2.5 border-t border-emerald-700/40">
-                <select id="teacherFilterSelect" onchange="window.switchTeacher(this.value)" class="bg-emerald-900/95 dark:bg-slate-800 border border-emerald-600/70 text-white text-base sm:text-lg font-black rounded-xl px-3.5 py-2.5 outline-none cursor-pointer shadow-sm w-full sm:w-auto">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 pt-2 border-t border-emerald-700/40">
+                <select id="teacherFilterSelect" onchange="window.switchTeacher(this.value)" class="bg-emerald-900/95 dark:bg-slate-800 border border-emerald-600/70 text-white text-sm sm:text-base font-black rounded-xl px-3 py-2 outline-none cursor-pointer shadow-sm w-full sm:w-auto">
                     <option value="ALL">Semua Guru (10 Kelas)</option>
                     <option value="Ustadz Sidik">Ustadz Sidik</option>
                     <option value="Ustadzah Mega">Ustadzah Mega</option>
                 </select>
 
-                <div class="flex items-center gap-2 relative justify-end">
+                <div class="flex items-center gap-1.5 sm:gap-2 relative justify-end overflow-x-auto pb-1 sm:pb-0">
                     <!-- 1. INPUT -->
-                    <div class="relative">
-                        <button onclick="window.toggleMenuDropdown(event, 'input')" id="mainNav-input" class="px-4 py-2.5 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md flex items-center gap-1.5 transition-all ring-2 ring-amber-400">
+                    <div class="relative shrink-0">
+                        <button onclick="window.toggleMenuDropdown(event, 'input')" id="mainNav-input" class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-base font-black bg-white text-emerald-950 shadow-md flex items-center gap-1 transition-all ring-2 ring-amber-400">
                             <span>1. Input</span>
-                            <svg id="chevron-input" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            <svg id="chevron-input" class="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
-                        <div id="dropdown-input" class="hidden absolute right-0 sm:left-0 top-full mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
-                            <button onclick="window.switchTab('setoran')" id="subItem-setoran" class="w-full px-4 py-3 rounded-xl text-left text-base sm:text-lg font-black bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Setoran Harian (Utama)</button>
-                            <button onclick="window.switchTab('viewlevels')" id="subItem-viewlevels" class="w-full px-4 py-3 rounded-xl text-left text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Panduan Level Qur'an</button>
+                        <div id="dropdown-input" class="hidden absolute right-0 sm:left-0 top-full mt-2 w-48 sm:w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
+                            <button onclick="window.switchTab('setoran')" id="subItem-setoran" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-black bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Setoran Harian (Utama)</button>
+                            <button onclick="window.switchTab('viewlevels')" id="subItem-viewlevels" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Panduan Level Qur'an</button>
                         </div>
                     </div>
 
                     <!-- 2. RIWAYAT -->
-                    <div class="relative">
-                        <button onclick="window.toggleMenuDropdown(event, 'riwayat')" id="mainNav-riwayat" class="px-4 py-2.5 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1.5 transition-all">
+                    <div class="relative shrink-0">
+                        <button onclick="window.toggleMenuDropdown(event, 'riwayat')" id="mainNav-riwayat" class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1 transition-all">
                             <span>2. Riwayat</span>
-                            <svg id="chevron-riwayat" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            <svg id="chevron-riwayat" class="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
-                        <div id="dropdown-riwayat" class="hidden absolute right-0 sm:left-0 top-full mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
-                            <button onclick="window.switchTab('history')" id="subItem-history" class="w-full px-4 py-3 rounded-xl text-left text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Riwayat Setoran</button>
-                            <button onclick="window.switchTab('santri')" id="subItem-santri" class="w-full px-4 py-3 rounded-xl text-left text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
+                        <div id="dropdown-riwayat" class="hidden absolute right-0 sm:left-0 top-full mt-2 w-48 sm:w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
+                            <button onclick="window.switchTab('history')" id="subItem-history" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Riwayat Setoran</button>
+                            <button onclick="window.switchTab('santri')" id="subItem-santri" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
                                 <span>Riwayat Murid</span>
-                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-black rounded">87</span>
+                                <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black rounded">87</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 3. LAPORAN -->
-                    <div class="relative">
-                        <button onclick="window.toggleMenuDropdown(event, 'laporan')" id="mainNav-laporan" class="px-4 py-2.5 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1.5 transition-all">
+                    <div class="relative shrink-0">
+                        <button onclick="window.toggleMenuDropdown(event, 'laporan')" id="mainNav-laporan" class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1 transition-all">
                             <span>3. Laporan</span>
-                            <svg id="chevron-laporan" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            <svg id="chevron-laporan" class="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>
-                        <div id="dropdown-laporan" class="hidden absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
-                            <button onclick="window.switchTab('reports')" id="subItem-reports" class="w-full px-4 py-3 rounded-xl text-left text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Laporan Kelas</button>
-                            <button onclick="window.switchTab('wa_report')" id="subItem-wa_report" class="w-full px-4 py-3 rounded-xl text-left text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Laporan WA Orang Tua</button>
+                        <div id="dropdown-laporan" class="hidden absolute right-0 top-full mt-2 w-48 sm:w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
+                            <button onclick="window.switchTab('reports')" id="subItem-reports" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Laporan Kelas</button>
+                            <button onclick="window.switchTab('wa_report')" id="subItem-wa_report" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Laporan WA Orang Tua</button>
                         </div>
                     </div>
                 </div>
@@ -992,12 +992,27 @@
             if (!s) return;
             const phoneEl = document.getElementById('waPhoneInput');
             const msgEl = document.getElementById('waMessagePreview');
-            if (phoneEl) phoneEl.value = s.phone || '085774042121';
+            if (phoneEl) phoneEl.value = '+6285774042121';
 
-            // Conditional building of WhatsApp report based on user inputs
+            // Format tanggal hari ini dalam bahasa Indonesia
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('id-ID', options);
+
+            // Format "Kak" menggantikan Ustadz/Ustadzah
+            let teacherNameFormatted = s.teacher || '-';
+            teacherNameFormatted = teacherNameFormatted.replace(/^Ustadz\s+/i, 'Kak ').replace(/^Ustadzah\s+/i, 'Kak ');
+
+            // Kata-kata hangat pengantar & format KARTU PRESTASI SANTRI
             let msg = `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
-            `Kepada Yth. Ayah/Bunda dari ananda *${s.name}* (${s.class}), semoga senantiasa berada dalam limpahan rahmat, kesehatan, dan keberkahan Allah SWT.\n\n` +
-            `Bersama pesan ini, dengan hormat kami sampaikan perkembangan dan rekapitulasi setoran ibadah harian ananda pada hari ini:\n\n`;
+            `Ayah dan Bunda yang kami sayangi dan banggakan, semoga senantiasa diberikan kesehatan dan limpahan keberkahan oleh Allah SWT. 🤲✨\n\n` +
+            `*KARTU PRESTASI SANTRI*\n` +
+            `*Rumah Qur'an Al - Khansa*\n` +
+            `____________________\n` +
+            `👤 *Nama:* ${s.name}\n` +
+            `🏫 *Kelas:* ${s.class}\n` +
+            `✍️ *Pengajar:* ${teacherNameFormatted}\n` +
+            `📅 *Tanggal:* ${todayStr}\n` +
+            `____________________\n\n`;
 
             // Bacaan section if filled
             const bStatus = document.getElementById('bacaanStatusSelect')?.value;
@@ -1036,9 +1051,9 @@
                 msg += `\n`;
             }
 
-            msg += `Demikian laporan ini kami sampaikan dengan penuh rasa hormat. Jazakumullahu khairan katsiran atas perhatian, dukungan, dan bimbingan Ayah/Bunda di rumah.\n\n` +
-            `Wassalamu'alaikum Warahmatullahi Wabarakatuh.\n` +
-            `( Pengajar : ${s.teacher} )`;
+            msg += `Alhamdulillah, ananda terus menunjukkan semangat yang luar biasa dalam belajar bersama kami. Terima kasih banyak Ayah/Bunda atas kesabaran, cinta, dan bimbingan hangatnya di rumah. Jazakumullahu khairan katsiran.\n\n` +
+            `Wassalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
+            `( Pengajar : ${teacherNameFormatted} )`;
 
             if (msgEl) msgEl.value = msg;
         };
