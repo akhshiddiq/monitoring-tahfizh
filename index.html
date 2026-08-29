@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <!-- Bottom Row: Teacher Selector & Direct Nav Tabs -->
+            <!-- Bottom Row: Teacher Selector & Direct Nav Buttons (No Dropdown) -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-emerald-700/40">
                 <select id="teacherFilterSelect" onchange="window.switchTeacher(this.value)" class="bg-emerald-900/95 dark:bg-slate-800 border border-emerald-600/70 text-white text-xs sm:text-sm font-black rounded-xl px-3 py-2 outline-none cursor-pointer shadow-sm w-full sm:w-auto">
                     <option value="ALL">Semua Guru (10 Kelas)</option>
@@ -85,9 +85,9 @@
                 </select>
 
                 <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
-                    <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input Setoran</button>
+                    <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
                     <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
-                    <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Murid (87)</button>
+                    <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Murid</button>
                     <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
                     <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
                     <button onclick="window.switchTab('sync')" id="btnTab-sync" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sync Sheets</button>
@@ -170,10 +170,13 @@
             </div>
         </section>
 
-        <!-- 3. DATA MASTER SANTRI -->
+        <!-- 3. DATA MASTER SANTRI (WITH EDIT FEATURE) -->
         <section id="section-santri" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-3">
-                <h3 class="font-black text-lg sm:text-xl">Master Data 87 Santri (RQ Al-Khansa)</h3>
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-lg sm:text-xl">Master Data 87 Santri (RQ Al-Khansa)</h3>
+                    <span class="text-xs text-slate-500 font-bold">Klik Edit untuk mengubah data murid</span>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm sm:text-base">
                         <thead>
@@ -184,6 +187,7 @@
                                 <th class="p-3">Kelas</th>
                                 <th class="p-3">Pengajar</th>
                                 <th class="p-3">No HP / WA</th>
+                                <th class="p-3 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="santriMasterTableBody" class="divide-y"></tbody>
@@ -252,17 +256,19 @@
         <!-- 6. SYNC SETTINGS (SEPARATE GOOGLE SHEETS) -->
         <section id="section-sync" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4 text-sm sm:text-base">
-                <h3 class="font-black text-xl sm:text-2xl">Pengaturan Sinkronisasi Google Sheets</h3>
+                <h3 class="font-black text-xl sm:text-2xl">Pengaturan Sinkronisasi Google Sheets (Pemisahan Tab)</h3>
                 <p class="text-slate-500 text-xs sm:text-sm">Konfigurasi endpoint webhook Google Apps Script untuk pemisahan data <strong>Bacaan</strong> dan <strong>Hafalan</strong>.</p>
                 
                 <div class="space-y-3">
                     <div>
                         <label class="font-extrabold text-emerald-700 dark:text-emerald-400">Webhook Google Sheet - Setoran BACAAN:</label>
                         <input type="text" id="webhookBacaanUrlInput" class="w-full mt-1 p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
+                        <span class="text-[11px] text-slate-400">Target Sheet ID: 1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I (gid=1254448464)</span>
                     </div>
                     <div>
                         <label class="font-extrabold text-amber-600 dark:text-amber-400">Webhook Google Sheet - Setoran HAFALAN:</label>
                         <input type="text" id="webhookHafalanUrlInput" class="w-full mt-1 p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
+                        <span class="text-[11px] text-slate-400">Target Sheet ID: 1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I (gid=1929280793)</span>
                     </div>
                 </div>
                 <button onclick="window.showToast('Pengaturan Webhook berhasil disimpan!', 'success')" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-black">Simpan Pengaturan</button>
@@ -270,6 +276,7 @@
         </section>
     </main>
 
+    <!-- SETORAN MODAL -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-sm sm:text-base">
             <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
@@ -345,6 +352,20 @@
                         </div>
                         <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid / kelancaran..." class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-medium outline-none auto-expand text-sm"></textarea>
                     </div>
+                    <!-- Upload Foto Bacaan -->
+                    <div class="space-y-2 pt-1 border-t border-emerald-200 dark:border-emerald-800/60">
+                        <div class="flex items-center justify-between">
+                            <label class="font-bold text-slate-600 dark:text-slate-300 text-xs">Foto Lembar Bacaan:</label>
+                            <label class="cursor-pointer px-3 py-1.5 bg-emerald-200 hover:bg-emerald-300 text-emerald-950 rounded-xl text-xs font-black inline-flex items-center gap-1">
+                                <i class="fa-solid fa-camera"></i> <span>Unggah Foto</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="window.handlePhotoUpload('bacaan', this)">
+                            </label>
+                        </div>
+                        <div id="bacaanPhotoPreviewWrapper" class="hidden relative w-full h-36 bg-slate-200 dark:bg-slate-800 rounded-xl overflow-hidden border">
+                            <img id="bacaanPhotoPreview" src="" class="w-full h-full object-cover">
+                            <button type="button" onclick="window.removePhoto('bacaan')" class="absolute top-2 right-2 p-1.5 bg-rose-600 text-white rounded-full text-xs font-bold shadow-md">✕</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 2. SETORAN HAFALAN -->
@@ -416,6 +437,20 @@
                         </div>
                         <textarea id="hafalanCatatanInput" rows="2" placeholder="Catatan kelancaran hafalan..." class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-medium outline-none auto-expand text-sm"></textarea>
                     </div>
+                    <!-- Upload Foto Hafalan -->
+                    <div class="space-y-2 pt-1 border-t border-amber-200 dark:border-amber-800/60">
+                        <div class="flex items-center justify-between">
+                            <label class="font-bold text-slate-600 dark:text-slate-300 text-xs">Foto Setoran Hafalan:</label>
+                            <label class="cursor-pointer px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-950 rounded-xl text-xs font-black inline-flex items-center gap-1">
+                                <i class="fa-solid fa-camera"></i> <span>Unggah Foto</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="window.handlePhotoUpload('hafalan', this)">
+                            </label>
+                        </div>
+                        <div id="hafalanPhotoPreviewWrapper" class="hidden relative w-full h-36 bg-slate-200 dark:bg-slate-800 rounded-xl overflow-hidden border">
+                            <img id="hafalanPhotoPreview" src="" class="w-full h-full object-cover">
+                            <button type="button" onclick="window.removePhoto('hafalan')" class="absolute top-2 right-2 p-1.5 bg-rose-600 text-white rounded-full text-xs font-bold shadow-md">✕</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
@@ -425,107 +460,140 @@
         </div>
     </div>
 
+    <!-- EDIT SANTRI MASTER MODAL -->
+    <div id="editSantriModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-md w-full flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-sm sm:text-base">
+            <div class="px-5 py-3.5 bg-emerald-800 text-white flex items-center justify-between shrink-0">
+                <h3 class="font-black text-lg">Edit Data Santri</h3>
+                <button onclick="window.closeEditSantriModal()" class="p-1.5 rounded-xl hover:bg-white/10 text-white font-black">✕</button>
+            </div>
+            <div class="p-4 sm:p-5 space-y-3">
+                <input type="hidden" id="editSantriId">
+                <div>
+                    <label class="font-extrabold text-xs text-slate-500">Nama Santri:</label>
+                    <input type="text" id="editSantriNameInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="font-extrabold text-xs text-slate-500">Kelas:</label>
+                    <input type="text" id="editSantriClassInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="font-extrabold text-xs text-slate-500">Pengajar:</label>
+                    <input type="text" id="editSantriTeacherInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="font-extrabold text-xs text-slate-500">No HP / WA Wali:</label>
+                    <input type="text" id="editSantriPhoneInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold" value="+6285774042121">
+                </div>
+            </div>
+            <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
+                <button onclick="window.closeEditSantriModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold">Batal</button>
+                <button onclick="window.saveSantriMasterData()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toastContainer" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
 
     <script>
         // Master Dataset of 87 Santri across 10 Classes with sample initial progress for class report
         window.santriList = [
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 14, lastHafalanAyat: 10 },
-            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 12, lastBacaan: "Iqro 6 hlm 5", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 10, lastHafalanAyat: 12 },
-            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-20", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 20, lastHafalanAyat: 15 },
-            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 10, lastBacaan: "An-Nisa' 1-15", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 15, lastHafalanAyat: 10 },
-            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 14, lastBacaan: "Al-Ma'idah 1-12", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 12, lastHafalanAyat: 14 },
-            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 20, lastBacaan: "Al-An'am 1-18", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 18, lastHafalanAyat: 20 },
-            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al-A'raf 1-14", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 14, lastHafalanAyat: 14 },
-            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Al-Anfal 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 10 },
-            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 16, lastBacaan: "At-Taubah 1-16", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 16, lastHafalanAyat: 16 },
-            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 15, lastBacaan: "Yunus 1-15", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 15, lastHafalanAyat: 15 },
-            // ABU UBAIDAH (17 students matching requested class report format)
-            { id: "IDSRQ011", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 18, lastBacaan: "Al Baqarah 94", lastHafalan: "Al Mujaadalah 1- 18", lastBacaanAyat: 15, lastHafalanAyat: 18 },
-            { id: "IDSRQ012", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 6 hlm 10", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 12, lastHafalanAyat: 10 },
-            { id: "IDSRQ013", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 2 halaman 19", lastHafalan: "Annas s.d Al Maun", lastBacaanAyat: 10, lastHafalanAyat: 10 },
-            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2 halaman 22 lanjut 24", lastHafalan: "Surat Annas s.d Surat Al Qodr", lastBacaanAyat: 14, lastHafalanAyat: 12 },
-            { id: "IDSRQ015", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 11, lastBacaan: "Iqro 3 hlm 16", lastHafalan: "Annas s.d Al Ashr", lastBacaanAyat: 16, lastHafalanAyat: 11 },
-            { id: "IDSRQ016", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 21, weeklyHafalan: 10, lastBacaan: "Iqro 4 hlm 21", lastHafalan: "Al Qodr - Al 'Alaq", lastBacaanAyat: 21, lastHafalanAyat: 10 },
-            { id: "IDSRQ017", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 13, weeklyHafalan: 8, lastBacaan: "Surah Al Imran ayat 132", lastHafalan: "Surah Al-Insan 1– 8", lastBacaanAyat: 13, lastHafalanAyat: 8 },
-            { id: "IDSRQ018", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 9, lastBacaan: "Iqro 3 lanjut hlm 8", lastHafalan: "Annas s.d Al Ma'un", lastBacaanAyat: 12, lastHafalanAyat: 9 },
-            { id: "IDSRQ019", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 24, weeklyHafalan: 15, lastBacaan: "Iqro 4 hlm 23 lanjut 24", lastHafalan: "Surat Annas s.d Surat Al Qoriah", lastBacaanAyat: 24, lastHafalanAyat: 15 },
-            { id: "IDSRQ020", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 30, weeklyHafalan: 20, lastBacaan: "Juzz 'amma Annas s.d Al Adiyaat", lastHafalan: "Annas s.d surat Al balad 1-15", lastBacaanAyat: 30, lastHafalanAyat: 20 },
-            { id: "IDSRQ021", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 27, weeklyHafalan: 25, lastBacaan: "Iqro 4 hlm 27 (Lanjut)", lastHafalan: "An-Nas s.d. Surah Al-Lail 1-15", lastBacaanAyat: 27, lastHafalanAyat: 25 },
-            { id: "IDSRQ022", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 210, weeklyHafalan: 30, lastBacaan: "Surah Al-Baqarah 210", lastHafalan: "An-Nas s.d. Surah Al-Insyiqaq 1-12", lastBacaanAyat: 210, lastHafalanAyat: 30 },
-            { id: "IDSRQ023", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 6, weeklyHafalan: 0, lastBacaan: "Iqro 2 hlm 6", lastHafalan: "-", lastBacaanAyat: 6, lastHafalanAyat: 0 },
-            { id: "IDSRQ024", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 194, weeklyHafalan: 36, lastBacaan: "Surah Ali 'Imran 194", lastHafalan: "An-Nas s.d. Surah Al-Mutaffifin", lastBacaanAyat: 194, lastHafalanAyat: 36 },
-            { id: "IDSRQ025", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 263, weeklyHafalan: 50, lastBacaan: "Surah Al-Baqarah 263", lastHafalan: "An-Nas s.d. An-Naba .. juz 29 AL MULK ayat 88", lastBacaanAyat: 263, lastHafalanAyat: 50 },
-            { id: "IDSRQ026", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 85, weeklyHafalan: 40, lastBacaan: "Al Baqoroh ayat 85 & Iqro 5 hal17", lastHafalan: "Annas s.d Surat Annaziat", lastBacaanAyat: 85, lastHafalanAyat: 40 },
-            { id: "IDSRQ027", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 21, weeklyHafalan: 7, lastBacaan: "Iqro 2 halaman 21", lastHafalan: "Surat Annashr", lastBacaanAyat: 21, lastHafalanAyat: 7 },
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 14, lastHafalanAyat: 10 },
+            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 10, weeklyHafalan: 12, lastBacaan: "Iqro 6 hlm 5", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 10, lastHafalanAyat: 12 },
+            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-20", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 20, lastHafalanAyat: 15 },
+            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 10, lastBacaan: "An-Nisa' 1-15", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 15, lastHafalanAyat: 10 },
+            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 14, lastBacaan: "Al-Ma'idah 1-12", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 12, lastHafalanAyat: 14 },
+            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 20, lastBacaan: "Al-An'am 1-18", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 18, lastHafalanAyat: 20 },
+            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al-A'raf 1-14", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 14, lastHafalanAyat: 14 },
+            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Al-Anfal 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 10 },
+            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 16, lastBacaan: "At-Taubah 1-16", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 16, lastHafalanAyat: 16 },
+            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 15, lastBacaan: "Yunus 1-15", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 15, lastHafalanAyat: 15 },
+            // ABU UBAIDAH (Exact initial data matching your class report list)
+            { id: "IDSRQ011", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 18, lastBacaan: "Al Baqarah 94", lastHafalan: "Al Mujaadalah 1- 18", lastBacaanAyat: 15, lastHafalanAyat: 18 },
+            { id: "IDSRQ012", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 6 hlm 10", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 12, lastHafalanAyat: 10 },
+            { id: "IDSRQ013", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 2 halaman 19", lastHafalan: "Annas s.d Al Maun", lastBacaanAyat: 10, lastHafalanAyat: 10 },
+            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2 halaman 22 lanjut 24", lastHafalan: "Surat Annas s.d Surat Al Qodr", lastBacaanAyat: 14, lastHafalanAyat: 12 },
+            { id: "IDSRQ015", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 11, lastBacaan: "Iqro 3 hlm 16", lastHafalan: "Annas s.d Al Ashr", lastBacaanAyat: 16, lastHafalanAyat: 11 },
+            { id: "IDSRQ016", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 21, weeklyHafalan: 10, lastBacaan: "Iqro 4 hlm 21", lastHafalan: "Al Qodr - Al 'Alaq", lastBacaanAyat: 21, lastHafalanAyat: 10 },
+            { id: "IDSRQ017", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 13, weeklyHafalan: 8, lastBacaan: "Surah Al Imran ayat 132", lastHafalan: "Surah Al-Insan 1– 8", lastBacaanAyat: 13, lastHafalanAyat: 8 },
+            { id: "IDSRQ018", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 9, lastBacaan: "Iqro 3 lanjut hlm 8", lastHafalan: "Annas s.d Al Ma'un", lastBacaanAyat: 12, lastHafalanAyat: 9 },
+            { id: "IDSRQ019", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 24, weeklyHafalan: 15, lastBacaan: "Iqro 4 hlm 23 lanjut 24", lastHafalan: "Surat Annas s.d Surat Al Qoriah", lastBacaanAyat: 24, lastHafalanAyat: 15 },
+            { id: "IDSRQ020", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 30, weeklyHafalan: 20, lastBacaan: "Juzz 'amma Annas s.d Al Adiyaat", lastHafalan: "Annas s.d surat Al balad 1-15", lastBacaanAyat: 30, lastHafalanAyat: 20 },
+            { id: "IDSRQ021", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 27, weeklyHafalan: 25, lastBacaan: "Iqro 4 hlm 27 (Lanjut)", lastHafalan: "An-Nas s.d. Surah Al-Lail 1-15", lastBacaanAyat: 27, lastHafalanAyat: 25 },
+            { id: "IDSRQ022", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 210, weeklyHafalan: 30, lastBacaan: "Surah Al-Baqarah 210", lastHafalan: "An-Nas s.d. Surah Al-Insyiqaq 1-12", lastBacaanAyat: 210, lastHafalanAyat: 30 },
+            { id: "IDSRQ023", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 6, weeklyHafalan: 0, lastBacaan: "Iqro 2 hlm 6", lastHafalan: "-", lastBacaanAyat: 6, lastHafalanAyat: 0 },
+            { id: "IDSRQ024", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 194, weeklyHafalan: 36, lastBacaan: "Surah Ali 'Imran 194", lastHafalan: "An-Nas s.d. Surah Al-Mutaffifin", lastBacaanAyat: 194, lastHafalanAyat: 36 },
+            { id: "IDSRQ025", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 263, weeklyHafalan: 50, lastBacaan: "Surah Al-Baqarah 263", lastHafalan: "An-Nas s.d. An-Naba .. juz 29 AL MULK ayat 88", lastBacaanAyat: 263, lastHafalanAyat: 50 },
+            { id: "IDSRQ026", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 85, weeklyHafalan: 40, lastBacaan: "Al Baqoroh ayat 85 & Iqro 5 hal17", lastHafalan: "Annas s.d Surat Annaziat", lastBacaanAyat: 85, lastHafalanAyat: 40 },
+            { id: "IDSRQ027", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 21, weeklyHafalan: 7, lastBacaan: "Iqro 2 halaman 21", lastHafalan: "Surat Annashr", lastBacaanAyat: 21, lastHafalanAyat: 7 },
             // ZUBAIR
-            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 1 hlm 10", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
-            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 2 hlm 5", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 15, lastHafalanAyat: 12 },
-            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 3 hlm 4", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 12, lastHafalanAyat: 10 },
-            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 15, lastBacaan: "Iqro 4 hlm 8", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 14, lastHafalanAyat: 15 },
-            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "Iqro 5 hlm 12", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 16 },
-            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Fatihah", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 7, lastHafalanAyat: 18 },
-            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 25, weeklyHafalan: 20, lastBacaan: "Al-Baqarah 1-5", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 5, lastHafalanAyat: 20 },
+            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 1 hlm 10", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 2 hlm 5", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 3 hlm 4", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 12, lastHafalanAyat: 10 },
+            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 15, lastBacaan: "Iqro 4 hlm 8", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 14, lastHafalanAyat: 15 },
+            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "Iqro 5 hlm 12", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 16 },
+            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Fatihah", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 7, lastHafalanAyat: 18 },
+            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 25, weeklyHafalan: 20, lastBacaan: "Al-Baqarah 1-5", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 5, lastHafalanAyat: 20 },
             // ALI
-            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
-            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 10 },
-            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 12 },
-            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 18, lastHafalanAyat: 15 },
-            { id: "IDSRQ039", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 10", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 10 },
+            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ039", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 10", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
             // UTSMAN
-            { id: "IDSRQ040", name: "Alzam Irawan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 2", lastHafalan: "An-Nas", lastBacaanAyat: 12, lastHafalanAyat: 1 },
-            { id: "IDSRQ041", name: "Fathir Santosa", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 15, lastHafalanAyat: 12 },
-            { id: "IDSRQ042", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ040", name: "Alzam Irawan", class: "Utsman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 2", lastHafalan: "An-Nas", lastBacaanAyat: 12, lastHafalanAyat: 1 },
+            { id: "IDSRQ041", name: "Fathir Santosa", class: "Utsman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ042", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Ustadz Sidik", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 18, lastHafalanAyat: 15 },
             // ABU BAKAR
-            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
-            { id: "IDSRQ044", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
-            { id: "IDSRQ045", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 14 },
-            { id: "IDSRQ046", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 18, lastHafalanAyat: 16 },
-            { id: "IDSRQ047", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
-            { id: "IDSRQ048", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 10, lastHafalanAyat: 20 },
-            { id: "IDSRQ049", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 15, lastHafalanAyat: 12 },
-            { id: "IDSRQ050", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 16, lastHafalanAyat: 14 },
-            { id: "IDSRQ051", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
-            { id: "IDSRQ052", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 19, weeklyHafalan: 16, lastBacaan: "An-Nisa' 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 16 },
-            { id: "IDSRQ053", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Ma'idah 1-10", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 10, lastHafalanAyat: 18 },
-            { id: "IDSRQ054", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-An'am 1-10", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 10, lastHafalanAyat: 20 },
+            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ044", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ045", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 14 },
+            { id: "IDSRQ046", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 18, lastHafalanAyat: 16 },
+            { id: "IDSRQ047", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ048", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 10, lastHafalanAyat: 20 },
+            { id: "IDSRQ049", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ050", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ051", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
+            { id: "IDSRQ052", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 19, weeklyHafalan: 16, lastBacaan: "An-Nisa' 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 16 },
+            { id: "IDSRQ053", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Ma'idah 1-10", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ054", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-An'am 1-10", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 10, lastHafalanAyat: 20 },
             // BILAL
-            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
-            { id: "IDSRQ056", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
-            { id: "IDSRQ057", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
-            { id: "IDSRQ058", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
-            { id: "IDSRQ059", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
-            { id: "IDSRQ060", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 },
-            { id: "IDSRQ061", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 10, lastHafalanAyat: 18 },
-            { id: "IDSRQ062", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 10, lastHafalanAyat: 14 },
-            { id: "IDSRQ063", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
-            { id: "IDSRQ064", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "An-Nisa' 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 16 },
-            { id: "IDSRQ065", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 19, weeklyHafalan: 17, lastBacaan: "Al-Ma'idah 1-10", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 10, lastHafalanAyat: 17 },
-            { id: "IDSRQ066", name: "Yumna Azkadina", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-An'am 1-10", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
-            { id: "IDSRQ067", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-A'raf 1-10", lastHafalan: "An-Nas s.d. At-Takatsur", lastBacaanAyat: 10, lastHafalanAyat: 20 },
+            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ056", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ057", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ058", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ059", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ060", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 },
+            { id: "IDSRQ061", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 22, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ062", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 10, lastHafalanAyat: 14 },
+            { id: "IDSRQ063", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
+            { id: "IDSRQ064", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "An-Nisa' 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 16 },
+            { id: "IDSRQ065", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 19, weeklyHafalan: 17, lastBacaan: "Al-Ma'idah 1-10", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 10, lastHafalanAyat: 17 },
+            { id: "IDSRQ066", name: "Yumna Azkadina", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-An'am 1-10", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ067", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-A'raf 1-10", lastHafalan: "An-Nas s.d. At-Takatsur", lastBacaanAyat: 10, lastHafalanAyat: 20 },
             // HAMZAH
-            { id: "IDSRQ068", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
-            { id: "IDSRQ069", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
-            { id: "IDSRQ070", name: "Fathan Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
-            { id: "IDSRQ071", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
-            { id: "IDSRQ072", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
-            { id: "IDSRQ073", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 },
-            { id: "IDSRQ074", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 10, lastHafalanAyat: 18 },
-            { id: "IDSRQ075", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 10, lastHafalanAyat: 14 },
-            { id: "IDSRQ076", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
+            { id: "IDSRQ068", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ069", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ070", name: "Fathan Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ071", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ072", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ073", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 },
+            { id: "IDSRQ074", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 22, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ075", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 10, lastHafalanAyat: 14 },
+            { id: "IDSRQ076", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
             // FATIMAH
-            { id: "IDSRQ077", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
-            { id: "IDSRQ078", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
-            { id: "IDSRQ079", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
-            { id: "IDSRQ080", name: "Nurhalimah", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
-            { id: "IDSRQ081", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ077", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ078", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ079", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ080", name: "Nurhalimah", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ081", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
             // UMAR
-            { id: "IDSRQ082", name: "Althaffatan Amsyar", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
-            { id: "IDSRQ083", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
-            { id: "IDSRQ084", name: "M. Fauzan", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
-            { id: "IDSRQ085", name: "Yasif Abqory", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
-            { id: "IDSRQ086", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
-            { id: "IDSRQ087", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 }
+            { id: "IDSRQ082", name: "Althaffatan Amsyar", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ083", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Ustadz Mega", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ084", name: "M. Fauzan", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ085", name: "Yasif Abqory", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ086", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ087", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 }
         ];
 
         // 114 Surahs with exact ayat counts and Mushaf page data
@@ -582,7 +650,6 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            // Highlight active tab
             ['setoran', 'history', 'santri', 'wa_report', 'class_report', 'sync'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
@@ -778,6 +845,9 @@
             if (hKemarinText) hKemarinText.innerText = s.lastHafalan || 'Belum ada data';
             if (hKemarinAyat) hKemarinAyat.innerText = (s.lastHafalanAyat || 0) + ' ayat';
 
+            window.removePhoto('bacaan');
+            window.removePhoto('hafalan');
+
             const modal = document.getElementById('setoranModal');
             if (modal) modal.classList.remove('hidden');
             
@@ -796,6 +866,31 @@
         window.closeEditModal = function() {
             const modal = document.getElementById('setoranModal');
             if (modal) modal.classList.add('hidden');
+        };
+
+        window.handlePhotoUpload = function(type, input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                window[`${type}PhotoData`] = e.target.result;
+                const preview = document.getElementById(`${type}PhotoPreview`);
+                const wrapper = document.getElementById(`${type}PhotoPreviewWrapper`);
+                if (preview && wrapper) {
+                    preview.src = e.target.result;
+                    wrapper.classList.remove('hidden');
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
+
+        window.removePhoto = function(type) {
+            window[`${type}PhotoData`] = null;
+            const preview = document.getElementById(`${type}PhotoPreview`);
+            const wrapper = document.getElementById(`${type}PhotoPreviewWrapper`);
+            if (preview && wrapper) {
+                preview.src = '';
+                wrapper.classList.add('hidden');
+            }
         };
 
         window.calcBacaanTotals = function() {
@@ -836,14 +931,11 @@
             
             const bSurahId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
             const bSurahObj = window.quranSurahs.find(x => x.id === bSurahId);
-            const bHal = document.getElementById('bacaanMushafHalInput')?.value || `Hal.${bSurahObj ? bSurahObj.hal : 1}`;
             s.lastBacaan = `${bSurahObj ? bSurahObj.name : 'Al-Fatihah'} ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
             s.lastBacaanAyat = bToday;
 
             const hSurahId = parseInt(document.getElementById('hafalanSurahSelect')?.value || 1);
             const hSurahObj = window.quranSurahs.find(x => x.id === hSurahId);
-            const hHal = document.getElementById('hafalanMushafHalInput')?.value || `Hal.${hSurahObj ? hSurahObj.hal : 1}`;
-            
             const currentHafalanLevel = document.getElementById('hafalanCurrentLevelInput')?.value || '-';
             const hafalanUjianStatus = document.getElementById('hafalanUjianStatusSelect')?.value || 'Belum diuji';
             const hafalanUjianManual = document.getElementById('hafalanUjianQuranManualInput')?.value || '-';
@@ -862,7 +954,7 @@
 
             const tanggalVal = document.getElementById('modalTanggalInput')?.value || new Date().toISOString().split('T')[0];
 
-            // 1. SYNC BACAAN TO GOOGLE SHEET 1
+            // 1. SYNC BACAAN TO GOOGLE SHEET 1 (gid=1254448464)
             const webhookBacaan = document.getElementById('webhookBacaanUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
             fetch(webhookBacaan, {
                 method: 'POST',
@@ -870,6 +962,8 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
                     type: 'setoran_bacaan',
+                    sheetId: '1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I',
+                    gid: '1254448464',
                     id: s.id,
                     name: s.name,
                     class: s.class,
@@ -879,11 +973,12 @@
                     bacaanStatus: document.getElementById('bacaanStatusSelect')?.value || 'Lancar (A)',
                     bacaanCatatan: document.getElementById('bacaanCatatanInput')?.value || '-',
                     bacaanTotalAyat: bToday,
-                    bacaanSepekan: s.weeklyBacaan
+                    bacaanSepekan: s.weeklyBacaan,
+                    fotoBacaan: window.bacaanPhotoData || ''
                 })
             }).catch(e => console.warn(e));
 
-            // 2. SYNC HAFALAN TO GOOGLE SHEET 2
+            // 2. SYNC HAFALAN TO GOOGLE SHEET 2 (gid=1929280793)
             const webhookHafalan = document.getElementById('webhookHafalanUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
             fetch(webhookHafalan, {
                 method: 'POST',
@@ -891,6 +986,8 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
                     type: 'setoran_hafalan',
+                    sheetId: '1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I',
+                    gid: '1929280793',
                     id: s.id,
                     name: s.name,
                     class: s.class,
@@ -903,11 +1000,12 @@
                     hafalanUjianManual: hafalanUjianManual,
                     hafalanCatatan: document.getElementById('hafalanCatatanInput')?.value || '-',
                     hafalanTotalAyat: hToday,
-                    hafalanSepekan: s.weeklyHafalan
+                    hafalanSepekan: s.weeklyHafalan,
+                    fotoHafalan: window.hafalanPhotoData || ''
                 })
             }).catch(e => console.warn(e));
 
-            window.showToast("Setoran berhasil disimpan & disinkronkan ke 2 Google Sheets!", "success");
+            window.showToast("Setoran berhasil disimpan & disinkronkan ke Google Sheets!", "success");
             window.closeEditModal();
             window.renderSantriCardsAndTable();
         };
@@ -937,8 +1035,40 @@
                     <td class="p-3 text-xs sm:text-sm">${s.class}</td>
                     <td class="p-3 text-xs sm:text-sm">${s.teacher}</td>
                     <td class="p-3 text-xs sm:text-sm">${s.phone}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="window.openEditSantriModal('${s.id}')" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs shadow-xs">Edit</button>
+                    </td>
                 </tr>
             `).join('');
+        };
+
+        window.openEditSantriModal = function(id) {
+            const s = window.santriList.find(x => x.id === id);
+            if (!s) return;
+            document.getElementById('editSantriId').value = s.id;
+            document.getElementById('editSantriNameInput').value = s.name;
+            document.getElementById('editSantriClassInput').value = s.class;
+            document.getElementById('editSantriTeacherInput').value = s.teacher;
+            document.getElementById('editSantriPhoneInput').value = s.phone || '+62585774042121';
+            document.getElementById('editSantriModal').classList.remove('hidden');
+        };
+
+        window.closeEditSantriModal = function() {
+            document.getElementById('editSantriModal').classList.add('hidden');
+        };
+
+        window.saveSantriMasterData = function() {
+            const id = document.getElementById('editSantriId').value;
+            const s = window.santriList.find(x => x.id === id);
+            if (!s) return;
+            s.name = document.getElementById('editSantriNameInput').value;
+            s.class = document.getElementById('editSantriClassInput').value;
+            s.teacher = document.getElementById('editSantriTeacherInput').value;
+            s.phone = document.getElementById('editSantriPhoneInput').value;
+            window.showToast("Data santri berhasil diperbarui!", "success");
+            window.closeEditSantriModal();
+            window.renderMasterSantriTable();
+            window.renderSantriCardsAndTable();
         };
 
         window.populateWaDropdown = function() {
@@ -960,7 +1090,9 @@
             const todayStr = new Date().toLocaleDateString('id-ID', options);
             let teacherFormatted = (s.teacher || '-').replace(/^Ustadz\s+/i, 'Kak ').replace(/^Ustadzah\s+/i, 'Kak ');
 
-            let msg = `*KARTU PRESTASI SANTRI*\n` +
+            let msg = `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
+            `Ayah/Bunda yang selalu dirahmati Allah SWT, semoga senantiasa diberikan kesehatan, keberkahan, dan limpahan kebahagiaan dalam keluarga. Aamiin.\n\n` +
+            `*KARTU PRESTASI SANTRI*\n` +
             `*Rumah Qur'an Al - Khansa*\n` +
             `____________________\n` +
             `👤 *Nama:* ${s.name}\n` +
@@ -981,7 +1113,7 @@
                 `• Jumlah Hari Ini: ${s.lastHafalanAyat || 0} ayat\n\n`;
             }
 
-            msg += `Alhamdulillah, ananda terus menunjukkan semangat luar biasa. Terima kasih banyak Ayah/Bunda atas bimbingan hangatnya di rumah. Jazakumullahu khairan katsiran.\n\n` +
+            msg += `Alhamdulillah, ananda terus menunjukkan semangat belajar yang sangat luar biasa setiap harinya. Terima kasih yang tak terhingga kami ucapkan kepada Ayah/Bunda atas kesabaran dan kehangatan bimbingannya di rumah. Jazakumullahu khairan katsiran.\n\n` +
             `Wassalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
             `( Pengajar : ${teacherFormatted} )`;
 
@@ -1002,7 +1134,7 @@
         };
 
         window.sendWaReportDirect = function() {
-            const phone = document.getElementById('waPhoneInput')?.value || '+6285774042121';
+            const phone = document.getElementById('waPhoneInput')?.value || '+62585774042121';
             const text = document.getElementById('waMessagePreview')?.value;
             if (text) {
                 window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
@@ -1015,7 +1147,8 @@
             const santrisInClass = window.santriList.filter(s => s.class === className);
             
             let msg = `بِسْمِ ٱللَّٰهِ\n` +
-            `Ayah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas ${className}:\n\n`;
+            `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
+            `Ayah/Bunda tercinta yang semoga senantiasa dirahmati dan diberkahi Allah SWT. Berikut dengan senang hati kami haturkan rekapan perkembangan hafalan dan bacaan santri kelas ${className}:\n\n`;
 
             const numberEmojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "1️⃣1️⃣", "1️⃣2️⃣", "1️⃣3️⃣", "1️⃣4️⃣", "1️⃣5️⃣", "1️⃣6️⃣", "1️⃣7️⃣", "1️⃣8️⃣", "1️⃣9️⃣", "2️⃣0️⃣"];
 
@@ -1027,6 +1160,8 @@
                 `📖 Bacaan: ${bacaanText}\n` +
                 `💡 Hafalan: ${hafalanText}\n\n`;
             });
+
+            msg += `Semoga Allah senantiasa memudahkan langkah ananda dalam menghafal dan mencintai Al-Qur'an. Jazakumullahu khairan katsiran atas support luar biasa Ayah/Bunda di rumah. 🌟`;
 
             const previewEl = document.getElementById('classReportMessagePreview');
             if (previewEl) previewEl.value = msg;
@@ -1046,7 +1181,7 @@
         };
 
         window.sendClassReportDirect = function() {
-            const phone = document.getElementById('classReportPhoneInput')?.value || '+6285774042121';
+            const phone = document.getElementById('classReportPhoneInput')?.value || '+62585774042121';
             const text = document.getElementById('classReportMessagePreview')?.value;
             if (text) {
                 window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
