@@ -32,7 +32,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; }
         .quran-font { font-family: 'Amiri', serif; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
@@ -40,114 +40,79 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.7); }
         textarea.auto-expand {
             field-sizing: content;
-            min-height: 60px;
-            max-height: 200px;
+            min-height: 50px;
+            max-height: 150px;
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200 text-base sm:text-lg">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200 text-sm sm:text-base">
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
-        <div class="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 space-y-2 sm:space-y-3">
+        <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-2.5 space-y-2">
             <!-- Top Row: Logo & Controls -->
-            <div class="flex items-center justify-between gap-2 sm:gap-3">
-                <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-10 h-10 sm:w-14 sm:h-14 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-base sm:text-lg font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-base font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
                     <div class="min-w-0">
-                        <h1 class="text-base sm:text-2xl font-black tracking-tight flex items-center gap-2 truncate">
+                        <h1 class="text-sm sm:text-lg font-black tracking-tight flex items-center gap-2 truncate">
                             <span class="truncate">Monitoring Santri</span>
-                            <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-[10px] sm:text-sm font-black rounded shrink-0 shadow-xs">RQ AL-KHANSA</span>
+                            <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-[10px] sm:text-xs font-black rounded shrink-0 shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-xs sm:text-base text-emerald-200 font-bold truncate">Setoran Bacaan & Hafalan Harian</p>
+                        <p class="text-xs sm:text-sm text-emerald-200 font-bold truncate">Setoran Bacaan & Hafalan Harian</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                    <button id="soundToggleBtn" onclick="window.toggleSound()" title="Suara / SFX" class="p-2 sm:p-2.5 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-sm sm:text-base font-bold transition-colors">
-                        <span id="soundIconWrapper"><svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button id="soundToggleBtn" onclick="window.toggleSound()" title="Suara / SFX" class="p-2 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-xs font-bold transition-colors">
+                        <span id="soundIconWrapper"><svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></span>
                     </button>
-                    <button onclick="window.toggleTheme()" title="Mode Gelap/Terang" class="p-2 sm:p-2.5 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-sm sm:text-base font-bold transition-colors">
-                        <span id="themeIconWrapper"><svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></span>
-                    </button>
-                    <button onclick="window.switchTab('sync')" title="Pengaturan & Sync" class="px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/50 text-xs sm:text-base font-bold transition-all flex items-center gap-1 shadow-sm">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                        <span class="hidden sm:inline">Sync</span>
+                    <button onclick="window.toggleTheme()" title="Mode Gelap/Terang" class="p-2 rounded-xl bg-emerald-900/95 hover:bg-emerald-700 border border-emerald-600/70 text-xs font-bold transition-colors">
+                        <span id="themeIconWrapper"><svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></span>
                     </button>
                 </div>
             </div>
 
-            <!-- Bottom Row: Teacher Selector & Nav Menus -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 pt-2 border-t border-emerald-700/40">
-                <select id="teacherFilterSelect" onchange="window.switchTeacher(this.value)" class="bg-emerald-900/95 dark:bg-slate-800 border border-emerald-600/70 text-white text-sm sm:text-base font-black rounded-xl px-3 py-2 outline-none cursor-pointer shadow-sm w-full sm:w-auto">
+            <!-- Bottom Row: Teacher Selector & Direct Nav Tabs -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-emerald-700/40">
+                <select id="teacherFilterSelect" onchange="window.switchTeacher(this.value)" class="bg-emerald-900/95 dark:bg-slate-800 border border-emerald-600/70 text-white text-xs sm:text-sm font-black rounded-xl px-3 py-2 outline-none cursor-pointer shadow-sm w-full sm:w-auto">
                     <option value="ALL">Semua Guru (10 Kelas)</option>
                     <option value="Ustadz Sidik">Ustadz Sidik</option>
                     <option value="Ustadzah Mega">Ustadzah Mega</option>
                 </select>
 
-                <div class="flex items-center gap-1.5 sm:gap-2 relative justify-end overflow-x-auto pb-1 sm:pb-0">
-                    <!-- 1. INPUT -->
-                    <div class="relative shrink-0">
-                        <button onclick="window.toggleMenuDropdown(event, 'input')" id="mainNav-input" class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-base font-black bg-white text-emerald-950 shadow-md flex items-center gap-1 transition-all ring-2 ring-amber-400">
-                            <span>1. Input</span>
-                            <svg id="chevron-input" class="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </button>
-                        <div id="dropdown-input" class="hidden absolute right-0 sm:left-0 top-full mt-2 w-48 sm:w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
-                            <button onclick="window.switchTab('setoran')" id="subItem-setoran" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-black bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">Setoran Harian (Utama)</button>
-                            <button onclick="window.switchTab('viewlevels')" id="subItem-viewlevels" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Panduan Level Qur'an</button>
-                        </div>
-                    </div>
-
-                    <!-- 2. RIWAYAT -->
-                    <div class="relative shrink-0">
-                        <button onclick="window.toggleMenuDropdown(event, 'riwayat')" id="mainNav-riwayat" class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1 transition-all">
-                            <span>2. Riwayat</span>
-                            <svg id="chevron-riwayat" class="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </button>
-                        <div id="dropdown-riwayat" class="hidden absolute right-0 sm:left-0 top-full mt-2 w-48 sm:w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
-                            <button onclick="window.switchTab('history')" id="subItem-history" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Riwayat Setoran</button>
-                            <button onclick="window.switchTab('santri')" id="subItem-santri" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
-                                <span>Riwayat Murid</span>
-                                <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black rounded">87</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 3. LAPORAN -->
-                    <div class="relative shrink-0">
-                        <button onclick="window.toggleMenuDropdown(event, 'laporan')" id="mainNav-laporan" class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 flex items-center gap-1 transition-all">
-                            <span>3. Laporan</span>
-                            <svg id="chevron-laporan" class="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </button>
-                        <div id="dropdown-laporan" class="hidden absolute right-0 top-full mt-2 w-48 sm:w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-[100] space-y-1">
-                            <button onclick="window.switchTab('reports')" id="subItem-reports" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Laporan Kelas</button>
-                            <button onclick="window.switchTab('wa_report')" id="subItem-wa_report" class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-left text-xs sm:text-base font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">Laporan WA Orang Tua</button>
-                        </div>
-                    </div>
+                <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
+                    <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input Setoran</button>
+                    <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
+                    <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Murid (87)</button>
+                    <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
+                    <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
+                    <button onclick="window.switchTab('sync')" id="btnTab-sync" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sync Sheets</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6">
+        <!-- 1. SETORAN UTAMA -->
         <section id="section-setoran" class="space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3.5">
-                <div class="relative w-full sm:w-96">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <div class="bg-white dark:bg-slate-800 p-3.5 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="relative w-full sm:w-80">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </span>
-                    <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas..." class="w-full pl-11 pr-12 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-lg sm:text-xl font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
-                    <button type="button" onclick="window.startVoiceSearchSantri()" title="Cari santri dengan suara" class="absolute inset-y-0 right-0 pr-3 flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700">
-                        <span class="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center shadow-xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                    <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas..." class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <button type="button" onclick="window.startVoiceSearchSantri()" title="Cari santri dengan suara" class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700">
+                        <span class="p-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center shadow-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
                         </span>
                     </button>
                 </div>
-                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-lg sm:text-xl font-bold rounded-xl px-3.5 py-3 outline-none cursor-pointer flex-1 sm:flex-none shadow-xs">
+                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm sm:text-base font-bold rounded-xl px-3 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none shadow-xs">
                         <option value="ALL">Semua Kelas (10 Kelas)</option>
                         <option value="Abdurrahman">Abdurrahman</option>
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
@@ -161,22 +126,22 @@
                         <option value="Umar">Umar</option>
                     </select>
                     <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
-                        <button onclick="window.setViewMode('grid')" id="viewModeGridBtn" class="px-3.5 py-2 rounded-lg text-lg font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700">Grid</button>
-                        <button onclick="window.setViewMode('table')" id="viewModeTableBtn" class="px-3.5 py-2 rounded-lg text-lg font-bold text-slate-500">Tabel</button>
+                        <button onclick="window.setViewMode('grid')" id="viewModeGridBtn" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700">Grid</button>
+                        <button onclick="window.setViewMode('table')" id="viewModeTableBtn" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-slate-500">Tabel</button>
                     </div>
                 </div>
             </div>
-            <div id="santriGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="santriGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
             <div id="santriTableContainer" class="hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-lg sm:text-xl">
+                    <table class="w-full text-left border-collapse text-sm sm:text-base">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-extrabold uppercase">
-                                <th class="p-4">Santri</th>
-                                <th class="p-4">Kelas & Guru</th>
-                                <th class="p-4">Bacaan Terakhir</th>
-                                <th class="p-4">Hafalan Terakhir</th>
-                                <th class="p-4 text-center">Aksi</th>
+                                <th class="p-3">Santri</th>
+                                <th class="p-3">Kelas & Guru</th>
+                                <th class="p-3">Bacaan Terakhir</th>
+                                <th class="p-3">Hafalan Terakhir</th>
+                                <th class="p-3 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="santriTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -185,24 +150,18 @@
             </div>
         </section>
 
-        <!-- OTHER SECTIONS -->
-        <section id="section-viewlevels" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-3">
-                <h3 class="font-black text-2xl text-emerald-800 dark:text-emerald-300">Panduan Level Al-Qur'an & Target Capaian</h3>
-                <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300">Panduan standar tahfizh dan tilawah santri RQ Al-Khansa sesuai kurikulum pengajaran.</p>
-            </div>
-        </section>
+        <!-- 2. RIWAYAT SETORAN -->
         <section id="section-history" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm border space-y-3">
-                <h3 class="font-black text-xl sm:text-2xl">Riwayat Setoran Harian</h3>
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-3">
+                <h3 class="font-black text-lg sm:text-xl">Riwayat Setoran Harian</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-lg sm:text-xl">
+                    <table class="w-full text-left border-collapse text-sm sm:text-base">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase">
-                                <th class="p-3.5">Waktu</th>
-                                <th class="p-3.5">Nama Santri</th>
-                                <th class="p-3.5">Setoran Bacaan</th>
-                                <th class="p-3.5">Setoran Hafalan</th>
+                                <th class="p-3">Waktu</th>
+                                <th class="p-3">Nama Santri</th>
+                                <th class="p-3">Setoran Bacaan</th>
+                                <th class="p-3">Setoran Hafalan</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody" class="divide-y"></tbody>
@@ -210,19 +169,21 @@
                 </div>
             </div>
         </section>
+
+        <!-- 3. DATA MASTER SANTRI -->
         <section id="section-santri" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm border space-y-3">
-                <h3 class="font-black text-xl sm:text-2xl">Master Data 87 Santri (RQ Al-Khansa)</h3>
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-3">
+                <h3 class="font-black text-lg sm:text-xl">Master Data 87 Santri (RQ Al-Khansa)</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-lg sm:text-xl">
+                    <table class="w-full text-left border-collapse text-sm sm:text-base">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase">
-                                <th class="p-3.5">No</th>
-                                <th class="p-3.5">ID</th>
-                                <th class="p-3.5">Nama Santri</th>
-                                <th class="p-3.5">Kelas</th>
-                                <th class="p-3.5">Pengajar</th>
-                                <th class="p-3.5">No HP / WA</th>
+                                <th class="p-3">No</th>
+                                <th class="p-3">ID</th>
+                                <th class="p-3">Nama Santri</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">Pengajar</th>
+                                <th class="p-3">No HP / WA</th>
                             </tr>
                         </thead>
                         <tbody id="santriMasterTableBody" class="divide-y"></tbody>
@@ -230,159 +191,185 @@
                 </div>
             </div>
         </section>
-        <section id="section-reports" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-3">
-                <h3 class="font-black text-2xl text-emerald-800 dark:text-emerald-300">Laporan Rekapitulasi Kelas</h3>
-                <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300">Rekapitulasi total capaian setoran santri berdasarkan kelas pengajar.</p>
-            </div>
-        </section>
+
+        <!-- 4. LAPORAN WA ORANG TUA (PERSONAL) -->
         <section id="section-wa_report" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4 text-lg sm:text-xl">
-                <h3 class="font-black text-2xl sm:text-3xl">Generator Laporan WhatsApp Orang Tua</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4 text-sm sm:text-base">
+                <h3 class="font-black text-xl sm:text-2xl">Generator Laporan WhatsApp Orang Tua (Personal)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
                         <label class="font-extrabold text-slate-500">Pilih Santri:</label>
-                        <select id="waSantriSelect" onchange="window.generateWaReport()" class="w-full mt-2 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold"></select>
+                        <select id="waSantriSelect" onchange="window.generateWaReport()" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold"></select>
                     </div>
                     <div>
                         <label class="font-extrabold text-slate-500">No WA Wali Santri:</label>
-                        <input type="text" id="waPhoneInput" class="w-full mt-2 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold" value="085774042121">
+                        <input type="text" id="waPhoneInput" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold" value="+6285774042121">
                     </div>
                 </div>
                 <div>
-                    <label class="font-extrabold text-slate-500">Preview Pesan Laporan Lengkap (Bacaan & Hafalan):</label>
-                    <textarea id="waMessagePreview" rows="12" class="w-full mt-2 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-lg sm:text-xl"></textarea>
+                    <label class="font-extrabold text-slate-500">Preview Pesan Laporan Lengkap:</label>
+                    <textarea id="waMessagePreview" rows="10" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm"></textarea>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="window.copyWaReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-bold">Salin Teks</button>
-                    <button onclick="window.sendWaReportDirect()" class="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black shadow-md">Kirim WhatsApp</button>
+                    <button onclick="window.copyWaReportText()" class="px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-bold">Salin Teks</button>
+                    <button onclick="window.sendWaReportDirect()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black shadow-md">Kirim WhatsApp</button>
                 </div>
             </div>
         </section>
+
+        <!-- 5. LAPORAN REKAPITULASI KELAS (WHATSAPP FORMAT) -->
+        <section id="section-class_report" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4 text-sm sm:text-base">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <h3 class="font-black text-xl sm:text-2xl text-emerald-800 dark:text-emerald-300">Laporan Rekapitulasi Per Kelas (WhatsApp)</h3>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-2.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold">
+                            <option value="Abdurrahman">Abdurrahman</option>
+                            <option value="Abu Ubaidah" selected>Abu Ubaidah</option>
+                            <option value="Zubair">Zubair</option>
+                            <option value="Ali">Ali</option>
+                            <option value="Utsman">Utsman</option>
+                            <option value="Abu Bakar">Abu Bakar</option>
+                            <option value="Bilal">Bilal</option>
+                            <option value="Hamzah">Hamzah</option>
+                            <option value="Fatimah">Fatimah</option>
+                            <option value="Umar">Umar</option>
+                        </select>
+                        <input type="text" id="classReportPhoneInput" class="p-2.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold w-36" value="+6285774042121">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-extrabold text-slate-500">Preview Pesan Grup / Laporan Kelas:</label>
+                    <textarea id="classReportMessagePreview" rows="14" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm"></textarea>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.copyClassReportText()" class="px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-bold">Salin Teks Kelas</button>
+                    <button onclick="window.sendClassReportDirect()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black shadow-md">Kirim WhatsApp Kelas</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. SYNC SETTINGS (SEPARATE GOOGLE SHEETS) -->
         <section id="section-sync" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4 text-lg sm:text-xl">
-                <h3 class="font-black text-2xl">Status Sinkronisasi Google Sheets</h3>
-                <p class="text-slate-500">Data setoran otomatis terhubung ke Webhook Google Apps Script.</p>
-                <input type="text" id="webhookUrlInput" class="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-base" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
+            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4 text-sm sm:text-base">
+                <h3 class="font-black text-xl sm:text-2xl">Pengaturan Sinkronisasi Google Sheets</h3>
+                <p class="text-slate-500 text-xs sm:text-sm">Konfigurasi endpoint webhook Google Apps Script untuk pemisahan data <strong>Bacaan</strong> dan <strong>Hafalan</strong>.</p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="font-extrabold text-emerald-700 dark:text-emerald-400">Webhook Google Sheet - Setoran BACAAN:</label>
+                        <input type="text" id="webhookBacaanUrlInput" class="w-full mt-1 p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
+                    </div>
+                    <div>
+                        <label class="font-extrabold text-amber-600 dark:text-amber-400">Webhook Google Sheet - Setoran HAFALAN:</label>
+                        <input type="text" id="webhookHafalanUrlInput" class="w-full mt-1 p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
+                    </div>
+                </div>
+                <button onclick="window.showToast('Pengaturan Webhook berhasil disimpan!', 'success')" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-black">Simpan Pengaturan</button>
             </div>
         </section>
     </main>
 
-    <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-lg sm:text-xl">
-            <div class="px-6 py-4.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
+    <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-sm sm:text-base">
+            <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
                 <div>
-                    <h3 id="modalSantriName" class="text-2xl sm:text-3xl font-black tracking-tight truncate">Setoran: Santri</h3>
-                    <p id="modalSantriMeta" class="text-base sm:text-lg text-emerald-200 font-bold truncate mt-0.5">Kelas • Pengajar</p>
+                    <h3 id="modalSantriName" class="text-lg sm:text-xl font-black tracking-tight truncate">Setoran: Santri</h3>
+                    <p id="modalSantriMeta" class="text-xs sm:text-sm text-emerald-200 font-bold truncate mt-0.5">Kelas • Pengajar</p>
                 </div>
-                <button onclick="window.closeEditModal()" class="p-2.5 rounded-xl hover:bg-white/10 text-white text-3xl font-black">✕</button>
+                <button onclick="window.closeEditModal()" class="p-2 rounded-xl hover:bg-white/10 text-white text-2xl font-black">✕</button>
             </div>
-            <div class="p-5 sm:p-6 overflow-y-auto custom-scrollbar flex-1 min-h-0 space-y-6">
-                <div class="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border flex items-center justify-between gap-3">
-                    <label class="text-lg font-extrabold text-slate-700 dark:text-slate-200">Tanggal Pertemuan:</label>
-                    <input type="date" id="modalTanggalInput" class="px-4 py-2.5 bg-white dark:bg-slate-800 border rounded-xl text-lg sm:text-xl font-bold outline-none cursor-pointer">
+            <div class="p-4 sm:p-5 overflow-y-auto custom-scrollbar flex-1 min-h-0 space-y-4">
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border flex items-center justify-between gap-3">
+                    <label class="font-extrabold text-slate-700 dark:text-slate-200">Tanggal Pertemuan:</label>
+                    <input type="date" id="modalTanggalInput" class="px-3 py-2 bg-white dark:bg-slate-800 border rounded-xl font-bold outline-none cursor-pointer">
                 </div>
 
                 <!-- 1. SETORAN BACAAN -->
-                <div class="p-5 sm:p-6 bg-emerald-50/70 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-800 space-y-4">
+                <div class="p-4 sm:p-5 bg-emerald-50/70 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-800 space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="font-black text-xl sm:text-2xl text-emerald-950 dark:text-emerald-200 uppercase tracking-wide">Setoran Bacaan</span>
-                        <select id="bacaanStatusSelect" class="text-lg p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-emerald-800 dark:text-emerald-300 shadow-xs">
+                        <span class="font-black text-base sm:text-lg text-emerald-950 dark:text-emerald-200 uppercase tracking-wide">Setoran Bacaan</span>
+                        <select id="bacaanStatusSelect" class="p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-emerald-800 dark:text-emerald-300 shadow-xs">
                             <option value="Lancar (A)">Lancar (A)</option>
                             <option value="Cukup (B)">Cukup (B)</option>
                             <option value="Kurang (C)">Kurang (C)</option>
                         </select>
                     </div>
-                    <div class="p-4 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-emerald-200 dark:border-emerald-700 flex items-center justify-between text-lg">
-                        <span class="px-3 py-1 bg-emerald-700 text-white font-black text-xs rounded shrink-0">KEMARIN</span>
-                        <span id="modalBacaanKemarinText" class="font-bold text-emerald-950 dark:text-emerald-200 truncate mx-2">-</span>
-                        <span id="modalBacaanKemarinAyat" class="font-black text-emerald-700 shrink-0">0 ayat</span>
+                    <div class="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-emerald-200 dark:border-emerald-700 flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 bg-emerald-700 text-white font-black text-[10px] rounded shrink-0">KEMARIN</span>
+                        <span id="modalBacaanKemarinText" class="font-bold text-emerald-950 dark:text-emerald-200 truncate mx-2 text-xs sm:text-sm">-</span>
+                        <span id="modalBacaanKemarinAyat" class="font-black text-emerald-700 shrink-0 text-xs sm:text-sm">0 ayat</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Kategori:</label>
-                            <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Kategori:</label>
+                            <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
                                 <option value="quran">Al-Qur'an</option>
                                 <option value="iqro">Iqro</option>
                             </select>
                         </div>
                         <div class="sm:col-span-2">
                             <div class="flex items-center justify-between">
-                                <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Surat / Jilid:</label>
-                                <span id="bacaanHalBadge" class="px-2.5 py-0.5 bg-amber-400 text-emerald-950 text-sm font-black rounded">Hal. 1</span>
+                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Surat / Jilid:</label>
+                                <span id="bacaanHalBadge" class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded">Hal. 1</span>
                             </div>
-                            <select id="bacaanSurahSelect" onchange="window.updateBacaanAyatLimits()" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold"></select>
+                            <select id="bacaanSurahSelect" onchange="window.updateBacaanAyatLimits()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm"></select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                        <div class="sm:col-span-1">
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Info Mushaf Halaman:</label>
-                            <input type="text" id="bacaanMushafHalInput" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold text-emerald-800 dark:text-emerald-300" placeholder="Hal. 1">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Info Mushaf Halaman:</label>
+                            <input type="text" id="bacaanMushafHalInput" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-emerald-800 dark:text-emerald-300 text-sm" placeholder="Hal. 1">
                         </div>
-                        <div class="sm:col-span-2 grid grid-cols-2 gap-3">
+                        <div class="sm:col-span-2 grid grid-cols-2 gap-2">
                             <div>
-                                <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Ayat Mulai:</label>
-                                <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold">
+                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Mulai:</label>
+                                <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
                             </div>
                             <div>
-                                <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Ayat Sampai:</label>
-                                <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold">
+                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Sampai:</label>
+                                <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
                             </div>
                         </div>
                     </div>
-                    <div class="text-lg font-bold text-emerald-900 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950/40 p-4 rounded-xl border border-emerald-200">
+                    <div class="font-bold text-emerald-900 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 text-xs sm:text-sm">
                         <div class="flex items-center justify-between">
-                            <span>Total Hari Ini: <strong id="bacaanTotalHariIni" class="text-xl sm:text-2xl">7</strong> ayat</span>
-                            <span>Akumulasi Sepekan: <strong id="bacaanTotalSepekan" class="text-xl sm:text-2xl">7</strong> ayat</span>
+                            <span>Total Hari Ini: <strong id="bacaanTotalHariIni" class="text-base sm:text-lg">7</strong> ayat</span>
+                            <span>Akumulasi Sepekan: <strong id="bacaanTotalSepekan" class="text-base sm:text-lg">7</strong> ayat</span>
                         </div>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Catatan Bacaan:</label>
-                            <button type="button" onclick="window.toggleVoiceRecording('bacaanCatatanInput')" class="text-base font-black text-emerald-700 dark:text-emerald-400 flex items-center gap-1">Voice Note</button>
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Catatan Bacaan:</label>
+                            <button type="button" onclick="window.toggleVoiceRecording('bacaanCatatanInput')" class="text-xs font-black text-emerald-700 dark:text-emerald-400">Voice Note</button>
                         </div>
-                        <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid / kelancaran..." class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-800 border rounded-xl text-lg font-medium outline-none auto-expand"></textarea>
-                    </div>
-                    <div class="space-y-2 pt-1">
-                        <div class="flex items-center justify-between">
-                            <label class="text-lg font-bold text-slate-600 dark:text-slate-300">Foto Bacaan:</label>
-                            <label class="cursor-pointer px-4 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-xl text-base font-extrabold inline-flex items-center gap-1.5">
-                                <span>Ambil / Unggah Foto</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="window.handlePhotoUpload('bacaan', this)">
-                            </label>
-                        </div>
-                        <div id="bacaanPhotoPreviewWrapper" class="hidden relative w-full h-44 bg-slate-200 dark:bg-slate-800 rounded-xl overflow-hidden">
-                            <img id="bacaanPhotoPreview" src="" class="w-full h-full object-cover">
-                            <button onclick="window.removePhoto('bacaan')" class="absolute top-2 right-2 p-1.5 bg-rose-600 text-white rounded-full text-xs font-bold">✕</button>
-                        </div>
+                        <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid / kelancaran..." class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-medium outline-none auto-expand text-sm"></textarea>
                     </div>
                 </div>
 
                 <!-- 2. SETORAN HAFALAN -->
-                <div class="p-5 sm:p-6 bg-amber-50/70 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800 space-y-4">
+                <div class="p-4 sm:p-5 bg-amber-50/70 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800 space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="font-black text-xl sm:text-2xl text-amber-950 dark:text-amber-200 uppercase tracking-wide">Setoran Hafalan</span>
-                        <select id="hafalanStatusSelect" class="text-lg p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-amber-800 dark:text-amber-300 shadow-xs">
+                        <span class="font-black text-base sm:text-lg text-amber-950 dark:text-amber-200 uppercase tracking-wide">Setoran Hafalan</span>
+                        <select id="hafalanStatusSelect" class="p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-amber-800 dark:text-amber-300 shadow-xs">
                             <option value="Lancar (A)">Lancar (A)</option>
                             <option value="Cukup (B)">Cukup (B)</option>
                             <option value="Ulang (C)">Ulang (C)</option>
                         </select>
                     </div>
-                    <div class="p-4 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-amber-200 dark:border-amber-700 flex items-center justify-between text-lg">
-                        <span class="px-3 py-1 bg-amber-700 text-white font-black text-xs rounded shrink-0">KEMARIN</span>
-                        <span id="modalHafalanKemarinText" class="font-bold text-amber-950 dark:text-amber-200 truncate mx-2">-</span>
-                        <span id="modalHafalanKemarinAyat" class="font-black text-amber-700 shrink-0">0 ayat</span>
+                    <div class="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-amber-200 dark:border-amber-700 flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 bg-amber-700 text-white font-black text-[10px] rounded shrink-0">KEMARIN</span>
+                        <span id="modalHafalanKemarinText" class="font-bold text-amber-950 dark:text-amber-200 truncate mx-2 text-xs sm:text-sm">-</span>
+                        <span id="modalHafalanKemarinAyat" class="font-black text-amber-700 shrink-0 text-xs sm:text-sm">0 ayat</span>
                     </div>
-
-                    <!-- Level Hafalan & Exam Status Fields -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Saat ini sedang di level hafalan:</label>
-                            <input type="text" id="hafalanCurrentLevelInput" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold text-amber-900 dark:text-amber-300" placeholder="Contoh: Juz 30 / Al-Mulk">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Level Hafalan:</label>
+                            <input type="text" id="hafalanCurrentLevelInput" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-amber-900 dark:text-amber-300 text-sm" placeholder="Contoh: Juz 30 / Al-Mulk">
                         </div>
                         <div>
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Status Ujian Hafalan:</label>
-                            <select id="hafalanUjianStatusSelect" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold text-amber-900 dark:text-amber-300">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Status Ujian Hafalan:</label>
+                            <select id="hafalanUjianStatusSelect" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-amber-900 dark:text-amber-300 text-sm">
                                 <option value="Belum diuji">Belum diuji</option>
                                 <option value="Sedang proses">Sedang proses</option>
                                 <option value="Sudah diuji">Sudah diuji</option>
@@ -390,64 +377,50 @@
                         </div>
                     </div>
                     <div>
-                        <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Kolom Ujian Qur'an (Catatan Manual):</label>
-                        <input type="text" id="hafalanUjianQuranManualInput" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold text-amber-900 dark:text-amber-300" placeholder="Masukkan keterangan ujian Qur'an manual...">
+                        <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Keterangan Ujian Manual:</label>
+                        <input type="text" id="hafalanUjianQuranManualInput" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-amber-900 dark:text-amber-300 text-sm" placeholder="Masukkan keterangan ujian...">
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="sm:col-span-2">
                             <div class="flex items-center justify-between">
-                                <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Surat Hafalan:</label>
-                                <span id="hafalanHalBadge" class="px-2.5 py-0.5 bg-amber-400 text-emerald-950 text-sm font-black rounded">Hal. 1</span>
+                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Surat Hafalan:</label>
+                                <span id="hafalanHalBadge" class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded">Hal. 1</span>
                             </div>
-                            <select id="hafalanSurahSelect" onchange="window.updateHafalanAyatLimits()" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold"></select>
+                            <select id="hafalanSurahSelect" onchange="window.updateHafalanAyatLimits()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm"></select>
                         </div>
                         <div>
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Info Mushaf Halaman:</label>
-                            <input type="text" id="hafalanMushafHalInput" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold text-amber-900 dark:text-amber-300" placeholder="Hal. 1">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Info Mushaf Halaman:</label>
+                            <input type="text" id="hafalanMushafHalInput" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-amber-900 dark:text-amber-300 text-sm" placeholder="Hal. 1">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3.5">
+                    <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Ayat Mulai:</label>
-                            <input type="number" id="hafalanAyatStartInput" value="1" min="1" oninput="window.calcHafalanTotals()" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Mulai:</label>
+                            <input type="number" id="hafalanAyatStartInput" value="1" min="1" oninput="window.calcHafalanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
                         </div>
                         <div>
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Ayat Sampai:</label>
-                            <input type="number" id="hafalanAyatEndInput" value="7" min="1" oninput="window.calcHafalanTotals()" class="w-full mt-1.5 p-3 bg-white dark:bg-slate-800 border rounded-xl text-lg font-bold">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Sampai:</label>
+                            <input type="number" id="hafalanAyatEndInput" value="7" min="1" oninput="window.calcHafalanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
                         </div>
                     </div>
-                    <div class="text-lg font-bold text-amber-900 dark:text-amber-300 bg-amber-100/70 dark:bg-amber-950/40 p-4 rounded-xl border border-amber-200">
+                    <div class="font-bold text-amber-900 dark:text-amber-300 bg-amber-100/70 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 text-xs sm:text-sm">
                         <div class="flex items-center justify-between">
-                            <span>Total Hari Ini: <strong id="hafalanTotalHariIni" class="text-xl sm:text-2xl">7</strong> ayat</span>
-                            <span>Akumulasi Sepekan: <strong id="hafalanTotalSepekan" class="text-xl sm:text-2xl">7</strong> ayat</span>
+                            <span>Total Hari Ini: <strong id="hafalanTotalHariIni" class="text-base sm:text-lg">7</strong> ayat</span>
+                            <span>Akumulasi Sepekan: <strong id="hafalanTotalSepekan" class="text-base sm:text-lg">7</strong> ayat</span>
                         </div>
                     </div>
                     <div>
                         <div class="flex items-center justify-between">
-                            <label class="text-lg font-extrabold text-slate-600 dark:text-slate-300">Catatan Hafalan:</label>
-                            <button type="button" onclick="window.toggleVoiceRecording('hafalanCatatanInput')" class="text-base font-black text-amber-700 dark:text-amber-400 flex items-center gap-1">Voice Note</button>
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Catatan Hafalan:</label>
+                            <button type="button" onclick="window.toggleVoiceRecording('hafalanCatatanInput')" class="text-xs font-black text-amber-700 dark:text-amber-400">Voice Note</button>
                         </div>
-                        <textarea id="hafalanCatatanInput" rows="2" placeholder="Catatan kelancaran hafalan..." class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-800 border rounded-xl text-lg font-medium outline-none auto-expand"></textarea>
-                    </div>
-                    <div class="space-y-2 pt-1">
-                        <div class="flex items-center justify-between">
-                            <label class="text-lg font-bold text-slate-600 dark:text-slate-300">Foto Hafalan:</label>
-                            <label class="cursor-pointer px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-base font-extrabold inline-flex items-center gap-1.5">
-                                <span>Ambil / Unggah Foto</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="window.handlePhotoUpload('hafalan', this)">
-                            </label>
-                        </div>
-                        <div id="hafalanPhotoPreviewWrapper" class="hidden relative w-full h-44 bg-slate-200 dark:bg-slate-800 rounded-xl overflow-hidden">
-                            <img id="hafalanPhotoPreview" src="" class="w-full h-full object-cover">
-                            <button onclick="window.removePhoto('hafalan')" class="absolute top-2 right-2 p-1.5 bg-rose-600 text-white rounded-full text-xs font-bold">✕</button>
-                        </div>
+                        <textarea id="hafalanCatatanInput" rows="2" placeholder="Catatan kelancaran hafalan..." class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-medium outline-none auto-expand text-sm"></textarea>
                     </div>
                 </div>
             </div>
-            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
-                <button onclick="window.closeEditModal()" class="px-6 py-3 rounded-xl bg-slate-200 dark:bg-slate-700 text-lg font-bold">Batal</button>
-                <button onclick="window.saveSetoranData()" class="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-lg sm:text-xl font-black shadow-md flex items-center gap-2">Simpan Setoran</button>
+            <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
+                <button onclick="window.closeEditModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold">Batal</button>
+                <button onclick="window.saveSetoranData()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-md">Simpan Setoran</button>
             </div>
         </div>
     </div>
@@ -455,95 +428,104 @@
     <div id="toastContainer" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
 
     <script>
-        // Master Dataset of 87 Santri across 10 Classes (Uniform WhatsApp number: 085774042121)
+        // Master Dataset of 87 Santri across 10 Classes with sample initial progress for class report
         window.santriList = [
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ012", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ013", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ015", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ016", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ017", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ018", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ019", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ020", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ021", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ022", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ023", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ024", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ025", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ026", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ027", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ039", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ040", name: "Alzam Irawan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ041", name: "Fathir Santosa", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ042", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ044", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ045", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ046", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ047", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ048", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ049", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ050", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ051", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ052", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ053", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ054", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ056", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ057", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ058", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ059", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ060", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ061", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ062", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ063", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ064", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ065", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ066", name: "Yumna Azkadina", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ067", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ068", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ069", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ070", name: "Fathan Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ071", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ072", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ073", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ074", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ075", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ076", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ077", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ078", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ079", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ080", name: "Nurhalimah", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ081", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ082", name: "Althaffatan Amsyar", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ083", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ084", name: "M. Fauzan", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ085", name: "Yasif Abqory", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ086", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 },
-            { id: "IDSRQ087", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 0, weeklyHafalan: 0 }
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 14, lastHafalanAyat: 10 },
+            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 12, lastBacaan: "Iqro 6 hlm 5", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 10, lastHafalanAyat: 12 },
+            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-20", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 20, lastHafalanAyat: 15 },
+            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 10, lastBacaan: "An-Nisa' 1-15", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 15, lastHafalanAyat: 10 },
+            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 14, lastBacaan: "Al-Ma'idah 1-12", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 12, lastHafalanAyat: 14 },
+            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 20, lastBacaan: "Al-An'am 1-18", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 18, lastHafalanAyat: 20 },
+            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al-A'raf 1-14", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 14, lastHafalanAyat: 14 },
+            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Al-Anfal 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 10 },
+            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 16, lastBacaan: "At-Taubah 1-16", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 16, lastHafalanAyat: 16 },
+            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 15, lastBacaan: "Yunus 1-15", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 15, lastHafalanAyat: 15 },
+            // ABU UBAIDAH (17 students matching requested class report format)
+            { id: "IDSRQ011", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 18, lastBacaan: "Al Baqarah 94", lastHafalan: "Al Mujaadalah 1- 18", lastBacaanAyat: 15, lastHafalanAyat: 18 },
+            { id: "IDSRQ012", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 6 hlm 10", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 12, lastHafalanAyat: 10 },
+            { id: "IDSRQ013", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 2 halaman 19", lastHafalan: "Annas s.d Al Maun", lastBacaanAyat: 10, lastHafalanAyat: 10 },
+            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2 halaman 22 lanjut 24", lastHafalan: "Surat Annas s.d Surat Al Qodr", lastBacaanAyat: 14, lastHafalanAyat: 12 },
+            { id: "IDSRQ015", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 11, lastBacaan: "Iqro 3 hlm 16", lastHafalan: "Annas s.d Al Ashr", lastBacaanAyat: 16, lastHafalanAyat: 11 },
+            { id: "IDSRQ016", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 21, weeklyHafalan: 10, lastBacaan: "Iqro 4 hlm 21", lastHafalan: "Al Qodr - Al 'Alaq", lastBacaanAyat: 21, lastHafalanAyat: 10 },
+            { id: "IDSRQ017", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 13, weeklyHafalan: 8, lastBacaan: "Surah Al Imran ayat 132", lastHafalan: "Surah Al-Insan 1– 8", lastBacaanAyat: 13, lastHafalanAyat: 8 },
+            { id: "IDSRQ018", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 9, lastBacaan: "Iqro 3 lanjut hlm 8", lastHafalan: "Annas s.d Al Ma'un", lastBacaanAyat: 12, lastHafalanAyat: 9 },
+            { id: "IDSRQ019", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 24, weeklyHafalan: 15, lastBacaan: "Iqro 4 hlm 23 lanjut 24", lastHafalan: "Surat Annas s.d Surat Al Qoriah", lastBacaanAyat: 24, lastHafalanAyat: 15 },
+            { id: "IDSRQ020", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 30, weeklyHafalan: 20, lastBacaan: "Juzz 'amma Annas s.d Al Adiyaat", lastHafalan: "Annas s.d surat Al balad 1-15", lastBacaanAyat: 30, lastHafalanAyat: 20 },
+            { id: "IDSRQ021", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 27, weeklyHafalan: 25, lastBacaan: "Iqro 4 hlm 27 (Lanjut)", lastHafalan: "An-Nas s.d. Surah Al-Lail 1-15", lastBacaanAyat: 27, lastHafalanAyat: 25 },
+            { id: "IDSRQ022", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 210, weeklyHafalan: 30, lastBacaan: "Surah Al-Baqarah 210", lastHafalan: "An-Nas s.d. Surah Al-Insyiqaq 1-12", lastBacaanAyat: 210, lastHafalanAyat: 30 },
+            { id: "IDSRQ023", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 6, weeklyHafalan: 0, lastBacaan: "Iqro 2 hlm 6", lastHafalan: "-", lastBacaanAyat: 6, lastHafalanAyat: 0 },
+            { id: "IDSRQ024", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 194, weeklyHafalan: 36, lastBacaan: "Surah Ali 'Imran 194", lastHafalan: "An-Nas s.d. Surah Al-Mutaffifin", lastBacaanAyat: 194, lastHafalanAyat: 36 },
+            { id: "IDSRQ025", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 263, weeklyHafalan: 50, lastBacaan: "Surah Al-Baqarah 263", lastHafalan: "An-Nas s.d. An-Naba .. juz 29 AL MULK ayat 88", lastBacaanAyat: 263, lastHafalanAyat: 50 },
+            { id: "IDSRQ026", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 85, weeklyHafalan: 40, lastBacaan: "Al Baqoroh ayat 85 & Iqro 5 hal17", lastHafalan: "Annas s.d Surat Annaziat", lastBacaanAyat: 85, lastHafalanAyat: 40 },
+            { id: "IDSRQ027", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 21, weeklyHafalan: 7, lastBacaan: "Iqro 2 halaman 21", lastHafalan: "Surat Annashr", lastBacaanAyat: 21, lastHafalanAyat: 7 },
+            // ZUBAIR
+            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 1 hlm 10", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 2 hlm 5", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 3 hlm 4", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 12, lastHafalanAyat: 10 },
+            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 15, lastBacaan: "Iqro 4 hlm 8", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 14, lastHafalanAyat: 15 },
+            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "Iqro 5 hlm 12", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 16 },
+            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Fatihah", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 7, lastHafalanAyat: 18 },
+            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 25, weeklyHafalan: 20, lastBacaan: "Al-Baqarah 1-5", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 5, lastHafalanAyat: 20 },
+            // ALI
+            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 10, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 10 },
+            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ039", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 10", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            // UTSMAN
+            { id: "IDSRQ040", name: "Alzam Irawan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 2", lastHafalan: "An-Nas", lastBacaanAyat: 12, lastHafalanAyat: 1 },
+            { id: "IDSRQ041", name: "Fathir Santosa", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ042", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Ustadz Sidik", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            // ABU BAKAR
+            { id: "IDSRQ043", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ044", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ045", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 14 },
+            { id: "IDSRQ046", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 18, lastHafalanAyat: 16 },
+            { id: "IDSRQ047", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ048", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 10, lastHafalanAyat: 20 },
+            { id: "IDSRQ049", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 12, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 15, lastHafalanAyat: 12 },
+            { id: "IDSRQ050", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ051", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
+            { id: "IDSRQ052", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 19, weeklyHafalan: 16, lastBacaan: "An-Nisa' 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 16 },
+            { id: "IDSRQ053", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-Ma'idah 1-10", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ054", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-An'am 1-10", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 10, lastHafalanAyat: 20 },
+            // BILAL
+            { id: "IDSRQ055", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ056", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ057", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ058", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ059", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ060", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 },
+            { id: "IDSRQ061", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ062", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 10, lastHafalanAyat: 14 },
+            { id: "IDSRQ063", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
+            { id: "IDSRQ064", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 16, lastBacaan: "An-Nisa' 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastBacaanAyat: 10, lastHafalanAyat: 16 },
+            { id: "IDSRQ065", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 19, weeklyHafalan: 17, lastBacaan: "Al-Ma'idah 1-10", lastHafalan: "An-Nas s.d. Al-Humazah", lastBacaanAyat: 10, lastHafalanAyat: 17 },
+            { id: "IDSRQ066", name: "Yumna Azkadina", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 18, lastBacaan: "Al-An'am 1-10", lastHafalan: "An-Nas s.d. Al-'Asr", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ067", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 20, lastBacaan: "Al-A'raf 1-10", lastHafalan: "An-Nas s.d. At-Takatsur", lastBacaanAyat: 10, lastHafalanAyat: 20 },
+            // HAMZAH
+            { id: "IDSRQ068", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ069", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ070", name: "Fathan Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ071", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ072", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ073", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 },
+            { id: "IDSRQ074", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 22, weeklyHafalan: 18, lastBacaan: "Al-Baqarah 1-10", lastHafalan: "An-Nas s.d. Al-Kautsar", lastBacaanAyat: 10, lastHafalanAyat: 18 },
+            { id: "IDSRQ075", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 14, lastBacaan: "Al-Baqarah 11-20", lastHafalan: "An-Nas s.d. Al-Ma'un", lastBacaanAyat: 10, lastHafalanAyat: 14 },
+            { id: "IDSRQ076", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-10", lastHafalan: "An-Nas s.d. Quraisy", lastBacaanAyat: 10, lastHafalanAyat: 15 },
+            // FATIMAH
+            { id: "IDSRQ077", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ078", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ079", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ080", name: "Nurhalimah", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ081", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            // UMAR
+            { id: "IDSRQ082", name: "Althaffatan Amsyar", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 12, weeklyHafalan: 10, lastBacaan: "Iqro 1", lastHafalan: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 1 },
+            { id: "IDSRQ083", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 14, weeklyHafalan: 12, lastBacaan: "Iqro 2", lastHafalan: "An-Nas s.d. Al-Falaq", lastBacaanAyat: 12, lastHafalanAyat: 12 },
+            { id: "IDSRQ084", name: "M. Fauzan", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 15, weeklyHafalan: 13, lastBacaan: "Iqro 3", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 13 },
+            { id: "IDSRQ085", name: "Yasif Abqory", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 16, weeklyHafalan: 14, lastBacaan: "Iqro 4", lastHafalan: "An-Nas s.d. Al-Masad", lastBacaanAyat: 16, lastHafalanAyat: 14 },
+            { id: "IDSRQ086", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 18, weeklyHafalan: 15, lastBacaan: "Iqro 5", lastHafalan: "An-Nas s.d. An-Nasr", lastBacaanAyat: 18, lastHafalanAyat: 15 },
+            { id: "IDSRQ087", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Ustadzah Mega", phone: "085774042121", weeklyBacaan: 20, weeklyHafalan: 16, lastBacaan: "Iqro 6", lastHafalan: "An-Nas s.d. Al-Kafirun", lastBacaanAyat: 20, lastHafalanAyat: 16 }
         ];
 
         // 114 Surahs with exact ayat counts and Mushaf page data
@@ -595,39 +577,28 @@
             if (fallback) fallback.classList.remove('hidden');
         };
 
-        window.toggleMenuDropdown = function(event, menuKey) {
-            if (event) event.stopPropagation();
-            const dropdown = document.getElementById(`dropdown-${menuKey}`);
-            const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
-            const allChevrons = document.querySelectorAll('[id^="chevron-"]');
-            const isCurrentlyOpen = dropdown && !dropdown.classList.contains('hidden');
-
-            allDropdowns.forEach(d => d.classList.add('hidden'));
-            allChevrons.forEach(c => c.classList.remove('rotate-180'));
-
-            if (!isCurrentlyOpen && dropdown) {
-                dropdown.classList.remove('hidden');
-                const chevron = document.getElementById(`chevron-${menuKey}`);
-                if (chevron) chevron.classList.add('rotate-180');
-            }
-        };
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('[id^="dropdown-"]') && !e.target.closest('[id^="mainNav-"]')) {
-                document.querySelectorAll('[id^="dropdown-"]').forEach(d => d.classList.add('hidden'));
-                document.querySelectorAll('[id^="chevron-"]').forEach(c => c.classList.remove('rotate-180'));
-            }
-        });
-
         window.switchTab = function(tabId) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
-            document.querySelectorAll('[id^="dropdown-"]').forEach(d => d.classList.add('hidden'));
+            
+            // Highlight active tab
+            ['setoran', 'history', 'santri', 'wa_report', 'class_report', 'sync'].forEach(t => {
+                const btn = document.getElementById(`btnTab-${t}`);
+                if (btn) {
+                    if (t === tabId) {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                    }
+                }
+            });
+
             if (tabId === 'setoran') window.renderSantriCardsAndTable();
             if (tabId === 'history') window.renderHistoryTable();
             if (tabId === 'santri') window.renderMasterSantriTable();
             if (tabId === 'wa_report') window.populateWaDropdown();
+            if (tabId === 'class_report') window.generateClassReport();
         };
 
         window.handleSearch = function(query) {
@@ -672,7 +643,7 @@
             const c = document.getElementById('toastContainer');
             if (!c) return;
             const t = document.createElement('div');
-            t.className = `p-4 rounded-2xl text-lg sm:text-xl font-bold text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
+            t.className = `p-3 rounded-2xl text-sm sm:text-base font-bold text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
             t.innerText = msg;
             c.appendChild(t);
             setTimeout(() => t.remove(), 3000);
@@ -719,16 +690,16 @@
             });
 
             grid.innerHTML = filtered.map(s => `
-                <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-2.5">
                     <div class="flex items-start justify-between">
                         <div>
-                            <span class="text-sm font-bold text-slate-400">${s.id}</span>
-                            <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">${s.name}</h3>
-                            <p class="text-lg sm:text-xl text-emerald-700 dark:text-emerald-400 font-bold">${s.class} • ${s.teacher}</p>
+                            <span class="text-xs font-bold text-slate-400">${s.id}</span>
+                            <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">${s.name}</h3>
+                            <p class="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-bold">${s.class} • ${s.teacher}</p>
                         </div>
-                        <button onclick="window.openEditModal('${s.id}')" class="px-5 py-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-lg sm:text-xl font-black border border-emerald-200 transition-colors shadow-xs">Setor</button>
+                        <button onclick="window.openEditModal('${s.id}')" class="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm sm:text-base font-black border border-emerald-200 transition-colors shadow-xs">Setor</button>
                     </div>
-                    <div class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 space-y-1 pt-2 border-t border-slate-100 dark:border-slate-700">
+                    <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-0.5 pt-2 border-t border-slate-100 dark:border-slate-700">
                         <div>Bacaan: <strong class="text-slate-900 dark:text-slate-100">${s.lastBacaan || '-'}</strong></div>
                         <div>Hafalan: <strong class="text-slate-900 dark:text-slate-100">${s.lastHafalan || '-'}</strong></div>
                     </div>
@@ -738,11 +709,11 @@
             if (tbody) {
                 tbody.innerHTML = filtered.map(s => `
                     <tr>
-                        <td class="p-4 font-black text-xl">${s.name}</td>
-                        <td class="p-4 text-lg sm:text-xl">${s.class}</td>
-                        <td class="p-4 text-lg sm:text-xl font-bold">${s.lastBacaan || '-'}</td>
-                        <td class="p-4 text-lg sm:text-xl font-bold">${s.lastHafalan || '-'}</td>
-                        <td class="p-4 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-lg shadow-xs">Setor</button></td>
+                        <td class="p-3 font-black">${s.name}</td>
+                        <td class="p-3 text-xs sm:text-sm">${s.class}</td>
+                        <td class="p-3 text-xs sm:text-sm font-bold">${s.lastBacaan || '-'}</td>
+                        <td class="p-3 text-xs sm:text-sm font-bold">${s.lastHafalan || '-'}</td>
+                        <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-3.5 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-xs shadow-xs">Setor</button></td>
                     </tr>
                 `).join('');
             }
@@ -807,9 +778,6 @@
             if (hKemarinText) hKemarinText.innerText = s.lastHafalan || 'Belum ada data';
             if (hKemarinAyat) hKemarinAyat.innerText = (s.lastHafalanAyat || 0) + ' ayat';
 
-            window.removePhoto('bacaan');
-            window.removePhoto('hafalan');
-
             const modal = document.getElementById('setoranModal');
             if (modal) modal.classList.remove('hidden');
             
@@ -828,29 +796,6 @@
         window.closeEditModal = function() {
             const modal = document.getElementById('setoranModal');
             if (modal) modal.classList.add('hidden');
-        };
-
-        window.handlePhotoUpload = function(type, input) {
-            if (!input.files || !input.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById(`${type}PhotoPreview`);
-                const wrapper = document.getElementById(`${type}PhotoPreviewWrapper`);
-                if (preview && wrapper) {
-                    preview.src = e.target.result;
-                    wrapper.classList.remove('hidden');
-                }
-            };
-            reader.readAsDataURL(input.files[0]);
-        };
-
-        window.removePhoto = function(type) {
-            const preview = document.getElementById(`${type}PhotoPreview`);
-            const wrapper = document.getElementById(`${type}PhotoPreviewWrapper`);
-            if (preview && wrapper) {
-                preview.src = '';
-                wrapper.classList.add('hidden');
-            }
         };
 
         window.calcBacaanTotals = function() {
@@ -892,7 +837,7 @@
             const bSurahId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
             const bSurahObj = window.quranSurahs.find(x => x.id === bSurahId);
             const bHal = document.getElementById('bacaanMushafHalInput')?.value || `Hal.${bSurahObj ? bSurahObj.hal : 1}`;
-            s.lastBacaan = `QS ${bSurahObj ? bSurahObj.name : 'Al-Fatihah'} (${bHal}) : ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
+            s.lastBacaan = `${bSurahObj ? bSurahObj.name : 'Al-Fatihah'} ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
             s.lastBacaanAyat = bToday;
 
             const hSurahId = parseInt(document.getElementById('hafalanSurahSelect')?.value || 1);
@@ -903,38 +848,55 @@
             const hafalanUjianStatus = document.getElementById('hafalanUjianStatusSelect')?.value || 'Belum diuji';
             const hafalanUjianManual = document.getElementById('hafalanUjianQuranManualInput')?.value || '-';
 
-            s.lastHafalan = `QS ${hSurahObj ? hSurahObj.name : 'Al-Fatihah'} (${hHal}) : ${document.getElementById('hafalanAyatStartInput')?.value}-${document.getElementById('hafalanAyatEndInput')?.value} [Level: ${currentHafalanLevel}, Status: ${hafalanUjianStatus}]`;
+            s.lastHafalan = `${hSurahObj ? hSurahObj.name : 'Al-Fatihah'} ${document.getElementById('hafalanAyatStartInput')?.value}-${document.getElementById('hafalanAyatEndInput')?.value}`;
             s.lastHafalanAyat = hToday;
 
             const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
             history.unshift({
                 timestamp: new Date().toLocaleString('id-ID'),
                 name: s.name,
-                bacaan: `${s.lastBacaan} (${bToday} ayat, Sepekan: ${s.weeklyBacaan} ayat)`,
-                hafalan: `${s.lastHafalan} (${hToday} ayat, Sepekan: ${s.weeklyHafalan} ayat)`
+                bacaan: `${s.lastBacaan} (${bToday} ayat)`,
+                hafalan: `${s.lastHafalan} (${hToday} ayat)`
             });
             localStorage.setItem('rq_history_db', JSON.stringify(history));
 
-            const webhook = document.getElementById('webhookUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
-            fetch(webhook, {
+            const tanggalVal = document.getElementById('modalTanggalInput')?.value || new Date().toISOString().split('T')[0];
+
+            // 1. SYNC BACAAN TO GOOGLE SHEET 1
+            const webhookBacaan = document.getElementById('webhookBacaanUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
+            fetch(webhookBacaan, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
-                    type: 'setoran_daily',
+                    type: 'setoran_bacaan',
                     id: s.id,
                     name: s.name,
                     class: s.class,
                     teacher: s.teacher,
-                    tanggal: document.getElementById('modalTanggalInput')?.value || new Date().toISOString().split('T')[0],
+                    tanggal: tanggalVal,
                     bacaanHariIni: s.lastBacaan,
-                    bacaanKemarin: document.getElementById('modalBacaanKemarinText')?.innerText || '-',
                     bacaanStatus: document.getElementById('bacaanStatusSelect')?.value || 'Lancar (A)',
                     bacaanCatatan: document.getElementById('bacaanCatatanInput')?.value || '-',
                     bacaanTotalAyat: bToday,
-                    bacaanSepekan: s.weeklyBacaan,
+                    bacaanSepekan: s.weeklyBacaan
+                })
+            }).catch(e => console.warn(e));
+
+            // 2. SYNC HAFALAN TO GOOGLE SHEET 2
+            const webhookHafalan = document.getElementById('webhookHafalanUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
+            fetch(webhookHafalan, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    type: 'setoran_hafalan',
+                    id: s.id,
+                    name: s.name,
+                    class: s.class,
+                    teacher: s.teacher,
+                    tanggal: tanggalVal,
                     hafalanHariIni: s.lastHafalan,
-                    hafalanKemarin: document.getElementById('modalHafalanKemarinText')?.innerText || '-',
                     hafalanStatus: document.getElementById('hafalanStatusSelect')?.value || 'Lancar (A)',
                     hafalanLevel: currentHafalanLevel,
                     hafalanUjianStatus: hafalanUjianStatus,
@@ -945,7 +907,7 @@
                 })
             }).catch(e => console.warn(e));
 
-            window.showToast("Setoran berhasil disimpan & disinkronkan!", "success");
+            window.showToast("Setoran berhasil disimpan & disinkronkan ke 2 Google Sheets!", "success");
             window.closeEditModal();
             window.renderSantriCardsAndTable();
         };
@@ -956,10 +918,10 @@
             const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
             tbody.innerHTML = history.map(h => `
                 <tr>
-                    <td class="p-4 text-lg">${h.timestamp}</td>
-                    <td class="p-4 font-bold text-xl">${h.name}</td>
-                    <td class="p-4 text-lg sm:text-xl">${h.bacaan}</td>
-                    <td class="p-4 text-lg sm:text-xl">${h.hafalan}</td>
+                    <td class="p-3 text-xs sm:text-sm">${h.timestamp}</td>
+                    <td class="p-3 font-bold">${h.name}</td>
+                    <td class="p-3 text-xs sm:text-sm">${h.bacaan}</td>
+                    <td class="p-3 text-xs sm:text-sm">${h.hafalan}</td>
                 </tr>
             `).join('');
         };
@@ -969,12 +931,12 @@
             if (!tbody) return;
             tbody.innerHTML = window.santriList.map((s, idx) => `
                 <tr>
-                    <td class="p-4 text-lg sm:text-xl">${idx + 1}</td>
-                    <td class="p-4 font-bold text-lg sm:text-xl">${s.id}</td>
-                    <td class="p-4 font-bold text-xl">${s.name}</td>
-                    <td class="p-4 text-lg sm:text-xl">${s.class}</td>
-                    <td class="p-4 text-lg sm:text-xl">${s.teacher}</td>
-                    <td class="p-4 text-lg sm:text-xl">${s.phone}</td>
+                    <td class="p-3 text-xs sm:text-sm">${idx + 1}</td>
+                    <td class="p-3 font-bold text-xs sm:text-sm">${s.id}</td>
+                    <td class="p-3 font-bold">${s.name}</td>
+                    <td class="p-3 text-xs sm:text-sm">${s.class}</td>
+                    <td class="p-3 text-xs sm:text-sm">${s.teacher}</td>
+                    <td class="p-3 text-xs sm:text-sm">${s.phone}</td>
                 </tr>
             `).join('');
         };
@@ -992,68 +954,36 @@
             if (!s) return;
             const phoneEl = document.getElementById('waPhoneInput');
             const msgEl = document.getElementById('waMessagePreview');
-            if (phoneEl) phoneEl.value = '+6285774042121';
+            if (phoneEl) phoneEl.value = s.phone || '+6285774042121';
 
-            // Format tanggal hari ini dalam bahasa Indonesia
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const todayStr = new Date().toLocaleDateString('id-ID', options);
+            let teacherFormatted = (s.teacher || '-').replace(/^Ustadz\s+/i, 'Kak ').replace(/^Ustadzah\s+/i, 'Kak ');
 
-            // Format "Kak" menggantikan Ustadz/Ustadzah
-            let teacherNameFormatted = s.teacher || '-';
-            teacherNameFormatted = teacherNameFormatted.replace(/^Ustadz\s+/i, 'Kak ').replace(/^Ustadzah\s+/i, 'Kak ');
-
-            // Kata-kata hangat pengantar & format KARTU PRESTASI SANTRI
-            let msg = `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
-            `Ayah dan Bunda yang kami sayangi dan banggakan, semoga senantiasa diberikan kesehatan dan limpahan keberkahan oleh Allah SWT. 🤲✨\n\n` +
-            `*KARTU PRESTASI SANTRI*\n` +
+            let msg = `*KARTU PRESTASI SANTRI*\n` +
             `*Rumah Qur'an Al - Khansa*\n` +
             `____________________\n` +
             `👤 *Nama:* ${s.name}\n` +
             `🏫 *Kelas:* ${s.class}\n` +
-            `✍️ *Pengajar:* ${teacherNameFormatted}\n` +
+            `✍️ *Pengajar:* ${teacherFormatted}\n` +
             `📅 *Tanggal:* ${todayStr}\n` +
             `____________________\n\n`;
 
-            // Bacaan section if filled
-            const bStatus = document.getElementById('bacaanStatusSelect')?.value;
-            const bCatatan = document.getElementById('bacaanCatatanInput')?.value?.trim();
             if (s.lastBacaan) {
                 msg += `📖 *SETORAN BACAAN AL-QUR'AN*:\n` +
-                `• Status Penilaian: ${bStatus || '-'}\n` +
                 `• Capaian Hari Ini: ${s.lastBacaan}\n` +
-                `• Jumlah Hari Ini: ${s.lastBacaanAyat || 0} ayat\n` +
-                `• Akumulasi Sepekan: ${s.weeklyBacaan || 0} ayat\n`;
-                if (bCatatan) {
-                    msg += `• Catatan Pengajar: ${bCatatan}\n`;
-                }
-                msg += `\n`;
+                `• Jumlah Hari Ini: ${s.lastBacaanAyat || 0} ayat\n\n`;
             }
-
-            // Hafalan section if filled
-            const hStatus = document.getElementById('hafalanStatusSelect')?.value;
-            const hLevel = document.getElementById('hafalanCurrentLevelInput')?.value?.trim();
-            const hUjianStatus = document.getElementById('hafalanUjianStatusSelect')?.value;
-            const hUjianManual = document.getElementById('hafalanUjianQuranManualInput')?.value?.trim();
-            const hCatatan = document.getElementById('hafalanCatatanInput')?.value?.trim();
 
             if (s.lastHafalan) {
                 msg += `🧠 *SETORAN HAFALAN TAHFIZH*:\n` +
-                `• Status Penilaian: ${hStatus || '-'}\n`;
-                if (hLevel) msg += `• Level Hafalan: ${hLevel}\n`;
-                if (hUjianStatus && hUjianStatus !== 'Belum diuji') msg += `• Status Ujian: ${hUjianStatus}\n`;
-                if (hUjianManual) msg += `• Keterangan Ujian: ${hUjianManual}\n`;
-                msg += `• Capaian Hari Ini: ${s.lastHafalan}\n` +
-                `• Jumlah Hari Ini: ${s.lastHafalanAyat || 0} ayat\n` +
-                `• Akumulasi Sepekan: ${s.weeklyHafalan || 0} ayat\n`;
-                if (hCatatan) {
-                    msg += `• Catatan Pengajar: ${hCatatan}\n`;
-                }
-                msg += `\n`;
+                `• Capaian Hari Ini: ${s.lastHafalan}\n` +
+                `• Jumlah Hari Ini: ${s.lastHafalanAyat || 0} ayat\n\n`;
             }
 
-            msg += `Alhamdulillah, ananda terus menunjukkan semangat yang luar biasa dalam belajar bersama kami. Terima kasih banyak Ayah/Bunda atas kesabaran, cinta, dan bimbingan hangatnya di rumah. Jazakumullahu khairan katsiran.\n\n` +
+            msg += `Alhamdulillah, ananda terus menunjukkan semangat luar biasa. Terima kasih banyak Ayah/Bunda atas bimbingan hangatnya di rumah. Jazakumullahu khairan katsiran.\n\n` +
             `Wassalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
-            `( Pengajar : ${teacherNameFormatted} )`;
+            `( Pengajar : ${teacherFormatted} )`;
 
             if (msgEl) msgEl.value = msg;
         };
@@ -1067,15 +997,59 @@
                 el.select();
                 document.execCommand('copy');
                 el.remove();
-                window.showToast("Pesan laporan lengkap berhasil disalin!", "success");
+                window.showToast("Pesan laporan berhasil disalin!", "success");
             }
         };
 
         window.sendWaReportDirect = function() {
-            const phone = document.getElementById('waPhoneInput')?.value || '085774042121';
+            const phone = document.getElementById('waPhoneInput')?.value || '+6285774042121';
             const text = document.getElementById('waMessagePreview')?.value;
             if (text) {
-                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+                window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
+            }
+        };
+
+        // Class Report Generator matching requested exact format
+        window.generateClassReport = function() {
+            const className = document.getElementById('reportClassSelect')?.value || 'Abu Ubaidah';
+            const santrisInClass = window.santriList.filter(s => s.class === className);
+            
+            let msg = `بِسْمِ ٱللَّٰهِ\n` +
+            `Ayah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas ${className}:\n\n`;
+
+            const numberEmojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "1️⃣1️⃣", "1️⃣2️⃣", "1️⃣3️⃣", "1️⃣4️⃣", "1️⃣5️⃣", "1️⃣6️⃣", "1️⃣7️⃣", "1️⃣8️⃣", "1️⃣9️⃣", "2️⃣0️⃣"];
+
+            santrisInClass.forEach((s, idx) => {
+                const numStr = numberEmojis[idx] || `${idx + 1}️⃣`;
+                const bacaanText = s.lastBacaan || '-';
+                const hafalanText = s.lastHafalan || '-';
+                msg += `${numStr} *${s.name}*\n` +
+                `📖 Bacaan: ${bacaanText}\n` +
+                `💡 Hafalan: ${hafalanText}\n\n`;
+            });
+
+            const previewEl = document.getElementById('classReportMessagePreview');
+            if (previewEl) previewEl.value = msg;
+        };
+
+        window.copyClassReportText = function() {
+            const text = document.getElementById('classReportMessagePreview')?.value;
+            if (text) {
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                el.remove();
+                window.showToast("Laporan rekap kelas berhasil disalin!", "success");
+            }
+        };
+
+        window.sendClassReportDirect = function() {
+            const phone = document.getElementById('classReportPhoneInput')?.value || '+6285774042121';
+            const text = document.getElementById('classReportMessagePreview')?.value;
+            if (text) {
+                window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
             }
         };
 
