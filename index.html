@@ -330,17 +330,51 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Kategori:</label>
-                            <select id="bacaanCategorySelect" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                            <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
                                 <option value="quran">Al-Qur'an</option>
                                 <option value="iqro">Iqro</option>
                             </select>
                         </div>
                         <div class="sm:col-span-2">
                             <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Surat / Jilid:</label>
+                                <label id="bacaanSurahLabel" class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Surat / Jilid:</label>
                                 <span id="bacaanHalBadge" class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded">Hal. 1</span>
                             </div>
                             <select id="bacaanSurahSelect" onchange="window.updateBacaanAyatLimits()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm"></select>
+                        </div>
+                    </div>
+                    <div id="bacaanAyatSection" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Info Mushaf Halaman:</label>
+                            <input type="text" id="bacaanMushafHalInput" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-emerald-800 dark:text-emerald-300 text-sm" placeholder="Hal. 1">
+                        </div>
+                        <div class="sm:col-span-2 grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Mulai:</label>
+                                <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                            </div>
+                            <div>
+                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Sampai:</label>
+                                <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Iqro specific input fields -->
+                    <div id="bacaanIqroSection" class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden">
+                        <div>
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Pilih Jilid:</label>
+                            <select id="bacaanIqroJilidSelect" onchange="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                                <option value="Iqro 1">Iqro Jilid 1</option>
+                                <option value="Iqro 2">Iqro Jilid 2</option>
+                                <option value="Iqro 3">Iqro Jilid 3</option>
+                                <option value="Iqro 4">Iqro Jilid 4</option>
+                                <option value="Iqro 5">Iqro Jilid 5</option>
+                                <option value="Iqro 6" selected>Iqro Jilid 6</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Halaman:</label>
+                            <input type="number" id="bacaanIqroHalInput" value="1" min="1" max="35" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm" placeholder="Nomor Halaman">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -930,6 +964,11 @@
         };
 
         window.updateBacaanAyatLimits = function() {
+            const category = document.getElementById('bacaanCategorySelect')?.value || 'quran';
+            if (category === 'iqro') {
+                window.calcBacaanTotals();
+                return;
+            }
             const sid = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
             const surah = window.quranSurahs.find(s => s.id === sid);
             if (surah) {
@@ -947,6 +986,29 @@
             }
             window.calcBacaanTotals();
             window.autoSuggestTasks();
+        };
+
+        window.onBacaanCategoryChange = function(cat) {
+            const surahSelect = document.getElementById('bacaanSurahSelect');
+            const surahLabel = document.getElementById('bacaanSurahLabel');
+            const ayatSec = document.getElementById('bacaanAyatSection');
+            const iqroSec = document.getElementById('bacaanIqroSection');
+            const badge = document.getElementById('bacaanHalBadge');
+            
+            if (cat === 'iqro') {
+                if (ayatSec) ayatSec.classList.add('hidden');
+                if (iqroSec) iqroSec.classList.remove('hidden');
+                if (surahLabel) surahLabel.innerText = "Jilid Iqro:";
+                if (surahSelect) surahSelect.parentElement.classList.add('hidden');
+                if (badge) badge.innerText = "Jilid 1-6";
+            } else {
+                if (ayatSec) ayatSec.classList.remove('hidden');
+                if (iqroSec) iqroSec.classList.add('hidden');
+                if (surahLabel) surahLabel.innerText = "Surat / Jilid:";
+                if (surahSelect) surahSelect.parentElement.classList.remove('hidden');
+                window.updateBacaanAyatLimits();
+            }
+            window.calcBacaanTotals();
         };
 
         window.updateHafalanAyatLimits = function(num) {
@@ -1108,11 +1170,18 @@
         };
 
         window.calcBacaanTotals = function() {
-            const startInput = document.getElementById('bacaanAyatStartInput');
-            const endInput = document.getElementById('bacaanAyatEndInput');
-            const start = parseInt(startInput ? startInput.value : 1) || 1;
-            const end = parseInt(endInput ? endInput.value : 7) || 7;
-            const totalToday = Math.max(0, end - start + 1);
+            const category = document.getElementById('bacaanCategorySelect')?.value || 'quran';
+            let totalToday = 0;
+            if (category === 'iqro') {
+                const hal = parseInt(document.getElementById('bacaanIqroHalInput')?.value || 1) || 1;
+                totalToday = hal; // For Iqro, value represents progress or page count representation
+            } else {
+                const startInput = document.getElementById('bacaanAyatStartInput');
+                const endInput = document.getElementById('bacaanAyatEndInput');
+                const start = parseInt(startInput ? startInput.value : 1) || 1;
+                const end = parseInt(endInput ? endInput.value : 7) || 7;
+                totalToday = Math.max(0, end - start + 1);
+            }
             const s = window.santriList.find(x => x.id === window.activeSantriId);
             const weekly = (s ? s.weeklyBacaan : 0) + totalToday;
             const hTodayEl = document.getElementById('bacaanTotalHariIni');
@@ -1156,11 +1225,18 @@
             const bToday = parseInt(document.getElementById('bacaanTotalHariIni')?.innerText || 0);
             const hToday = parseInt(document.getElementById('hafalanTotalHariIni')?.innerText || 0);
             s.weeklyBacaan = parseInt(document.getElementById('bacaanTotalSepekan')?.innerText || 0);
-            s.weeklyHafalan = parseInt(document.getElementById('hafalanTotalSepekan')?.innerText || 0);
+            s.weeklyHafalan = parseInt(document.getElementById('bacaanTotalSepekan')?.innerText || 0);
             
-            const bSurahId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
-            const bSurahObj = window.quranSurahs.find(x => x.id === bSurahId);
-            s.lastBacaan = `${bSurahObj ? bSurahObj.name : 'Al-Fatihah'} ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
+            const category = document.getElementById('bacaanCategorySelect')?.value || 'quran';
+            if (category === 'iqro') {
+                const jilid = document.getElementById('bacaanIqroJilidSelect')?.value || 'Iqro 6';
+                const hal = document.getElementById('bacaanIqroHalInput')?.value || '1';
+                s.lastBacaan = `${jilid} hlm ${hal}`;
+            } else {
+                const bSurahId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
+                const bSurahObj = window.quranSurahs.find(x => x.id === bSurahId);
+                s.lastBacaan = `${bSurahObj ? bSurahObj.name : 'Al-Fatihah'} ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
+            }
             s.lastBacaanAyat = bToday;
             s.bacaanCatatan = document.getElementById('bacaanCatatanInput')?.value || '';
 
