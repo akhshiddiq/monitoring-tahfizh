@@ -198,7 +198,10 @@
         <!-- 4. LAPORAN WA ORANG TUA (PERSONAL) -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4 text-sm sm:text-base">
-                <h3 class="font-black text-xl sm:text-2xl">Generator Laporan WhatsApp Orang Tua (Personal)</h3>
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl sm:text-2xl">Generator Laporan WhatsApp Orang Tua (Personal)</h3>
+                    <button onclick="window.rotateWaGreeting()" class="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold rounded-xl text-xs border border-emerald-200 hover:bg-emerald-100 transition-colors">Acak Doa & Salam 🔄</button>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
                         <label class="font-extrabold text-slate-500">Pilih Santri:</label>
@@ -294,7 +297,6 @@
         </section>
     </main>
 
-    <!-- SETORAN MODAL -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-sm sm:text-base">
             <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
@@ -328,7 +330,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Kategori:</label>
-                            <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                            <select id="bacaanCategorySelect" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
                                 <option value="quran">Al-Qur'an</option>
                                 <option value="iqro">Iqro</option>
                             </select>
@@ -359,7 +361,7 @@
                     </div>
                     <!-- Tugas Bacaan -->
                     <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-300 space-y-2">
-                        <label class="font-black text-xs text-emerald-800 uppercase">Tugas / PR Bacaan Selanjutnya (Disarankan Otomatis):</label>
+                        <label class="font-black text-xs text-emerald-800 uppercase">Tugas / PR Bacaan Selanjutnya (Saran Otomatis):</label>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <select id="tugasBacaanSurahSelect" class="sm:col-span-2 p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm"></select>
                             <input type="text" id="tugasBacaanAyatInput" class="p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm" placeholder="Ayat (cth: 8-15)">
@@ -488,7 +490,7 @@
 
                     <!-- Tugas Hafalan -->
                     <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-amber-300 space-y-2">
-                        <label class="font-black text-xs text-amber-800 uppercase">Tugas / PR Hafalan Selanjutnya (Disarankan Otomatis):</label>
+                        <label class="font-black text-xs text-amber-800 uppercase">Tugas / PR Hafalan Selanjutnya (Saran Otomatis):</label>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <select id="tugasHafalanSurahSelect" class="sm:col-span-2 p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm"></select>
                             <input type="text" id="tugasHafalanAyatInput" class="p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm" placeholder="Ayat (cth: 8-15)">
@@ -541,11 +543,11 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="text-[11px] font-extrabold text-slate-500">Mulai Ayat:</label>
-                                <input type="number" id="murojaahAyatStartInput1" value="1" min="1" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
+                                <input type="number" id="murojaahAyatStartInput1" value="1" min="1" oninput="window.autoSuggestTasks()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
                             </div>
                             <div>
                                 <label class="text-[11px] font-extrabold text-slate-500">Sampai Ayat:</label>
-                                <input type="number" id="murojaahAyatEndInput1" value="10" min="1" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
+                                <input type="number" id="murojaahAyatEndInput1" value="10" min="1" oninput="window.autoSuggestTasks()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
                             </div>
                         </div>
                     </div>
@@ -570,7 +572,7 @@
 
                     <!-- Tugas Muroja'ah -->
                     <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-teal-300 space-y-2">
-                        <label class="font-black text-xs text-teal-800 uppercase">Tugas / PR Muroja'ah Selanjutnya (Disarankan Otomatis):</label>
+                        <label class="font-black text-xs text-teal-800 uppercase">Tugas / PR Muroja'ah Selanjutnya (Saran Otomatis):</label>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <select id="tugasMurojaahSurahSelect" class="sm:col-span-2 p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm"></select>
                             <input type="text" id="tugasMurojaahAyatInput" class="p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm" placeholder="Ayat (cth: 11-20)">
@@ -603,7 +605,6 @@
         </div>
     </div>
 
-    <!-- EDIT SANTRI MASTER MODAL -->
     <div id="editSantriModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-md w-full flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-sm sm:text-base">
             <div class="px-5 py-3.5 bg-emerald-800 text-white flex items-center justify-between shrink-0">
@@ -640,7 +641,7 @@
 
     <script>
         window.santriList = [
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastMurojaah: "Al-Fatihah 1-7", lastTugasBacaan: "Al Baqarah 15-18", lastTugasHafalan: "An-Nas s.d. Al-Ikhlas", lastTugasMurojaah: "Al-Fatihah 8-11", lastBacaanAyat: 14, lastHafalanAyat: 10 },
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", weeklyBacaan: 14, weeklyHafalan: 14, lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastMurojaah: "Al-Fatihah 1-7", lastTugasBacaan: "Al Baqarah 15-18", lastTugasHafalan: "An-Nas s.d. Al-Ikhlas", lastTugasMurojaah: "Al-Fatihah 8-11", lastBacaanAyat: 14, lastHafalanAyat: 10, bacaanCatatan: "Tajwid sudah baik", hafalanCatatan: "Lancar" },
             { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", weeklyBacaan: 10, weeklyHafalan: 12, lastBacaan: "Iqro 6 hlm 5", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastMurojaah: "An-Nas", lastBacaanAyat: 10, lastHafalanAyat: 12 },
             { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", weeklyBacaan: 20, weeklyHafalan: 15, lastBacaan: "Ali 'Imran 1-20", lastHafalan: "An-Nas s.d. An-Nasr", lastMurojaah: "Al-Falaq", lastBacaanAyat: 20, lastHafalanAyat: 15 },
             { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", weeklyBacaan: 15, weeklyHafalan: 10, lastBacaan: "An-Nisa' 1-15", lastHafalan: "An-Nas s.d. Al-Kafirun", lastMurojaah: "Al-Ikhlas", lastBacaanAyat: 15, lastHafalanAyat: 10 },
@@ -971,8 +972,9 @@
         };
 
         window.autoSuggestTasks = function() {
-            // Bacaan suggestion
+            // Bacaan suggestion (+3 verses advanced)
             const bSurahId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
+            const bStart = parseInt(document.getElementById('bacaanAyatStartInput')?.value || 1);
             const bEnd = parseInt(document.getElementById('bacaanAyatEndInput')?.value || 7);
             const bSurahObj = window.quranSurahs.find(x => x.id === bSurahId);
             if (bSurahObj) {
@@ -986,8 +988,9 @@
                 }
             }
 
-            // Hafalan suggestion
+            // Hafalan suggestion (+3 verses advanced)
             const hSurahId = parseInt(document.getElementById('hafalanSurahSelect1')?.value || 1);
+            const hStart = parseInt(document.getElementById('hafalanAyatStartInput1')?.value || 1);
             const hEnd = parseInt(document.getElementById('hafalanAyatEndInput1')?.value || 7);
             const hSurahObj = window.quranSurahs.find(x => x.id === hSurahId);
             if (hSurahObj) {
@@ -1001,8 +1004,9 @@
                 }
             }
 
-            // Muroja'ah suggestion
+            // Muroja'ah suggestion (+3 verses advanced)
             const mSurahId = parseInt(document.getElementById('murojaahSurahSelect1')?.value || 1);
+            const mStart = parseInt(document.getElementById('murojaahAyatStartInput1')?.value || 1);
             const mEnd = parseInt(document.getElementById('murojaahAyatEndInput1')?.value || 10);
             const mSurahObj = window.quranSurahs.find(x => x.id === mSurahId);
             if (mSurahObj) {
@@ -1158,6 +1162,7 @@
             const bSurahObj = window.quranSurahs.find(x => x.id === bSurahId);
             s.lastBacaan = `${bSurahObj ? bSurahObj.name : 'Al-Fatihah'} ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
             s.lastBacaanAyat = bToday;
+            s.bacaanCatatan = document.getElementById('bacaanCatatanInput')?.value || '';
 
             // Compile multi-surah hafalan
             const h1Id = parseInt(document.getElementById('hafalanSurahSelect1')?.value || 1);
@@ -1182,6 +1187,7 @@
 
             s.lastHafalan = hafalanStr;
             s.lastHafalanAyat = hToday;
+            s.hafalanCatatan = document.getElementById('hafalanCatatanInput')?.value || '';
 
             // Compile multi-surah muroja'ah
             const m1Id = parseInt(document.getElementById('murojaahSurahSelect1')?.value || 1);
@@ -1240,7 +1246,7 @@
                     bacaanHariIni: s.lastBacaan,
                     tugasBacaan: s.lastTugasBacaan,
                     bacaanStatus: document.getElementById('bacaanStatusSelect')?.value || 'Lancar (A)',
-                    bacaanCatatan: document.getElementById('bacaanCatatanInput')?.value || '-',
+                    bacaanCatatan: s.bacaanCatatan,
                     bacaanTotalAyat: bToday,
                     bacaanSepekan: s.weeklyBacaan,
                     fotoBacaan: window.bacaanPhotoData || ''
@@ -1268,7 +1274,7 @@
                     hafalanLevel: document.getElementById('hafalanCurrentLevelInput')?.value || '-',
                     hafalanUjianStatus: document.getElementById('hafalanUjianStatusSelect')?.value || 'Belum diuji',
                     hafalanUjianManual: document.getElementById('hafalanUjianQuranManualInput')?.value || '-',
-                    hafalanCatatan: document.getElementById('hafalanCatatanInput')?.value || '-',
+                    hafalanCatatan: s.hafalanCatatan,
                     hafalanTotalAyat: hToday,
                     hafalanSepekan: s.weeklyHafalan,
                     fotoHafalan: window.hafalanPhotoData || ''
@@ -1372,6 +1378,18 @@
             window.generateWaReport();
         };
 
+        const waGreetingsPool = [
+            "Ayah/Bunda yang selalu dirahmati Allah dan semoga senantiasa diberikan kesehatan, keberkahan dalam keluarga.",
+            "Semoga Ayah dan Bunda sekeluarga selalu dalam lindungan Allah SWT, diberikan kesehatan yang berlimpah, serta hari yang penuh berkah dan kemudahan dalam segala urusan.",
+            "Ayah/Bunda tercinta, semoga limpahan rahmat dan kasih sayang Allah senantiasa menyertai keluarga kita hari ini dan seterusnya. Aamiin ya Rabbal 'alamiin."
+        ];
+
+        window.rotateWaGreeting = function() {
+            window.currentGreeting = waGreetingsPool[Math.floor(Math.random() * waGreetingsPool.length)];
+            window.generateWaReport();
+            window.showToast("Doa & salam berhasil diacak!", "info");
+        };
+
         window.generateWaReport = function() {
             const id = document.getElementById('waSantriSelect')?.value;
             const s = window.santriList.find(x => x.id === id);
@@ -1380,12 +1398,16 @@
             const msgEl = document.getElementById('waMessagePreview');
             if (phoneEl) phoneEl.value = s.phone || '+6285774042121';
 
+            if (!window.currentGreeting) {
+                window.currentGreeting = waGreetingsPool[0];
+            }
+
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const todayStr = new Date().toLocaleDateString('id-ID', options);
             let teacherFormatted = (s.teacher || '-').replace(/^Ustadz\s+/i, 'Kak ').replace(/^Ustadzah\s+/i, 'Kak ');
 
             let msg = `Assalamu'alaikum\n` +
-            `Ayah/Bunda yang selalu dirahmati Allah dan semoga senantiasa diberikan kesehatan, keberkahan dalam keluarga\n` +
+            `${window.currentGreeting}\n` +
             `*KARTU PRESTASI SANTRI*\n` +
             `*Rumah Qur'an Al - Khansa*\n` +
             `__________________________\n` +
@@ -1397,19 +1419,27 @@
 
             if (s.lastBacaan) {
                 msg += `🟦*Bacaan:*\n${s.lastBacaan}\n`;
+                if (s.bacaanCatatan) {
+                    msg += `   _Catatan: ${s.bacaanCatatan}_\n`;
+                }
             }
             if (s.lastHafalan) {
                 msg += `🟦*Hafalan:*\n${s.lastHafalan}\n`;
+                if (s.hafalanCatatan) {
+                    msg += `   _Catatan: ${s.hafalanCatatan}_\n`;
+                }
             }
             if (s.lastMurojaah) {
-                msg += `🟦*Muroja'ah di kelas:* \n${s.lastMurojaah}\n`;
+                msg += `🟦*Muroja'ah di kelas:*\n${s.lastMurojaah}\n`;
             }
-            if (s.lastTugasBacaan || s.lastTugasHafalan || s.lastTugasMurojaah) {
-                let taskList = [];
-                if (s.lastTugasBacaan) taskList.push(`Bacaan (${s.lastTugasBacaan})`);
-                if (s.lastTugasHafalan) taskList.push(`Hafalan (${s.lastTugasHafalan})`);
-                if (s.lastTugasMurojaah) taskList.push(`Muroja'ah (${s.lastTugasMurojaah})`);
-                msg += `🟦*Tugas:*\n${taskList.join(' | ')}\n`;
+
+            let tugasList = [];
+            if (s.lastTugasBacaan) tugasList.push(`Bacaan (${s.lastTugasBacaan})`);
+            if (s.lastTugasHafalan) tugasList.push(`Hafalan (${s.lastTugasHafalan})`);
+            if (s.lastTugasMurojaah) tugasList.push(`Muroja'ah (${s.lastTugasMurojaah})`);
+
+            if (tugasList.length > 0) {
+                msg += `🟦*Tugas:*\n${tugasList.join(' | ')}\n`;
             }
 
             msg += `____________________\n` +
