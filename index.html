@@ -377,22 +377,6 @@
                             <input type="number" id="bacaanIqroHalInput" value="1" min="1" max="35" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm" placeholder="Nomor Halaman">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Info Mushaf Halaman:</label>
-                            <input type="text" id="bacaanMushafHalInput" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-emerald-800 dark:text-emerald-300 text-sm" placeholder="Hal. 1">
-                        </div>
-                        <div class="sm:col-span-2 grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Mulai:</label>
-                                <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                            </div>
-                            <div>
-                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Sampai:</label>
-                                <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                            </div>
-                        </div>
-                    </div>
                     <!-- Tugas Bacaan -->
                     <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-300 space-y-2">
                         <label class="font-black text-xs text-emerald-800 uppercase">Tugas / PR Bacaan Selanjutnya (Saran Otomatis):</label>
@@ -1034,9 +1018,7 @@
         };
 
         window.autoSuggestTasks = function() {
-            // Bacaan suggestion (+3 verses advanced)
             const bSurahId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
-            const bStart = parseInt(document.getElementById('bacaanAyatStartInput')?.value || 1);
             const bEnd = parseInt(document.getElementById('bacaanAyatEndInput')?.value || 7);
             const bSurahObj = window.quranSurahs.find(x => x.id === bSurahId);
             if (bSurahObj) {
@@ -1050,9 +1032,7 @@
                 }
             }
 
-            // Hafalan suggestion (+3 verses advanced)
             const hSurahId = parseInt(document.getElementById('hafalanSurahSelect1')?.value || 1);
-            const hStart = parseInt(document.getElementById('hafalanAyatStartInput1')?.value || 1);
             const hEnd = parseInt(document.getElementById('hafalanAyatEndInput1')?.value || 7);
             const hSurahObj = window.quranSurahs.find(x => x.id === hSurahId);
             if (hSurahObj) {
@@ -1066,9 +1046,7 @@
                 }
             }
 
-            // Muroja'ah suggestion (+3 verses advanced)
             const mSurahId = parseInt(document.getElementById('murojaahSurahSelect1')?.value || 1);
-            const mStart = parseInt(document.getElementById('murojaahAyatStartInput1')?.value || 1);
             const mEnd = parseInt(document.getElementById('murojaahAyatEndInput1')?.value || 10);
             const mSurahObj = window.quranSurahs.find(x => x.id === mSurahId);
             if (mSurahObj) {
@@ -1174,7 +1152,7 @@
             let totalToday = 0;
             if (category === 'iqro') {
                 const hal = parseInt(document.getElementById('bacaanIqroHalInput')?.value || 1) || 1;
-                totalToday = hal; // For Iqro, value represents progress or page count representation
+                totalToday = hal;
             } else {
                 const startInput = document.getElementById('bacaanAyatStartInput');
                 const endInput = document.getElementById('bacaanAyatEndInput');
@@ -1357,14 +1335,14 @@
                 })
             }).catch(e => console.warn(e));
 
-            // 3. SYNC MUROJA'AH TO SHEET (gid=795737538)
+            // 3. SYNC MUROJA'AH DI KELAS TO SHEET (gid=795737538)
             const webhookMurojaah = document.getElementById('webhookMurojaahUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
             fetch(webhookMurojaah, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
-                    type: 'muroja_kelas',
+                    type: 'murojaah_kelas',
                     sheetId: '1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I',
                     gid: '795737538',
                     id: s.id,
