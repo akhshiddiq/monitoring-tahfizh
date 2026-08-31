@@ -53,7 +53,7 @@
                         </h1>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
-                            <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Hybrid Storage: Local & Cloud Active</p>
+                            <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Google Sheets Master Source</p>
                         </div>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
                             <i class="fa-solid fa-book text-emerald-600"></i> Materi Belajar Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Hybrid Storage</span>
+                        <span class="text-xs font-bold text-slate-400">Google Sheets Sync</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -208,7 +208,7 @@
                         <h3 class="font-black text-xl text-amber-800 dark:text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-star text-amber-500"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Hybrid Storage</span>
+                        <span class="text-xs font-bold text-slate-400">Google Sheets Sync</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -262,7 +262,7 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
                     <div>
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
-                        <p class="text-xs text-slate-500 font-bold mt-0.5">Kelola data riwayat setoran harian Anda.</p>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Kelola data riwayat setoran harian langsung dari Google Sheet.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap justify-end">
                         <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-4 py-2.5 rounded-xl text-sm font-black bg-emerald-600 text-white shadow-md">Riwayat Bacaan</button>
@@ -378,12 +378,12 @@
                         <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Cloud Sekarang
                     </button>
                 </div>
-                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung otomatis ke Google Sheets RQ Al-Khansa.</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung langsung ke Google Sheets RQ Al-Khansa.</p>
                 
                 <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3">
                     <label class="font-black text-sm text-emerald-900 dark:text-emerald-200">Google Apps Script Web App URL (Connected):</label>
                     <div class="flex gap-2">
-                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
+                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycby8atLR5viI84lmuUzWdrViCWjOq_j9gumnViLYZw9gW9pjE7L1lKnASXnX6ym9eLa3/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
                         <button onclick="window.saveGoogleScriptUrl()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shrink-0">Perbarui URL</button>
                     </div>
                 </div>
@@ -724,7 +724,7 @@
 
             <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-6 py-3 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-base">Tutup Modal</button>
-                <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis ke memori & Google Sheets</span>
+                <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis ke Google Sheets</span>
             </div>
         </div>
     </div>
@@ -919,7 +919,7 @@
 
         window.syncToCloud = async function(payload) {
             window.setSyncIndicator('pending');
-            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec';
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycby8atLR5viI84lmuUzWdrViCWjOq_j9gumnViLYZw9gW9pjE7L1lKnASXnX6ym9eLa3/exec';
             try {
                 await fetch(url, {
                     method: 'POST',
@@ -936,7 +936,7 @@
 
         window.fetchAllDataFromCloud = async function() {
             window.setSyncIndicator('pending');
-            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec';
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycby8atLR5viI84lmuUzWdrViCWjOq_j9gumnViLYZw9gW9pjE7L1lKnASXnX6ym9eLa3/exec';
             try {
                 window.showToast("Menyinkronkan data dari Google Sheet...", "success");
                 const res = await fetch(url);
@@ -970,7 +970,7 @@
                 }
             } catch (err) {
                 window.setSyncIndicator('error');
-                window.showToast("Sinkronisasi lokal aktif (Offline Mode).", "success");
+                window.showToast("Gagal terhubung ke Cloud. Mode Offline aktif.", "error");
             }
         };
 
@@ -1366,7 +1366,7 @@
                 });
             }
 
-            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan!`, "success");
+            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan ke Google Sheet!`, "success");
             window.renderSantriCardsAndTable();
             window.renderHistoryTable();
         };
@@ -1666,7 +1666,7 @@
                 document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-base';
             }
             if (!localStorage.getItem('rq_google_script_url')) {
-                localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec');
+                localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycby8atLR5viI84lmuUzWdrViCWjOq_j9gumnViLYZw9gW9pjE7L1lKnASXnX6ym9eLa3/exec');
             }
             const scriptUrlInput = document.getElementById('googleScriptUrlInput');
             if (scriptUrlInput) {
