@@ -80,7 +80,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- SECTION: INPUT / SETORAN -->
+        <!-- Section: Setoran -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -137,8 +137,20 @@
             </div>
         </section>
 
-        <!-- SECTION: MATERI -->
+        <!-- Section: Materi -->
         <section id="section-materi" class="hidden space-y-6">
+            <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border flex-wrap gap-3">
+                <h3 class="font-black text-lg text-emerald-800 dark:text-emerald-300">Akses Google Sheet Materi Belajar</h3>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 transition shadow-xs">
+                        <i class="fa-solid fa-table"></i> Sheet Materi Utama 📊
+                    </a>
+                    <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs flex items-center gap-2 transition shadow-xs">
+                        <i class="fa-solid fa-table"></i> Sheet Materi Tambahan 📊
+                    </a>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                     <div class="flex items-center justify-between border-b pb-3">
@@ -244,7 +256,7 @@
             </div>
         </section>
 
-        <!-- SECTION: RIWAYAT / HISTORY -->
+        <!-- Section: History -->
         <section id="section-history" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
@@ -295,7 +307,7 @@
             </div>
         </section>
 
-        <!-- SECTION: WA PERSONAL -->
+        <!-- Section: WhatsApp Report -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -329,7 +341,7 @@
             </div>
         </section>
 
-        <!-- SECTION: LAPORAN KELAS -->
+        <!-- Section: Class Report -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -357,7 +369,7 @@
             </div>
         </section>
 
-        <!-- SECTION: CLOUD & RESET -->
+        <!-- Section: Export & Cloud Sync -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex items-center justify-between">
@@ -386,6 +398,7 @@
         </section>
     </main>
 
+    <!-- Modal: Setoran -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border-4 border-emerald-500 overflow-hidden">
             <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
@@ -404,7 +417,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     
-                    <!-- 1. BACAAN (HIJAU / GREEN - 2 SLOTS) -->
+                    <!-- 1. BACAAN (GREEN) -->
                     <div class="p-6 bg-emerald-50 dark:bg-emerald-950/50 rounded-3xl border-4 border-emerald-500 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-emerald-400 dark:border-emerald-600">
@@ -519,7 +532,7 @@
                         </div>
                     </div>
 
-                    <!-- 2. HAFALAN (MERAH / RED - 2 SLOTS) -->
+                    <!-- 2. HAFALAN (RED) -->
                     <div class="p-6 bg-rose-50 dark:bg-rose-950/50 rounded-3xl border-4 border-rose-500 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-rose-400 dark:border-rose-600">
@@ -587,7 +600,7 @@
                         </div>
                     </div>
 
-                    <!-- 3. MUROJA'AH (BIRU / BLUE - 2 SLOTS) -->
+                    <!-- 3. MUROJA'AH (BLUE) -->
                     <div class="p-6 bg-sky-50 dark:bg-sky-950/50 rounded-3xl border-4 border-sky-500 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-sky-400 dark:border-sky-600">
@@ -655,7 +668,7 @@
                         </div>
                     </div>
 
-                    <!-- 4. TUGAS (COKLAT / BROWN - 2 SLOTS) -->
+                    <!-- 4. TUGAS (BROWN) -->
                     <div class="p-6 bg-amberbrown-50 dark:bg-amberbrown-950/50 rounded-3xl border-4 border-amberbrown-600 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-amberbrown-400 dark:border-amberbrown-600">
@@ -939,9 +952,19 @@
                     if (cloudData.murojaah) localStorage.setItem('rq_history_murojaah', JSON.stringify(cloudData.murojaah));
                     if (cloudData.tugas) localStorage.setItem('rq_history_tugas', JSON.stringify(cloudData.tugas));
                     if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
+                    if (cloudData.materi) {
+                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4] }));
+                        localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
+                    }
+                    if (cloudData.materi_tambahan) {
+                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4] }));
+                        localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
+                    }
                     
                     window.renderSantriCardsAndTable();
                     window.renderHistoryTable();
+                    window.renderMateriList('utama');
+                    window.renderMateriList('tambahan');
                     window.setSyncIndicator('success');
                     window.showToast("Sinkronisasi Google Sheets berhasil!", "success");
                 }
