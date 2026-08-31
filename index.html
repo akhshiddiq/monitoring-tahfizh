@@ -279,7 +279,6 @@
                                 <th class="p-3.5">Detail Setoran</th>
                                 <th class="p-3.5">Status</th>
                                 <th class="p-3.5">Catatan</th>
-                                <th class="p-3.5 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -1566,7 +1565,7 @@
 
             const currentDateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-            let fullMsg = `Assalamu'alaikum\nAyah/Bunda semoga senantiasa diberikan kesehatan, keberkahan, dan kemudahan dalam segala urusan.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n👤 *Nama:* ${s.name}\n🏫 *Kelas:* ${s.class}\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n`;
+            let fullMsg = `Assalamu'alaikum\nAyah/Bunda semoga senantiasa diberikan kesehatan, keberkahan, dan kemudahan dalam segala urusan.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n👤 *Nama:* *${s.name}*\n🏫 *Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n`;
             
             if (bagianSetoran) {
                 fullMsg += `${bagianSetoran}_______________`;
@@ -1608,7 +1607,7 @@
             const filteredMateri = materiUtama.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
             const filteredTambahan = materiTambahan.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
 
-            let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas ${className}:\n\n`;
+            let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}*:\n\n`;
             
             if (filteredMateri.length > 0) {
                 msg += `📚 *Materi Belajar Hari Ini:*`;
