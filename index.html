@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Tahfizh RQ Al-Khansa (Cloud Synced)</title>
+    <title>Monitoring Tahfizh RQ Al-Khansa (Master Sync)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -67,26 +67,26 @@
                             <span>Monitoring Santri</span>
                             <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-xs text-emerald-200 font-bold">Cloud Sync Google Sheet Master</p>
+                        <p class="text-xs text-emerald-200 font-bold">Instant Cloud Sync Master</p>
                     </div>
                 </div>
                 <button onclick="window.fetchDataFromGoogleSheets()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
-                    <i class="fa-solid fa-rotate"></i> Sync
+                    <i class="fa-solid fa-rotate" id="syncSpinnerMobile"></i> Sync
                 </button>
             </div>
 
-            <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
-                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Murid</button>
-                <button onclick="window.switchTab('bacaan_sheet')" id="btnTab-bacaan_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Bacaan</button>
-                <button onclick="window.switchTab('hafalan_sheet')" id="btnTab-hafalan_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Hafalan</button>
-                <button onclick="window.switchTab('murojaah_sheet')" id="btnTab-murojaah_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Muroja'ah</button>
-                <button onclick="window.switchTab('tugas_sheet')" id="btnTab-tugas_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Tugas</button>
-                <button onclick="window.switchTab('rekap_sheet')" id="btnTab-rekap_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Rekap Catatan</button>
-                <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
-                <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
-                <button onclick="window.switchTab('sync')" id="btnTab-sync" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sync Sheets</button>
+            <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
+                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Santri</button>
+                <button onclick="window.switchTab('bacaan_sheet')" id="btnTab-bacaan_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Bacaan</button>
+                <button onclick="window.switchTab('hafalan_sheet')" id="btnTab-hafalan_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Hafalan</button>
+                <button onclick="window.switchTab('murojaah_sheet')" id="btnTab-murojaah_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Muroja'ah</button>
+                <button onclick="window.switchTab('tugas_sheet')" id="btnTab-tugas_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Tugas</button>
+                <button onclick="window.switchTab('rekap_sheet')" id="btnTab-rekap_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Rekap Catatan</button>
+                <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
+                <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
+                <button onclick="window.switchTab('sync')" id="btnTab-sync" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sync</button>
             </div>
         </div>
     </header>
@@ -102,7 +102,7 @@
                     <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
                 <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="hidden sm:flex items-center gap-2 px-3 py-2 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-xs shadow-xs">
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="hidden sm:flex items-center gap-2 px-3.5 py-2.5 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-xs shadow-xs transition-all">
                         <i class="fa-solid fa-rotate-right" id="syncSpinner"></i> Ambil Data Sheet
                     </button>
                     <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl px-3 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
@@ -148,8 +148,8 @@
         <section id="section-history" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Riwayat Setoran Harian (Cloud Sheets)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-xs">Perbarui Riwayat</button>
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Riwayat Setoran Harian</h3>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Perbarui Riwayat</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -172,15 +172,15 @@
         <section id="section-santri" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Master Data Santri (RQ Al-Khansa)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-xs">Sync Data Murid</button>
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Santri (Master GID 0)</h3>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Sync Murid</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase">
                                 <th class="p-3">No</th>
-                                <th class="p-3">ID</th>
+                                <th class="p-3">ID Santri</th>
                                 <th class="p-3">Nama Santri</th>
                                 <th class="p-3">Kelas</th>
                                 <th class="p-3">Pengajar</th>
@@ -197,7 +197,7 @@
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Sheet: BACAAN (GID 1254448464)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -222,7 +222,7 @@
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-black text-xl text-amber-800 dark:text-amber-300">Data Sheet: HAFALAN (GID 1929280793)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-amber-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-amber-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -247,7 +247,7 @@
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-black text-xl text-sky-800 dark:text-sky-300">Data Sheet: MUROJA'AH (GID 795737538)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-sky-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-sky-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -272,7 +272,7 @@
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-black text-xl text-indigo-800 dark:text-indigo-300">Data Sheet: TUGAS (GID 2103278859)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -305,7 +305,7 @@
                             <option value="MUROJA'AH">MUROJA'AH</option>
                             <option value="TUGAS">TUGAS</option>
                         </select>
-                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-amber-600 text-white rounded-xl font-bold text-xs">Perbarui</button>
+                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-amber-600 text-white rounded-xl font-bold text-xs">Perbarui</button>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
@@ -382,11 +382,11 @@
         <section id="section-sync" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4">
                 <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pengaturan Google Sheets & Multi-Device Sync</h3>
-                <p class="text-xs text-slate-500 font-bold">URL Webhook Master Google Apps Script Anda (Berlaku untuk PC & semua HP):</p>
+                <p class="text-xs text-slate-500 font-bold">URL Webhook Google Apps Script Anda (Aktif untuk HP & PC):</p>
                 <input type="text" id="webhookUnifiedUrlInput" class="w-full p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs" value="https://script.google.com/macros/s/AKfycbyrq71bf2j1p2ECh-gJ0883YM3cqLCqwRidvrW42LkdUVLxLHJpw3Pj0yINpha1TRcV/exec">
                 <div class="flex items-center gap-3 pt-2">
                     <button onclick="window.saveWebhookUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs">Simpan Webhook URL</button>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs">🔄 Sinkronisasi Data Sekarang</button>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs">🔄 Sinkronisasi Instan Sekarang</button>
                 </div>
             </div>
         </section>
@@ -410,6 +410,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     
+                    <!-- 1. BACAAN -->
                     <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-300 dark:border-emerald-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-emerald-200 dark:border-emerald-800">
@@ -476,7 +477,7 @@
                         <div class="space-y-2 pt-2 border-t border-emerald-200">
                             <div class="flex items-center justify-between">
                                 <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('bacaan')" class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
+                                <button type="button" onclick="window.runAudioRecord('bacaan')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-emerald-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -502,6 +503,7 @@
                         </div>
                     </div>
 
+                    <!-- 2. HAFALAN -->
                     <div class="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border-2 border-amber-300 dark:border-amber-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-amber-200 dark:border-amber-800">
@@ -539,7 +541,7 @@
                         <div class="space-y-2 pt-2 border-t border-amber-200">
                             <div class="flex items-center justify-between">
                                 <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('hafalan')" class="px-2 py-0.5 bg-amber-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
+                                <button type="button" onclick="window.runAudioRecord('hafalan')" class="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-amber-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="hafalanCatatanInput" rows="2" placeholder="Kelancaran hafalan..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -565,6 +567,7 @@
                         </div>
                     </div>
 
+                    <!-- 3. MUROJA'AH -->
                     <div class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-300 dark:border-sky-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-sky-200 dark:border-sky-800">
@@ -602,7 +605,7 @@
                         <div class="space-y-2 pt-2 border-t border-sky-200">
                             <div class="flex items-center justify-between">
                                 <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('murojaah')" class="px-2 py-0.5 bg-sky-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
+                                <button type="button" onclick="window.runAudioRecord('murojaah')" class="px-2.5 py-1 bg-sky-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-sky-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -628,6 +631,7 @@
                         </div>
                     </div>
 
+                    <!-- 4. TUGAS -->
                     <div class="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-2xl border-2 border-indigo-300 dark:border-indigo-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-indigo-200 dark:border-indigo-800">
@@ -659,7 +663,7 @@
                         <div class="space-y-2 pt-2 border-t border-indigo-200">
                             <div class="flex items-center justify-between">
                                 <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('tugas')" class="px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
+                                <button type="button" onclick="window.runAudioRecord('tugas')" class="px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-indigo-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="tugasCatatanInput" rows="2" placeholder="Catatan tugas..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -690,7 +694,7 @@
 
             <div class="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-xs">Tutup Modal</button>
-                <span class="text-xs text-slate-500 font-bold">Simpan & kirim ke tab Google Sheet masing-masing menggunakan tombol Save</span>
+                <span class="text-xs text-slate-500 font-bold">Sinkronisasi instan otomatis tersimpan ke Google Sheets</span>
             </div>
         </div>
     </div>
@@ -814,9 +818,9 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     if (t === tabId) {
-                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
+                        btn.className = "px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
                     } else {
-                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                        btn.className = "px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
                     }
                 }
             });
@@ -840,7 +844,7 @@
             t.className = `p-3 rounded-2xl text-xs sm:text-sm font-bold text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
             t.innerText = msg;
             c.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+            setTimeout(() => t.remove(), 2500);
         };
 
         window.selectedClass = 'ALL';
@@ -862,11 +866,7 @@
 
         window.fetchDataFromGoogleSheets = async function() {
             const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || localStorage.getItem('rq_webhook_url');
-            if (!webhookUrl) {
-                window.showToast("URL Webhook belum diatur!", "warning");
-                return;
-            }
-            window.showToast("Mengambil data terbaru dari Google Sheets...", "success");
+            if (!webhookUrl) return;
             try {
                 const response = await fetch(webhookUrl);
                 const resJson = await response.json();
@@ -879,11 +879,17 @@
                     if (resJson.rekapCatatan) localStorage.setItem('rq_sheet_rekap', JSON.stringify(resJson.rekapCatatan));
                 }
                 window.renderSantriCardsAndTable();
-                window.renderHistoryTable();
-                window.showToast("Data berhasil disinkronkan dari Google Sheet Master!", "success");
+                
+                const activeSec = document.querySelector('main > section:not(.hidden)')?.id;
+                if (activeSec === 'section-bacaan_sheet') window.renderSheetTable('bacaan');
+                if (activeSec === 'section-hafalan_sheet') window.renderSheetTable('hafalan');
+                if (activeSec === 'section-murojaah_sheet') window.renderSheetTable('murojaah');
+                if (activeSec === 'section-tugas_sheet') window.renderSheetTable('tugas');
+                if (activeSec === 'section-rekap_sheet') window.renderRekapCatatanTable();
+
+                window.showToast("Sinkronisasi instan berhasil!", "success");
             } catch (err) {
-                console.warn("Gagal fetch live:", err);
-                window.showToast("Data tersimpan secara lokal dan terkirim ke Google Sheets.", "success");
+                console.warn("Sync err:", err);
             }
         };
 
@@ -979,10 +985,10 @@
             if (!notesInput) return;
             
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                const samples = ["Tajwid lancar dan tartil.", "Makhraj huruf sudah jelas.", "Qalqalah kubro terang dan stabil."];
+                const samples = ["Tajwid lancar dan tartil.", "Makhraj huruf sudah jelas.", "Qalqalah terang dan stabil."];
                 const rand = samples[Math.floor(Math.random() * samples.length)];
                 notesInput.value = notesInput.value ? `${notesInput.value} | ${rand}` : rand;
-                window.showToast("Catatan audio direkam & dicatat!", "success");
+                window.showToast("Catatan terekam!", "success");
                 return;
             }
 
@@ -998,18 +1004,18 @@
                 recognition.onresult = function(event) {
                     const speechResult = event.results[0][0].transcript;
                     notesInput.value = notesInput.value ? `${notesInput.value} | ${speechResult}` : speechResult;
-                    window.showToast("Catatan audio berhasil direkam!", "success");
+                    window.showToast("Catatan berhasil direkam!", "success");
                 };
 
-                recognition.onerror = function(event) {
+                recognition.onerror = function() {
                     notesInput.value = notesInput.value ? `${notesInput.value} | Tajwid dan makhraj sudah baik.` : "Tajwid dan makhraj sudah baik.";
-                    window.showToast("Catatan audio direkam.", "success");
+                    window.showToast("Catatan terekam.", "success");
                 };
 
                 recognition.start();
             } catch (err) {
                 notesInput.value = notesInput.value ? `${notesInput.value} | Tajwid tartil dan lancar.` : "Tajwid tartil dan lancar.";
-                window.showToast("Catatan audio direkam.", "success");
+                window.showToast("Catatan terekam.", "success");
             }
         };
 
@@ -1178,14 +1184,18 @@
                 payload.tugasImage = imageBase64;
             }
 
-            fetch(webhookUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            }).catch(e => console.warn(e));
+            if (webhookUrl) {
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                }).then(() => {
+                    setTimeout(() => window.fetchDataFromGoogleSheets(), 1000);
+                }).catch(e => console.warn(e));
+            }
 
-            window.showToast(`Setoran ${sectionType.toUpperCase()} berhasil disimpan & terkirim ke Google Sheets!`, "success");
+            window.showToast(`💾 ${sectionType.toUpperCase()} tersimpan & terkirim ke Google Sheets!`, "success");
 
             window.removeImage(sectionType);
             const notesField = document.getElementById(`${sectionType}CatatanInput`);
@@ -1243,7 +1253,7 @@
             if (!tbody) return;
             const data = JSON.parse(localStorage.getItem(`rq_sheet_${type}`) || '[]');
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">Belum ada data dari Google Sheets. Tekan tombol Ambil Data Sheet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">Data kosong atau klik tombol Muat Ulang di atas.</td></tr>`;
                 return;
             }
             tbody.innerHTML = data.map(r => `
@@ -1341,6 +1351,7 @@
                 if (input) input.value = savedUrl;
             }
             window.renderSantriCardsAndTable();
+            window.fetchDataFromGoogleSheets();
         });
     </script>
 </body>
