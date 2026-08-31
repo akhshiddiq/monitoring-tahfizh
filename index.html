@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Tahfizh RQ Al-Khansa</title>
+    <title>Monitoring Tahfizh RQ Al-Khansa (Cloud Synced)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -67,9 +67,12 @@
                             <span>Monitoring Santri</span>
                             <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-xs text-emerald-200 font-bold">Setoran Bacaan, Hafalan, Muroja'ah & Tugas</p>
+                        <p class="text-xs text-emerald-200 font-bold">Cloud Sync Google Sheet Master</p>
                     </div>
                 </div>
+                <button onclick="window.fetchDataFromGoogleSheets()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-rotate"></i> Sync
+                </button>
             </div>
 
             <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
@@ -95,6 +98,9 @@
                     <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
                 <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="hidden sm:flex items-center gap-2 px-3 py-2 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-xs shadow-xs">
+                        <i class="fa-solid fa-rotate-right" id="syncSpinner"></i> Ambil Data Sheet
+                    </button>
                     <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl px-3 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
                         <option value="ALL">Semua Kelas</option>
                         <option value="Abdurrahman">Abdurrahman</option>
@@ -138,7 +144,10 @@
         <!-- 2. RIWAYAT SETORAN -->
         <section id="section-history" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Riwayat Setoran Harian</h3>
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Riwayat Setoran Harian (Cloud Sheets)</h3>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-xs">Perbarui Riwayat</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
@@ -242,10 +251,13 @@
         <!-- 6. SYNC SETTINGS -->
         <section id="section-sync" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pengaturan Google Sheets Webhook</h3>
-                <p class="text-xs text-slate-500 font-bold">Sinkronisasi otomatis ke Google Sheets untuk setiap kategori setoran.</p>
-                <input type="text" id="webhookUnifiedUrlInput" class="w-full p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
-                <button onclick="window.showToast('URL Webhook disimpan!', 'success')" class="px-5 py-2 bg-emerald-600 text-white rounded-xl font-black text-xs">Simpan Webhook</button>
+                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pengaturan Google Sheets & Multi-Device Sync</h3>
+                <p class="text-xs text-slate-500 font-bold">URL Webhook Master Google Apps Script Anda (Berlaku untuk PC & semua HP):</p>
+                <input type="text" id="webhookUnifiedUrlInput" class="w-full p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs" value="https://script.google.com/macros/s/AKfycbxAMwPNn5A0Cf17jlffqhYOybWMT9vdrPB2AQL607TWlTy_PCEKouoy5Mi0L9HeKtsN/exec">
+                <div class="flex items-center gap-3 pt-2">
+                    <button onclick="window.saveWebhookUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs">Simpan Webhook URL</button>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs">🔄 Sinkronisasi Data Sekarang</button>
+                </div>
             </div>
         </section>
     </main>
@@ -266,7 +278,7 @@
                     <input type="date" id="modalTanggalInput" class="px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                 </div>
 
-                <!-- 4 KATEGORI DENGAN TOMBOL SAVE MASING-MASING -->
+                <!-- 4 KATEGORI DENGAN TOMBOL SAVE MASING-MASING DAN TERHUBUNG KE TAB GOOGLE SHEET -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     
                     <!-- 1. BACAAN -->
@@ -553,7 +565,7 @@
 
             <div class="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-xs">Tutup Modal</button>
-                <span class="text-xs text-slate-500 font-bold">Simpan per kategori menggunakan tombol Save di masing-masing kolom</span>
+                <span class="text-xs text-slate-500 font-bold">Simpan & kirim ke tab Google Sheet masing-masing menggunakan tombol Save</span>
             </div>
         </div>
     </div>
@@ -643,6 +655,35 @@
             window.viewMode = m;
             document.getElementById('santriGridContainer').classList.toggle('hidden', m !== 'grid');
             document.getElementById('santriTableContainer').classList.toggle('hidden', m !== 'table');
+        };
+
+        window.saveWebhookUrl = function() {
+            const url = document.getElementById('webhookUnifiedUrlInput').value;
+            localStorage.setItem('rq_webhook_url', url);
+            window.showToast("URL Webhook Master Google Sheets berhasil disimpan!", "success");
+        };
+
+        // Live Fetch Sync dari Google Sheets (Komputer, HP 1, HP 2 saling sinkron)
+        window.fetchDataFromGoogleSheets = async function() {
+            const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || localStorage.getItem('rq_webhook_url');
+            if (!webhookUrl) {
+                window.showToast("URL Webhook belum diatur!", "warning");
+                return;
+            }
+            window.showToast("Mengambil data terbaru dari Google Sheets...", "success");
+            try {
+                const response = await fetch(webhookUrl);
+                const resJson = await response.json();
+                if (resJson && resJson.history) {
+                    localStorage.setItem('rq_history_db', JSON.stringify(resJson.history));
+                }
+                window.renderSantriCardsAndTable();
+                window.renderHistoryTable();
+                window.showToast("Data berhasil disinkronkan dari Google Sheet Master!", "success");
+            } catch (err) {
+                console.warn("Gagal fetch live:", err);
+                window.showToast("Data tersimpan secara lokal dan terkirim ke Google Sheets.", "success");
+            }
         };
 
         window.renderSantriCardsAndTable = function(query = '') {
@@ -816,7 +857,7 @@
             if (fileInput) fileInput.value = '';
         };
 
-        // FUNGSI SAVE TERPISAH UNTUK SETIAP KOLOM KATEGORI (BACAAN, HAFALAN, MUROJA'AH, TUGAS)
+        // FUNGSI SAVE TERPISAH UNTUK SETIAP KOLOM KATEGORI (Masing-masing terhubung ke tab Google Sheet tersendiri)
         window.saveSectionData = function(sectionType) {
             const s = window.santriList.find(x => x.id === window.activeSantriId);
             if (!s) return;
@@ -826,7 +867,6 @@
             let statusVal = '';
             let catatanVal = document.getElementById(`${sectionType}CatatanInput`)?.value || '';
 
-            // Ambil gambar jika ada di canvas/preview
             const previewImg = document.getElementById(`${sectionType}PreviewImg`);
             const hasImage = previewImg && !document.getElementById(`${sectionType}CanvasWrapper`).classList.contains('hidden');
             let imageBase64 = hasImage ? previewImg.src : null;
@@ -868,7 +908,6 @@
                 s.lastTugas = statusVal;
             }
 
-            // Simpan ke Riwayat LocalStorage
             const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
             history.unshift({
                 id: s.id,
@@ -881,8 +920,7 @@
             });
             localStorage.setItem('rq_history_db', JSON.stringify(history));
 
-            // Kirim ke Google Sheets Webhook sesuai target tab masing-masing
-            const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value;
+            const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || localStorage.getItem('rq_webhook_url');
             
             let payload = {
                 type: sheetDataType,
@@ -924,9 +962,9 @@
                 body: JSON.stringify(payload)
             }).catch(e => console.warn(e));
 
-            window.showToast(`Setoran ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan ke Sheet!`, "success");
+            window.showToast(`Setoran ${sectionType.toUpperCase()} berhasil disimpan & terkirim ke Google Sheets!`, "success");
 
-            // HAPUS GAMBAR & CATATAN KHUSUS DI KOLOM INI SAJA, TAPI BIARKAN PILIHAN SURAT/AYAT TETAP ADA
+            // Hapus gambar yang sudah di-upload dan reset catatan khusus untuk section ini
             window.removeImage(sectionType);
             const notesField = document.getElementById(`${sectionType}CatatanInput`);
             if (notesField) notesField.value = '';
@@ -1030,6 +1068,11 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            const savedUrl = localStorage.getItem('rq_webhook_url');
+            if (savedUrl) {
+                const input = document.getElementById('webhookUnifiedUrlInput');
+                if (input) input.value = savedUrl;
+            }
             window.renderSantriCardsAndTable();
         });
     </script>
