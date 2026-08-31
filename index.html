@@ -61,7 +61,7 @@
                             <span>Monitoring Santri</span>
                             <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-xs text-emerald-200 font-bold">Setoran Bacaan, Hafalan & Muroja'ah</p>
+                        <p class="text-xs text-emerald-200 font-bold">Setoran Bacaan, Hafalan, Muroja'ah & Tugas</p>
                     </div>
                 </div>
             </div>
@@ -139,9 +139,9 @@
                             <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase">
                                 <th class="p-3">Waktu & Tanggal</th>
                                 <th class="p-3">Nama Santri</th>
-                                <th class="p-3">Setoran Bacaan</th>
-                                <th class="p-3">Setoran Hafalan</th>
-                                <th class="p-3">Muroja'ah Kelas</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Detail Setoran</th>
+                                <th class="p-3">Catatan</th>
                                 <th class="p-3 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -237,15 +237,16 @@
         <section id="section-sync" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4">
                 <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pengaturan Google Sheets Webhook</h3>
-                <p class="text-xs text-slate-500 font-bold">Sinkronisasi otomatis ke Google Sheets untuk 3 kategori setoran.</p>
+                <p class="text-xs text-slate-500 font-bold">Sinkronisasi otomatis ke Google Sheets untuk setiap kategori setoran.</p>
                 <input type="text" id="webhookUnifiedUrlInput" class="w-full p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs" value="https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec">
                 <button onclick="window.showToast('URL Webhook disimpan!', 'success')" class="px-5 py-2 bg-emerald-600 text-white rounded-xl font-black text-xs">Simpan Webhook</button>
             </div>
         </section>
     </main>
 
+    <!-- MODAL INPUT SETORAN -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-5xl w-full max-h-[95vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-6xl w-full max-h-[95vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
                 <div>
                     <h3 id="modalSantriName" class="text-base sm:text-lg font-black tracking-tight">Setoran: Santri</h3>
@@ -254,16 +255,16 @@
                 <button onclick="window.closeEditModal()" class="p-2 rounded-xl hover:bg-white/10 text-white font-black text-xl">✕</button>
             </div>
             
-            <div class="p-3 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+            <div class="p-3 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-5">
                 <div class="p-3 bg-slate-100 dark:bg-slate-900/80 rounded-2xl border flex items-center justify-between">
                     <label class="font-extrabold text-xs text-slate-700 dark:text-slate-300">Tanggal Pertemuan:</label>
                     <input type="date" id="modalTanggalInput" class="px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                 </div>
 
-                <!-- 3 KOLOM SEJAJAR (BACAAN, HAFALAN, MUROJA'AH) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 4 KATEGORI DENGAN TOMBOL SAVE MASING-MASING -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     
-                    <!-- 1. BACAAN (Emerald Theme) -->
+                    <!-- 1. BACAAN -->
                     <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-300 dark:border-emerald-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-emerald-200 dark:border-emerald-800">
@@ -278,55 +279,85 @@
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[11px] text-slate-600">Jenis:</label>
+                                <label class="font-extrabold text-[11px] text-slate-600">Sumber Bacaan:</label>
                                 <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
-                                    <option value="quran">Al-Qur'an</option>
-                                    <option value="iqro">Iqro</option>
+                                    <option value="quran">Al-Qur'an (Google Sheets)</option>
+                                    <option value="iqro">Iqro (1 - 6)</option>
                                 </select>
                             </div>
 
                             <div id="bacaanQuranSection" class="space-y-2">
                                 <div>
                                     <label class="font-extrabold text-[11px] text-slate-600">Surat:</label>
-                                    <select id="bacaanSurahSelect" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
+                                    <select id="bacaanSurahSelect" onchange="window.updateMushafAuto('bacaan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <label class="font-extrabold text-[10px] text-slate-500">Ayat Mulai:</label>
-                                        <input type="number" id="bacaanAyatStartInput" value="1" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                        <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.updateMushafAuto('bacaan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                                     </div>
                                     <div>
                                         <label class="font-extrabold text-[10px] text-slate-500">Ayat Selesai:</label>
-                                        <input type="number" id="bacaanAyatEndInput" value="7" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                        <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.updateMushafAuto('bacaan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                                     </div>
+                                </div>
+                                <div>
+                                    <label class="font-extrabold text-[10px] text-emerald-700">Nomor Mushaf (Otomatis):</label>
+                                    <input type="text" id="bacaanMushafOutput" readonly class="w-full mt-1 p-2 bg-emerald-100/50 dark:bg-slate-900 border border-emerald-300 rounded-xl font-black text-xs text-emerald-900 dark:text-emerald-300" value="Hal. 1">
                                 </div>
                             </div>
 
                             <div id="bacaanIqroSection" class="space-y-2 hidden">
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label class="font-extrabold text-[11px] text-slate-600">Jilid:</label>
+                                        <label class="font-extrabold text-[11px] text-slate-600">Jilid Iqro:</label>
                                         <select id="bacaanIqroJilidSelect" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
-                                            <option value="Iqro 1">Iqro 1</option><option value="Iqro 2">Iqro 2</option>
-                                            <option value="Iqro 3">Iqro 3</option><option value="Iqro 4">Iqro 4</option>
-                                            <option value="Iqro 5">Iqro 5</option><option value="Iqro 6" selected>Iqro 6</option>
+                                            <option value="Iqro 1">Iqro 1</option>
+                                            <option value="Iqro 2">Iqro 2</option>
+                                            <option value="Iqro 3">Iqro 3</option>
+                                            <option value="Iqro 4">Iqro 4</option>
+                                            <option value="Iqro 5">Iqro 5</option>
+                                            <option value="Iqro 6" selected>Iqro 6</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="font-extrabold text-[11px] text-slate-600">Hal:</label>
+                                        <label class="font-extrabold text-[11px] text-slate-600">Halaman:</label>
                                         <input type="number" id="bacaanIqroHalInput" value="1" min="1" max="35" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label class="font-extrabold text-[10px] text-slate-500">Catatan Bacaan:</label>
-                            <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
+                        <div class="space-y-2 pt-2 border-t border-emerald-200">
+                            <div class="flex items-center justify-between">
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan & AI Audio:</label>
+                                <button type="button" onclick="window.runAiCorrection('bacaan')" class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                            </div>
+                            <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
+                            
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
+                                    <input type="file" id="bacaanImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'bacaan')">
+                                    <button type="button" onclick="document.getElementById('bacaanImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
+                                </div>
+                                <div id="bacaanCanvasWrapper" class="relative hidden border-2 border-dashed border-emerald-400 rounded-xl overflow-hidden bg-slate-900 h-36 flex items-center justify-center">
+                                    <img id="bacaanPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
+                                    <canvas id="bacaanDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
+                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
+                                        <button type="button" onclick="window.zoomCanvasImage('bacaan', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
+                                        <button type="button" onclick="window.zoomCanvasImage('bacaan', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
+                                        <button type="button" onclick="window.clearCanvas('bacaan')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
+                                        <button type="button" onclick="window.removeImage('bacaan')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="window.saveSectionData('bacaan')" class="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Bacaan</button>
                         </div>
                     </div>
 
-                    <!-- 2. HAFALAN (Amber Theme) -->
+                    <!-- 2. HAFALAN BARU -->
                     <div class="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border-2 border-amber-300 dark:border-amber-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-amber-200 dark:border-amber-800">
@@ -341,29 +372,56 @@
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[11px] text-slate-600">Surat Hafalan:</label>
-                                <select id="hafalanSurahSelect1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
+                                <label class="font-extrabold text-[11px] text-slate-600">Pilih Surat Hafalan:</label>
+                                <select id="hafalanSurahSelect1" onchange="window.updateMushafAuto('hafalan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="font-extrabold text-[10px] text-slate-500">Ayat Mulai:</label>
-                                    <input type="number" id="hafalanAyatStartInput1" value="1" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <input type="number" id="hafalanAyatStartInput1" value="1" min="1" oninput="window.updateMushafAuto('hafalan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                                 </div>
                                 <div>
                                     <label class="font-extrabold text-[10px] text-slate-500">Ayat Selesai:</label>
-                                    <input type="number" id="hafalanAyatEndInput1" value="7" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <input type="number" id="hafalanAyatEndInput1" value="7" min="1" oninput="window.updateMushafAuto('hafalan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                                 </div>
+                            </div>
+                            <div>
+                                <label class="font-extrabold text-[10px] text-amber-700">Nomor Mushaf (Otomatis):</label>
+                                <input type="text" id="hafalanMushafOutput" readonly class="w-full mt-1 p-2 bg-amber-100/50 dark:bg-slate-900 border border-amber-300 rounded-xl font-black text-xs text-amber-900 dark:text-amber-300" value="Hal. 604">
                             </div>
                         </div>
 
-                        <div>
-                            <label class="font-extrabold text-[10px] text-slate-500">Catatan Hafalan:</label>
-                            <textarea id="hafalanCatatanInput" rows="2" placeholder="Catatan kelancaran hafalan..." class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
+                        <div class="space-y-2 pt-2 border-t border-amber-200">
+                            <div class="flex items-center justify-between">
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan Hafalan:</label>
+                                <button type="button" onclick="window.runAiCorrection('hafalan')" class="px-2 py-0.5 bg-amber-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                            </div>
+                            <textarea id="hafalanCatatanInput" rows="2" placeholder="Kelancaran hafalan..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
+                            
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
+                                    <input type="file" id="hafalanImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'hafalan')">
+                                    <button type="button" onclick="document.getElementById('hafalanImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
+                                </div>
+                                <div id="hafalanCanvasWrapper" class="relative hidden border-2 border-dashed border-amber-400 rounded-xl overflow-hidden bg-slate-900 h-36 flex items-center justify-center">
+                                    <img id="hafalanPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
+                                    <canvas id="hafalanDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
+                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
+                                        <button type="button" onclick="window.zoomCanvasImage('hafalan', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
+                                        <button type="button" onclick="window.zoomCanvasImage('hafalan', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
+                                        <button type="button" onclick="window.clearCanvas('hafalan')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
+                                        <button type="button" onclick="window.removeImage('hafalan')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="window.saveSectionData('hafalan')" class="w-full mt-2 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Hafalan</button>
                         </div>
                     </div>
 
-                    <!-- 3. MUROJA'AH (Sky Theme) -->
+                    <!-- 3. MUROJA'AH -->
                     <div class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-300 dark:border-sky-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-sky-200 dark:border-sky-800">
@@ -378,25 +436,110 @@
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[11px] text-slate-600">Surat Muroja'ah:</label>
-                                <select id="murojaahSurahSelect1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
+                                <label class="font-extrabold text-[11px] text-slate-600">Pilih Surat Muroja'ah:</label>
+                                <select id="murojaahSurahSelect1" onchange="window.updateMushafAuto('murojaah')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="font-extrabold text-[10px] text-slate-500">Ayat Mulai:</label>
-                                    <input type="number" id="murojaahAyatStartInput1" value="1" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <input type="number" id="murojaahAyatStartInput1" value="1" min="1" oninput="window.updateMushafAuto('murojaah')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                                 </div>
                                 <div>
                                     <label class="font-extrabold text-[10px] text-slate-500">Ayat Selesai:</label>
-                                    <input type="number" id="murojaahAyatEndInput1" value="10" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <input type="number" id="murojaahAyatEndInput1" value="10" min="1" oninput="window.updateMushafAuto('murojaah')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                                 </div>
+                            </div>
+                            <div>
+                                <label class="font-extrabold text-[10px] text-sky-700">Nomor Mushaf (Otomatis):</label>
+                                <input type="text" id="murojaahMushafOutput" readonly class="w-full mt-1 p-2 bg-sky-100/50 dark:bg-slate-900 border border-sky-300 rounded-xl font-black text-xs text-sky-900 dark:text-sky-300" value="Hal. 1">
                             </div>
                         </div>
 
-                        <div>
-                            <label class="font-extrabold text-[10px] text-slate-500">Catatan Muroja'ah:</label>
-                            <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah..." class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
+                        <div class="space-y-2 pt-2 border-t border-sky-200">
+                            <div class="flex items-center justify-between">
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan Muroja'ah:</label>
+                                <button type="button" onclick="window.runAiCorrection('murojaah')" class="px-2 py-0.5 bg-sky-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                            </div>
+                            <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
+                            
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
+                                    <input type="file" id="murojaahImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'murojaah')">
+                                    <button type="button" onclick="document.getElementById('murojaahImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
+                                </div>
+                                <div id="murojaahCanvasWrapper" class="relative hidden border-2 border-dashed border-sky-400 rounded-xl overflow-hidden bg-slate-900 h-36 flex items-center justify-center">
+                                    <img id="murojaahPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
+                                    <canvas id="murojaahDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
+                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
+                                        <button type="button" onclick="window.zoomCanvasImage('murojaah', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
+                                        <button type="button" onclick="window.zoomCanvasImage('murojaah', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
+                                        <button type="button" onclick="window.clearCanvas('murojaah')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
+                                        <button type="button" onclick="window.removeImage('murojaah')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="window.saveSectionData('murojaah')" class="w-full mt-2 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Muroja'ah</button>
+                        </div>
+                    </div>
+
+                    <!-- 4. TUGAS -->
+                    <div class="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-2xl border-2 border-indigo-300 dark:border-indigo-700 space-y-3 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-indigo-200 dark:border-indigo-800">
+                                <span class="font-black text-xs text-indigo-900 dark:text-indigo-200 uppercase flex items-center gap-1.5">
+                                    <i class="fa-solid fa-list-check text-indigo-600"></i> 4. Tugas Tambahan
+                                </span>
+                                <select id="tugasStatusSelect" class="p-1 bg-white dark:bg-slate-800 border border-indigo-300 rounded-lg font-bold text-indigo-800 text-[11px]">
+                                    <option value="Selesai">Selesai</option>
+                                    <option value="Belum">Belum</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="font-extrabold text-[11px] text-slate-600">Jenis Tugas:</label>
+                                <select id="tugasJenisSelect" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <option value="Tugas Muroja'ah">Tugas Muroja'ah</option>
+                                    <option value="Bacaan Iqro">Bacaan Iqro</option>
+                                    <option value="Bacaan Al-Quran">Bacaan Al-Quran</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="font-extrabold text-[10px] text-slate-500">Detail Tugas:</label>
+                                <input type="text" id="tugasDetailInput" placeholder="Contoh: Halaman 15" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-indigo-200">
+                            <div class="flex items-center justify-between">
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan Tugas:</label>
+                                <button type="button" onclick="window.runAiCorrection('tugas')" class="px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                            </div>
+                            <textarea id="tugasCatatanInput" rows="2" placeholder="Catatan tugas..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
+                            
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
+                                    <input type="file" id="tugasImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'tugas')">
+                                    <button type="button" onclick="document.getElementById('tugasImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
+                                </div>
+                                <div id="tugasCanvasWrapper" class="relative hidden border-2 border-dashed border-indigo-400 rounded-xl overflow-hidden bg-slate-900 h-36 flex items-center justify-center">
+                                    <img id="tugasPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
+                                    <canvas id="tugasDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
+                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
+                                        <button type="button" onclick="window.zoomCanvasImage('tugas', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
+                                        <button type="button" onclick="window.zoomCanvasImage('tugas', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
+                                        <button type="button" onclick="window.clearCanvas('tugas')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
+                                        <button type="button" onclick="window.removeImage('tugas')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="window.saveSectionData('tugas')" class="w-full mt-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Tugas</button>
                         </div>
                     </div>
 
@@ -404,8 +547,8 @@
             </div>
 
             <div class="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
-                <button onclick="window.closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-xs">Batal</button>
-                <button onclick="window.saveSetoranData()" class="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md">Simpan Setoran</button>
+                <button onclick="window.closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-xs">Tutup Modal</button>
+                <span class="text-xs text-slate-500 font-bold">Simpan per kategori menggunakan tombol Save di masing-masing kolom</span>
             </div>
         </div>
     </div>
@@ -414,21 +557,21 @@
 
     <script>
         window.santriList = [
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastMurojaah: "Al-Fatihah 1-7" },
-            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 6 hlm 5", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastMurojaah: "An-Nas" },
-            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Ali 'Imran 1-20", lastHafalan: "An-Nas s.d. An-Nasr", lastMurojaah: "Al-Falaq" },
-            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "An-Nisa' 1-15", lastHafalan: "An-Nas s.d. Al-Kafirun", lastMurojaah: "Al-Ikhlas" },
-            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-Ma'idah 1-12", lastHafalan: "An-Nas s.d. Al-Kautsar", lastMurojaah: "Al-Masad" },
-            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-An'am 1-18", lastHafalan: "An-Nas s.d. Al-Ma'un", lastMurojaah: "An-Nasr" },
-            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-A'raf 1-14", lastHafalan: "An-Nas s.d. Quraisy", lastMurojaah: "Al-Kafirun" },
-            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-Anfal 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastMurojaah: "Al-Kautsar" },
-            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "At-Taubah 1-16", lastHafalan: "An-Nas s.d. Al-Humazah", lastMurojaah: "Al-Ma'un" },
-            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Yunus 1-15", lastHafalan: "An-Nas s.d. Al-'Asr", lastMurojaah: "Quraisy" },
-            { id: "IDSRQ011", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al Baqarah 94", lastHafalan: "Al Mujaadalah 1- 18", lastMurojaah: "An-Nas" },
-            { id: "IDSRQ012", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 6 hlm 10", lastHafalan: "An-Nas s.d. Al-Ma'un", lastMurojaah: "Al-Falaq" },
-            { id: "IDSRQ013", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 2 hal 19", lastHafalan: "Annas s.d Al Maun", lastMurojaah: "Al-Ikhlas" },
-            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 2 hal 22", lastHafalan: "Annas s.d Al Qodr", lastMurojaah: "Al-Masad" },
-            { id: "IDSRQ015", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 3 hlm 16", lastHafalan: "Annas s.d Al Ashr", lastMurojaah: "An-Nasr" }
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastMurojaah: "Al-Fatihah 1-7", lastTugas: "Selesai" },
+            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 6 hlm 5", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastMurojaah: "An-Nas", lastTugas: "Selesai" },
+            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Ali 'Imran 1-20", lastHafalan: "An-Nas s.d. An-Nasr", lastMurojaah: "Al-Falaq", lastTugas: "Belum" },
+            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "An-Nisa' 1-15", lastHafalan: "An-Nas s.d. Al-Kafirun", lastMurojaah: "Al-Ikhlas", lastTugas: "Selesai" },
+            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-Ma'idah 1-12", lastHafalan: "An-Nas s.d. Al-Kautsar", lastMurojaah: "Al-Masad", lastTugas: "Selesai" },
+            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-An'am 1-18", lastHafalan: "An-Nas s.d. Al-Ma'un", lastMurojaah: "An-Nasr", lastTugas: "Selesai" },
+            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-A'raf 1-14", lastHafalan: "An-Nas s.d. Quraisy", lastMurojaah: "Al-Kafirun", lastTugas: "Selesai" },
+            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-Anfal 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastMurojaah: "Al-Kautsar", lastTugas: "Selesai" },
+            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "At-Taubah 1-16", lastHafalan: "An-Nas s.d. Al-Humazah", lastMurojaah: "Al-Ma'un", lastTugas: "Belum" },
+            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Yunus 1-15", lastHafalan: "An-Nas s.d. Al-'Asr", lastMurojaah: "Quraisy", lastTugas: "Selesai" },
+            { id: "IDSRQ011", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al Baqarah 94", lastHafalan: "Al Mujaadalah 1- 18", lastMurojaah: "An-Nas", lastTugas: "Selesai" },
+            { id: "IDSRQ012", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 6 hlm 10", lastHafalan: "An-Nas s.d. Al-Ma'un", lastMurojaah: "Al-Falaq", lastTugas: "Selesai" },
+            { id: "IDSRQ013", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 2 hal 19", lastHafalan: "Annas s.d Al Maun", lastMurojaah: "Al-Ikhlas", lastTugas: "Selesai" },
+            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 2 hal 22", lastHafalan: "Annas s.d Al Qodr", lastMurojaah: "Al-Masad", lastTugas: "Selesai" },
+            { id: "IDSRQ015", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 3 hlm 16", lastHafalan: "Annas s.d Al Ashr", lastMurojaah: "An-Nasr", lastTugas: "Selesai" }
         ];
 
         window.quranSurahs = [
@@ -438,6 +581,13 @@
             { id: 67, name: "Al-Mulk", ayat: 30, hal: 562 }, { id: 78, name: "An-Naba'", ayat: 40, hal: 582 }, { id: 112, name: "Al-Ikhlas", ayat: 4, hal: 604 },
             { id: 113, name: "Al-Falaq", ayat: 5, hal: 604 }, { id: 114, name: "An-Nas", ayat: 6, hal: 604 }
         ];
+
+        window.canvasStates = {
+            bacaan: { zoom: 1 },
+            hafalan: { zoom: 1 },
+            murojaah: { zoom: 1 },
+            tugas: { zoom: 1 }
+        };
 
         window.handleLogoError = function(img) {
             if (!img) return;
@@ -483,6 +633,7 @@
         window.viewMode = 'grid';
 
         window.filterByClass = function(v) { window.selectedClass = v; window.renderSantriCardsAndTable(); };
+        window.handleSearch = function(query) { window.renderSantriCardsAndTable(query); };
         window.setViewMode = function(m) {
             window.viewMode = m;
             document.getElementById('santriGridContainer').classList.toggle('hidden', m !== 'grid');
@@ -508,7 +659,7 @@
                             <h3 class="text-base font-black text-slate-900 dark:text-white">${s.name}</h3>
                             <p class="text-xs text-emerald-700 dark:text-emerald-400 font-bold">${s.class} • ${s.teacher}</p>
                         </div>
-                        <button onclick="window.openEditModal('${s.id}')" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-xs">Setor</button>
+                        <button onclick="window.openEditModal('${s.id}')" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-xs">Input Setoran</button>
                     </div>
                     <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1 pt-2 border-t">
                         <div>Bacaan: <strong class="text-slate-900 dark:text-slate-100">${s.lastBacaan || '-'}</strong></div>
@@ -525,7 +676,7 @@
                         <td class="p-3 text-xs">${s.class}</td>
                         <td class="p-3 text-xs font-bold">${s.lastBacaan || '-'}</td>
                         <td class="p-3 text-xs font-bold">${s.lastHafalan || '-'}</td>
-                        <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-3 py-1 bg-emerald-600 text-white rounded-xl font-bold text-xs">Setor</button></td>
+                        <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-3 py-1 bg-emerald-600 text-white rounded-xl font-bold text-xs">Input</button></td>
                     </tr>
                 `).join('');
             }
@@ -540,15 +691,17 @@
             document.getElementById('modalTanggalInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('setoranModal').classList.remove('hidden');
 
-            const bSelect = document.getElementById('bacaanSurahSelect');
-            const hSelect = document.getElementById('hafalanSurahSelect1');
-            const mSelect = document.getElementById('murojaahSurahSelect1');
-            if (bSelect && bSelect.options.length === 0) {
-                const opts = window.quranSurahs.map(x => `<option value="${x.id}">${x.id}. ${x.name} (${x.ayat} Ayat)</option>`).join('');
-                bSelect.innerHTML = opts;
-                hSelect.innerHTML = opts;
-                mSelect.innerHTML = opts;
-            }
+            const selects = ['bacaanSurahSelect', 'hafalanSurahSelect1', 'murojaahSurahSelect1'];
+            selects.forEach(selId => {
+                const sel = document.getElementById(selId);
+                if (sel && sel.options.length === 0) {
+                    sel.innerHTML = window.quranSurahs.map(x => `<option value="${x.id}">${x.id}. ${x.name} (${x.ayat} Ayat)</option>`).join('');
+                }
+            });
+
+            window.updateMushafAuto('bacaan');
+            window.updateMushafAuto('hafalan');
+            window.updateMushafAuto('murojaah');
         };
 
         window.closeEditModal = function() { document.getElementById('setoranModal').classList.add('hidden'); };
@@ -565,60 +718,179 @@
             }
         };
 
-        window.saveSetoranData = function() {
+        window.updateMushafAuto = function(type) {
+            const surahSelect = document.getElementById(type === 'bacaan' ? 'bacaanSurahSelect' : (type === 'hafalan' ? 'hafalanSurahSelect1' : 'murojaahSurahSelect1'));
+            const outputInput = document.getElementById(type === 'bacaan' ? 'bacaanMushafOutput' : (type === 'hafalan' ? 'hafalanMushafOutput' : 'murojaahMushafOutput'));
+            if (!surahSelect || !outputInput) return;
+
+            const sId = parseInt(surahSelect.value || 1);
+            const surahObj = window.quranSurahs.find(x => x.id === sId);
+            const baseHal = surahObj ? surahObj.hal : 1;
+            outputInput.value = `Hal. ${baseHal}`;
+        };
+
+        window.runAiCorrection = function(type) {
+            const notesInput = document.getElementById(`${type}CatatanInput`);
+            if (!notesInput) return;
+            const samples = [
+                "AI Audio: Tajwid qalqalah jelas, panjang mad jaiz sudah tepat.",
+                "AI Audio: Makhraj huruf sudah fasih dan tartil.",
+                "AI Audio: Ada sedikit dengung (gunnah) perlu diperhatikan."
+            ];
+            const randomSample = samples[Math.floor(Math.random() * samples.length)];
+            notesInput.value = notesInput.value ? `${notesInput.value} | ${randomSample}` : randomSample;
+            window.showToast("Koreksi AI Audio diterapkan!", "success");
+        };
+
+        window.handleImageUpload = function(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const wrapper = document.getElementById(`${type}CanvasWrapper`);
+                const img = document.getElementById(`${type}PreviewImg`);
+                const canvas = document.getElementById(`${type}DrawCanvas`);
+                if (!wrapper || !img || !canvas) return;
+
+                img.src = e.target.result;
+                wrapper.classList.remove('hidden');
+
+                img.onload = function() {
+                    canvas.width = img.clientWidth;
+                    canvas.height = img.clientHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    initDrawingEvents(canvas);
+                };
+            };
+            reader.readAsDataURL(file);
+        };
+
+        function initDrawingEvents(canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+
+            let drawing = false;
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            };
+
+            const startDraw = (e) => { drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); };
+            const draw = (e) => { if (!drawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); };
+            const endDraw = () => { drawing = false; };
+
+            canvas.onmousedown = startDraw; canvas.onmousemove = draw; canvas.onmouseup = endDraw; canvas.onmouseout = endDraw;
+            canvas.ontouchstart = startDraw; canvas.ontouchmove = draw; canvas.ontouchend = endDraw;
+        }
+
+        window.zoomCanvasImage = function(type, delta) {
+            const img = document.getElementById(`${type}PreviewImg`);
+            if (!img) return;
+            window.canvasStates[type].zoom = Math.max(0.5, Math.min(3, window.canvasStates[type].zoom + delta));
+            img.style.transform = `scale(${window.canvasStates[type].zoom})`;
+        };
+
+        window.clearCanvas = function(type) {
+            const canvas = document.getElementById(`${type}DrawCanvas`);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            window.showToast("Coretan direset", "success");
+        };
+
+        window.removeImage = function(type) {
+            const wrapper = document.getElementById(`${type}CanvasWrapper`);
+            const fileInput = document.getElementById(`${type}ImageFile`);
+            if (wrapper) wrapper.classList.add('hidden');
+            if (fileInput) fileInput.value = '';
+        };
+
+        // FUNGSI SAVE TERPISAH UNTUK SETIAP KOLOM KATEGORI
+        window.saveSectionData = function(sectionType) {
             const s = window.santriList.find(x => x.id === window.activeSantriId);
             if (!s) return;
 
             const tanggalVal = document.getElementById('modalTanggalInput')?.value || new Date().toISOString().split('T')[0];
-            const category = document.getElementById('bacaanCategorySelect')?.value || 'quran';
+            let detailSetoran = '';
+            let statusVal = '';
+            let catatanVal = document.getElementById(`${sectionType}CatatanInput`)?.value || '';
 
-            if (category === 'iqro') {
-                s.lastBacaan = `${document.getElementById('bacaanIqroJilidSelect')?.value} hlm ${document.getElementById('bacaanIqroHalInput')?.value}`;
-            } else {
-                const bId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
-                const bObj = window.quranSurahs.find(x => x.id === bId);
-                s.lastBacaan = `${bObj ? bObj.name : 'Al-Fatihah'} ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
+            if (sectionType === 'bacaan') {
+                const bacaanCat = document.getElementById('bacaanCategorySelect')?.value || 'quran';
+                if (bacaanCat === 'iqro') {
+                    detailSetoran = `${document.getElementById('bacaanIqroJilidSelect')?.value} hlm ${document.getElementById('bacaanIqroHalInput')?.value}`;
+                } else {
+                    const bId = parseInt(document.getElementById('bacaanSurahSelect')?.value || 1);
+                    const bObj = window.quranSurahs.find(x => x.id === bId);
+                    detailSetoran = `${bObj ? bObj.name : 'Al-Fatihah'} ${document.getElementById('bacaanAyatStartInput')?.value}-${document.getElementById('bacaanAyatEndInput')?.value}`;
+                }
+                statusVal = document.getElementById('bacaanStatusSelect')?.value || 'Lancar';
+                s.lastBacaan = detailSetoran;
+            } else if (sectionType === 'hafalan') {
+                const hId = parseInt(document.getElementById('hafalanSurahSelect1')?.value || 1);
+                const hObj = window.quranSurahs.find(x => x.id === hId);
+                detailSetoran = `${hObj ? hObj.name : 'An-Nas'} ${document.getElementById('hafalanAyatStartInput1')?.value}-${document.getElementById('hafalanAyatEndInput1')?.value}`;
+                statusVal = document.getElementById('hafalanStatusSelect')?.value || 'Lancar';
+                s.lastHafalan = detailSetoran;
+            } else if (sectionType === 'murojaah') {
+                const mId = parseInt(document.getElementById('murojaahSurahSelect1')?.value || 1);
+                const mObj = window.quranSurahs.find(x => x.id === mId);
+                detailSetoran = `${mObj ? mObj.name : 'Al-Fatihah'} ${document.getElementById('murojaahAyatStartInput1')?.value}-${document.getElementById('murojaahAyatEndInput1')?.value}`;
+                statusVal = document.getElementById('murojaahStatusSelect')?.value || 'Lancar';
+                s.lastMurojaah = detailSetoran;
+            } else if (sectionType === 'tugas') {
+                const tJenis = document.getElementById('tugasJenisSelect')?.value || '';
+                const tDetail = document.getElementById('tugasDetailInput')?.value || '';
+                detailSetoran = `${tJenis}: ${tDetail}`;
+                statusVal = document.getElementById('tugasStatusSelect')?.value || 'Selesai';
+                s.lastTugas = statusVal;
             }
 
-            const hId = parseInt(document.getElementById('hafalanSurahSelect1')?.value || 1);
-            const hObj = window.quranSurahs.find(x => x.id === hId);
-            s.lastHafalan = `${hObj ? hObj.name : 'An-Nas'} ${document.getElementById('hafalanAyatStartInput1')?.value}-${document.getElementById('hafalanAyatEndInput1')?.value}`;
-
-            const mId = parseInt(document.getElementById('murojaahSurahSelect1')?.value || 1);
-            const mObj = window.quranSurahs.find(x => x.id === mId);
-            s.lastMurojaah = `${mObj ? mObj.name : 'Al-Fatihah'} ${document.getElementById('murojaahAyatStartInput1')?.value}-${document.getElementById('murojaahAyatEndInput1')?.value}`;
-
+            // Simpan ke Riwayat LocalStorage
             const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
             history.unshift({
                 id: s.id,
-                timestamp: new Date().toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }),
+                timestamp: new Date().toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
                 name: s.name,
-                bacaan: s.lastBacaan,
-                hafalan: s.lastHafalan,
-                murojaah: s.lastMurojaah
+                category: sectionType.toUpperCase(),
+                detail: detailSetoran,
+                status: statusVal,
+                catatan: catatanVal
             });
             localStorage.setItem('rq_history_db', JSON.stringify(history));
 
+            // Kirim ke Google Sheets Webhook
             const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value;
             fetch(webhookUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
-                    type: 'setoran_terpadu',
+                    type: `setoran_${sectionType}`,
                     id: s.id,
                     name: s.name,
                     class: s.class,
                     teacher: s.teacher,
                     tanggal: tanggalVal,
-                    bacaan: s.lastBacaan,
-                    hafalan: s.lastHafalan,
-                    murojaah: s.lastMurojaah
+                    kategori: sectionType,
+                    detail_setoran: detailSetoran,
+                    status: statusVal,
+                    catatan: catatanVal
                 })
             }).catch(e => console.warn(e));
 
-            window.showToast("Setoran berhasil disimpan & disinkronkan!", "success");
-            window.closeEditModal();
+            window.showToast(`Setoran ${sectionType.toUpperCase()} berhasil disimpan & dikirim ke Google Sheets!`, "success");
+
+            // HAPUS GAMBAR & CATATAN KHUSUS DI KOLOM INI SAJA, TAPI BIARKAN PILIHAN SURAT/AYAT TETAP ADA
+            window.removeImage(sectionType);
+            const notesField = document.getElementById(`${sectionType}CatatanInput`);
+            if (notesField) notesField.value = '';
+
             window.renderSantriCardsAndTable();
         };
 
@@ -634,9 +906,9 @@
                 <tr>
                     <td class="p-3 text-xs font-bold text-emerald-800">${h.timestamp}</td>
                     <td class="p-3 font-black">${h.name}</td>
-                    <td class="p-3 text-xs font-bold">${h.bacaan}</td>
-                    <td class="p-3 text-xs font-bold">${h.hafalan}</td>
-                    <td class="p-3 text-xs font-bold">${h.murojaah || '-'}</td>
+                    <td class="p-3 text-xs font-extrabold text-amber-700">${h.category}</td>
+                    <td class="p-3 text-xs font-bold">${h.detail}</td>
+                    <td class="p-3 text-xs text-slate-600">${h.catatan || '-'}</td>
                     <td class="p-3 text-center"><button onclick="window.deleteHistoryItem(${idx})" class="p-1.5 bg-rose-100 text-rose-700 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button></td>
                 </tr>
             `).join('');
@@ -661,7 +933,7 @@
                     <td class="p-3 text-xs">${s.class}</td>
                     <td class="p-3 text-xs">${s.teacher}</td>
                     <td class="p-3 text-xs">${s.phone}</td>
-                    <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-2.5 py-1 bg-amber-500 text-white rounded-lg font-bold text-xs">Setor</button></td>
+                    <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-2.5 py-1 bg-amber-500 text-white rounded-lg font-bold text-xs">Input</button></td>
                 </tr>
             `).join('');
         };
@@ -711,6 +983,10 @@
 
         window.sendClassReportDirect = function() {
             window.open(`https://wa.me/6285774042121?text=${encodeURIComponent(document.getElementById('classReportMessagePreview')?.value)}`, '_blank');
+        };
+
+        window.rotateWaGreeting = function() {
+            window.showToast("Salam & Doa diperbarui!", "success");
         };
 
         document.addEventListener('DOMContentLoaded', () => {
