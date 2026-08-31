@@ -53,7 +53,7 @@
                         </h1>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
-                            <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Google Sheets Master Source</p>
+                            <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Hybrid Storage: Local & Cloud Active</p>
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,6 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- Section: Setoran -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -137,7 +136,6 @@
             </div>
         </section>
 
-        <!-- Section: Materi -->
         <section id="section-materi" class="hidden space-y-6">
             <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border flex-wrap gap-3">
                 <h3 class="font-black text-lg text-emerald-800 dark:text-emerald-300">Akses Google Sheet Materi Belajar</h3>
@@ -256,7 +254,6 @@
             </div>
         </section>
 
-        <!-- Section: History -->
         <section id="section-history" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
@@ -307,7 +304,6 @@
             </div>
         </section>
 
-        <!-- Section: WhatsApp Report -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -341,7 +337,6 @@
             </div>
         </section>
 
-        <!-- Section: Class Report -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -369,7 +364,6 @@
             </div>
         </section>
 
-        <!-- Section: Export & Cloud Sync -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex items-center justify-between">
@@ -398,15 +392,22 @@
         </section>
     </main>
 
-    <!-- Modal: Setoran -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border-4 border-emerald-500 overflow-hidden">
-            <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
+            <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex flex-col sm:flex-row items-center justify-between shrink-0 gap-3">
                 <div>
                     <h3 id="modalSantriName" class="text-xl sm:text-2xl font-black tracking-tight">Setoran: Santri</h3>
                     <p id="modalSantriMeta" class="text-base text-emerald-200 font-bold">Kelas • Pengajar</p>
                 </div>
-                <button onclick="window.closeEditModal()" class="p-3 rounded-xl hover:bg-white/10 text-white font-black text-2xl">✕</button>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" onclick="window.sendModalWaPersonal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-sm transition">
+                        <i class="fa-brands fa-whatsapp"></i> WA Personal
+                    </button>
+                    <button type="button" onclick="window.sendModalWaClass()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs flex items-center gap-1.5 shadow-sm transition">
+                        <i class="fa-solid fa-users"></i> Laporan Grup
+                    </button>
+                    <button onclick="window.closeEditModal()" class="p-2.5 rounded-xl hover:bg-white/10 text-white font-black text-xl">✕</button>
+                </div>
             </div>
             
             <div class="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-6">
@@ -675,9 +676,6 @@
                                 <span class="font-black text-lg text-amberbrown-950 dark:text-amberbrown-200 uppercase flex items-center gap-2">
                                     <i class="fa-solid fa-list-check text-amberbrown-700 text-2xl"></i> 4. Tugas Tambahan
                                 </span>
-                                <select id="tugasStatusSelect" class="p-3 bg-white dark:bg-slate-900 border-2 border-amberbrown-600 rounded-xl font-black text-amberbrown-950 text-base">
-                                    <option value="Selesai">Selesai</option><option value="Belum">Belum</option>
-                                </select>
                             </div>
 
                             <!-- SLOT 1 TUGAS -->
@@ -947,10 +945,22 @@
                         window.santriList = cloudData.santri;
                         localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
                     }
-                    if (cloudData.bacaan) localStorage.setItem('rq_history_bacaan', JSON.stringify(cloudData.bacaan));
-                    if (cloudData.hafalan) localStorage.setItem('rq_history_hafalan', JSON.stringify(cloudData.hafalan));
-                    if (cloudData.murojaah) localStorage.setItem('rq_history_murojaah', JSON.stringify(cloudData.murojaah));
-                    if (cloudData.tugas) localStorage.setItem('rq_history_tugas', JSON.stringify(cloudData.tugas));
+                    if (cloudData.bacaan) {
+                        localStorage.setItem('rq_history_bacaan', JSON.stringify(cloudData.bacaan));
+                        window.populateLatestFromHistory('bacaan', cloudData.bacaan);
+                    }
+                    if (cloudData.hafalan) {
+                        localStorage.setItem('rq_history_hafalan', JSON.stringify(cloudData.hafalan));
+                        window.populateLatestFromHistory('hafalan', cloudData.hafalan);
+                    }
+                    if (cloudData.murojaah) {
+                        localStorage.setItem('rq_history_murojaah', JSON.stringify(cloudData.murojaah));
+                        window.populateLatestFromHistory('murojaah', cloudData.murojaah);
+                    }
+                    if (cloudData.tugas) {
+                        localStorage.setItem('rq_history_tugas', JSON.stringify(cloudData.tugas));
+                        window.populateLatestFromHistory('tugas', cloudData.tugas);
+                    }
                     if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
                     if (cloudData.materi) {
                         const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4] }));
@@ -972,6 +982,20 @@
                 window.setSyncIndicator('error');
                 window.showToast("Gagal terhubung ke Cloud. Mode Offline aktif.", "error");
             }
+        };
+
+        window.populateLatestFromHistory = function(type, rows) {
+            rows.forEach(r => {
+                const name = r[3] || r.name;
+                const detail = r[6] || r.detail;
+                const santri = window.santriList.find(s => s.name.toLowerCase() === (name || '').toLowerCase());
+                if (santri) {
+                    if (type === 'bacaan' && (!santri.lastBacaan || santri.lastBacaan === '-')) santri.lastBacaan = detail;
+                    if (type === 'hafalan' && (!santri.lastHafalan || santri.lastHafalan === '-')) santri.lastHafalan = detail;
+                    if (type === 'murojaah' && (!santri.lastMurojaah || santri.lastMurojaah === '-')) santri.lastMurojaah = detail;
+                    if (type === 'tugas' && (!santri.lastTugas || santri.lastTugas === '-')) santri.lastTugas = detail;
+                }
+            });
         };
 
         window.fetchHistoryFromCloud = async function() {
@@ -1173,7 +1197,6 @@
             document.getElementById('murojaahCatatanInput').value = m.catatan || '';
 
             const t = s.dataTugas || {};
-            document.getElementById('tugasStatusSelect').value = t.status || 'Selesai';
             document.getElementById('tugasJenisSelect').value = t.jenis1 || "Tugas Muroja'ah";
             document.getElementById('tugasDetailInput').value = t.detail1 || '';
             document.getElementById('tugasJenisSelect2').value = t.jenis2 || '';
@@ -1324,8 +1347,8 @@
                 let part2 = t2Jenis ? `${t2Jenis}: ${t2Detail}` : '';
 
                 detailSetoran = part2 ? `${part1} | ${part2}` : part1;
-                statusVal = document.getElementById('tugasStatusSelect')?.value || 'Selesai';
-                s.lastTugas = statusVal;
+                statusVal = 'Selesai';
+                s.lastTugas = detailSetoran;
                 s.dataTugas = { jenis1: t1Jenis, detail1: t1Detail, jenis2: t2Jenis, detail2: t2Detail, status: statusVal, catatan: catatanVal };
             }
 
@@ -1369,6 +1392,32 @@
             window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan ke Google Sheet!`, "success");
             window.renderSantriCardsAndTable();
             window.renderHistoryTable();
+        };
+
+        window.sendModalWaPersonal = function() {
+            if (!window.activeSantriId) return;
+            const s = window.santriList.find(x => x.id === window.activeSantriId);
+            if (!s) return;
+            window.switchTab('wa_report');
+            const waSelect = document.getElementById('waSantriSelect');
+            if (waSelect) {
+                waSelect.value = s.id;
+                window.generateWaReport();
+            }
+            window.closeEditModal();
+        };
+
+        window.sendModalWaClass = function() {
+            if (!window.activeSantriId) return;
+            const s = window.santriList.find(x => x.id === window.activeSantriId);
+            if (!s) return;
+            window.switchTab('class_report');
+            const classSelect = document.getElementById('reportClassSelect');
+            if (classSelect) {
+                classSelect.value = s.class;
+                window.generateClassReport();
+            }
+            window.closeEditModal();
         };
 
         window.activeHistoryCategory = 'bacaan';
@@ -1521,10 +1570,26 @@
             const filteredTambahan = materiTambahan.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
 
             let bagianSetoran = "";
-            if (s.lastBacaan && s.lastBacaan !== '-') bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}\n`;
-            if (s.lastHafalan && s.lastHafalan !== '-') bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}\n`;
-            if (s.lastMurojaah && s.lastMurojaah !== '-') bagianSetoran += `🔄 *Muroja'ah:* ${s.lastMurojaah}\n`;
-            if (s.lastTugas && s.lastTugas !== '-') bagianSetoran += `📝 *Tugas:* ${s.lastTugas}\n`;
+            if (s.lastBacaan && s.lastBacaan !== '-') {
+                bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}`;
+                if (s.dataBacaan && s.dataBacaan.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataBacaan.catatan}`;
+                bagianSetoran += `\n`;
+            }
+            if (s.lastHafalan && s.lastHafalan !== '-') {
+                bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}`;
+                if (s.dataHafalan && s.dataHafalan.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataHafalan.catatan}`;
+                bagianSetoran += `\n`;
+            }
+            if (s.lastMurojaah && s.lastMurojaah !== '-') {
+                bagianSetoran += `🔄 *Muroja'ah:* ${s.lastMurojaah}`;
+                if (s.dataMurojaah && s.dataMurojaah.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataMurojaah.catatan}`;
+                bagianSetoran += `\n`;
+            }
+            if (s.lastTugas && s.lastTugas !== '-') {
+                bagianSetoran += `📝 *Tugas:* ${s.lastTugas}`;
+                if (s.dataTugas && s.dataTugas.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataTugas.catatan}`;
+                bagianSetoran += `\n`;
+            }
 
             let materiText = "";
             if (filteredMateri.length > 0) {
@@ -1605,14 +1670,35 @@
             }
 
             msg += `👥 *Daftar Santri & Prestasi:*`;
-            list.forEach((s, idx) => {
-                let santriLine = `\n${idx + 1}. *${s.name}*`;
-                if (s.lastBacaan && s.lastBacaan !== '-') santriLine += `\n   - Bacaan: ${s.lastBacaan}`;
-                if (s.lastHafalan && s.lastHafalan !== '-') santriLine += `\n   - Hafalan: ${s.lastHafalan}`;
-                if (s.lastMurojaah && s.lastMurojaah !== '-') santriLine += `\n   - Muroja'ah: ${s.lastMurojaah}`;
-                if (s.lastTugas && s.lastTugas !== '-') santriLine += `\n   - Tugas: ${s.lastTugas}`;
-                msg += santriLine + `\n`;
+            let activeSantriCount = 0;
+            list.forEach((s) => {
+                let hasAnySetoran = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
+                if (hasAnySetoran) {
+                    activeSantriCount++;
+                    let santriLine = `\n${activeSantriCount}. *${s.name}*`;
+                    if (s.lastBacaan && s.lastBacaan !== '-') {
+                        santriLine += `\n   - Bacaan: ${s.lastBacaan}`;
+                        if (s.dataBacaan && s.dataBacaan.catatan) santriLine += ` (_Catatan: ${s.dataBacaan.catatan}_)`;
+                    }
+                    if (s.lastHafalan && s.lastHafalan !== '-') {
+                        santriLine += `\n   - Hafalan: ${s.lastHafalan}`;
+                        if (s.dataHafalan && s.dataHafalan.catatan) santriLine += ` (_Catatan: ${s.dataHafalan.catatan}_)`;
+                    }
+                    if (s.lastMurojaah && s.lastMurojaah !== '-') {
+                        santriLine += `\n   - Muroja'ah: ${s.lastMurojaah}`;
+                        if (s.dataMurojaah && s.dataMurojaah.catatan) santriLine += ` (_Catatan: ${s.dataMurojaah.catatan}_)`;
+                    }
+                    if (s.lastTugas && s.lastTugas !== '-') {
+                        santriLine += `\n   - Tugas: ${s.lastTugas}`;
+                        if (s.dataTugas && s.dataTugas.catatan) santriLine += ` (_Catatan: ${s.dataTugas.catatan}_)`;
+                    }
+                    msg += santriLine + `\n`;
+                }
             });
+
+            if (activeSantriCount === 0) {
+                msg += `\n_Belum ada santri yang melakukan setoran tercatat._`;
+            }
 
             document.getElementById('classReportMessagePreview').value = msg;
         };
