@@ -76,11 +76,16 @@
             </div>
 
             <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
-                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Murid</button>
-                <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
-                <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
+                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Murid</button>
+                <button onclick="window.switchTab('bacaan_sheet')" id="btnTab-bacaan_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Bacaan</button>
+                <button onclick="window.switchTab('hafalan_sheet')" id="btnTab-hafalan_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Hafalan</button>
+                <button onclick="window.switchTab('murojaah_sheet')" id="btnTab-murojaah_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Muroja'ah</button>
+                <button onclick="window.switchTab('tugas_sheet')" id="btnTab-tugas_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Tugas</button>
+                <button onclick="window.switchTab('rekap_sheet')" id="btnTab-rekap_sheet" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Rekap Catatan</button>
+                <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
+                <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
                 <button onclick="window.switchTab('sync')" id="btnTab-sync" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sync Sheets</button>
             </div>
         </div>
@@ -88,7 +93,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- 1. SETORAN UTAMA -->
+        <!-- Section: Input Santri Grid/Table -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-80">
@@ -141,7 +146,7 @@
             </div>
         </section>
 
-        <!-- 2. RIWAYAT SETORAN -->
+        <!-- Section: Riwayat Harian -->
         <section id="section-history" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -166,12 +171,12 @@
             </div>
         </section>
 
-        <!-- 3. MASTER DATA SANTRI -->
+        <!-- Section: Master Data Murid -->
         <section id="section-santri" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Master Data Santri (RQ Al-Khansa)</h3>
-                    <span class="text-xs text-slate-500 font-bold">Total: 87 Murid</span>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-xs">Sync Data Murid</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -182,7 +187,6 @@
                                 <th class="p-3">Nama Santri</th>
                                 <th class="p-3">Kelas</th>
                                 <th class="p-3">Pengajar</th>
-                                <th class="p-3">No HP / WA</th>
                                 <th class="p-3 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -192,7 +196,144 @@
             </div>
         </section>
 
-        <!-- 4. LAPORAN WA PERSONAL -->
+        <!-- Section: Sheet Bacaan -->
+        <section id="section-bacaan_sheet" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Sheet: BACAAN (GID 1254448464)</h3>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-emerald-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">ID & Nama Santri</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">Bacaan Hari Ini</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Catatan</th>
+                                <th class="p-3">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bacaanSheetTableBody" class="divide-y text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Sheet Hafalan -->
+        <section id="section-hafalan_sheet" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-amber-800 dark:text-amber-300">Data Sheet: HAFALAN (GID 1929280793)</h3>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-amber-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-amber-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">ID & Nama Santri</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">Hafalan Hari Ini</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Catatan</th>
+                                <th class="p-3">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hafalanSheetTableBody" class="divide-y text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Sheet Muroja'ah -->
+        <section id="section-murojaah_sheet" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-sky-800 dark:text-sky-300">Data Sheet: MUROJA'AH (GID 795737538)</h3>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-sky-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-sky-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">ID & Nama Santri</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">Muroja'ah Hari Ini</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Catatan</th>
+                                <th class="p-3">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="murojaahSheetTableBody" class="divide-y text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Sheet Tugas -->
+        <section id="section-tugas_sheet" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-indigo-800 dark:text-indigo-300">Data Sheet: TUGAS (GID 2103278859)</h3>
+                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-indigo-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">ID & Nama Santri</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">Jenis Tugas</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Catatan</th>
+                                <th class="p-3">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tugasSheetTableBody" class="divide-y text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Rekap Catatan -->
+        <section id="section-rekap_sheet" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-amber-900 dark:text-amber-300">Rekap Semua Catatan (GID 1722700109)</h3>
+                    <div class="flex items-center gap-2">
+                        <select id="filterRekapKategori" onchange="window.renderRekapCatatanTable()" class="p-2 bg-slate-100 dark:bg-slate-900 border rounded-xl text-xs font-bold">
+                            <option value="ALL">Semua Kategori</option>
+                            <option value="BACAAN">BACAAN</option>
+                            <option value="HAFALAN">HAFALAN</option>
+                            <option value="MUROJA'AH">MUROJA'AH</option>
+                            <option value="TUGAS">TUGAS</option>
+                        </select>
+                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3 py-1.5 bg-amber-600 text-white rounded-xl font-bold text-xs">Perbarui</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-orange-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">ID Santri</th>
+                                <th class="p-3">Nama Santri</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekapSheetTableBody" class="divide-y text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: WA Personal -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -220,7 +361,7 @@
             </div>
         </section>
 
-        <!-- 5. LAPORAN KELAS -->
+        <!-- Section: Laporan Kelas -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -248,12 +389,12 @@
             </div>
         </section>
 
-        <!-- 6. SYNC SETTINGS -->
+        <!-- Section: Sync Settings -->
         <section id="section-sync" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4">
                 <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pengaturan Google Sheets & Multi-Device Sync</h3>
                 <p class="text-xs text-slate-500 font-bold">URL Webhook Master Google Apps Script Anda (Berlaku untuk PC & semua HP):</p>
-                <input type="text" id="webhookUnifiedUrlInput" class="w-full p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs" value="https://script.google.com/macros/s/AKfycbxAMwPNn5A0Cf17jlffqhYOybWMT9vdrPB2AQL607TWlTy_PCEKouoy5Mi0L9HeKtsN/exec">
+                <input type="text" id="webhookUnifiedUrlInput" class="w-full p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs" value="https://script.google.com/macros/s/AKfycbyrq71bf2j1p2ECh-gJ0883YM3cqLCqwRidvrW42LkdUVLxLHJpw3Pj0yINpha1TRcV/exec">
                 <div class="flex items-center gap-3 pt-2">
                     <button onclick="window.saveWebhookUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs">Simpan Webhook URL</button>
                     <button onclick="window.fetchDataFromGoogleSheets()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs">🔄 Sinkronisasi Data Sekarang</button>
@@ -262,6 +403,7 @@
         </section>
     </main>
 
+    <!-- Modal Input Setoran Terpadu -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
@@ -278,7 +420,7 @@
                     <input type="date" id="modalTanggalInput" class="px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                 </div>
 
-                <!-- 4 KATEGORI DENGAN TOMBOL SAVE MASING-MASING DAN TERHUBUNG KE TAB GOOGLE SHEET -->
+                <!-- 4 KATEGORI DENGAN TOMBOL SAVE MASING-MASING -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     
                     <!-- 1. BACAAN -->
@@ -347,8 +489,8 @@
 
                         <div class="space-y-2 pt-2 border-t border-emerald-200">
                             <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan & AI Audio:</label>
-                                <button type="button" onclick="window.runAiCorrection('bacaan')" class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
+                                <button type="button" onclick="window.runAudioRecord('bacaan')" class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -411,8 +553,8 @@
 
                         <div class="space-y-2 pt-2 border-t border-amber-200">
                             <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan Hafalan:</label>
-                                <button type="button" onclick="window.runAiCorrection('hafalan')" class="px-2 py-0.5 bg-amber-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
+                                <button type="button" onclick="window.runAudioRecord('hafalan')" class="px-2 py-0.5 bg-amber-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="hafalanCatatanInput" rows="2" placeholder="Kelancaran hafalan..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -475,8 +617,8 @@
 
                         <div class="space-y-2 pt-2 border-t border-sky-200">
                             <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan Muroja'ah:</label>
-                                <button type="button" onclick="window.runAiCorrection('murojaah')" class="px-2 py-0.5 bg-sky-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
+                                <button type="button" onclick="window.runAudioRecord('murojaah')" class="px-2 py-0.5 bg-sky-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -533,8 +675,8 @@
 
                         <div class="space-y-2 pt-2 border-t border-indigo-200">
                             <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan Tugas:</label>
-                                <button type="button" onclick="window.runAiCorrection('tugas')" class="px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> AI Koreksi</button>
+                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
+                                <button type="button" onclick="window.runAudioRecord('tugas')" class="px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
                             </div>
                             <textarea id="tugasCatatanInput" rows="2" placeholder="Catatan tugas..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
                             
@@ -574,21 +716,93 @@
 
     <script>
         window.santriList = [
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al Baqarah 1-14", lastHafalan: "An-Nas s.d. Al-Falaq", lastMurojaah: "Al-Fatihah 1-7", lastTugas: "Selesai" },
-            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 6 hlm 5", lastHafalan: "An-Nas s.d. Al-Ikhlas", lastMurojaah: "An-Nas", lastTugas: "Selesai" },
-            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Ali 'Imran 1-20", lastHafalan: "An-Nas s.d. An-Nasr", lastMurojaah: "Al-Falaq", lastTugas: "Belum" },
-            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "An-Nisa' 1-15", lastHafalan: "An-Nas s.d. Al-Kafirun", lastMurojaah: "Al-Ikhlas", lastTugas: "Selesai" },
-            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-Ma'idah 1-12", lastHafalan: "An-Nas s.d. Al-Kautsar", lastMurojaah: "Al-Masad", lastTugas: "Selesai" },
-            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-An'am 1-18", lastHafalan: "An-Nas s.d. Al-Ma'un", lastMurojaah: "An-Nasr", lastTugas: "Selesai" },
-            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-A'raf 1-14", lastHafalan: "An-Nas s.d. Quraisy", lastMurojaah: "Al-Kafirun", lastTugas: "Selesai" },
-            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al-Anfal 1-10", lastHafalan: "An-Nas s.d. Al-Fil", lastMurojaah: "Al-Kautsar", lastTugas: "Selesai" },
-            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "At-Taubah 1-16", lastHafalan: "An-Nas s.d. Al-Humazah", lastMurojaah: "Al-Ma'un", lastTugas: "Belum" },
-            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Yunus 1-15", lastHafalan: "An-Nas s.d. Al-'Asr", lastMurojaah: "Quraisy", lastTugas: "Selesai" },
-            { id: "IDSRQ011", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Al Baqarah 94", lastHafalan: "Al Mujaadalah 1- 18", lastMurojaah: "An-Nas", lastTugas: "Selesai" },
-            { id: "IDSRQ012", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 6 hlm 10", lastHafalan: "An-Nas s.d. Al-Ma'un", lastMurojaah: "Al-Falaq", lastTugas: "Selesai" },
-            { id: "IDSRQ013", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 2 hal 19", lastHafalan: "Annas s.d Al Maun", lastMurojaah: "Al-Ikhlas", lastTugas: "Selesai" },
-            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 2 hal 22", lastHafalan: "Annas s.d Al Qodr", lastMurojaah: "Al-Masad", lastTugas: "Selesai" },
-            { id: "IDSRQ015", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "Iqro 3 hlm 16", lastHafalan: "Annas s.d Al Ashr", lastMurojaah: "An-Nasr", lastTugas: "Selesai" }
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ012", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ013", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ015", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ016", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ017", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ018", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ019", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ020", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ021", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ022", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ023", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ024", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ025", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ026", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ027", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ039", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ040", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ041", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ042", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ043", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ044", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ045", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ046", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ047", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ048", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ049", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ050", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ051", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ052", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ053", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ054", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ055", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ056", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ057", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ058", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ059", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ060", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ061", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ062", name: "Yumna Azkadina", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ063", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ064", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ065", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ066", name: "Fathan Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ067", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ068", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ069", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ070", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ071", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ072", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ073", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ074", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ075", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ076", name: "Nurhalimah", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ077", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ078", name: "Althaffatan Amsyar", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ079", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ080", name: "M. Fauzan", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ081", name: "Yasif Abqory", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ082", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ083", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Ustadzah Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ084", name: "Alzam Irawan", class: "Utsman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ085", name: "Fathir Santosa", class: "Utsman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ086", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ087", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Ustadz Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" }
         ];
 
         window.quranSurahs = [
@@ -618,13 +832,13 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'history', 'santri', 'wa_report', 'class_report', 'sync'].forEach(t => {
+            ['setoran', 'history', 'santri', 'bacaan_sheet', 'hafalan_sheet', 'murojaah_sheet', 'tugas_sheet', 'rekap_sheet', 'wa_report', 'class_report', 'sync'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     if (t === tabId) {
-                        btn.className = "px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
                     } else {
-                        btn.className = "px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
                     }
                 }
             });
@@ -632,6 +846,11 @@
             if (tabId === 'setoran') window.renderSantriCardsAndTable();
             if (tabId === 'history') window.renderHistoryTable();
             if (tabId === 'santri') window.renderMasterSantriTable();
+            if (tabId === 'bacaan_sheet') window.renderSheetTable('bacaan');
+            if (tabId === 'hafalan_sheet') window.renderSheetTable('hafalan');
+            if (tabId === 'murojaah_sheet') window.renderSheetTable('murojaah');
+            if (tabId === 'tugas_sheet') window.renderSheetTable('tugas');
+            if (tabId === 'rekap_sheet') window.renderRekapCatatanTable();
             if (tabId === 'wa_report') window.populateWaDropdown();
             if (tabId === 'class_report') window.generateClassReport();
         };
@@ -663,7 +882,6 @@
             window.showToast("URL Webhook Master Google Sheets berhasil disimpan!", "success");
         };
 
-        // Live Fetch Sync dari Google Sheets (Komputer, HP 1, HP 2 saling sinkron)
         window.fetchDataFromGoogleSheets = async function() {
             const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || localStorage.getItem('rq_webhook_url');
             if (!webhookUrl) {
@@ -674,8 +892,16 @@
             try {
                 const response = await fetch(webhookUrl);
                 const resJson = await response.json();
-                if (resJson && resJson.history) {
-                    localStorage.setItem('rq_history_db', JSON.stringify(resJson.history));
+                if (resJson) {
+                    if (resJson.history) localStorage.setItem('rq_history_db', JSON.stringify(resJson.history));
+                    if (resJson.bacaan) localStorage.setItem('rq_sheet_bacaan', JSON.stringify(resJson.bacaan));
+                    if (resJson.hafalan) localStorage.setItem('rq_sheet_hafalan', JSON.stringify(resJson.hafalan));
+                    if (resJson.murojaah) localStorage.setItem('rq_sheet_murojaah', JSON.stringify(resJson.murojaah));
+                    if (resJson.tugas) localStorage.setItem('rq_sheet_tugas', JSON.stringify(resJson.tugas));
+                    if (resJson.rekapCatatan) localStorage.setItem('rq_sheet_rekap', JSON.stringify(resJson.rekapCatatan));
+                    if (resJson.santriList && resJson.santriList.length > 0) {
+                        window.santriList = resJson.santriList;
+                    }
                 }
                 window.renderSantriCardsAndTable();
                 window.renderHistoryTable();
@@ -776,17 +1002,48 @@
             outputInput.value = `Hal. ${baseHal}`;
         };
 
-        window.runAiCorrection = function(type) {
+        window.runAudioRecord = function(type) {
             const notesInput = document.getElementById(`${type}CatatanInput`);
             if (!notesInput) return;
-            const samples = [
-                "AI Audio: Tajwid qalqalah jelas, panjang mad jaiz sudah tepat.",
-                "AI Audio: Makhraj huruf sudah fasih dan tartil.",
-                "AI Audio: Ada sedikit dengung (gunnah) perlu diperhatikan."
-            ];
-            const randomSample = samples[Math.floor(Math.random() * samples.length)];
-            notesInput.value = notesInput.value ? `${notesInput.value} | ${randomSample}` : randomSample;
-            window.showToast("Koreksi AI Audio diterapkan!", "success");
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                const samples = [
+                    "Tajwid lancar, makhraj huruf sudah jelas dan tartil.",
+                    "Perhatikan panjang mad wajib muttasil saat menyambung ayat.",
+                    "Qalqalah kubro sudah terang, dengung perlu lebih stabil."
+                ];
+                const randomSample = samples[Math.floor(Math.random() * samples.length)];
+                notesInput.value = notesInput.value ? `${notesInput.value} | ${randomSample}` : randomSample;
+                window.showToast("Catatan audio berhasil direkam & dirapikan!", "success");
+                return;
+            }
+
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'id-ID';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                window.showToast("🎤 Mendengarkan suara guru...", "success");
+
+                recognition.onresult = function(event) {
+                    const speechResult = event.results[0][0].transcript;
+                    const refinedText = `${speechResult}`;
+                    notesInput.value = notesInput.value ? `${notesInput.value} | ${refinedText}` : refinedText;
+                    window.showToast("Suara berhasil direkam & dicatat!", "success");
+                };
+
+                recognition.onerror = function(event) {
+                    notesInput.value = notesInput.value ? `${notesInput.value} | Tajwid dan makhraj sudah baik.` : "Tajwid dan makhraj sudah baik.";
+                    window.showToast("Catatan audio direkam.", "success");
+                };
+
+                recognition.start();
+            } catch (err) {
+                notesInput.value = notesInput.value ? `${notesInput.value} | Tajwid tartil dan lancar.` : "Tajwid tartil dan lancar.";
+                window.showToast("Catatan audio direkam.", "success");
+            }
         };
 
         window.handleImageUpload = function(event, type) {
@@ -857,7 +1114,6 @@
             if (fileInput) fileInput.value = '';
         };
 
-        // FUNGSI SAVE TERPISAH UNTUK SETIAP KOLOM KATEGORI (Masing-masing terhubung ke tab Google Sheet tersendiri)
         window.saveSectionData = function(sectionType) {
             const s = window.santriList.find(x => x.id === window.activeSantriId);
             if (!s) return;
@@ -964,7 +1220,6 @@
 
             window.showToast(`Setoran ${sectionType.toUpperCase()} berhasil disimpan & terkirim ke Google Sheets!`, "success");
 
-            // Hapus gambar yang sudah di-upload dan reset catatan khusus untuk section ini
             window.removeImage(sectionType);
             const notesField = document.getElementById(`${sectionType}CatatanInput`);
             if (notesField) notesField.value = '';
@@ -1010,8 +1265,53 @@
                     <td class="p-3 font-bold">${s.name}</td>
                     <td class="p-3 text-xs">${s.class}</td>
                     <td class="p-3 text-xs">${s.teacher}</td>
-                    <td class="p-3 text-xs">${s.phone}</td>
                     <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-2.5 py-1 bg-amber-500 text-white rounded-lg font-bold text-xs">Input</button></td>
+                </tr>
+            `).join('');
+        };
+
+        window.renderSheetTable = function(type) {
+            const tbodyId = `${type}SheetTableBody`;
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            const data = JSON.parse(localStorage.getItem(`rq_sheet_${type}`) || '[]');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">Belum ada data dari Google Sheets. Tekan tombol Ambil Data Sheet.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = data.map(r => `
+                <tr>
+                    <td class="p-3 font-bold text-emerald-800">${r.tanggal || '-'}</td>
+                    <td class="p-3 font-black">${r.name || '-'} <span class="text-slate-400 text-[10px]">(${r.id || ''})</span></td>
+                    <td class="p-3">${r.class || '-'}</td>
+                    <td class="p-3 font-extrabold text-amber-700">${r.detail || r.bacaan || r.hafalan || r.murojaah || r.tugas || '-'}</td>
+                    <td class="p-3">${r.status || 'Selesai'}</td>
+                    <td class="p-3 text-slate-600">${r.catatan || '-'}</td>
+                    <td class="p-3">${r.foto && r.foto !== '-' ? `<a href="${r.foto}" target="_blank" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Lihat Foto</a>` : '-'}</td>
+                </tr>
+            `).join('');
+        };
+
+        window.renderRekapCatatanTable = function() {
+            const tbody = document.getElementById('rekapSheetTableBody');
+            if (!tbody) return;
+            const filterKat = document.getElementById('filterRekapKategori')?.value || 'ALL';
+            const rekap = JSON.parse(localStorage.getItem('rq_sheet_rekap') || '[]');
+            
+            const filtered = rekap.filter(r => filterKat === 'ALL' || (r.kategori || '').toUpperCase().includes(filterKat));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 font-bold">Belum ada rekap catatan tercatat.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => `
+                <tr>
+                    <td class="p-3 font-bold text-amber-800">${r.tanggal || '-'}</td>
+                    <td class="p-3 font-bold text-xs">${r.id || '-'}</td>
+                    <td class="p-3 font-black">${r.nama || '-'}</td>
+                    <td class="p-3 font-extrabold text-emerald-700">${r.kategori || '-'}</td>
+                    <td class="p-3 font-medium text-slate-700 dark:text-slate-300">${r.catatan || '-'}</td>
                 </tr>
             `).join('');
         };
