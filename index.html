@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Tahfizh RQ Al-Khansa (Local Storage)</title>
+    <title>Monitoring Tahfizh RQ Al-Khansa</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -1118,37 +1118,38 @@
                 bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}\n`;
                 const histBacaan = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
                 const lastB = histBacaan.find(h => h.id === s.id);
-                if (lastB && lastB.catatan) bagianSetoran += `   💬 Catatan: ${lastB.catatan}\n`;
+                if (lastB && lastB.catatan && lastB.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastB.catatan}\n`;
             }
             if (s.lastHafalan && s.lastHafalan !== '-') {
                 bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}\n`;
                 const histHafalan = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
                 const lastH = histHafalan.find(h => h.id === s.id);
-                if (lastH && lastH.catatan) bagianSetoran += `   💬 Catatan: ${lastH.catatan}\n`;
+                if (lastH && lastH.catatan && lastH.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastH.catatan}\n`;
             }
             if (s.lastMurojaah && s.lastMurojaah !== '-') {
                 bagianSetoran += `🔄 *Muroja'ah:* ${s.lastMurojaah}\n`;
                 const histMurojaah = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
                 const lastM = histMurojaah.find(h => h.id === s.id);
-                if (lastM && lastM.catatan) bagianSetoran += `   💬 Catatan: ${lastM.catatan}\n`;
+                if (lastM && lastM.catatan && lastM.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastM.catatan}\n`;
             }
             if (s.lastTugas && s.lastTugas !== '-') {
                 bagianSetoran += `📝 *Tugas:* ${s.lastTugas}\n`;
                 const histTugas = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
                 const lastT = histTugas.find(h => h.id === s.id);
-                if (lastT && lastT.catatan) bagianSetoran += `   💬 Catatan: ${lastT.catatan}\n`;
+                if (lastT && lastT.catatan && lastT.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastT.catatan}\n`;
             }
 
             let materiText = "";
             if (filteredMateri.length > 0) {
-                materiText += "\n📚 *Materi Belajar Hari Ini:*";
+                materiText += "📚 *Materi Belajar Hari Ini:*";
                 filteredMateri.forEach(m => {
                     materiText += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
                 });
             }
 
             if (filteredTambahan.length > 0) {
-                materiText += "\n\n⭐ *Materi Tambahan:*";
+                if (materiText) materiText += "\n\n";
+                materiText += "⭐ *Materi Tambahan:*";
                 filteredTambahan.forEach(m => {
                     materiText += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
                 });
@@ -1156,7 +1157,23 @@
 
             const currentDateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-            document.getElementById('waMessagePreview').value = `Assalamu'alaikum\nAyah/Bunda semoga senantiasa diberikan kesehatan, keberkahan, dan kemudahan dalam segala urusan.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n👤 *Nama:* ${s.name}\n🏫 *Kelas:* ${s.class}\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n${bagianSetoran}______________\n${materiText ? materiText + '\n____________________\n' : ''}Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
+            let fullMsg = `Assalamu'alaikum\nAyah/Bunda semoga senantiasa diberikan kesehatan, keberkahan, dan kemudahan dalam segala urusan.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n👤 *Nama:* ${s.name}\n🏫 *Kelas:* ${s.class}\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n`;
+            
+            if (bagianSetoran) {
+                fullMsg += `${bagianSetoran}_______________`;
+            } else {
+                fullMsg += `Belum ada setoran hari ini\n_______________`;
+            }
+
+            if (materiText) {
+                fullMsg += `\n${materiText}\n____________________\n`;
+            } else {
+                fullMsg += `\n____________________\n`;
+            }
+
+            fullMsg += `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
+
+            document.getElementById('waMessagePreview').value = fullMsg;
         };
 
         window.copyWaReportText = function() {
@@ -1189,16 +1206,18 @@
                 filteredMateri.forEach(m => {
                     msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
+                msg += `\n`;
             }
 
             if (filteredTambahan.length > 0) {
-                msg += `\n⭐ *Materi Tambahan:*`;
+                msg += `⭐ *Materi Tambahan:*`;
                 filteredTambahan.forEach(m => {
                     msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
+                msg += `\n`;
             }
 
-            msg += `\n👥 *Daftar Santri & Prestasi:*`;
+            msg += `👥 *Daftar Santri & Prestasi:*`;
             list.forEach((s, idx) => {
                 let santriLine = `\n${idx + 1}. *${s.name}*`;
                 if (s.lastBacaan && s.lastBacaan !== '-') santriLine += `\n   - Bacaan: ${s.lastBacaan}`;
@@ -1234,7 +1253,7 @@
         };
 
         window.resetDailyLogsOnly = function() {
-            if (confirm("Reset hanya data bacaan, hafalan, muroja'ah, dan tugas harian santri? Catatan rekap santri tetap aman.")) {
+            if (confirm("Reset hanya data bacaan, hafalan, muroja'ah, dan tugas harian santri? Catatan rekap santri dan daftar nama santri tetap aman.")) {
                 window.santriList.forEach(s => {
                     s.lastBacaan = '-';
                     s.lastHafalan = '-';
