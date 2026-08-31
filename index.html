@@ -79,11 +79,64 @@
                 <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
                 <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
                 <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Santri</button>
-                <button onclick="window.switchTab('bacaan_sheet')" id="btnTab-bacaan_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Bacaan</button>
-                <button onclick="window.switchTab('hafalan_sheet')" id="btnTab-hafalan_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Hafalan</button>
-                <button onclick="window.switchTab('murojaah_sheet')" id="btnTab-murojaah_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Muroja'ah</button>
-                <button onclick="window.switchTab('tugas_sheet')" id="btnTab-tugas_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sheet Tugas</button>
-                <button onclick="window.switchTab('rekap_sheet')" id="btnTab-rekap_sheet" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Rekap Catatan</button>
+                
+                <!-- UNIFIED SHEET DROPDOWN MENU -->
+                <div class="relative inline-block text-left shrink-0">
+                    <button type="button" onclick="window.toggleSheetDropdown(event)" id="sheetDropdownBtn" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-table"></i> Data Sheet <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </button>
+                    <div id="sheetDropdownMenu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 py-1.5 z-50">
+                        <div class="px-3 py-1 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Tampilan & Link Sheet</div>
+                        
+                        <div class="flex items-center justify-between px-2 hover:bg-emerald-50 dark:hover:bg-slate-700">
+                            <button onclick="window.switchTab('bacaan_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
+                                Sheet Bacaan
+                            </button>
+                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1254448464#gid=1254448464" target="_blank" class="p-2 text-emerald-600 hover:text-emerald-800 text-xs" title="Buka G-Sheet Bacaan" onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+
+                        <div class="flex items-center justify-between px-2 hover:bg-amber-50 dark:hover:bg-slate-700">
+                            <button onclick="window.switchTab('hafalan_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
+                                Sheet Hafalan
+                            </button>
+                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1929280793#gid=1929280793" target="_blank" class="p-2 text-amber-600 hover:text-amber-800 text-xs" title="Buka G-Sheet Hafalan" onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+
+                        <div class="flex items-center justify-between px-2 hover:bg-sky-50 dark:hover:bg-slate-700">
+                            <button onclick="window.switchTab('murojaah_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
+                                Sheet Muroja'ah
+                            </button>
+                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=795737538#gid=795737538" target="_blank" class="p-2 text-sky-600 hover:text-sky-800 text-xs" title="Buka G-Sheet Muroja'ah" onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+
+                        <div class="flex items-center justify-between px-2 hover:bg-indigo-50 dark:hover:bg-slate-700">
+                            <button onclick="window.switchTab('tugas_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
+                                Sheet Tugas
+                            </button>
+                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=2103278859#gid=2103278859" target="_blank" class="p-2 text-indigo-600 hover:text-indigo-800 text-xs" title="Buka G-Sheet Tugas" onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+
+                        <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+
+                        <div class="flex items-center justify-between px-2 hover:bg-orange-50 dark:hover:bg-slate-700">
+                            <button onclick="window.switchTab('rekap_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-black text-amber-700 dark:text-amber-400">
+                                Rekap Catatan
+                            </button>
+                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1722700109#gid=1722700109" target="_blank" class="p-2 text-amber-600 hover:text-amber-800 text-xs" title="Buka G-Sheet Rekap" onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
                 <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
                 <button onclick="window.switchTab('sync')" id="btnTab-sync" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sync</button>
@@ -173,7 +226,12 @@
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Santri (Master GID 0)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Sync Murid</button>
+                    <div class="flex items-center gap-2">
+                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=0#gid=0" target="_blank" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-800">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka G-Sheet Santri
+                        </a>
+                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Sync Murid</button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -193,11 +251,17 @@
             </div>
         </section>
 
+        <!-- SHEET BACAAN -->
         <section id="section-bacaan_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Sheet: BACAAN (GID 1254448464)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Sheet: BACAAN</h3>
+                    <div class="flex items-center gap-2">
+                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1254448464#gid=1254448464" target="_blank" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-800">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
+                        </a>
+                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -218,11 +282,17 @@
             </div>
         </section>
 
+        <!-- SHEET HAFALAN -->
         <section id="section-hafalan_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-amber-800 dark:text-amber-300">Data Sheet: HAFALAN (GID 1929280793)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-amber-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h3 class="font-black text-xl text-amber-800 dark:text-amber-300">Data Sheet: HAFALAN</h3>
+                    <div class="flex items-center gap-2">
+                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1929280793#gid=1929280793" target="_blank" class="px-3.5 py-2 bg-amber-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-amber-800">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
+                        </a>
+                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-amber-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -243,11 +313,17 @@
             </div>
         </section>
 
+        <!-- SHEET MUROJA'AH -->
         <section id="section-murojaah_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-sky-800 dark:text-sky-300">Data Sheet: MUROJA'AH (GID 795737538)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-sky-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h3 class="font-black text-xl text-sky-800 dark:text-sky-300">Data Sheet: MUROJA'AH</h3>
+                    <div class="flex items-center gap-2">
+                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=795737538#gid=795737538" target="_blank" class="px-3.5 py-2 bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-sky-800">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
+                        </a>
+                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-sky-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -268,11 +344,17 @@
             </div>
         </section>
 
+        <!-- SHEET TUGAS -->
         <section id="section-tugas_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-indigo-800 dark:text-indigo-300">Data Sheet: TUGAS (GID 2103278859)</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h3 class="font-black text-xl text-indigo-800 dark:text-indigo-300">Data Sheet: TUGAS</h3>
+                    <div class="flex items-center gap-2">
+                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=2103278859#gid=2103278859" target="_blank" class="px-3.5 py-2 bg-indigo-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-indigo-800">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
+                        </a>
+                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -293,11 +375,15 @@
             </div>
         </section>
 
+        <!-- REKAP CATATAN -->
         <section id="section-rekap_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-amber-900 dark:text-amber-300">Rekap Semua Catatan (GID 1722700109)</h3>
-                    <div class="flex items-center gap-2">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h3 class="font-black text-xl text-amber-900 dark:text-amber-300">Rekap Semua Catatan</h3>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1722700109#gid=1722700109" target="_blank" class="px-3.5 py-2 bg-amber-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-amber-800">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
+                        </a>
                         <select id="filterRekapKategori" onchange="window.renderRekapCatatanTable()" class="p-2 bg-slate-100 dark:bg-slate-900 border rounded-xl text-xs font-bold">
                             <option value="ALL">Semua Kategori</option>
                             <option value="BACAAN">BACAAN</option>
@@ -808,6 +894,21 @@
             const fallback = document.getElementById('defaultLogoIcon');
             if (fallback) fallback.classList.remove('hidden');
         };
+
+        window.toggleSheetDropdown = function(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('sheetDropdownMenu');
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            const btn = document.getElementById('sheetDropdownBtn');
+            const menu = document.getElementById('sheetDropdownMenu');
+            if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
 
         window.switchTab = function(tabId) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
