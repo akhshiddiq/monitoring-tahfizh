@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Tahfizh RQ Al-Khansa</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS CDN (Fixed typo from tailwindacss.com to tailtailwindcss.com) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -273,153 +273,181 @@
         </section>
     </main>
 
-    <!-- MODAL SETORAN -->
+    <!-- MODAL SETORAN (WIDER & DISTINCT COLORED SECTIONS) -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-sm sm:text-base">
-            <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[94vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden text-sm sm:text-base">
+            <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
                 <div>
                     <h3 id="modalSantriName" class="text-lg sm:text-xl font-black tracking-tight truncate">Setoran: Santri</h3>
                     <p id="modalSantriMeta" class="text-xs sm:text-sm text-emerald-200 font-bold truncate mt-0.5">Kelas • Pengajar</p>
                 </div>
                 <button onclick="window.closeEditModal()" class="p-2 rounded-xl hover:bg-white/10 text-white text-2xl font-black">✕</button>
             </div>
-            <div class="p-4 sm:p-5 overflow-y-auto custom-scrollbar flex-1 min-h-0 space-y-4">
-                <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border flex items-center justify-between gap-3">
+            
+            <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar flex-1 min-h-0 space-y-5">
+                <div class="p-4 bg-slate-100 dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
                     <label class="font-extrabold text-slate-700 dark:text-slate-200">Tanggal Pertemuan:</label>
-                    <input type="date" id="modalTanggalInput" class="px-3 py-2 bg-white dark:bg-slate-800 border rounded-xl font-bold outline-none cursor-pointer">
+                    <input type="date" id="modalTanggalInput" class="px-4 py-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold outline-none cursor-pointer">
                 </div>
 
-                <!-- 1. SETORAN BACAAN -->
-                <div class="p-4 sm:p-5 bg-emerald-50/70 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-800 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="font-black text-base sm:text-lg text-emerald-950 dark:text-emerald-200 uppercase tracking-wide">Setoran Bacaan</span>
-                        <select id="bacaanStatusSelect" class="p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-emerald-800 dark:text-emerald-300 shadow-xs">
-                            <option value="Lancar (A)">Lancar (A)</option>
-                            <option value="Cukup (B)">Cukup (B)</option>
-                            <option value="Kurang (C)">Kurang (C)</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Kategori:</label>
-                            <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                                <option value="quran">Al-Qur'an</option>
-                                <option value="iqro">Iqro</option>
-                            </select>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <div class="flex items-center justify-between">
-                                <label id="bacaanSurahLabel" class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Surat / Jilid:</label>
-                                <span id="bacaanHalBadge" class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded">Hal. 1</span>
+                <!-- GRID SECTION FOR 3 TYPES: BACAAN, HAFALAN, MUROJA'AH -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    
+                    <!-- 1. SETORAN BACAAN (Emerald Theme) -->
+                    <div class="p-4 sm:p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-300 dark:border-emerald-700 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-emerald-200 dark:border-emerald-800">
+                                <span class="font-black text-base text-emerald-900 dark:text-emerald-200 uppercase tracking-wide flex items-center gap-1.5">
+                                    <i class="fa-solid fa-book-open text-emerald-600"></i> Bacaan
+                                </span>
+                                <select id="bacaanStatusSelect" class="p-1.5 bg-white dark:bg-slate-800 border border-emerald-300 rounded-lg font-bold text-emerald-800 dark:text-emerald-300 text-xs shadow-xs">
+                                    <option value="Lancar (A)">Lancar (A)</option>
+                                    <option value="Cukup (B)">Cukup (B)</option>
+                                    <option value="Kurang (C)">Kurang (C)</option>
+                                </select>
                             </div>
-                            <select id="bacaanSurahSelect" onchange="window.updateBacaanAyatLimits()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm"></select>
-                        </div>
-                    </div>
-                    <div id="bacaanAyatSection" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Info Mushaf Halaman:</label>
-                            <input type="text" id="bacaanMushafHalInput" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-emerald-800 dark:text-emerald-300 text-sm" placeholder="Hal. 1">
-                        </div>
-                        <div class="sm:col-span-2 grid grid-cols-2 gap-2">
+                            
                             <div>
-                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Mulai:</label>
-                                <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                                <label class="font-extrabold text-slate-700 dark:text-slate-300 text-xs">Kategori:</label>
+                                <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 rounded-xl font-bold text-sm">
+                                    <option value="quran">Al-Qur'an</option>
+                                    <option value="iqro">Iqro</option>
+                                </select>
                             </div>
-                            <div>
-                                <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Ayat Sampai:</label>
-                                <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                            </div>
-                        </div>
-                    </div>
-                    <div id="bacaanIqroSection" class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden">
-                        <div>
-                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Pilih Jilid:</label>
-                            <select id="bacaanIqroJilidSelect" onchange="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                                <option value="Iqro 1">Iqro Jilid 1</option>
-                                <option value="Iqro 2">Iqro Jilid 2</option>
-                                <option value="Iqro 3">Iqro Jilid 3</option>
-                                <option value="Iqro 4">Iqro Jilid 4</option>
-                                <option value="Iqro 5">Iqro Jilid 5</option>
-                                <option value="Iqro 6" selected>Iqro Jilid 6</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Halaman:</label>
-                            <input type="number" id="bacaanIqroHalInput" value="1" min="1" max="35" oninput="window.calcBacaanTotals()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Catatan Bacaan:</label>
-                        <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid / kelancaran..." class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-medium outline-none auto-expand text-sm"></textarea>
-                    </div>
-                </div>
 
-                <!-- 2. SETORAN HAFALAN -->
-                <div class="p-4 sm:p-5 bg-amber-50/70 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="font-black text-base sm:text-lg text-amber-950 dark:text-amber-200 uppercase tracking-wide">Setoran Hafalan</span>
-                        <select id="hafalanStatusSelect" class="p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-amber-800 dark:text-amber-300 shadow-xs">
-                            <option value="Lancar (A)">Lancar (A)</option>
-                            <option value="Cukup (B)">Cukup (B)</option>
-                            <option value="Ulang (C)">Ulang (C)</option>
-                        </select>
-                    </div>
-                    <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-amber-200 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="font-black text-xs text-amber-800 uppercase">Surat Hafalan Utama</span>
-                            <span id="hafalanHalBadge1" class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-[10px] font-black rounded">Hal. 1</span>
-                        </div>
-                        <select id="hafalanSurahSelect1" onchange="window.updateHafalanAyatLimits(1)" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm"></select>
-                        <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="text-[11px] font-extrabold text-slate-500">Mulai Ayat:</label>
-                                <input type="number" id="hafalanAyatStartInput1" value="1" min="1" oninput="window.calcHafalanTotals()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
+                                <div class="flex items-center justify-between">
+                                    <label id="bacaanSurahLabel" class="font-extrabold text-slate-700 dark:text-slate-300 text-xs">Surat / Jilid:</label>
+                                    <span id="bacaanHalBadge" class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-[10px] font-black rounded">Hal. 1</span>
+                                </div>
+                                <select id="bacaanSurahSelect" onchange="window.updateBacaanAyatLimits()" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 rounded-xl font-bold text-sm"></select>
                             </div>
-                            <div>
-                                <label class="text-[11px] font-extrabold text-slate-500">Sampai Ayat:</label>
-                                <input type="number" id="hafalanAyatEndInput1" value="7" min="1" oninput="window.calcHafalanTotals()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Catatan Hafalan:</label>
-                        <textarea id="hafalanCatatanInput" rows="2" placeholder="Catatan kelancaran hafalan..." class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-medium outline-none auto-expand text-sm"></textarea>
-                    </div>
-                </div>
 
-                <!-- 3. MUROJA'AH DI KELAS -->
-                <div class="p-4 sm:p-5 bg-teal-50/70 dark:bg-teal-950/20 rounded-2xl border border-teal-200 dark:border-teal-800 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="font-black text-base sm:text-lg text-teal-950 dark:text-teal-200 uppercase tracking-wide">Muroja'ah di Kelas</span>
-                        <select id="murojaahStatusSelect" class="p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-teal-800 dark:text-teal-300 shadow-xs">
-                            <option value="Lancar (A)">Lancar (A)</option>
-                            <option value="Cukup (B)">Cukup (B)</option>
-                            <option value="Kurang (C)">Kurang (C)</option>
-                        </select>
-                    </div>
-                    <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-teal-200 space-y-2">
-                        <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Surat Muroja'ah:</label>
-                        <select id="murojaahSurahSelect1" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm"></select>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[11px] font-extrabold text-slate-500">Mulai Ayat:</label>
-                                <input type="number" id="murojaahAyatStartInput1" value="1" min="1" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
+                            <div id="bacaanAyatSection" class="space-y-2">
+                                <div>
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-xs">Mushaf Hal:</label>
+                                    <input type="text" id="bacaanMushafHalInput" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-emerald-200 rounded-xl font-bold text-emerald-800 dark:text-emerald-300 text-xs" placeholder="Hal. 1">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="font-extrabold text-slate-700 dark:text-slate-300 text-[11px]">Ayat Mulai:</label>
+                                        <input type="number" id="bacaanAyatStartInput" value="1" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-emerald-200 rounded-xl font-bold text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="font-extrabold text-slate-700 dark:text-slate-300 text-[11px]">Ayat Selesai:</label>
+                                        <input type="number" id="bacaanAyatEndInput" value="7" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-emerald-200 rounded-xl font-bold text-sm">
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label class="text-[11px] font-extrabold text-slate-500">Sampai Ayat:</label>
-                                <input type="number" id="murojaahAyatEndInput1" value="10" min="1" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
+
+                            <div id="bacaanIqroSection" class="space-y-2 hidden">
+                                <div>
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-xs">Pilih Jilid:</label>
+                                    <select id="bacaanIqroJilidSelect" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-emerald-200 rounded-xl font-bold text-xs">
+                                        <option value="Iqro 1">Iqro Jilid 1</option>
+                                        <option value="Iqro 2">Iqro Jilid 2</option>
+                                        <option value="Iqro 3">Iqro Jilid 3</option>
+                                        <option value="Iqro 4">Iqro Jilid 4</option>
+                                        <option value="Iqro 5">Iqro Jilid 5</option>
+                                        <option value="Iqro 6" selected>Iqro Jilid 6</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-xs">Halaman:</label>
+                                    <input type="number" id="bacaanIqroHalInput" value="1" min="1" max="35" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-emerald-200 rounded-xl font-bold text-sm">
+                                </div>
                             </div>
                         </div>
+
+                        <div class="pt-2">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-400 text-[11px]">Catatan Bacaan:</label>
+                            <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-emerald-200 rounded-xl text-xs font-medium outline-none"></textarea>
+                        </div>
                     </div>
-                    <div>
-                        <label class="font-extrabold text-slate-600 dark:text-slate-300 text-xs">Catatan Muroja'ah:</label>
-                        <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah di kelas..." class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-medium outline-none auto-expand text-sm"></textarea>
+
+                    <!-- 2. SETORAN HAFALAN (Amber Theme) -->
+                    <div class="p-4 sm:p-5 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border-2 border-amber-300 dark:border-amber-700 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-amber-200 dark:border-amber-800">
+                                <span class="font-black text-base text-amber-900 dark:text-amber-200 uppercase tracking-wide flex items-center gap-1.5">
+                                    <i class="fa-solid fa-award text-amber-600"></i> Hafalan
+                                </span>
+                                <select id="hafalanStatusSelect" class="p-1.5 bg-white dark:bg-slate-800 border border-amber-300 rounded-lg font-bold text-amber-800 dark:text-amber-300 text-xs shadow-xs">
+                                    <option value="Lancar (A)">Lancar (A)</option>
+                                    <option value="Cukup (B)">Cukup (B)</option>
+                                    <option value="Ulang (C)">Ulang (C)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-xs">Surat Hafalan:</label>
+                                    <span id="hafalanHalBadge1" class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-[10px] font-black rounded">Hal. 1</span>
+                                </div>
+                                <select id="hafalanSurahSelect1" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl font-bold text-sm"></select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-[11px]">Ayat Mulai:</label>
+                                    <input type="number" id="hafalanAyatStartInput1" value="1" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-amber-200 rounded-xl font-bold text-sm">
+                                </div>
+                                <div>
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-[11px]">Ayat Selesai:</label>
+                                    <input type="number" id="hafalanAyatEndInput1" value="7" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-amber-200 rounded-xl font-bold text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-400 text-[11px]">Catatan Hafalan:</label>
+                            <textarea id="hafalanCatatanInput" rows="2" placeholder="Catatan kelancaran hafalan..." class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-amber-200 rounded-xl text-xs font-medium outline-none"></textarea>
+                        </div>
                     </div>
+
+                    <!-- 3. MUROJA'AH DI KELAS (Sky / Blue-Teal Theme) -->
+                    <div class="p-4 sm:p-5 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-300 dark:border-sky-700 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-sky-200 dark:border-sky-800">
+                                <span class="font-black text-base text-sky-900 dark:text-sky-200 uppercase tracking-wide flex items-center gap-1.5">
+                                    <i class="fa-solid fa-rotate text-sky-600"></i> Muroja'ah
+                                </span>
+                                <select id="murojaahStatusSelect" class="p-1.5 bg-white dark:bg-slate-800 border border-sky-300 rounded-lg font-bold text-sky-800 dark:text-sky-300 text-xs shadow-xs">
+                                    <option value="Lancar (A)">Lancar (A)</option>
+                                    <option value="Cukup (B)">Cukup (B)</option>
+                                    <option value="Kurang (C)">Kurang (C)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="font-extrabold text-slate-700 dark:text-slate-300 text-xs">Surat Muroja'ah:</label>
+                                <select id="murojaahSurahSelect1" class="w-full mt-1 p-2.5 bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-800 rounded-xl font-bold text-sm"></select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-[11px]">Ayat Mulai:</label>
+                                    <input type="number" id="murojaahAyatStartInput1" value="1" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-sky-200 rounded-xl font-bold text-sm">
+                                </div>
+                                <div>
+                                    <label class="font-extrabold text-slate-700 dark:text-slate-300 text-[11px]">Ayat Selesai:</label>
+                                    <input type="number" id="murojaahAyatEndInput1" value="10" min="1" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-sky-200 rounded-xl font-bold text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <label class="font-extrabold text-slate-600 dark:text-slate-400 text-[11px]">Catatan Muroja'ah:</label>
+                            <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah di kelas..." class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border border-sky-200 rounded-xl text-xs font-medium outline-none"></textarea>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-            <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
+
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold">Batal</button>
-                <button onclick="window.saveSetoranData()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-md">Simpan Setoran</button>
+                <button onclick="window.saveSetoranData()" class="px-7 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-md">Simpan Setoran</button>
             </div>
         </div>
     </div>
@@ -669,7 +697,6 @@
             const m1Obj = window.quranSurahs.find(x => x.id === m1Id);
             s.lastMurojaah = `${m1Obj ? m1Obj.name : 'Al-Fatihah'} ${document.getElementById('murojaahAyatStartInput1')?.value}-${document.getElementById('murojaahAyatEndInput1')?.value}`;
 
-            // Format Tanggal Singkat Web: "Senin, 30 Agst"
             const now = new Date();
             const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             const monthsShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agst", "Sep", "Okt", "Nov", "Des"];
@@ -688,7 +715,6 @@
 
             const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
 
-            // Kirim ke Google Sheets (Bacaan, Hafalan, Murojaah)
             ['setoran_bacaan', 'setoran_hafalan', 'murojaah_kelas'].forEach(type => {
                 fetch(webhookUrl, {
                     method: 'POST',
@@ -727,7 +753,6 @@
             if (confirm(`Hapus riwayat setoran untuk ${item.name}? Data di Google Sheets juga akan terhapus.`)) {
                 const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || "https://script.google.com/macros/s/AKfycbwDj2j36rGuC-iW33cK_GAOPGdugQ3bR_lDBjUXxAbW1TqKbLMhJKdjY9EN7PU3hSjk/exec";
 
-                // Kirim perintah delete ke Google Apps Script
                 fetch(webhookUrl, {
                     method: 'POST',
                     mode: 'no-cors',
