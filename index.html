@@ -66,7 +66,6 @@
 
             <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
                 <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-4 py-2.5 rounded-xl text-base font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
-                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Santri</button>
                 <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi</button>
                 <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
                 <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
@@ -129,75 +128,6 @@
                             </tr>
                         </thead>
                         <tbody id="santriTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <section id="section-santri" class="hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
-                    <div>
-                        <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Manajemen Data Santri & Sinkronisasi Sheets</h3>
-                        <p class="text-xs text-slate-500 font-bold mt-0.5">Tambah atau hapus santri langsung di sini atau di Google Sheet Anda.</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="window.fetchSantriFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs">
-                            <i class="fa-solid fa-rotate"></i> Sinkron Google Sheet
-                        </button>
-                    </div>
-                </div>
-
-                <div class="p-5 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 space-y-4">
-                    <h4 class="font-black text-base text-emerald-900 dark:text-emerald-200">➕ Tambah Santri Baru</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                        <div>
-                            <label class="text-xs font-bold">ID Santri:</label>
-                            <input type="text" id="newSantriId" placeholder="IDSRQ088" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold">Nama Lengkap:</label>
-                            <input type="text" id="newSantriName" placeholder="Nama Santri" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold">Kelas:</label>
-                            <select id="newSantriClass" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                                <option value="Abdurrahman">Abdurrahman</option>
-                                <option value="Abu Ubaidah">Abu Ubaidah</option>
-                                <option value="Zubair">Zubair</option>
-                                <option value="Ali">Ali</option>
-                                <option value="Utsman">Utsman</option>
-                                <option value="Abu Bakar">Abu Bakar</option>
-                                <option value="Bilal">Bilal</option>
-                                <option value="Hamzah">Hamzah</option>
-                                <option value="Fatimah">Fatimah</option>
-                                <option value="Umar">Umar</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold">Pengajar (Kak):</label>
-                            <input type="text" id="newSantriTeacher" placeholder="Kak Sidik / Kak Mega" value="Kak Sidik" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
-                        </div>
-                        <div class="flex items-end">
-                            <button onclick="window.addNewSantri()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">Simpan Santri</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
-                                <th class="p-3.5 text-center w-16">No</th>
-                                <th class="p-3.5">ID Santri</th>
-                                <th class="p-3.5">Nama Santri</th>
-                                <th class="p-3.5">Kelas</th>
-                                <th class="p-3.5">Pengajar</th>
-                                <th class="p-3.5">No WA Wali</th>
-                                <th class="p-3.5 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="santriManagerTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
                     </table>
                 </div>
             </div>
@@ -423,7 +353,7 @@
                         <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Santri Sekarang
                     </button>
                 </div>
-                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung otomatis ke Google Sheets RQ Al-Khansa. Tambah, edit, atau hapus santri langsung di tab <code>santri</code> Google Sheet Anda, atau melalui menu Data Santri di atas!</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung otomatis ke Google Sheets RQ Al-Khansa.</p>
                 
                 <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3">
                     <label class="font-black text-sm text-emerald-900 dark:text-emerald-200">Google Apps Script Web App URL (Connected):</label>
@@ -942,7 +872,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'santri', 'materi', 'history', 'wa_report', 'class_report', 'export'].forEach(t => {
+            ['setoran', 'materi', 'history', 'wa_report', 'class_report', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     if (t === tabId) {
@@ -954,7 +884,6 @@
             });
 
             if (tabId === 'setoran') window.renderSantriCardsAndTable();
-            if (tabId === 'santri') window.renderSantriManagerTable();
             if (tabId === 'history') window.switchHistorySubTab('bacaan');
             if (tabId === 'materi') window.renderMateriList('utama');
             if (tabId === 'wa_report') window.initWaDropdown();
@@ -1096,7 +1025,6 @@
                         }));
                     }
                     window.renderSantriCardsAndTable();
-                    window.renderSantriManagerTable();
                     window.showToast(`Berhasil menyinkronkan ${window.santriList.length} santri dari Cloud!`, "success");
                 }
             } catch (err) {
@@ -1122,75 +1050,6 @@
             } catch (err) {
                 window.showToast("Gagal mengambil riwayat dari Cloud", "error");
             }
-        };
-
-        window.addNewSantri = function() {
-            const id = document.getElementById('newSantriId')?.value.trim();
-            const name = document.getElementById('newSantriName')?.value.trim();
-            const klass = document.getElementById('newSantriClass')?.value;
-            const teacher = document.getElementById('newSantriTeacher')?.value.trim() || 'Kak Sidik';
-
-            if (!id || !name) {
-                window.showToast("ID dan Nama santri wajib diisi!", "error");
-                return;
-            }
-
-            const newSantri = {
-                id, name, class: klass, teacher, phone: '+6285774042121',
-                lastBacaan: '-', lastHafalan: '-', lastMurojaah: '-', lastTugas: '-',
-                dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null
-            };
-
-            window.santriList.push(newSantri);
-            window.renderSantriManagerTable();
-            window.renderSantriCardsAndTable();
-
-            window.syncToCloud({
-                type: 'santri_add',
-                id, name, class: klass, teacher, phone: '+6285774042121'
-            });
-
-            document.getElementById('newSantriId').value = '';
-            document.getElementById('newSantriName').value = '';
-            window.showToast("Santri baru berhasil ditambahkan & disinkronkan ke Sheet!", "success");
-        };
-
-        window.deleteSantri = function(id) {
-            if (confirm("Hapus santri ini dari daftar dan Google Sheet?")) {
-                window.santriList = window.santriList.filter(s => s.id !== id);
-                window.renderSantriManagerTable();
-                window.renderSantriCardsAndTable();
-
-                window.syncToCloud({
-                    type: 'santri_delete',
-                    id: id
-                });
-                window.showToast("Santri berhasil dihapus", "success");
-            }
-        };
-
-        window.renderSantriManagerTable = function() {
-            const tbody = document.getElementById('santriManagerTableBody');
-            if (!tbody) return;
-
-            if (window.santriList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Belum ada data santri.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = window.santriList.map((s, idx) => `
-                <tr>
-                    <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
-                    <td class="p-3.5 font-bold text-emerald-800 dark:text-emerald-300">${s.id}</td>
-                    <td class="p-3.5 font-black text-base">${s.name}</td>
-                    <td class="p-3.5 font-bold">${s.class}</td>
-                    <td class="p-3.5 font-bold">${s.teacher}</td>
-                    <td class="p-3.5 font-bold text-slate-600 dark:text-slate-400">${s.phone}</td>
-                    <td class="p-3.5 text-center">
-                        <button onclick="window.deleteSantri('${s.id}')" class="px-3 py-1.5 bg-rose-100 text-rose-700 rounded-xl font-bold text-xs"><i class="fa-solid fa-trash"></i> Hapus</button>
-                    </td>
-                </tr>
-            `).join('');
         };
 
         window.saveMateri = function(type) {
@@ -1333,7 +1192,6 @@
                 }
             });
 
-            // Load BACAAN for this specific santri only
             const b = s.dataBacaan || {};
             document.getElementById('bacaanStatusSelect').value = b.status || 'Lancar (A)';
             document.getElementById('bacaanCategorySelect').value = b.category1 || 'quran';
@@ -1363,7 +1221,6 @@
             }
             document.getElementById('bacaanCatatanInput').value = b.catatan || '';
 
-            // Load HAFALAN for this specific santri only
             const h = s.dataHafalan || {};
             document.getElementById('hafalanStatusSelect').value = h.status || 'Lancar (A)';
             document.getElementById('hafalanSurahSelect1').value = h.surahId1 || 1;
@@ -1378,7 +1235,6 @@
 
             document.getElementById('hafalanCatatanInput').value = h.catatan || '';
 
-            // Load MUROJA'AH for this specific santri only
             const m = s.dataMurojaah || {};
             document.getElementById('murojaahStatusSelect').value = m.status || 'Lancar (A)';
             document.getElementById('murojaahSurahSelect1').value = m.surahId1 || 1;
@@ -1393,7 +1249,6 @@
 
             document.getElementById('murojaahCatatanInput').value = m.catatan || '';
 
-            // Load TUGAS for this specific santri only
             const t = s.dataTugas || {};
             document.getElementById('tugasStatusSelect').value = t.status || 'Selesai';
             document.getElementById('tugasJenisSelect').value = t.jenis1 || "Tugas Muroja'ah";
@@ -1927,7 +1782,6 @@
             await window.fetchSantriFromCloud();
             await window.fetchHistoryFromCloud();
             window.renderSantriCardsAndTable();
-            window.renderSantriManagerTable();
             window.checkStorageUsage();
         });
     </script>
