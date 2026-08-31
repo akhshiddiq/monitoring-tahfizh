@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Tahfizh RQ Al-Khansa (Master Sync)</title>
+    <title>Monitoring Tahfizh RQ Al-Khansa (Local Storage)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -67,85 +67,30 @@
                             <span>Monitoring Santri</span>
                             <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-xs text-emerald-200 font-bold">Instant Cloud Sync Master</p>
+                        <p class="text-xs text-emerald-200 font-bold">Local Storage High Performance</p>
                     </div>
                 </div>
-                <button onclick="window.fetchDataFromGoogleSheets()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
-                    <i class="fa-solid fa-rotate" id="syncSpinnerMobile"></i> Sync
+                <button onclick="window.exportDataToExcel()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-download"></i> Export
                 </button>
             </div>
 
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">2. Riwayat</button>
-                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Santri</button>
-                
-                <!-- UNIFIED SHEET DROPDOWN MENU -->
-                <div class="relative inline-block text-left shrink-0">
-                    <button type="button" onclick="window.toggleSheetDropdown(event)" id="sheetDropdownBtn" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-table"></i> Data Sheet <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </button>
-                    <div id="sheetDropdownMenu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 py-1.5 z-50">
-                        <div class="px-3 py-1 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Tampilan & Link Sheet</div>
-                        
-                        <div class="flex items-center justify-between px-2 hover:bg-emerald-50 dark:hover:bg-slate-700">
-                            <button onclick="window.switchTab('bacaan_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
-                                Sheet Bacaan
-                            </button>
-                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1254448464#gid=1254448464" target="_blank" class="p-2 text-emerald-600 hover:text-emerald-800 text-xs" title="Buka G-Sheet Bacaan" onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </a>
-                        </div>
-
-                        <div class="flex items-center justify-between px-2 hover:bg-amber-50 dark:hover:bg-slate-700">
-                            <button onclick="window.switchTab('hafalan_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
-                                Sheet Hafalan
-                            </button>
-                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1929280793#gid=1929280793" target="_blank" class="p-2 text-amber-600 hover:text-amber-800 text-xs" title="Buka G-Sheet Hafalan" onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </a>
-                        </div>
-
-                        <div class="flex items-center justify-between px-2 hover:bg-sky-50 dark:hover:bg-slate-700">
-                            <button onclick="window.switchTab('murojaah_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
-                                Sheet Muroja'ah
-                            </button>
-                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=795737538#gid=795737538" target="_blank" class="p-2 text-sky-600 hover:text-sky-800 text-xs" title="Buka G-Sheet Muroja'ah" onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </a>
-                        </div>
-
-                        <div class="flex items-center justify-between px-2 hover:bg-indigo-50 dark:hover:bg-slate-700">
-                            <button onclick="window.switchTab('tugas_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-bold text-slate-700 dark:text-slate-200">
-                                Sheet Tugas
-                            </button>
-                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=2103278859#gid=2103278859" target="_blank" class="p-2 text-indigo-600 hover:text-indigo-800 text-xs" title="Buka G-Sheet Tugas" onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </a>
-                        </div>
-
-                        <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-
-                        <div class="flex items-center justify-between px-2 hover:bg-orange-50 dark:hover:bg-slate-700">
-                            <button onclick="window.switchTab('rekap_sheet'); window.toggleSheetDropdown()" class="flex-1 text-left py-2 px-2 text-xs font-black text-amber-700 dark:text-amber-400">
-                                Rekap Catatan
-                            </button>
-                            <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1722700109#gid=1722700109" target="_blank" class="p-2 text-amber-600 hover:text-amber-800 text-xs" title="Buka G-Sheet Rekap" onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
+                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi Hari Ini</button>
+                <button onclick="window.switchTab('materi_tambahan')" id="btnTab-materi_tambahan" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi Tambahan</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
+                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Santri</button>
                 <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
                 <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
-                <button onclick="window.switchTab('sync')" id="btnTab-sync" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Sync</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Export Data</button>
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
+        <!-- SECTION 1: INPUT SETORAN -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-80">
@@ -155,8 +100,8 @@
                     <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
                 <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="hidden sm:flex items-center gap-2 px-3.5 py-2.5 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-xs shadow-xs transition-all">
-                        <i class="fa-solid fa-rotate-right" id="syncSpinner"></i> Ambil Data Sheet
+                    <button onclick="window.exportDataToExcel()" class="hidden sm:flex items-center gap-2 px-3.5 py-2.5 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-xs shadow-xs transition-all">
+                        <i class="fa-solid fa-download"></i> Download Data (Excel)
                     </button>
                     <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl px-3 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
                         <option value="ALL">Semua Kelas</option>
@@ -198,11 +143,116 @@
             </div>
         </section>
 
+        <!-- SECTION: MATERI HARI INI -->
+        <section id="section-materi" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Input Materi Belajar Hari Ini</h3>
+                    <span class="text-xs font-bold text-slate-400">Tersimpan di Local Storage</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Pilih Kelas:</label>
+                        <select id="materiKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                            <option value="Abdurrahman">Abdurrahman</option>
+                            <option value="Abu Ubaidah">Abu Ubaidah</option>
+                            <option value="Zubair">Zubair</option>
+                            <option value="Ali">Ali</option>
+                            <option value="Utsman">Utsman</option>
+                            <option value="Abu Bakar">Abu Bakar</option>
+                            <option value="Bilal">Bilal</option>
+                            <option value="Hamzah">Hamzah</option>
+                            <option value="Fatimah">Fatimah</option>
+                            <option value="Umar">Umar</option>
+                            <option value="SEMUA KELAS">Semua Kelas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Judul Mata Pelajaran:</label>
+                        <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Bab / Tema:</label>
+                        <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah / Surat An-Naba" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Tanggal:</label>
+                        <input type="date" id="materiTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-extrabold text-xs text-slate-500">Keterangan Materi:</label>
+                    <textarea id="materiKeteranganInput" rows="3" placeholder="Rincian materi pembelajaran hari ini..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs"></textarea>
+                </div>
+                <button onclick="window.saveMateri('utama')" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md">💾 Simpan Materi Hari Ini</button>
+
+                <div class="pt-4 border-t">
+                    <h4 class="font-black text-sm text-slate-700 dark:text-slate-300 mb-2">Daftar Materi Tersimpan:</h4>
+                    <div id="materiListContainer" class="space-y-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: MATERI TAMBAHAN HARI INI -->
+        <section id="section-materi_tambahan" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-amber-800 dark:text-amber-300">Input Materi Tambahan Hari Ini</h3>
+                    <span class="text-xs font-bold text-slate-400">Tersimpan di Local Storage</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Pilih Kelas:</label>
+                        <select id="materiTambahanKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                            <option value="Abdurrahman">Abdurrahman</option>
+                            <option value="Abu Ubaidah">Abu Ubaidah</option>
+                            <option value="Zubair">Zubair</option>
+                            <option value="Ali">Ali</option>
+                            <option value="Utsman">Utsman</option>
+                            <option value="Abu Bakar">Abu Bakar</option>
+                            <option value="Bilal">Bilal</option>
+                            <option value="Hamzah">Hamzah</option>
+                            <option value="Fatimah">Fatimah</option>
+                            <option value="Umar">Umar</option>
+                            <option value="SEMUA KELAS">Semua Kelas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Judul Mata Pelajaran (Tambahan):</label>
+                        <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Bab / Tema:</label>
+                        <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="font-extrabold text-xs text-slate-500">Tanggal:</label>
+                        <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-extrabold text-xs text-slate-500">Keterangan Materi Tambahan:</label>
+                    <textarea id="materiTambahanKeteranganInput" rows="3" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs"></textarea>
+                </div>
+                <button onclick="window.saveMateri('tambahan')" class="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs shadow-md">💾 Simpan Materi Tambahan</button>
+
+                <div class="pt-4 border-t">
+                    <h4 class="font-black text-sm text-slate-700 dark:text-slate-300 mb-2">Daftar Materi Tambahan Tersimpan:</h4>
+                    <div id="materiTambahanListContainer" class="space-y-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: RIWAYAT -->
         <section id="section-history" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Riwayat Setoran Harian</h3>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Perbarui Riwayat</button>
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Riwayat Setoran Harian (Local)</h3>
+                    <button onclick="window.renderHistoryTable()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Perbarui</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -222,16 +272,12 @@
             </div>
         </section>
 
+        <!-- SECTION: DATA SANTRI -->
         <section id="section-santri" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Santri (Master GID 0)</h3>
-                    <div class="flex items-center gap-2">
-                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=0#gid=0" target="_blank" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-800">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka G-Sheet Santri
-                        </a>
-                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Sync Murid</button>
-                    </div>
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Master Santri (87 Santri)</h3>
+                    <button onclick="window.exportDataToExcel()" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs">Export Excel</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -251,166 +297,7 @@
             </div>
         </section>
 
-        <!-- SHEET BACAAN -->
-        <section id="section-bacaan_sheet" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Sheet: BACAAN</h3>
-                    <div class="flex items-center gap-2">
-                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1254448464#gid=1254448464" target="_blank" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-800">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
-                        </a>
-                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-emerald-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
-                                <th class="p-3">Tanggal</th>
-                                <th class="p-3">ID & Nama Santri</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Bacaan Hari Ini</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3">Catatan</th>
-                                <th class="p-3">Foto</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bacaanSheetTableBody" class="divide-y text-xs"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- SHEET HAFALAN -->
-        <section id="section-hafalan_sheet" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <h3 class="font-black text-xl text-amber-800 dark:text-amber-300">Data Sheet: HAFALAN</h3>
-                    <div class="flex items-center gap-2">
-                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1929280793#gid=1929280793" target="_blank" class="px-3.5 py-2 bg-amber-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-amber-800">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
-                        </a>
-                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-amber-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-amber-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
-                                <th class="p-3">Tanggal</th>
-                                <th class="p-3">ID & Nama Santri</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Hafalan Hari Ini</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3">Catatan</th>
-                                <th class="p-3">Foto</th>
-                            </tr>
-                        </thead>
-                        <tbody id="hafalanSheetTableBody" class="divide-y text-xs"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- SHEET MUROJA'AH -->
-        <section id="section-murojaah_sheet" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <h3 class="font-black text-xl text-sky-800 dark:text-sky-300">Data Sheet: MUROJA'AH</h3>
-                    <div class="flex items-center gap-2">
-                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=795737538#gid=795737538" target="_blank" class="px-3.5 py-2 bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-sky-800">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
-                        </a>
-                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-sky-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-sky-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
-                                <th class="p-3">Tanggal</th>
-                                <th class="p-3">ID & Nama Santri</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Muroja'ah Hari Ini</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3">Catatan</th>
-                                <th class="p-3">Foto</th>
-                            </tr>
-                        </thead>
-                        <tbody id="murojaahSheetTableBody" class="divide-y text-xs"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- SHEET TUGAS -->
-        <section id="section-tugas_sheet" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <h3 class="font-black text-xl text-indigo-800 dark:text-indigo-300">Data Sheet: TUGAS</h3>
-                    <div class="flex items-center gap-2">
-                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=2103278859#gid=2103278859" target="_blank" class="px-3.5 py-2 bg-indigo-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-indigo-800">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
-                        </a>
-                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs">Muat Ulang</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-indigo-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
-                                <th class="p-3">Tanggal</th>
-                                <th class="p-3">ID & Nama Santri</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Jenis Tugas</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3">Catatan</th>
-                                <th class="p-3">Foto</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tugasSheetTableBody" class="divide-y text-xs"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- REKAP CATATAN -->
-        <section id="section-rekap_sheet" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <h3 class="font-black text-xl text-amber-900 dark:text-amber-300">Rekap Semua Catatan</h3>
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <a href="https://docs.google.com/spreadsheets/d/1BKVSEw6gi24DZhVTKWJva4I0YCa3TAWBBjqaHY8Ic3I/edit?gid=1722700109#gid=1722700109" target="_blank" class="px-3.5 py-2 bg-amber-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-amber-800">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Sheet
-                        </a>
-                        <select id="filterRekapKategori" onchange="window.renderRekapCatatanTable()" class="p-2 bg-slate-100 dark:bg-slate-900 border rounded-xl text-xs font-bold">
-                            <option value="ALL">Semua Kategori</option>
-                            <option value="BACAAN">BACAAN</option>
-                            <option value="HAFALAN">HAFALAN</option>
-                            <option value="MUROJA'AH">MUROJA'AH</option>
-                            <option value="TUGAS">TUGAS</option>
-                        </select>
-                        <button onclick="window.fetchDataFromGoogleSheets()" class="px-3.5 py-2 bg-amber-600 text-white rounded-xl font-bold text-xs">Perbarui</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-orange-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
-                                <th class="p-3">Tanggal</th>
-                                <th class="p-3">ID Santri</th>
-                                <th class="p-3">Nama Santri</th>
-                                <th class="p-3">Kategori</th>
-                                <th class="p-3">Catatan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rekapSheetTableBody" class="divide-y text-xs"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
+        <!-- SECTION: WA PERSONAL -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -429,7 +316,7 @@
                 </div>
                 <div>
                     <label class="font-extrabold text-xs text-slate-500">Preview Pesan:</label>
-                    <textarea id="waMessagePreview" rows="12" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs"></textarea>
+                    <textarea id="waMessagePreview" rows="15" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs"></textarea>
                 </div>
                 <div class="flex items-center gap-3">
                     <button onclick="window.copyWaReportText()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-xl font-bold text-xs">Salin Teks</button>
@@ -438,10 +325,11 @@
             </div>
         </section>
 
+        <!-- SECTION: LAPORAN KELAS -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Laporan Rekapitulasi Per Kelas</h3>
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Laporan Rekapitulasi Per Kelas & Materi Belajar</h3>
                     <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-2.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-xs">
                         <option value="Abdurrahman">Abdurrahman</option>
                         <option value="Abu Ubaidah" selected>Abu Ubaidah</option>
@@ -456,7 +344,7 @@
                     </select>
                 </div>
                 <div>
-                    <textarea id="classReportMessagePreview" rows="12" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs"></textarea>
+                    <textarea id="classReportMessagePreview" rows="16" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs"></textarea>
                 </div>
                 <div class="flex items-center gap-3">
                     <button onclick="window.copyClassReportText()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-xl font-bold text-xs">Salin Teks Kelas</button>
@@ -465,14 +353,16 @@
             </div>
         </section>
 
-        <section id="section-sync" class="hidden space-y-4">
+        <!-- SECTION: EXPORT DATA -->
+        <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pengaturan Google Sheets & Multi-Device Sync</h3>
-                <p class="text-xs text-slate-500 font-bold">URL Webhook Google Apps Script Anda (Aktif untuk HP & PC):</p>
-                <input type="text" id="webhookUnifiedUrlInput" class="w-full p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-mono text-xs" value="https://script.google.com/macros/s/AKfycbyrq71bf2j1p2ECh-gJ0883YM3cqLCqwRidvrW42LkdUVLxLHJpw3Pj0yINpha1TRcV/exec">
+                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Backup & Export Data (Local Storage)</h3>
+                <p class="text-xs text-slate-500 font-bold">Semua data riwayat, setoran, dan materi tersimpan aman di browser Anda. Klik tombol di bawah untuk mendownload file Excel/CSV cadangan:</p>
                 <div class="flex items-center gap-3 pt-2">
-                    <button onclick="window.saveWebhookUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs">Simpan Webhook URL</button>
-                    <button onclick="window.fetchDataFromGoogleSheets()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs">🔄 Sinkronisasi Instan Sekarang</button>
+                    <button onclick="window.exportDataToExcel()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Download Excel (.xls / .csv)
+                    </button>
+                    <button onclick="window.clearLocalStorage()" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs">Reset Data Lokal</button>
                 </div>
             </div>
         </section>
@@ -513,7 +403,7 @@
                             <div>
                                 <label class="font-extrabold text-[11px] text-slate-600">Sumber Bacaan:</label>
                                 <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
-                                    <option value="quran">Al-Qur'an (Google Sheets)</option>
+                                    <option value="quran">Al-Qur'an</option>
                                     <option value="iqro">Iqro (1 - 6)</option>
                                 </select>
                             </div>
@@ -561,30 +451,8 @@
                         </div>
 
                         <div class="space-y-2 pt-2 border-t border-emerald-200">
-                            <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('bacaan')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-emerald-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
-                            </div>
+                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
                             <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
-                                    <input type="file" id="bacaanImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'bacaan')">
-                                    <button type="button" onclick="document.getElementById('bacaanImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
-                                </div>
-                                <div id="bacaanCanvasWrapper" class="relative hidden border-2 border-dashed border-emerald-400 rounded-xl overflow-hidden bg-slate-900 h-44 flex items-center justify-center">
-                                    <img id="bacaanPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
-                                    <canvas id="bacaanDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
-                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
-                                        <button type="button" onclick="window.zoomCanvasImage('bacaan', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
-                                        <button type="button" onclick="window.zoomCanvasImage('bacaan', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
-                                        <button type="button" onclick="window.clearCanvas('bacaan')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
-                                        <button type="button" onclick="window.removeImage('bacaan')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
-                                    </div>
-                                </div>
-                            </div>
-
                             <button type="button" onclick="window.saveSectionData('bacaan')" class="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Bacaan</button>
                         </div>
                     </div>
@@ -625,30 +493,8 @@
                         </div>
 
                         <div class="space-y-2 pt-2 border-t border-amber-200">
-                            <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('hafalan')" class="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-amber-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
-                            </div>
+                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
                             <textarea id="hafalanCatatanInput" rows="2" placeholder="Kelancaran hafalan..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
-                                    <input type="file" id="hafalanImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'hafalan')">
-                                    <button type="button" onclick="document.getElementById('hafalanImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
-                                </div>
-                                <div id="hafalanCanvasWrapper" class="relative hidden border-2 border-dashed border-amber-400 rounded-xl overflow-hidden bg-slate-900 h-44 flex items-center justify-center">
-                                    <img id="hafalanPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
-                                    <canvas id="hafalanDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
-                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
-                                        <button type="button" onclick="window.zoomCanvasImage('hafalan', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
-                                        <button type="button" onclick="window.zoomCanvasImage('hafalan', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
-                                        <button type="button" onclick="window.clearCanvas('hafalan')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
-                                        <button type="button" onclick="window.removeImage('hafalan')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
-                                    </div>
-                                </div>
-                            </div>
-
                             <button type="button" onclick="window.saveSectionData('hafalan')" class="w-full mt-2 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Hafalan</button>
                         </div>
                     </div>
@@ -689,30 +535,8 @@
                         </div>
 
                         <div class="space-y-2 pt-2 border-t border-sky-200">
-                            <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('murojaah')" class="px-2.5 py-1 bg-sky-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-sky-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
-                            </div>
+                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
                             <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
-                                    <input type="file" id="murojaahImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'murojaah')">
-                                    <button type="button" onclick="document.getElementById('murojaahImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
-                                </div>
-                                <div id="murojaahCanvasWrapper" class="relative hidden border-2 border-dashed border-sky-400 rounded-xl overflow-hidden bg-slate-900 h-44 flex items-center justify-center">
-                                    <img id="murojaahPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
-                                    <canvas id="murojaahDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
-                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
-                                        <button type="button" onclick="window.zoomCanvasImage('murojaah', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
-                                        <button type="button" onclick="window.zoomCanvasImage('murojaah', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
-                                        <button type="button" onclick="window.clearCanvas('murojaah')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
-                                        <button type="button" onclick="window.removeImage('murojaah')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
-                                    </div>
-                                </div>
-                            </div>
-
                             <button type="button" onclick="window.saveSectionData('murojaah')" class="w-full mt-2 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Muroja'ah</button>
                         </div>
                     </div>
@@ -747,30 +571,8 @@
                         </div>
 
                         <div class="space-y-2 pt-2 border-t border-indigo-200">
-                            <div class="flex items-center justify-between">
-                                <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                                <button type="button" onclick="window.runAudioRecord('tugas')" class="px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[11px] font-extrabold shadow-xs hover:bg-indigo-700 flex items-center gap-1"><i class="fa-solid fa-microphone"></i> Rekam Catatan</button>
-                            </div>
+                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
                             <textarea id="tugasCatatanInput" rows="2" placeholder="Catatan tugas..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <label class="font-extrabold text-[10px] text-slate-500">Foto & Coretan:</label>
-                                    <input type="file" id="tugasImageFile" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'tugas')">
-                                    <button type="button" onclick="document.getElementById('tugasImageFile').click()" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-bold"><i class="fa-solid fa-camera"></i> Upload</button>
-                                </div>
-                                <div id="tugasCanvasWrapper" class="relative hidden border-2 border-dashed border-indigo-400 rounded-xl overflow-hidden bg-slate-900 h-44 flex items-center justify-center">
-                                    <img id="tugasPreviewImg" class="max-h-full max-w-full object-contain transition-transform duration-200" alt="Preview">
-                                    <canvas id="tugasDrawCanvas" class="absolute inset-0 cursor-crosshair w-full h-full"></canvas>
-                                    <div class="absolute bottom-1 right-1 flex items-center gap-1 bg-black/70 p-1 rounded-lg">
-                                        <button type="button" onclick="window.zoomCanvasImage('tugas', 0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">+</button>
-                                        <button type="button" onclick="window.zoomCanvasImage('tugas', -0.1)" class="px-1.5 py-0.5 text-white text-[10px] font-bold bg-white/25 rounded">-</button>
-                                        <button type="button" onclick="window.clearCanvas('tugas')" class="px-1.5 py-0.5 text-rose-300 text-[10px] font-bold bg-rose-900/50 rounded">Reset</button>
-                                        <button type="button" onclick="window.removeImage('tugas')" class="px-1.5 py-0.5 text-rose-400 text-[10px] font-bold bg-black rounded">✕</button>
-                                    </div>
-                                </div>
-                            </div>
-
                             <button type="button" onclick="window.saveSectionData('tugas')" class="w-full mt-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Tugas</button>
                         </div>
                     </div>
@@ -780,7 +582,7 @@
 
             <div class="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-xs">Tutup Modal</button>
-                <span class="text-xs text-slate-500 font-bold">Sinkronisasi instan otomatis tersimpan ke Google Sheets</span>
+                <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis di Local Storage browser</span>
             </div>
         </div>
     </div>
@@ -886,8 +688,6 @@
             { id: 113, name: "Al-Falaq", ayat: 5, hal: 604 }, { id: 114, name: "An-Nas", ayat: 6, hal: 604 }
         ];
 
-        window.canvasStates = { bacaan: { zoom: 1 }, hafalan: { zoom: 1 }, murojaah: { zoom: 1 }, tugas: { zoom: 1 } };
-
         window.handleLogoError = function(img) {
             if (!img) return;
             img.classList.add('hidden');
@@ -895,33 +695,18 @@
             if (fallback) fallback.classList.remove('hidden');
         };
 
-        window.toggleSheetDropdown = function(e) {
-            if (e) e.stopPropagation();
-            const menu = document.getElementById('sheetDropdownMenu');
-            if (menu) menu.classList.toggle('hidden');
-        };
-
-        // Close dropdown when clicking outside
-        window.addEventListener('click', function(e) {
-            const btn = document.getElementById('sheetDropdownBtn');
-            const menu = document.getElementById('sheetDropdownMenu');
-            if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
-                menu.classList.add('hidden');
-            }
-        });
-
         window.switchTab = function(tabId) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'history', 'santri', 'bacaan_sheet', 'hafalan_sheet', 'murojaah_sheet', 'tugas_sheet', 'rekap_sheet', 'wa_report', 'class_report', 'sync'].forEach(t => {
+            ['setoran', 'materi', 'materi_tambahan', 'history', 'santri', 'wa_report', 'class_report', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     if (t === tabId) {
-                        btn.className = "px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
                     } else {
-                        btn.className = "px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
                     }
                 }
             });
@@ -929,11 +714,8 @@
             if (tabId === 'setoran') window.renderSantriCardsAndTable();
             if (tabId === 'history') window.renderHistoryTable();
             if (tabId === 'santri') window.renderMasterSantriTable();
-            if (tabId === 'bacaan_sheet') window.renderSheetTable('bacaan');
-            if (tabId === 'hafalan_sheet') window.renderSheetTable('hafalan');
-            if (tabId === 'murojaah_sheet') window.renderSheetTable('murojaah');
-            if (tabId === 'tugas_sheet') window.renderSheetTable('tugas');
-            if (tabId === 'rekap_sheet') window.renderRekapCatatanTable();
+            if (tabId === 'materi') window.renderMateriList('utama');
+            if (tabId === 'materi_tambahan') window.renderMateriList('tambahan');
             if (tabId === 'wa_report') window.populateWaDropdown();
             if (tabId === 'class_report') window.generateClassReport();
         };
@@ -959,39 +741,69 @@
             document.getElementById('santriTableContainer').classList.toggle('hidden', m !== 'table');
         };
 
-        window.saveWebhookUrl = function() {
-            const url = document.getElementById('webhookUnifiedUrlInput').value;
-            localStorage.setItem('rq_webhook_url', url);
-            window.showToast("URL Webhook Master Google Sheets berhasil disimpan!", "success");
+        // MATERI SAVE & RENDER
+        window.saveMateri = function(type) {
+            const isUtama = type === 'utama';
+            const kelas = document.getElementById(isUtama ? 'materiKelasSelect' : 'materiTambahanKelasSelect').value;
+            const judul = document.getElementById(isUtama ? 'materiJudulInput' : 'materiTambahanJudulInput').value;
+            const bab = document.getElementById(isUtama ? 'materiBabInput' : 'materiTambahanBabInput').value;
+            const tanggal = document.getElementById(isUtama ? 'materiTanggalInput' : 'materiTambahanTanggalInput').value || new Date().toISOString().split('T')[0];
+            const ket = document.getElementById(isUtama ? 'materiKeteranganInput' : 'materiTambahanKeteranganInput').value;
+
+            if (!judul) {
+                window.showToast("Judul mata pelajaran wajib diisi!", "error");
+                return;
+            }
+
+            const key = isUtama ? 'rq_materi_utama' : 'rq_materi_tambahan';
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            list.unshift({ kelas, judul, bab, tanggal, ket });
+            localStorage.setItem(key, JSON.stringify(list));
+
+            window.showToast("Materi berhasil disimpan!", "success");
+            window.renderMateriList(type);
+
+            if (isUtama) {
+                document.getElementById('materiJudulInput').value = '';
+                document.getElementById('materiBabInput').value = '';
+                document.getElementById('materiKeteranganInput').value = '';
+            } else {
+                document.getElementById('materiTambahanJudulInput').value = '';
+                document.getElementById('materiTambahanBabInput').value = '';
+                document.getElementById('materiTambahanKeteranganInput').value = '';
+            }
         };
 
-        window.fetchDataFromGoogleSheets = async function() {
-            const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || localStorage.getItem('rq_webhook_url');
-            if (!webhookUrl) return;
-            try {
-                const response = await fetch(webhookUrl);
-                const resJson = await response.json();
-                if (resJson) {
-                    if (resJson.history) localStorage.setItem('rq_history_db', JSON.stringify(resJson.history));
-                    if (resJson.bacaan) localStorage.setItem('rq_sheet_bacaan', JSON.stringify(resJson.bacaan));
-                    if (resJson.hafalan) localStorage.setItem('rq_sheet_hafalan', JSON.stringify(resJson.hafalan));
-                    if (resJson.murojaah) localStorage.setItem('rq_sheet_murojaah', JSON.stringify(resJson.murojaah));
-                    if (resJson.tugas) localStorage.setItem('rq_sheet_tugas', JSON.stringify(resJson.tugas));
-                    if (resJson.rekapCatatan) localStorage.setItem('rq_sheet_rekap', JSON.stringify(resJson.rekapCatatan));
-                }
-                window.renderSantriCardsAndTable();
-                
-                const activeSec = document.querySelector('main > section:not(.hidden)')?.id;
-                if (activeSec === 'section-bacaan_sheet') window.renderSheetTable('bacaan');
-                if (activeSec === 'section-hafalan_sheet') window.renderSheetTable('hafalan');
-                if (activeSec === 'section-murojaah_sheet') window.renderSheetTable('murojaah');
-                if (activeSec === 'section-tugas_sheet') window.renderSheetTable('tugas');
-                if (activeSec === 'section-rekap_sheet') window.renderRekapCatatanTable();
+        window.renderMateriList = function(type) {
+            const isUtama = type === 'utama';
+            const container = document.getElementById(isUtama ? 'materiListContainer' : 'materiTambahanListContainer');
+            if (!container) return;
+            const key = isUtama ? 'rq_materi_utama' : 'rq_materi_tambahan';
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
 
-                window.showToast("Sinkronisasi instan berhasil!", "success");
-            } catch (err) {
-                console.warn("Sync err:", err);
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 font-bold">Belum ada materi tersimpan.</p>`;
+                return;
             }
+
+            container.innerHTML = list.map((m, idx) => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs">
+                    <div>
+                        <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${m.tanggal}</div>
+                        <div class="font-bold text-slate-600 dark:text-slate-400">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
+                    </div>
+                    <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-2 py-1">Hapus</button>
+                </div>
+            `).join('');
+        };
+
+        window.deleteMateri = function(type, idx) {
+            const key = type === 'utama' ? 'rq_materi_utama' : 'rq_materi_tambahan';
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            list.splice(idx, 1);
+            localStorage.setItem(key, JSON.stringify(list));
+            window.renderMateriList(type);
+            window.showToast("Materi dihapus", "success");
         };
 
         window.renderSantriCardsAndTable = function(query = '') {
@@ -1081,113 +893,6 @@
             outputInput.value = `Hal. ${surahObj ? surahObj.hal : 1}`;
         };
 
-        window.runAudioRecord = function(type) {
-            const notesInput = document.getElementById(`${type}CatatanInput`);
-            if (!notesInput) return;
-            
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                const samples = ["Tajwid lancar dan tartil.", "Makhraj huruf sudah jelas.", "Qalqalah terang dan stabil."];
-                const rand = samples[Math.floor(Math.random() * samples.length)];
-                notesInput.value = notesInput.value ? `${notesInput.value} | ${rand}` : rand;
-                window.showToast("Catatan terekam!", "success");
-                return;
-            }
-
-            try {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'id-ID';
-                recognition.interimResults = false;
-                recognition.maxAlternatives = 1;
-
-                window.showToast("🎤 Mendengarkan suara...", "success");
-
-                recognition.onresult = function(event) {
-                    const speechResult = event.results[0][0].transcript;
-                    notesInput.value = notesInput.value ? `${notesInput.value} | ${speechResult}` : speechResult;
-                    window.showToast("Catatan berhasil direkam!", "success");
-                };
-
-                recognition.onerror = function() {
-                    notesInput.value = notesInput.value ? `${notesInput.value} | Tajwid dan makhraj sudah baik.` : "Tajwid dan makhraj sudah baik.";
-                    window.showToast("Catatan terekam.", "success");
-                };
-
-                recognition.start();
-            } catch (err) {
-                notesInput.value = notesInput.value ? `${notesInput.value} | Tajwid tartil dan lancar.` : "Tajwid tartil dan lancar.";
-                window.showToast("Catatan terekam.", "success");
-            }
-        };
-
-        window.handleImageUpload = function(event, type) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const wrapper = document.getElementById(`${type}CanvasWrapper`);
-                const img = document.getElementById(`${type}PreviewImg`);
-                const canvas = document.getElementById(`${type}DrawCanvas`);
-                if (!wrapper || !img || !canvas) return;
-
-                img.src = e.target.result;
-                wrapper.classList.remove('hidden');
-
-                img.onload = function() {
-                    canvas.width = img.clientWidth;
-                    canvas.height = img.clientHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    initDrawingEvents(canvas);
-                };
-            };
-            reader.readAsDataURL(file);
-        };
-
-        function initDrawingEvents(canvas) {
-            const ctx = canvas.getContext('2d');
-            ctx.strokeStyle = '#34d399';
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-
-            let drawing = false;
-            const getPos = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return { x: clientX - rect.left, y: clientY - rect.top };
-            };
-
-            const startDraw = (e) => { drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); };
-            const draw = (e) => { if (!drawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); };
-            const endDraw = () => { drawing = false; };
-
-            canvas.onmousedown = startDraw; canvas.onmousemove = draw; canvas.onmouseup = endDraw; canvas.onmouseout = endDraw;
-            canvas.ontouchstart = startDraw; canvas.ontouchmove = draw; canvas.ontouchend = endDraw;
-        }
-
-        window.zoomCanvasImage = function(type, delta) {
-            const img = document.getElementById(`${type}PreviewImg`);
-            if (!img) return;
-            window.canvasStates[type].zoom = Math.max(0.5, Math.min(3, window.canvasStates[type].zoom + delta));
-            img.style.transform = `scale(${window.canvasStates[type].zoom})`;
-        };
-
-        window.clearCanvas = function(type) {
-            const canvas = document.getElementById(`${type}DrawCanvas`);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            window.showToast("Coretan direset", "success");
-        };
-
-        window.removeImage = function(type) {
-            const wrapper = document.getElementById(`${type}CanvasWrapper`);
-            const fileInput = document.getElementById(`${type}ImageFile`);
-            if (wrapper) wrapper.classList.add('hidden');
-            if (fileInput) fileInput.value = '';
-        };
-
         window.saveSectionData = function(sectionType) {
             const s = window.santriList.find(x => x.id === window.activeSantriId);
             if (!s) return;
@@ -1197,14 +902,7 @@
             let statusVal = '';
             let catatanVal = document.getElementById(`${sectionType}CatatanInput`)?.value || '';
 
-            const previewImg = document.getElementById(`${sectionType}PreviewImg`);
-            const hasImage = previewImg && !document.getElementById(`${sectionType}CanvasWrapper`).classList.contains('hidden');
-            let imageBase64 = hasImage ? previewImg.src : null;
-
-            let sheetDataType = '';
-
             if (sectionType === 'bacaan') {
-                sheetDataType = 'setoran_bacaan';
                 const bacaanCat = document.getElementById('bacaanCategorySelect')?.value || 'quran';
                 if (bacaanCat === 'iqro') {
                     detailSetoran = `${document.getElementById('bacaanIqroJilidSelect')?.value} hlm ${document.getElementById('bacaanIqroHalInput')?.value}`;
@@ -1216,21 +914,18 @@
                 statusVal = document.getElementById('bacaanStatusSelect')?.value || 'Lancar (A)';
                 s.lastBacaan = detailSetoran;
             } else if (sectionType === 'hafalan') {
-                sheetDataType = 'setoran_hafalan';
                 const hId = parseInt(document.getElementById('hafalanSurahSelect1')?.value || 1);
                 const hObj = window.quranSurahs.find(x => x.id === hId);
                 detailSetoran = `${hObj ? hObj.name : 'An-Nas'} ${document.getElementById('hafalanAyatStartInput1')?.value}-${document.getElementById('hafalanAyatEndInput1')?.value}`;
                 statusVal = document.getElementById('hafalanStatusSelect')?.value || 'Lancar (A)';
                 s.lastHafalan = detailSetoran;
             } else if (sectionType === 'murojaah') {
-                sheetDataType = 'murojaah_kelas';
                 const mId = parseInt(document.getElementById('murojaahSurahSelect1')?.value || 1);
                 const mObj = window.quranSurahs.find(x => x.id === mId);
                 detailSetoran = `${mObj ? mObj.name : 'Al-Fatihah'} ${document.getElementById('murojaahAyatStartInput1')?.value}-${document.getElementById('murojaahAyatEndInput1')?.value}`;
                 statusVal = document.getElementById('murojaahStatusSelect')?.value || 'Lancar (A)';
                 s.lastMurojaah = detailSetoran;
             } else if (sectionType === 'tugas') {
-                sheetDataType = 'setoran_tugas';
                 const tJenis = document.getElementById('tugasJenisSelect')?.value || '';
                 const tDetail = document.getElementById('tugasDetailInput')?.value || '';
                 detailSetoran = `${tJenis}: ${tDetail}`;
@@ -1250,55 +945,7 @@
             });
             localStorage.setItem('rq_history_db', JSON.stringify(history));
 
-            const webhookUrl = document.getElementById('webhookUnifiedUrlInput')?.value || localStorage.getItem('rq_webhook_url');
-            
-            let payload = {
-                type: sheetDataType,
-                action: 'save',
-                id: s.id,
-                name: s.name,
-                class: s.class,
-                teacher: s.teacher,
-                tanggal: tanggalVal,
-                status: statusVal,
-                catatan: catatanVal
-            };
-
-            if (sectionType === 'bacaan') {
-                payload.bacaanHariIni = detailSetoran;
-                payload.bacaanStatus = statusVal;
-                payload.bacaanCatatan = catatanVal;
-                payload.bacaanImage = imageBase64;
-            } else if (sectionType === 'hafalan') {
-                payload.hafalanHariIni = detailSetoran;
-                payload.hafalanCatatan = catatanVal;
-                payload.hafalanImage = imageBase64;
-            } else if (sectionType === 'murojaah') {
-                payload.murojaahHariIni = detailSetoran;
-                payload.murojaahStatus = statusVal;
-                payload.murojaahCatatan = catatanVal;
-                payload.fotoMurojaah = imageBase64;
-            } else if (sectionType === 'tugas') {
-                payload.tugasJenis = detailSetoran;
-                payload.tugasStatus = statusVal;
-                payload.tugasCatatan = catatanVal;
-                payload.tugasImage = imageBase64;
-            }
-
-            if (webhookUrl) {
-                fetch(webhookUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                }).then(() => {
-                    setTimeout(() => window.fetchDataFromGoogleSheets(), 1000);
-                }).catch(e => console.warn(e));
-            }
-
-            window.showToast(`💾 ${sectionType.toUpperCase()} tersimpan & terkirim ke Google Sheets!`, "success");
-
-            window.removeImage(sectionType);
+            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan ke Local Storage!`, "success");
             const notesField = document.getElementById(`${sectionType}CatatanInput`);
             if (notesField) notesField.value = '';
 
@@ -1348,52 +995,6 @@
             `).join('');
         };
 
-        window.renderSheetTable = function(type) {
-            const tbodyId = `${type}SheetTableBody`;
-            const tbody = document.getElementById(tbodyId);
-            if (!tbody) return;
-            const data = JSON.parse(localStorage.getItem(`rq_sheet_${type}`) || '[]');
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 font-bold">Data kosong atau klik tombol Muat Ulang di atas.</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = data.map(r => `
-                <tr>
-                    <td class="p-3 font-bold text-emerald-800">${r.tanggal || '-'}</td>
-                    <td class="p-3 font-black">${r.name || '-'} <span class="text-slate-400 text-[10px]">(${r.id || ''})</span></td>
-                    <td class="p-3">${r.class || '-'}</td>
-                    <td class="p-3 font-extrabold text-amber-700">${r.detail || r.bacaan || r.hafalan || r.murojaah || r.tugas || '-'}</td>
-                    <td class="p-3">${r.status || 'Selesai'}</td>
-                    <td class="p-3 text-slate-600">${r.catatan || '-'}</td>
-                    <td class="p-3">${r.foto && r.foto !== '-' ? `<a href="${r.foto}" target="_blank" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Lihat Foto</a>` : '-'}</td>
-                </tr>
-            `).join('');
-        };
-
-        window.renderRekapCatatanTable = function() {
-            const tbody = document.getElementById('rekapSheetTableBody');
-            if (!tbody) return;
-            const filterKat = document.getElementById('filterRekapKategori')?.value || 'ALL';
-            const rekap = JSON.parse(localStorage.getItem('rq_sheet_rekap') || '[]');
-            
-            const filtered = rekap.filter(r => filterKat === 'ALL' || (r.kategori || '').toUpperCase().includes(filterKat));
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 font-bold">Belum ada rekap catatan tercatat.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filtered.map(r => `
-                <tr>
-                    <td class="p-3 font-bold text-amber-800">${r.tanggal || '-'}</td>
-                    <td class="p-3 font-bold text-xs">${r.id || '-'}</td>
-                    <td class="p-3 font-black">${r.nama || '-'}</td>
-                    <td class="p-3 font-extrabold text-emerald-700">${r.kategori || '-'}</td>
-                    <td class="p-3 font-medium text-slate-700 dark:text-slate-300">${r.catatan || '-'}</td>
-                </tr>
-            `).join('');
-        };
-
         window.populateWaDropdown = function() {
             const sel = document.getElementById('waSantriSelect');
             if (!sel) return;
@@ -1405,14 +1006,38 @@
             const id = document.getElementById('waSantriSelect')?.value;
             const s = window.santriList.find(x => x.id === id);
             if (!s) return;
-            document.getElementById('waMessagePreview').value = `Assalamu'alaikum\nAyah/Bunda semoga sehat selalu.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n\n👤 *Nama:* ${s.name}\n🏫 *Kelas:* ${s.class}\n\n📖 *Bacaan:* ${s.lastBacaan || '-'}\n⭐ *Hafalan:* ${s.lastHafalan || '-'}\n🔄 *Muroja'ah:* ${s.lastMurojaah || '-'}\n📝 *Tugas:* ${s.lastTugas || '-'}\n\nJazakumullah khairan katsiran.`;
+
+            // Get Materi Utama & Tambahan for this santri's class
+            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+            
+            const filteredMateri = materiUtama.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
+            const filteredTambahan = materiTambahan.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
+
+            let materiText = "\n📚 *Materi Belajar Hari Ini:*";
+            if (filteredMateri.length > 0) {
+                filteredMateri.forEach(m => {
+                    materiText += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                });
+            } else {
+                materiText += "\n- Belum ada materi utama.";
+            }
+
+            if (filteredTambahan.length > 0) {
+                materiText += "\n\n⭐ *Materi Tambahan:*";
+                filteredTambahan.forEach(m => {
+                    materiText += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                });
+            }
+
+            document.getElementById('waMessagePreview').value = `Assalamu'alaikum\nAyah/Bunda semoga sehat selalu.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n\n👤 *Nama:* ${s.name}\n🏫 *Kelas:* ${s.class}\n\n📖 *Bacaan:* ${s.lastBacaan || '-'}\n⭐ *Hafalan:* ${s.lastHafalan || '-'}\n🔄 *Muroja'ah:* ${s.lastMurojaah || '-'}\n📝 *Tugas:* ${s.lastTugas || '-'}\n${materiText}\n\nJazakumullah khairan katsiran.`;
         };
 
         window.copyWaReportText = function() {
             const text = document.getElementById('waMessagePreview')?.value;
             if (text) {
                 navigator.clipboard.writeText(text);
-                window.showToast("Pesan disalin ke clipboard!", "success");
+                window.showToast("Pesan WA disalin!", "success");
             }
         };
 
@@ -1425,10 +1050,36 @@
         window.generateClassReport = function() {
             const className = document.getElementById('reportClassSelect')?.value || 'Abu Ubaidah';
             const list = window.santriList.filter(s => s.class === className);
-            let msg = `Rekap Kelas ${className}:\n\n`;
+            
+            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+            
+            const filteredMateri = materiUtama.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
+            const filteredTambahan = materiTambahan.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
+
+            let msg = `📊 *LAPORAN REKAP KELAS ${className.toUpperCase()}*\n*Rumah Qur'an Al-Khansa*\n\n`;
+            
+            msg += `📚 *Materi Belajar Hari Ini:*`;
+            if (filteredMateri.length > 0) {
+                filteredMateri.forEach(m => {
+                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                });
+            } else {
+                msg += `\n- Belum ada materi utama kelas ini.`;
+            }
+
+            if (filteredTambahan.length > 0) {
+                msg += `\n\n⭐ *Materi Tambahan:*`;
+                filteredTambahan.forEach(m => {
+                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                });
+            }
+
+            msg += `\n\n👥 *Daftar Santri & Prestasi:*`;
             list.forEach((s, idx) => {
-                msg += `${idx + 1}. ${s.name}\n- Bacaan: ${s.lastBacaan || '-'}\n- Hafalan: ${s.lastHafalan || '-'}\n\n`;
+                msg += `\n${idx + 1}. *${s.name}*\n   - Bacaan: ${s.lastBacaan || '-'}\n   - Hafalan: ${s.lastHafalan || '-'}\n`;
             });
+
             document.getElementById('classReportMessagePreview').value = msg;
         };
 
@@ -1441,18 +1092,32 @@
             window.open(`https://wa.me/6285774042121?text=${encodeURIComponent(document.getElementById('classReportMessagePreview')?.value)}`, '_blank');
         };
 
+        window.exportDataToExcel = function() {
+            let csv = "ID Santri,Nama Santri,Kelas,Pengajar,Bacaan Terakhir,Hafalan Terakhir,Murojaah Terakhir,Tugas Terakhir\n";
+            window.santriList.forEach(s => {
+                csv += `"${s.id}","${s.name}","${s.class}","${s.teacher}","${s.lastBacaan}","${s.lastHafalan}","${s.lastMurojaah}","${s.lastTugas}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Data_Santri_RQ_AlKhansa_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            window.showToast("File Excel/CSV berhasil didownload!", "success");
+        };
+
+        window.clearLocalStorage = function() {
+            if (confirm("Reset seluruh data lokal?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        };
+
         window.rotateWaGreeting = function() {
             window.showToast("Salam & Doa diperbarui!", "success");
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            const savedUrl = localStorage.getItem('rq_webhook_url');
-            if (savedUrl) {
-                const input = document.getElementById('webhookUnifiedUrlInput');
-                if (input) input.value = savedUrl;
-            }
             window.renderSantriCardsAndTable();
-            window.fetchDataFromGoogleSheets();
         });
     </script>
 </body>
