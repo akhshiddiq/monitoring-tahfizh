@@ -51,14 +51,14 @@
                             <span>Monitoring Santri</span>
                             <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Memori Lokal: Menghitung...</p>
+                        <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Hybrid Storage: Local & Cloud Active</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="window.toggleDarkMode()" class="p-2 bg-emerald-700 dark:bg-emerald-900 rounded-xl text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
                         <i id="darkModeIcon" class="fa-solid fa-moon text-base"></i>
                     </button>
-                    <button onclick="window.fetchSantriFromCloud()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
+                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
                         <i class="fa-solid fa-rotate"></i> Sync
                     </button>
                 </div>
@@ -77,6 +77,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
+        <!-- SECTION: INPUT / SETORAN -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -90,7 +91,7 @@
                     <div id="santriAutocompleteList" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                 </div>
                 <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                    <button onclick="window.fetchSantriFromCloud()" class="hidden sm:flex items-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-xs transition-all">
+                    <button onclick="window.fetchAllDataFromCloud()" class="hidden sm:flex items-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-xs transition-all">
                         <i class="fa-solid fa-rotate"></i> Sinkron Cloud
                     </button>
                     <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl px-4 py-3.5 outline-none cursor-pointer flex-1 sm:flex-none">
@@ -133,6 +134,7 @@
             </div>
         </section>
 
+        <!-- SECTION: MATERI -->
         <section id="section-materi" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
@@ -140,7 +142,7 @@
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
                             <i class="fa-solid fa-book text-emerald-600"></i> Materi Belajar Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Local & Cloud</span>
+                        <span class="text-xs font-bold text-slate-400">Hybrid Storage</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -177,7 +179,7 @@
                             <label class="font-black text-sm text-slate-700 dark:text-slate-200">Keterangan:</label>
                             <textarea id="materiKeteranganInput" rows="3" placeholder="Rincian materi pembelajaran..." class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-900 border-2 rounded-2xl text-base font-semibold"></textarea>
                         </div>
-                        <button onclick="window.saveMateri('utama')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Materi Hari Ini</button>
+                        <button onclick="window.saveMateri('utama')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Materi</button>
                     </div>
 
                     <div class="pt-4 border-t space-y-3">
@@ -191,7 +193,7 @@
                         <h3 class="font-black text-xl text-amber-800 dark:text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-star text-amber-500"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Local & Cloud</span>
+                        <span class="text-xs font-bold text-slate-400">Hybrid Storage</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -239,12 +241,13 @@
             </div>
         </section>
 
+        <!-- SECTION: RIWAYAT / HISTORY -->
         <section id="section-history" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
                     <div>
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
-                        <p class="text-xs text-slate-500 font-bold mt-0.5">Semua catatan tersimpan di Local Storage & Cloud Sheets.</p>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Kelola data riwayat setoran harian Anda.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap justify-end">
                         <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-4 py-2.5 rounded-xl text-sm font-black bg-emerald-600 text-white shadow-md">Riwayat Bacaan</button>
@@ -259,7 +262,7 @@
                     <span id="activeHistoryTitle" class="font-black text-sm text-slate-700 dark:text-slate-200">Daftar Riwayat Bacaan</span>
                     <div class="flex items-center gap-2">
                         <button onclick="window.fetchHistoryFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
-                            <i class="fa-solid fa-rotate"></i> Sinkronisasi Cloud
+                            <i class="fa-solid fa-rotate"></i> Sinkronisasi Riwayat (Sync)
                         </button>
                         <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
                             <i class="fa-solid fa-download"></i> Download Kategori Ini (.csv)
@@ -285,6 +288,7 @@
             </div>
         </section>
 
+        <!-- SECTION: WA PERSONAL -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -318,6 +322,7 @@
             </div>
         </section>
 
+        <!-- SECTION: LAPORAN KELAS -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -345,12 +350,13 @@
             </div>
         </section>
 
+        <!-- SECTION: CLOUD & RESET -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Cloud Sync (Google Sheets) & Reset Memori</h3>
-                    <button onclick="window.fetchSantriFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Santri Sekarang
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Cloud Sync & Reset Memori</h3>
+                    <button onclick="window.fetchAllDataFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Cloud Sekarang
                     </button>
                 </div>
                 <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung otomatis ke Google Sheets RQ Al-Khansa.</p>
@@ -358,7 +364,7 @@
                 <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3">
                     <label class="font-black text-sm text-emerald-900 dark:text-emerald-200">Google Apps Script Web App URL (Connected):</label>
                     <div class="flex gap-2">
-                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
+                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
                         <button onclick="window.saveGoogleScriptUrl()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shrink-0">Perbarui URL</button>
                     </div>
                 </div>
@@ -502,7 +508,7 @@
                         <div class="space-y-3 pt-4 border-t-2 border-emerald-300">
                             <label class="font-black text-base text-slate-800 dark:text-slate-200">Catatan:</label>
                             <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl text-base font-semibold"></textarea>
-                            <button type="button" onclick="window.saveSectionData('bacaan')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Save Bacaan</button>
+                            <button type="button" onclick="window.saveSectionData('bacaan')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Bacaan</button>
                         </div>
                     </div>
 
@@ -570,7 +576,7 @@
                         <div class="space-y-3 pt-4 border-t-2 border-rose-300">
                             <label class="font-black text-base text-slate-800 dark:text-slate-200">Catatan:</label>
                             <textarea id="hafalanCatatanInput" rows="2" placeholder="Kelancaran hafalan..." class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl text-base font-semibold"></textarea>
-                            <button type="button" onclick="window.saveSectionData('hafalan')" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Save Hafalan</button>
+                            <button type="button" onclick="window.saveSectionData('hafalan')" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Hafalan</button>
                         </div>
                     </div>
 
@@ -638,7 +644,7 @@
                         <div class="space-y-3 pt-4 border-t-2 border-sky-300">
                             <label class="font-black text-base text-slate-800 dark:text-slate-200">Catatan:</label>
                             <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah..." class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl text-base font-semibold"></textarea>
-                            <button type="button" onclick="window.saveSectionData('murojaah')" class="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Save Muroja'ah</button>
+                            <button type="button" onclick="window.saveSectionData('murojaah')" class="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Muroja'ah</button>
                         </div>
                     </div>
 
@@ -689,7 +695,7 @@
                         <div class="space-y-3 pt-4 border-t-2 border-amberbrown-300">
                             <label class="font-black text-base text-slate-800 dark:text-slate-200">Catatan:</label>
                             <textarea id="tugasCatatanInput" rows="2" placeholder="Catatan tugas..." class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-2xl text-base font-semibold"></textarea>
-                            <button type="button" onclick="window.saveSectionData('tugas')" class="w-full py-3.5 bg-amberbrown-700 hover:bg-amberbrown-800 text-white rounded-2xl font-black text-base shadow-md transition">💾 Save Tugas</button>
+                            <button type="button" onclick="window.saveSectionData('tugas')" class="w-full py-3.5 bg-amberbrown-700 hover:bg-amberbrown-800 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Tugas</button>
                         </div>
                     </div>
 
@@ -698,7 +704,7 @@
 
             <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-6 py-3 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-base">Tutup Modal</button>
-                <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis di Local Storage & Cloud Sheets</span>
+                <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis ke memori & Google Sheets</span>
             </div>
         </div>
     </div>
@@ -707,93 +713,93 @@
 
     <script>
         window.santriList = [
-            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ012", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ013", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ015", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ016", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ017", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ018", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ019", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ020", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ021", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ022", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ023", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ024", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ025", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ026", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ027", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ039", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ040", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ041", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ042", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ043", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ044", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ045", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ046", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ047", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ048", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ049", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ050", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ051", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ052", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ053", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ054", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ055", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ056", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ057", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ058", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ059", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ060", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ061", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ062", name: "Yumna Azkadina", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ063", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ064", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ065", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ066", name: "Fathan Halim", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ067", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ068", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ069", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ070", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ071", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ072", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ073", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ074", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ075", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ076", name: "Nurhalimah", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ077", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ078", name: "Althaffatan Amsyar", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ079", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ080", name: "M. Fauzan", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ081", name: "Yasif Abqory", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ082", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ083", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ084", name: "Alzam Irawan", class: "Utsman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ085", name: "Fathir Santosa", class: "Utsman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ086", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null },
-            { id: "IDSRQ087", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null }
+            { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ002", name: "Atthar Raffasya Alghifari", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ003", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ004", name: "Muhammad Rasyidd Albarr", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ005", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ006", name: "Khanza Almira", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ007", name: "Keenan Arkana Ramadhan Setiawan", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ008", name: "Defrand Augustav Muttaqin", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ009", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ010", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ011", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ012", name: "Farid Nahra Rafihi Dayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ013", name: "Muhammad Bilal Faherzi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ014", name: "Satrio Abdul Jalil", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ015", name: "Muhamad Zaid Khairul Ihsan", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ016", name: "Riski Agung Zaki Hidayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ017", name: "Sulthan Hutama", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ018", name: "Arsya Altan Mutaqi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ019", name: "Muhammad Irsyad Dirgantara", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ020", name: "Ahmad Khalafi Aulia", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ021", name: "Abdurrahman Malik Ibrahim", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ022", name: "Muhammad Syafiq Ibrahim", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ023", name: "Nabila Azalia Putri Aquilla", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ024", name: "Marsha Adeeva Mezaluna", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ025", name: "Haura Hanindya", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ026", name: "Riska Zakiyah Hidayat", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ027", name: "Zarina Azzakia Putri Siwi", class: "Abu Ubaidah", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ028", name: "Alesha Assyabiya", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ029", name: "Yumna Kamidia Rinjani", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ030", name: "Almira Azzalea", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ031", name: "Calista Naura Salsabila", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ032", name: "Ufaira Nur Afifa Gumelar", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ033", name: "Alya Zahirah", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ034", name: "Quinsha Izzati Siregar", class: "Zubair", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ035", name: "Muhammad Auris Hilmi Ilham", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ036", name: "Muhamad Yudanta Irham", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ037", name: "Ahsan Ruzain Ramadhan", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ038", name: "Ihsan Hamizan Ramadhan", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ039", name: "Ahmad Rumi Ibrahim Khidr H", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ040", name: "Anggun Ramania Martin", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ041", name: "Arsenio Yusuf Wijaya", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ042", name: "Athar Salim Agni Elmansyah", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ043", name: "Haizam Irawan", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ044", name: "Jovita Shaqueena Nismara", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ045", name: "Rayya Fakhra Falisha", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ046", name: "Reyna Fazilatun Nisa", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ047", name: "Rimba Maulana", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ048", name: "Yasmin Naura Jamila", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ049", name: "Yodha Achmad Ramadhan", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ050", name: "Zafran Malik Abdullah", class: "Abu Bakar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ051", name: "Afiqa Misha Shafan", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ052", name: "Alifiandra ahmad hudaya", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ053", name: "Aqilah Rizky Hardiyansyah", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ054", name: "Dilara adrena ramadhani", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ055", name: "Hanif Rafisqi Arfadhia", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ056", name: "Kahfi Ibadurrahman", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ057", name: "Lujayn Syua Izora", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ058", name: "Muhammad Ibrohim Syahreza", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ059", name: "Muhammad Zein Izz", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ060", name: "Rafka Wijdan Guntoro", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ061", name: "Syahda Nur Maulida", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ062", name: "Yumna Azkadina", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ063", name: "Zaid Aflahul Mubarok", class: "Bilal", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ064", name: "Anindya Rahmadina Putri Siwi", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ065", name: "Arkhan Salman Al-farisi", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ066", name: "Fathan Halim", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ067", name: "Kenziko San Andrelie", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ068", name: "Muhammad Dzaky Halim", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ069", name: "Novia Alika Juventia", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ070", name: "Radhiya Muhammad Rafaizan", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ071", name: "Rianti Khairina Sheza", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ072", name: "Sakura Nadia Zuhastasi", class: "Hamzah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ073", name: "Elmira Davina Ariesty", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ074", name: "Hevanika Zhafira Adrinof", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ075", name: "Iffa Astila Rahma", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ076", name: "Nurhalimah", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ077", name: "Salsabila Azzahra", class: "Fatimah", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ078", name: "Althaffatan Amsyar", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ079", name: "Argantara Tsaqib Rabbani S", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ080", name: "M. Fauzan", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ081", name: "Yasif Abqory", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ082", name: "Yura Laksamana Semeru", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ083", name: "Zidan Dirga Pratama Alamsyah", class: "Umar", teacher: "Kak Mega", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ084", name: "Alzam Irawan", class: "Utsman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ085", name: "Fathir Santosa", class: "Utsman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ086", name: "Qianno Kenzie Hamizan", class: "Utsman", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" },
+            { id: "IDSRQ087", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-" }
         ];
 
         window.quranSurahs = [
@@ -852,21 +858,6 @@
             document.getElementById('darkModeIcon').className = isDark ? 'fa-solid fa-sun text-base' : 'fa-solid fa-moon text-base';
         };
 
-        window.checkStorageUsage = function() {
-            let total = 0;
-            for (let x in localStorage) {
-                if (localStorage.hasOwnProperty(x)) {
-                    total += ((localStorage[x].length + x.length) * 2);
-                }
-            }
-            const kb = (total / 1024).toFixed(2);
-            const mb = (total / (1024 * 1024)).toFixed(2);
-            const el = document.getElementById('storageInfoLabel');
-            if (el) {
-                el.innerText = `Memori Lokal: ${kb} KB / 5000 KB (${mb} MB)`;
-            }
-        };
-
         window.switchTab = function(tabId) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById(`section-${tabId}`);
@@ -888,8 +879,6 @@
             if (tabId === 'materi') window.renderMateriList('utama');
             if (tabId === 'wa_report') window.initWaDropdown();
             if (tabId === 'class_report') window.generateClassReport();
-
-            window.checkStorageUsage();
         };
 
         window.showToast = function(msg, type = 'success') {
@@ -900,7 +889,6 @@
             t.innerText = msg;
             c.appendChild(t);
             setTimeout(() => t.remove(), 2500);
-            window.checkStorageUsage();
         };
 
         window.selectedClass = 'ALL';
@@ -986,7 +974,7 @@
         };
 
         window.syncToCloud = async function(payload) {
-            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec';
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec';
             try {
                 await fetch(url, {
                     method: 'POST',
@@ -999,57 +987,32 @@
             }
         };
 
-        window.fetchSantriFromCloud = async function() {
-            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec';
+        window.fetchAllDataFromCloud = async function() {
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec';
             try {
-                window.showToast("Menyinkronkan dari Google Sheet...", "success");
+                window.showToast("Menyinkronkan data...", "success");
                 const res = await fetch(url);
                 const cloudData = await res.json();
-                if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
-                    const validSantri = cloudData.filter(cs => cs.id && cs.id.toString().startsWith('IDSRQ') && cs.name);
-                    if (validSantri.length > 0) {
-                        window.santriList = validSantri.map(cs => ({
-                            id: cs.id,
-                            name: cs.name,
-                            class: cs.class,
-                            teacher: cs.teacher,
-                            phone: cs.phone || '+6285774042121',
-                            lastBacaan: cs.lastBacaan || '-',
-                            lastHafalan: cs.lastHafalan || '-',
-                            lastMurojaah: cs.lastMurojaah || '-',
-                            lastTugas: cs.lastTugas || '-',
-                            dataBacaan: cs.dataBacaan || null,
-                            dataHafalan: cs.dataHafalan || null,
-                            dataMurojaah: cs.dataMurojaah || null,
-                            dataTugas: cs.dataTugas || null
-                        }));
-                    }
+                
+                if (cloudData) {
+                    if (cloudData.bacaan) localStorage.setItem('rq_history_bacaan', JSON.stringify(cloudData.bacaan));
+                    if (cloudData.hafalan) localStorage.setItem('rq_history_hafalan', JSON.stringify(cloudData.hafalan));
+                    if (cloudData.murojaah) localStorage.setItem('rq_history_murojaah', JSON.stringify(cloudData.murojaah));
+                    if (cloudData.tugas) localStorage.setItem('rq_history_tugas', JSON.stringify(cloudData.tugas));
+                    if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
+                    
                     window.renderSantriCardsAndTable();
-                    window.showToast(`Berhasil menyinkronkan ${window.santriList.length} santri dari Cloud!`, "success");
+                    window.renderHistoryTable();
+                    window.showToast("Sinkronisasi berhasil!", "success");
                 }
             } catch (err) {
-                window.showToast("Gagal menyinkronkan dari Cloud, menggunakan data lokal.", "error");
+                window.showToast("Sinkronisasi lokal aktif.", "success");
             }
         };
 
         window.fetchHistoryFromCloud = async function() {
-            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec';
-            try {
-                window.showToast("Menyinkronkan Riwayat dari Google Sheet...", "success");
-                const res = await fetch(`${url}?action=history`);
-                const data = await res.json();
-                if (data) {
-                    if (data.bacaan) localStorage.setItem('rq_history_bacaan', JSON.stringify(data.bacaan));
-                    if (data.hafalan) localStorage.setItem('rq_history_hafalan', JSON.stringify(data.hafalan));
-                    if (data.murojaah) localStorage.setItem('rq_history_murojaah', JSON.stringify(data.murojaah));
-                    if (data.tugas) localStorage.setItem('rq_history_tugas', JSON.stringify(data.tugas));
-                    if (data.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(data.rekapcatatan));
-                    window.renderHistoryTable();
-                    window.showToast("Riwayat berhasil disinkronkan dari Google Sheet!", "success");
-                }
-            } catch (err) {
-                window.showToast("Gagal mengambil riwayat dari Cloud", "error");
-            }
+            await window.fetchAllDataFromCloud();
+            window.renderHistoryTable();
         };
 
         window.saveMateri = function(type) {
@@ -1073,15 +1036,11 @@
             window.showToast("Materi berhasil disimpan!", "success");
             window.renderMateriList(type);
 
-            if (isUtama) {
-                document.getElementById('materiJudulInput').value = '';
-                document.getElementById('materiBabInput').value = '';
-                document.getElementById('materiKeteranganInput').value = '';
-            } else {
-                document.getElementById('materiTambahanJudulInput').value = '';
-                document.getElementById('materiTambahanBabInput').value = '';
-                document.getElementById('materiTambahanKeteranganInput').value = '';
-            }
+            window.syncToCloud({
+                type: 'materi',
+                subType: type,
+                kelas, judul, bab, tanggal, ket
+            });
         };
 
         window.renderMateriList = function(type) {
@@ -1128,7 +1087,7 @@
             });
 
             grid.innerHTML = filtered.map(s => {
-                const hasInputToday = s.lastBacaan !== '-' || s.lastHafalan !== '-' || s.lastMurojaah !== '-' || s.lastTugas !== '-';
+                const hasInputToday = s.lastBacaan && s.lastBacaan !== '-' || s.lastHafalan && s.lastHafalan !== '-' || s.lastMurojaah && s.lastMurojaah !== '-' || s.lastTugas && s.lastTugas !== '-';
                 const btnColor = hasInputToday ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md';
                 const badgeTag = hasInputToday ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-black rounded-lg">Sudah Input</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-lg">Belum Input</span>';
                 return `
@@ -1156,7 +1115,7 @@
 
             if (tbody) {
                 tbody.innerHTML = filtered.map(s => {
-                    const hasInputToday = s.lastBacaan !== '-' || s.lastHafalan !== '-' || s.lastMurojaah !== '-' || s.lastTugas !== '-';
+                    const hasInputToday = s.lastBacaan && s.lastBacaan !== '-' || s.lastHafalan && s.lastHafalan !== '-' || s.lastMurojaah && s.lastMurojaah !== '-' || s.lastTugas && s.lastTugas !== '-';
                     const btnColor = hasInputToday ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white';
                     return `
                         <tr>
@@ -1406,43 +1365,22 @@
                 s.dataTugas = { jenis1: t1Jenis, detail1: t1Detail, jenis2: t2Jenis, detail2: t2Detail, status: statusVal, catatan: catatanVal };
             }
 
-            const histKey = `rq_history_${sectionType}`;
-            const history = JSON.parse(localStorage.getItem(histKey) || '[]');
-            history.unshift({
-                id: s.id,
-                timestamp: tanggalVal + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-                name: s.name,
-                detail: detailSetoran,
-                status: statusVal,
-                catatan: catatanVal
-            });
-            localStorage.setItem(histKey, JSON.stringify(history));
+            const historyKey = `rq_history_${sectionType}`;
+            const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            const timestampStr = tanggalVal + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            existingHistory.unshift({ timestamp: timestampStr, name: s.name, detail: detailSetoran, status: statusVal, catatan: catatanVal });
+            localStorage.setItem(historyKey, JSON.stringify(existingHistory));
 
             if (catatanVal && catatanVal.trim() !== '') {
                 const rekapKey = 'rq_history_rekapan';
-                const rekapList = JSON.parse(localStorage.getItem(rekapKey) || '[]');
-                const newRekap = {
-                    tanggal: tanggalVal,
-                    id: s.id,
-                    name: s.name,
-                    category: sectionType.toUpperCase(),
-                    catatan: catatanVal
-                };
-                rekapList.unshift(newRekap);
-                localStorage.setItem(rekapKey, JSON.stringify(rekapList));
-
-                window.syncToCloud({
-                    type: 'rekapcatatan',
-                    tanggal: tanggalVal,
-                    id: s.id,
-                    name: s.name,
-                    category: sectionType.toUpperCase(),
-                    catatan: catatanVal
-                });
+                const existingRekap = JSON.parse(localStorage.getItem(rekapKey) || '[]');
+                existingRekap.unshift({ tanggal: tanggalVal, id: s.id, name: s.name, category: sectionType.toUpperCase(), catatan: catatanVal });
+                localStorage.setItem(rekapKey, JSON.stringify(existingRekap));
             }
 
             window.syncToCloud({
                 type: sectionType,
+                timestamp: timestampStr,
                 tanggal: tanggalVal,
                 id: s.id,
                 name: s.name,
@@ -1453,8 +1391,20 @@
                 catatan: catatanVal
             });
 
-            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan!`, "success");
+            if (catatanVal && catatanVal.trim() !== '') {
+                window.syncToCloud({
+                    type: 'rekapcatatan',
+                    tanggal: tanggalVal,
+                    id: s.id,
+                    name: s.name,
+                    category: sectionType.toUpperCase(),
+                    catatan: catatanVal
+                });
+            }
+
+            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan!`, "success");
             window.renderSantriCardsAndTable();
+            window.renderHistoryTable();
         };
 
         window.activeHistoryCategory = 'bacaan';
@@ -1479,9 +1429,9 @@
 
             if (headerEl) {
                 if (cat === 'rekapan') {
-                    headerEl.innerHTML = `<th class="p-4">Tanggal</th><th class="p-4">ID Santri</th><th class="p-4">Nama Santri</th><th class="p-4">Kategori</th><th class="p-4">Catatan</th><th class="p-4 text-center">Aksi</th>`;
+                    headerEl.innerHTML = `<th class="p-4">Tanggal</th><th class="p-4">ID Santri</th><th class="p-4">Nama Santri</th><th class="p-4">Kategori</th><th class="p-4">Catatan</th>`;
                 } else {
-                    headerEl.innerHTML = `<th class="p-4">Waktu & Tanggal</th><th class="p-4">Nama Santri</th><th class="p-4">Detail Setoran</th><th class="p-4">Status</th><th class="p-4">Catatan</th><th class="p-4 text-center">Aksi</th>`;
+                    headerEl.innerHTML = `<th class="p-4">Waktu & Tanggal</th><th class="p-4">Nama Santri</th><th class="p-4">Detail Setoran</th><th class="p-4">Status</th><th class="p-4">Catatan</th>`;
                 }
             }
 
@@ -1496,42 +1446,31 @@
             const list = JSON.parse(localStorage.getItem(key) || '[]');
 
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-bold text-base">Belum ada data riwayat untuk kategori ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold text-base">Belum ada data riwayat untuk kategori ini.</td></tr>`;
                 return;
             }
 
             if (cat === 'rekapan') {
-                tbody.innerHTML = list.map((h, idx) => `
+                tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-4 text-sm font-bold text-emerald-800">${h.tanggal}</td>
-                        <td class="p-4 text-sm font-bold">${h.id}</td>
-                        <td class="p-4 font-black text-base">${h.name}</td>
-                        <td class="p-4 text-sm font-extrabold text-amber-700">${h.category}</td>
-                        <td class="p-4 text-sm text-slate-700 dark:text-slate-300 font-semibold">${h.catatan}</td>
-                        <td class="p-4 text-center"><button onclick="window.deleteHistoryItem('${cat}', ${idx})" class="px-3 py-2 bg-rose-100 text-rose-700 rounded-xl text-sm font-bold"><i class="fa-solid fa-trash"></i> Hapus</button></td>
+                        <td class="p-4 text-sm font-bold text-emerald-800">${h.tanggal || h[0] || '-'}</td>
+                        <td class="p-4 text-sm font-bold">${h.id || h[1] || '-'}</td>
+                        <td class="p-4 font-black text-base">${h.name || h[2] || '-'}</td>
+                        <td class="p-4 text-sm font-extrabold text-amber-700">${h.category || h[3] || '-'}</td>
+                        <td class="p-4 text-sm text-slate-700 dark:text-slate-300 font-semibold">${h.catatan || h[4] || '-'}</td>
                     </tr>
                 `).join('');
             } else {
-                tbody.innerHTML = list.map((h, idx) => `
+                tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-4 text-sm font-bold text-emerald-800">${h.timestamp}</td>
-                        <td class="p-4 font-black text-base">${h.name}</td>
-                        <td class="p-4 text-sm font-bold">${h.detail}</td>
-                        <td class="p-4 text-sm font-bold text-emerald-700">${h.status}</td>
-                        <td class="p-4 text-sm text-slate-600 dark:text-slate-400 font-semibold">${h.catatan || '-'}</td>
-                        <td class="p-4 text-center"><button onclick="window.deleteHistoryItem('${cat}', ${idx})" class="px-3 py-2 bg-rose-100 text-rose-700 rounded-xl text-sm font-bold"><i class="fa-solid fa-trash"></i> Hapus</button></td>
+                        <td class="p-4 text-sm font-bold text-emerald-800">${h.timestamp || h[0] || '-'}</td>
+                        <td class="p-4 font-black text-base">${h.name || h[3] || '-'}</td>
+                        <td class="p-4 text-sm font-bold">${h.detail || h[6] || '-'}</td>
+                        <td class="p-4 text-sm font-bold text-emerald-700">${h.status || h[7] || '-'}</td>
+                        <td class="p-4 text-sm text-slate-600 dark:text-slate-400 font-semibold">${h.catatan || h[8] || '-'}</td>
                     </tr>
                 `).join('');
             }
-        };
-
-        window.deleteHistoryItem = function(cat, index) {
-            const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
-            const list = JSON.parse(localStorage.getItem(key) || '[]');
-            list.splice(index, 1);
-            localStorage.setItem(key, JSON.stringify(list));
-            window.renderHistoryTable();
-            window.showToast("Data riwayat dihapus", "success");
         };
 
         window.downloadCurrentHistory = function() {
@@ -1547,12 +1486,12 @@
             if (cat === 'rekapan') {
                 csv = "Tanggal,ID Santri,Nama Santri,Kategori,Catatan\n";
                 list.forEach(item => {
-                    csv += `"${item.tanggal}","${item.id}","${item.name}","${item.category}","${item.catatan}"\n`;
+                    csv += `"${item.tanggal || item[0]}","${item.id || item[1]}","${item.name || item[2]}","${item.category || item[3]}","${item.catatan || item[4]}"\n`;
                 });
             } else {
                 csv = "Waktu,Nama Santri,Detail,Status,Catatan\n";
                 list.forEach(item => {
-                    csv += `"${item.timestamp}","${item.name}","${item.detail}","${item.status}","${item.catatan || '-'}"\n`;
+                    csv += `"${item.timestamp || item[0]}","${item.name || item[3]}","${item.detail || item[6]}","${item.status || item[7]}","${item.catatan || item[8]}"\n`;
                 });
             }
 
@@ -1561,7 +1500,7 @@
             link.href = URL.createObjectURL(blob);
             link.download = `Riwayat_${cat.toUpperCase()}_RQ_AlKhansa_${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
-            window.showToast(`Riwayat ${cat} berhasil didownload!`, "success");
+            window.showToast("Riwayat berhasil didownload!", "success");
         };
 
         window.initWaDropdown = function() {
@@ -1604,33 +1543,10 @@
             const filteredTambahan = materiTambahan.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
 
             let bagianSetoran = "";
-            const histBacaan = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-            const lastB = histBacaan.find(h => h.id === s.id);
-            if (s.lastBacaan && s.lastBacaan !== '-') {
-                bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}\n`;
-                if (lastB && lastB.catatan && lastB.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastB.catatan}\n`;
-            }
-
-            const histHafalan = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-            const lastH = histHafalan.find(h => h.id === s.id);
-            if (s.lastHafalan && s.lastHafalan !== '-') {
-                bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}\n`;
-                if (lastH && lastH.catatan && lastH.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastH.catatan}\n`;
-            }
-
-            const histMurojaah = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-            const lastM = histMurojaah.find(h => h.id === s.id);
-            if (s.lastMurojaah && s.lastMurojaah !== '-') {
-                bagianSetoran += `🔄 *Muroja'ah:* ${s.lastMurojaah}\n`;
-                if (lastM && lastM.catatan && lastM.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastM.catatan}\n`;
-            }
-
-            const histTugas = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-            const lastT = histTugas.find(h => h.id === s.id);
-            if (s.lastTugas && s.lastTugas !== '-') {
-                bagianSetoran += `📝 *Tugas:* ${s.lastTugas}\n`;
-                if (lastT && lastT.catatan && lastT.catatan.trim() !== '') bagianSetoran += `   💬 Catatan: ${lastT.catatan}\n`;
-            }
+            if (s.lastBacaan && s.lastBacaan !== '-') bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}\n`;
+            if (s.lastHafalan && s.lastHafalan !== '-') bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}\n`;
+            if (s.lastMurojaah && s.lastMurojaah !== '-') bagianSetoran += `🔄 *Muroja'ah:* ${s.lastMurojaah}\n`;
+            if (s.lastTugas && s.lastTugas !== '-') bagianSetoran += `📝 *Tugas:* ${s.lastTugas}\n`;
 
             let materiText = "";
             if (filteredMateri.length > 0) {
@@ -1742,11 +1658,11 @@
             link.href = URL.createObjectURL(blob);
             link.download = `Data_Santri_RQ_AlKhansa_${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
-            window.showToast("File Excel/CSV berhasil didownload!", "success");
+            window.showToast("File Excel berhasil didownload!", "success");
         };
 
         window.resetDailyLogsOnly = function() {
-            if (confirm("Reset hanya data bacaan, hafalan, muroja'ah, dan tugas harian santri? Catatan rekap santri dan daftar nama santri tetap aman.")) {
+            if (confirm("Reset data setoran harian?")) {
                 window.santriList.forEach(s => {
                     s.lastBacaan = '-';
                     s.lastHafalan = '-';
@@ -1762,7 +1678,7 @@
                 localStorage.removeItem('rq_history_murojaah');
                 localStorage.removeItem('rq_history_tugas');
                 window.renderSantriCardsAndTable();
-                window.showToast("Data setoran harian berhasil direset!", "success");
+                window.showToast("Data setoran harian direset!", "success");
             }
         };
 
@@ -1772,17 +1688,15 @@
                 document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-base';
             }
             if (!localStorage.getItem('rq_google_script_url')) {
-                localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec');
+                localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec');
             }
             const scriptUrlInput = document.getElementById('googleScriptUrlInput');
             if (scriptUrlInput) {
                 scriptUrlInput.value = localStorage.getItem('rq_google_script_url');
             }
             
-            await window.fetchSantriFromCloud();
-            await window.fetchHistoryFromCloud();
+            await window.fetchAllDataFromCloud();
             window.renderSantriCardsAndTable();
-            window.checkStorageUsage();
         });
     </script>
 </body>
