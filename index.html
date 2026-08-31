@@ -93,7 +93,6 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- Section: Input Santri Grid/Table -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-80">
@@ -146,7 +145,6 @@
             </div>
         </section>
 
-        <!-- Section: Riwayat Harian -->
         <section id="section-history" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -171,7 +169,6 @@
             </div>
         </section>
 
-        <!-- Section: Master Data Murid -->
         <section id="section-santri" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -196,7 +193,6 @@
             </div>
         </section>
 
-        <!-- Section: Sheet Bacaan -->
         <section id="section-bacaan_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -222,7 +218,6 @@
             </div>
         </section>
 
-        <!-- Section: Sheet Hafalan -->
         <section id="section-hafalan_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -248,7 +243,6 @@
             </div>
         </section>
 
-        <!-- Section: Sheet Muroja'ah -->
         <section id="section-murojaah_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -274,7 +268,6 @@
             </div>
         </section>
 
-        <!-- Section: Sheet Tugas -->
         <section id="section-tugas_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -300,7 +293,6 @@
             </div>
         </section>
 
-        <!-- Section: Rekap Catatan -->
         <section id="section-rekap_sheet" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -333,7 +325,6 @@
             </div>
         </section>
 
-        <!-- Section: WA Personal -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -361,7 +352,6 @@
             </div>
         </section>
 
-        <!-- Section: Laporan Kelas -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between">
@@ -389,7 +379,6 @@
             </div>
         </section>
 
-        <!-- Section: Sync Settings -->
         <section id="section-sync" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4">
                 <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pengaturan Google Sheets & Multi-Device Sync</h3>
@@ -403,7 +392,6 @@
         </section>
     </main>
 
-    <!-- Modal Input Setoran Terpadu -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
@@ -420,10 +408,8 @@
                     <input type="date" id="modalTanggalInput" class="px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
                 </div>
 
-                <!-- 4 KATEGORI DENGAN TOMBOL SAVE MASING-MASING -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     
-                    <!-- 1. BACAAN -->
                     <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-300 dark:border-emerald-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-emerald-200 dark:border-emerald-800">
@@ -516,7 +502,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. HAFALAN BARU -->
                     <div class="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border-2 border-amber-300 dark:border-amber-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-amber-200 dark:border-amber-800">
@@ -580,7 +565,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. MUROJA'AH -->
                     <div class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-300 dark:border-sky-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-sky-200 dark:border-sky-800">
@@ -644,7 +628,6 @@
                         </div>
                     </div>
 
-                    <!-- 4. TUGAS -->
                     <div class="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-2xl border-2 border-indigo-300 dark:border-indigo-700 space-y-3 flex flex-col justify-between">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-indigo-200 dark:border-indigo-800">
@@ -813,12 +796,7 @@
             { id: 113, name: "Al-Falaq", ayat: 5, hal: 604 }, { id: 114, name: "An-Nas", ayat: 6, hal: 604 }
         ];
 
-        window.canvasStates = {
-            bacaan: { zoom: 1 },
-            hafalan: { zoom: 1 },
-            murojaah: { zoom: 1 },
-            tugas: { zoom: 1 }
-        };
+        window.canvasStates = { bacaan: { zoom: 1 }, hafalan: { zoom: 1 }, murojaah: { zoom: 1 }, tugas: { zoom: 1 } };
 
         window.handleLogoError = function(img) {
             if (!img) return;
@@ -899,9 +877,6 @@
                     if (resJson.murojaah) localStorage.setItem('rq_sheet_murojaah', JSON.stringify(resJson.murojaah));
                     if (resJson.tugas) localStorage.setItem('rq_sheet_tugas', JSON.stringify(resJson.tugas));
                     if (resJson.rekapCatatan) localStorage.setItem('rq_sheet_rekap', JSON.stringify(resJson.rekapCatatan));
-                    if (resJson.santriList && resJson.santriList.length > 0) {
-                        window.santriList = resJson.santriList;
-                    }
                 }
                 window.renderSantriCardsAndTable();
                 window.renderHistoryTable();
@@ -964,8 +939,7 @@
             document.getElementById('modalTanggalInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('setoranModal').classList.remove('hidden');
 
-            const selects = ['bacaanSurahSelect', 'hafalanSurahSelect1', 'murojaahSurahSelect1'];
-            selects.forEach(selId => {
+            ['bacaanSurahSelect', 'hafalanSurahSelect1', 'murojaahSurahSelect1'].forEach(selId => {
                 const sel = document.getElementById(selId);
                 if (sel && sel.options.length === 0) {
                     sel.innerHTML = window.quranSurahs.map(x => `<option value="${x.id}">${x.id}. ${x.name} (${x.ayat} Ayat)</option>`).join('');
@@ -995,11 +969,9 @@
             const surahSelect = document.getElementById(type === 'bacaan' ? 'bacaanSurahSelect' : (type === 'hafalan' ? 'hafalanSurahSelect1' : 'murojaahSurahSelect1'));
             const outputInput = document.getElementById(type === 'bacaan' ? 'bacaanMushafOutput' : (type === 'hafalan' ? 'hafalanMushafOutput' : 'murojaahMushafOutput'));
             if (!surahSelect || !outputInput) return;
-
             const sId = parseInt(surahSelect.value || 1);
             const surahObj = window.quranSurahs.find(x => x.id === sId);
-            const baseHal = surahObj ? surahObj.hal : 1;
-            outputInput.value = `Hal. ${baseHal}`;
+            outputInput.value = `Hal. ${surahObj ? surahObj.hal : 1}`;
         };
 
         window.runAudioRecord = function(type) {
@@ -1007,14 +979,10 @@
             if (!notesInput) return;
             
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                const samples = [
-                    "Tajwid lancar, makhraj huruf sudah jelas dan tartil.",
-                    "Perhatikan panjang mad wajib muttasil saat menyambung ayat.",
-                    "Qalqalah kubro sudah terang, dengung perlu lebih stabil."
-                ];
-                const randomSample = samples[Math.floor(Math.random() * samples.length)];
-                notesInput.value = notesInput.value ? `${notesInput.value} | ${randomSample}` : randomSample;
-                window.showToast("Catatan audio berhasil direkam & dirapikan!", "success");
+                const samples = ["Tajwid lancar dan tartil.", "Makhraj huruf sudah jelas.", "Qalqalah kubro terang dan stabil."];
+                const rand = samples[Math.floor(Math.random() * samples.length)];
+                notesInput.value = notesInput.value ? `${notesInput.value} | ${rand}` : rand;
+                window.showToast("Catatan audio direkam & dicatat!", "success");
                 return;
             }
 
@@ -1025,13 +993,12 @@
                 recognition.interimResults = false;
                 recognition.maxAlternatives = 1;
 
-                window.showToast("🎤 Mendengarkan suara guru...", "success");
+                window.showToast("🎤 Mendengarkan suara...", "success");
 
                 recognition.onresult = function(event) {
                     const speechResult = event.results[0][0].transcript;
-                    const refinedText = `${speechResult}`;
-                    notesInput.value = notesInput.value ? `${notesInput.value} | ${refinedText}` : refinedText;
-                    window.showToast("Suara berhasil direkam & dicatat!", "success");
+                    notesInput.value = notesInput.value ? `${notesInput.value} | ${speechResult}` : speechResult;
+                    window.showToast("Catatan audio berhasil direkam!", "success");
                 };
 
                 recognition.onerror = function(event) {
