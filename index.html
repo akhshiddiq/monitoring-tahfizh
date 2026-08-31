@@ -78,7 +78,6 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- Tab: Input / Setoran -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -135,7 +134,6 @@
             </div>
         </section>
 
-        <!-- Tab: Data Santri Manager -->
         <section id="section-santri" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
@@ -205,7 +203,6 @@
             </div>
         </section>
 
-        <!-- Tab: Materi Belajar -->
         <section id="section-materi" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
@@ -312,7 +309,6 @@
             </div>
         </section>
 
-        <!-- Tab: Riwayat -->
         <section id="section-history" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
@@ -332,7 +328,7 @@
                 <div class="flex items-center justify-between pt-2 flex-wrap gap-2">
                     <span id="activeHistoryTitle" class="font-black text-sm text-slate-700 dark:text-slate-200">Daftar Riwayat Bacaan</span>
                     <div class="flex items-center gap-2">
-                        <button onclick="window.fetchSantriFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
+                        <button onclick="window.fetchHistoryFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
                             <i class="fa-solid fa-rotate"></i> Sinkronisasi Cloud
                         </button>
                         <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
@@ -359,7 +355,6 @@
             </div>
         </section>
 
-        <!-- Tab: WA Personal Report -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -393,7 +388,6 @@
             </div>
         </section>
 
-        <!-- Tab: Laporan Kelas -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -421,7 +415,6 @@
             </div>
         </section>
 
-        <!-- Tab: Cloud & Reset -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex items-center justify-between">
@@ -435,7 +428,7 @@
                 <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3">
                     <label class="font-black text-sm text-emerald-900 dark:text-emerald-200">Google Apps Script Web App URL (Connected):</label>
                     <div class="flex gap-2">
-                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
+                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
                         <button onclick="window.saveGoogleScriptUrl()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shrink-0">Perbarui URL</button>
                     </div>
                 </div>
@@ -450,7 +443,6 @@
         </section>
     </main>
 
-    <!-- Modal Input Setoran -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border-4 border-emerald-500 overflow-hidden">
             <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
@@ -1065,7 +1057,7 @@
         };
 
         window.syncToCloud = async function(payload) {
-            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec';
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec';
             try {
                 await fetch(url, {
                     method: 'POST',
@@ -1079,33 +1071,56 @@
         };
 
         window.fetchSantriFromCloud = async function() {
-            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec';
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec';
             try {
                 window.showToast("Menyinkronkan dari Google Sheet...", "success");
                 const res = await fetch(url);
                 const cloudData = await res.json();
                 if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
-                    window.santriList = cloudData.map(cs => ({
-                        id: cs.id,
-                        name: cs.name,
-                        class: cs.class,
-                        teacher: cs.teacher,
-                        phone: cs.phone || '+6285774042121',
-                        lastBacaan: cs.lastBacaan || '-',
-                        lastHafalan: cs.lastHafalan || '-',
-                        lastMurojaah: cs.lastMurojaah || '-',
-                        lastTugas: cs.lastTugas || '-',
-                        dataBacaan: cs.dataBacaan || null,
-                        dataHafalan: cs.dataHafalan || null,
-                        dataMurojaah: cs.dataMurojaah || null,
-                        dataTugas: cs.dataTugas || null
-                    }));
+                    const validSantri = cloudData.filter(cs => cs.id && cs.id.toString().startsWith('IDSRQ') && cs.name);
+                    if (validSantri.length > 0) {
+                        window.santriList = validSantri.map(cs => ({
+                            id: cs.id,
+                            name: cs.name,
+                            class: cs.class,
+                            teacher: cs.teacher,
+                            phone: cs.phone || '+6285774042121',
+                            lastBacaan: cs.lastBacaan || '-',
+                            lastHafalan: cs.lastHafalan || '-',
+                            lastMurojaah: cs.lastMurojaah || '-',
+                            lastTugas: cs.lastTugas || '-',
+                            dataBacaan: cs.dataBacaan || null,
+                            dataHafalan: cs.dataHafalan || null,
+                            dataMurojaah: cs.dataMurojaah || null,
+                            dataTugas: cs.dataTugas || null
+                        }));
+                    }
                     window.renderSantriCardsAndTable();
                     window.renderSantriManagerTable();
-                    window.showToast(`Berhasil menyinkronkan ${window.santriList.length} santri!`, "success");
+                    window.showToast(`Berhasil menyinkronkan ${window.santriList.length} santri dari Cloud!`, "success");
                 }
             } catch (err) {
                 window.showToast("Gagal menyinkronkan dari Cloud, menggunakan data lokal.", "error");
+            }
+        };
+
+        window.fetchHistoryFromCloud = async function() {
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec';
+            try {
+                window.showToast("Menyinkronkan Riwayat dari Google Sheet...", "success");
+                const res = await fetch(`${url}?action=history`);
+                const data = await res.json();
+                if (data) {
+                    if (data.bacaan) localStorage.setItem('rq_history_bacaan', JSON.stringify(data.bacaan));
+                    if (data.hafalan) localStorage.setItem('rq_history_hafalan', JSON.stringify(data.hafalan));
+                    if (data.murojaah) localStorage.setItem('rq_history_murojaah', JSON.stringify(data.murojaah));
+                    if (data.tugas) localStorage.setItem('rq_history_tugas', JSON.stringify(data.tugas));
+                    if (data.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(data.rekapcatatan));
+                    window.renderHistoryTable();
+                    window.showToast("Riwayat berhasil disinkronkan dari Google Sheet!", "success");
+                }
+            } catch (err) {
+                window.showToast("Gagal mengambil riwayat dari Cloud", "error");
             }
         };
 
@@ -1131,20 +1146,25 @@
             window.renderSantriCardsAndTable();
 
             window.syncToCloud({
-                type: 'santri',
+                type: 'santri_add',
                 id, name, class: klass, teacher, phone: '+6285774042121'
             });
 
-            document.getElementById('newSantriId.value') = '';
+            document.getElementById('newSantriId').value = '';
             document.getElementById('newSantriName').value = '';
-            window.showToast("Santri baru berhasil ditambahkan & disinkronkan!", "success");
+            window.showToast("Santri baru berhasil ditambahkan & disinkronkan ke Sheet!", "success");
         };
 
         window.deleteSantri = function(id) {
-            if (confirm("Hapus santri ini dari daftar?")) {
+            if (confirm("Hapus santri ini dari daftar dan Google Sheet?")) {
                 window.santriList = window.santriList.filter(s => s.id !== id);
                 window.renderSantriManagerTable();
                 window.renderSantriCardsAndTable();
+
+                window.syncToCloud({
+                    type: 'santri_delete',
+                    id: id
+                });
                 window.showToast("Santri berhasil dihapus", "success");
             }
         };
@@ -1313,7 +1333,7 @@
                 }
             });
 
-            // Load BACAAN
+            // Load BACAAN for this specific santri only
             const b = s.dataBacaan || {};
             document.getElementById('bacaanStatusSelect').value = b.status || 'Lancar (A)';
             document.getElementById('bacaanCategorySelect').value = b.category1 || 'quran';
@@ -1343,7 +1363,7 @@
             }
             document.getElementById('bacaanCatatanInput').value = b.catatan || '';
 
-            // Load HAFALAN
+            // Load HAFALAN for this specific santri only
             const h = s.dataHafalan || {};
             document.getElementById('hafalanStatusSelect').value = h.status || 'Lancar (A)';
             document.getElementById('hafalanSurahSelect1').value = h.surahId1 || 1;
@@ -1358,7 +1378,7 @@
 
             document.getElementById('hafalanCatatanInput').value = h.catatan || '';
 
-            // Load MUROJA'AH
+            // Load MUROJA'AH for this specific santri only
             const m = s.dataMurojaah || {};
             document.getElementById('murojaahStatusSelect').value = m.status || 'Lancar (A)';
             document.getElementById('murojaahSurahSelect1').value = m.surahId1 || 1;
@@ -1373,7 +1393,7 @@
 
             document.getElementById('murojaahCatatanInput').value = m.catatan || '';
 
-            // Load TUGAS
+            // Load TUGAS for this specific santri only
             const t = s.dataTugas || {};
             document.getElementById('tugasStatusSelect').value = t.status || 'Selesai';
             document.getElementById('tugasJenisSelect').value = t.jenis1 || "Tugas Muroja'ah";
@@ -1897,7 +1917,7 @@
                 document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-base';
             }
             if (!localStorage.getItem('rq_google_script_url')) {
-                localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec');
+                localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycbzkchRd5T4WNUL9Bu2j_nuFxZ2SYh-M27mQ84eIW3x_8QeABQGW-W8FcClbA3X0S3Qn/exec');
             }
             const scriptUrlInput = document.getElementById('googleScriptUrlInput');
             if (scriptUrlInput) {
@@ -1905,6 +1925,7 @@
             }
             
             await window.fetchSantriFromCloud();
+            await window.fetchHistoryFromCloud();
             window.renderSantriCardsAndTable();
             window.renderSantriManagerTable();
             window.checkStorageUsage();
