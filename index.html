@@ -11,31 +11,11 @@
             theme: {
                 extend: {
                     colors: {
-                        emerald: {
-                            50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7',
-                            400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857',
-                            800: '#065f46', 900: '#064e3b', 950: '#022c22'
-                        },
-                        amber: {
-                            50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d',
-                            400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309',
-                            800: '#92400e', 900: '#78350f', 950: '#451a03'
-                        },
-                        sky: {
-                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                            400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                            800: '#075985', 900: '#0c4a6e', 950: '#082f49'
-                        },
-                        rose: {
-                            50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
-                            400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c',
-                            800: '#9f1239', 900: '#881337', 950: '#4c0519'
-                        },
-                        amberbrown: {
-                            50: '#fdf8f6', 100: '#fbeee6', 200: '#f5dcd0', 300: '#eac2ae',
-                            400: '#dc9c7f', 500: '#cb7a55', 600: '#bc623d', 700: '#9c4e30',
-                            800: '#7e4028', 900: '#683624', 950: '#381c12'
-                        }
+                        emerald: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
+                        amber: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f', 950: '#451a03' },
+                        sky: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e', 950: '#082f49' },
+                        rose: { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' },
+                        amberbrown: { 50: '#fdf8f6', 100: '#fbeee6', 200: '#f5dcd0', 300: '#eac2ae', 400: '#dc9c7f', 500: '#cb7a55', 600: '#bc623d', 700: '#9c4e30', 800: '#7e4028', 900: '#683624', 950: '#381c12' }
                     }
                 }
             }
@@ -78,14 +58,15 @@
                     <button onclick="window.toggleDarkMode()" class="p-2 bg-emerald-700 dark:bg-emerald-900 rounded-xl text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
                         <i id="darkModeIcon" class="fa-solid fa-moon text-base"></i>
                     </button>
-                    <button onclick="window.exportDataToExcel()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
-                        <i class="fa-solid fa-download"></i> Export
+                    <button onclick="window.fetchSantriFromCloud()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-rotate"></i> Sync
                     </button>
                 </div>
             </div>
 
             <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
                 <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-4 py-2.5 rounded-xl text-base font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
+                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Santri</button>
                 <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi</button>
                 <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
                 <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
@@ -97,6 +78,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
+        <!-- Tab: Input / Setoran -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -107,12 +89,11 @@
                     <button type="button" onclick="window.startVoiceSearch('santriSearchInput')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-emerald-600 hover:text-emerald-700" title="Cari dengan Suara">
                         <i class="fa-solid fa-microphone text-lg"></i>
                     </button>
-                    <!-- Autocomplete suggestions dropdown -->
                     <div id="santriAutocompleteList" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                 </div>
                 <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                    <button onclick="window.exportDataToExcel()" class="hidden sm:flex items-center gap-2 px-4 py-3 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-sm shadow-xs transition-all">
-                        <i class="fa-solid fa-download"></i> Download Data (Excel)
+                    <button onclick="window.fetchSantriFromCloud()" class="hidden sm:flex items-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-xs transition-all">
+                        <i class="fa-solid fa-rotate"></i> Sinkron Cloud
                     </button>
                     <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl px-4 py-3.5 outline-none cursor-pointer flex-1 sm:flex-none">
                         <option value="ALL">Semua Kelas</option>
@@ -154,9 +135,79 @@
             </div>
         </section>
 
+        <!-- Tab: Data Santri Manager -->
+        <section id="section-santri" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
+                    <div>
+                        <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Manajemen Data Santri & Sinkronisasi Sheets</h3>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Tambah atau hapus santri langsung di sini atau di Google Sheet Anda.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.fetchSantriFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs">
+                            <i class="fa-solid fa-rotate"></i> Sinkron Google Sheet
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 space-y-4">
+                    <h4 class="font-black text-base text-emerald-900 dark:text-emerald-200">➕ Tambah Santri Baru</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <div>
+                            <label class="text-xs font-bold">ID Santri:</label>
+                            <input type="text" id="newSantriId" placeholder="IDSRQ088" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold">Nama Lengkap:</label>
+                            <input type="text" id="newSantriName" placeholder="Nama Santri" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold">Kelas:</label>
+                            <select id="newSantriClass" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                                <option value="Abdurrahman">Abdurrahman</option>
+                                <option value="Abu Ubaidah">Abu Ubaidah</option>
+                                <option value="Zubair">Zubair</option>
+                                <option value="Ali">Ali</option>
+                                <option value="Utsman">Utsman</option>
+                                <option value="Abu Bakar">Abu Bakar</option>
+                                <option value="Bilal">Bilal</option>
+                                <option value="Hamzah">Hamzah</option>
+                                <option value="Fatimah">Fatimah</option>
+                                <option value="Umar">Umar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold">Pengajar (Kak):</label>
+                            <input type="text" id="newSantriTeacher" placeholder="Kak Sidik / Kak Mega" value="Kak Sidik" class="w-full mt-1 p-3 bg-white dark:bg-slate-800 border rounded-xl font-bold text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="window.addNewSantri()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">Simpan Santri</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                                <th class="p-3.5 text-center w-16">No</th>
+                                <th class="p-3.5">ID Santri</th>
+                                <th class="p-3.5">Nama Santri</th>
+                                <th class="p-3.5">Kelas</th>
+                                <th class="p-3.5">Pengajar</th>
+                                <th class="p-3.5">No WA Wali</th>
+                                <th class="p-3.5 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="santriManagerTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Materi Belajar -->
         <section id="section-materi" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Materi Utama -->
                 <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                     <div class="flex items-center justify-between border-b pb-3">
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
@@ -208,7 +259,6 @@
                     </div>
                 </div>
 
-                <!-- Materi Tambahan -->
                 <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                     <div class="flex items-center justify-between border-b pb-3">
                         <h3 class="font-black text-xl text-amber-800 dark:text-amber-300 flex items-center gap-2">
@@ -262,6 +312,7 @@
             </div>
         </section>
 
+        <!-- Tab: Riwayat -->
         <section id="section-history" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
@@ -278,11 +329,16 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between pt-2">
+                <div class="flex items-center justify-between pt-2 flex-wrap gap-2">
                     <span id="activeHistoryTitle" class="font-black text-sm text-slate-700 dark:text-slate-200">Daftar Riwayat Bacaan</span>
-                    <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
-                        <i class="fa-solid fa-download"></i> Download Kategori Ini (.csv)
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.fetchSantriFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
+                            <i class="fa-solid fa-rotate"></i> Sinkronisasi Cloud
+                        </button>
+                        <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
+                            <i class="fa-solid fa-download"></i> Download Kategori Ini (.csv)
+                        </button>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
@@ -303,6 +359,7 @@
             </div>
         </section>
 
+        <!-- Tab: WA Personal Report -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -336,6 +393,7 @@
             </div>
         </section>
 
+        <!-- Tab: Laporan Kelas -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -363,15 +421,21 @@
             </div>
         </section>
 
+        <!-- Tab: Cloud & Reset -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
-                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Cloud Sync (Google Sheets) & Reset Memori</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini sudah terhubung otomatis ke Google Sheets RQ Al-Khansa agar setiap data setoran & rekap catatan tersimpan online antara HP dan Laptop.</p>
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Cloud Sync (Google Sheets) & Reset Memori</h3>
+                    <button onclick="window.fetchSantriFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Santri Sekarang
+                    </button>
+                </div>
+                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung otomatis ke Google Sheets RQ Al-Khansa. Tambah, edit, atau hapus santri langsung di tab <code>santri</code> Google Sheet Anda, atau melalui menu Data Santri di atas!</p>
                 
                 <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3">
                     <label class="font-black text-sm text-emerald-900 dark:text-emerald-200">Google Apps Script Web App URL (Connected):</label>
                     <div class="flex gap-2">
-                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec" readonly class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
+                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
                         <button onclick="window.saveGoogleScriptUrl()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shrink-0">Perbarui URL</button>
                     </div>
                 </div>
@@ -386,6 +450,7 @@
         </section>
     </main>
 
+    <!-- Modal Input Setoran -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border-4 border-emerald-500 overflow-hidden">
             <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
@@ -809,7 +874,6 @@
             { id: "IDSRQ087", name: "Muhammad Yusuf Wiranatanagara", class: "Ali", teacher: "Kak Sidik", phone: "+6285774042121", lastBacaan: "-", lastHafalan: "-", lastMurojaah: "-", lastTugas: "-", dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null }
         ];
 
-        // Complete 114 Surahs with accurate Madinah Mushaf standard starting page numbers (1 - 604)
         window.quranSurahs = [
             { id: 1, name: "Al-Fatihah", ayat: 7, hal: 1 }, { id: 2, name: "Al-Baqarah", ayat: 286, hal: 2 }, { id: 3, name: "Ali 'Imran", ayat: 200, hal: 50 },
             { id: 4, name: "An-Nisa'", ayat: 176, hal: 77 }, { id: 5, name: "Al-Ma'idah", ayat: 120, hal: 106 }, { id: 6, name: "Al-An'am", ayat: 165, hal: 128 },
@@ -886,7 +950,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'history', 'wa_report', 'class_report', 'export'].forEach(t => {
+            ['setoran', 'santri', 'materi', 'history', 'wa_report', 'class_report', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     if (t === tabId) {
@@ -898,6 +962,7 @@
             });
 
             if (tabId === 'setoran') window.renderSantriCardsAndTable();
+            if (tabId === 'santri') window.renderSantriManagerTable();
             if (tabId === 'history') window.switchHistorySubTab('bacaan');
             if (tabId === 'materi') window.renderMateriList('utama');
             if (tabId === 'wa_report') window.initWaDropdown();
@@ -1011,6 +1076,101 @@
             } catch (err) {
                 console.error("Cloud sync error:", err);
             }
+        };
+
+        window.fetchSantriFromCloud = async function() {
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec';
+            try {
+                window.showToast("Menyinkronkan dari Google Sheet...", "success");
+                const res = await fetch(url);
+                const cloudData = await res.json();
+                if (cloudData && Array.isArray(cloudData) && cloudData.length > 0) {
+                    window.santriList = cloudData.map(cs => ({
+                        id: cs.id,
+                        name: cs.name,
+                        class: cs.class,
+                        teacher: cs.teacher,
+                        phone: cs.phone || '+6285774042121',
+                        lastBacaan: cs.lastBacaan || '-',
+                        lastHafalan: cs.lastHafalan || '-',
+                        lastMurojaah: cs.lastMurojaah || '-',
+                        lastTugas: cs.lastTugas || '-',
+                        dataBacaan: cs.dataBacaan || null,
+                        dataHafalan: cs.dataHafalan || null,
+                        dataMurojaah: cs.dataMurojaah || null,
+                        dataTugas: cs.dataTugas || null
+                    }));
+                    window.renderSantriCardsAndTable();
+                    window.renderSantriManagerTable();
+                    window.showToast(`Berhasil menyinkronkan ${window.santriList.length} santri!`, "success");
+                }
+            } catch (err) {
+                window.showToast("Gagal menyinkronkan dari Cloud, menggunakan data lokal.", "error");
+            }
+        };
+
+        window.addNewSantri = function() {
+            const id = document.getElementById('newSantriId')?.value.trim();
+            const name = document.getElementById('newSantriName')?.value.trim();
+            const klass = document.getElementById('newSantriClass')?.value;
+            const teacher = document.getElementById('newSantriTeacher')?.value.trim() || 'Kak Sidik';
+
+            if (!id || !name) {
+                window.showToast("ID dan Nama santri wajib diisi!", "error");
+                return;
+            }
+
+            const newSantri = {
+                id, name, class: klass, teacher, phone: '+6285774042121',
+                lastBacaan: '-', lastHafalan: '-', lastMurojaah: '-', lastTugas: '-',
+                dataBacaan: null, dataHafalan: null, dataMurojaah: null, dataTugas: null
+            };
+
+            window.santriList.push(newSantri);
+            window.renderSantriManagerTable();
+            window.renderSantriCardsAndTable();
+
+            window.syncToCloud({
+                type: 'santri',
+                id, name, class: klass, teacher, phone: '+6285774042121'
+            });
+
+            document.getElementById('newSantriId.value') = '';
+            document.getElementById('newSantriName').value = '';
+            window.showToast("Santri baru berhasil ditambahkan & disinkronkan!", "success");
+        };
+
+        window.deleteSantri = function(id) {
+            if (confirm("Hapus santri ini dari daftar?")) {
+                window.santriList = window.santriList.filter(s => s.id !== id);
+                window.renderSantriManagerTable();
+                window.renderSantriCardsAndTable();
+                window.showToast("Santri berhasil dihapus", "success");
+            }
+        };
+
+        window.renderSantriManagerTable = function() {
+            const tbody = document.getElementById('santriManagerTableBody');
+            if (!tbody) return;
+
+            if (window.santriList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Belum ada data santri.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = window.santriList.map((s, idx) => `
+                <tr>
+                    <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
+                    <td class="p-3.5 font-bold text-emerald-800 dark:text-emerald-300">${s.id}</td>
+                    <td class="p-3.5 font-black text-base">${s.name}</td>
+                    <td class="p-3.5 font-bold">${s.class}</td>
+                    <td class="p-3.5 font-bold">${s.teacher}</td>
+                    <td class="p-3.5 font-bold text-slate-600 dark:text-slate-400">${s.phone}</td>
+                    <td class="p-3.5 text-center">
+                        <button onclick="window.deleteSantri('${s.id}')" class="px-3 py-1.5 bg-rose-100 text-rose-700 rounded-xl font-bold text-xs"><i class="fa-solid fa-trash"></i> Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
         };
 
         window.saveMateri = function(type) {
@@ -1731,7 +1891,7 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('rq_dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
                 document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-base';
@@ -1739,7 +1899,14 @@
             if (!localStorage.getItem('rq_google_script_url')) {
                 localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec');
             }
+            const scriptUrlInput = document.getElementById('googleScriptUrlInput');
+            if (scriptUrlInput) {
+                scriptUrlInput.value = localStorage.getItem('rq_google_script_url');
+            }
+            
+            await window.fetchSantriFromCloud();
             window.renderSantriCardsAndTable();
+            window.renderSantriManagerTable();
             window.checkStorageUsage();
         });
     </script>
