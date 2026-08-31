@@ -90,14 +90,13 @@
                 <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
                 <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
                 <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Backup & Reset</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- Section: Setoran / Input -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -108,7 +107,7 @@
                     <button type="button" onclick="window.startVoiceSearch('santriSearchInput')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-emerald-600 hover:text-emerald-700" title="Cari dengan Suara">
                         <i class="fa-solid fa-microphone text-lg"></i>
                     </button>
-                    <!-- Autocomplete dropdown suggestions -->
+                    <!-- Autocomplete suggestions dropdown -->
                     <div id="santriAutocompleteList" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                 </div>
                 <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
@@ -155,7 +154,6 @@
             </div>
         </section>
 
-        <!-- Section: Materi -->
         <section id="section-materi" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Materi Utama -->
@@ -164,7 +162,7 @@
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
                             <i class="fa-solid fa-book text-emerald-600"></i> Materi Belajar Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Local Storage</span>
+                        <span class="text-xs font-bold text-slate-400">Local & Cloud</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -216,7 +214,7 @@
                         <h3 class="font-black text-xl text-amber-800 dark:text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-star text-amber-500"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Local Storage</span>
+                        <span class="text-xs font-bold text-slate-400">Local & Cloud</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -264,13 +262,12 @@
             </div>
         </section>
 
-        <!-- Section: History / Riwayat -->
         <section id="section-history" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
                     <div>
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
-                        <p class="text-xs text-slate-500 font-bold mt-0.5">Semua catatan tersimpan di Local Storage. Pilih kategori dan download data jika diperlukan.</p>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Semua catatan tersimpan di Local Storage & Cloud Sheets.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap justify-end">
                         <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-4 py-2.5 rounded-xl text-sm font-black bg-emerald-600 text-white shadow-md">Riwayat Bacaan</button>
@@ -294,7 +291,7 @@
                             <tr id="historyTableHeader" class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
                                 <th class="p-3.5">Waktu & Tanggal</th>
                                 <th class="p-3.5">Nama Santri</th>
-                                <th class="p-3.5">Detail Bacaan</th>
+                                <th class="p-3.5">Detail Setoran</th>
                                 <th class="p-3.5">Status</th>
                                 <th class="p-3.5">Catatan</th>
                                 <th class="p-3.5 text-center">Aksi</th>
@@ -306,7 +303,6 @@
             </div>
         </section>
 
-        <!-- Section: WA Personal Report -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -340,7 +336,6 @@
             </div>
         </section>
 
-        <!-- Section: Class Report -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -368,11 +363,19 @@
             </div>
         </section>
 
-        <!-- Section: Backup & Reset -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
-                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Backup & Reset Memori Lokal</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Semua data santri dan setoran Anda tersimpan aman di memori Local Storage browser Anda. Anda dapat mendownload file Excel/CSV kapan saja, atau mereset data harian (Bacaan, Hafalan, Muroja'ah, Tugas) tanpa menghapus rekapan catatan santri maupun data nama santri.</p>
+                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Cloud Sync (Google Sheets) & Reset Memori</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini sudah terhubung otomatis ke Google Sheets RQ Al-Khansa agar setiap data setoran & rekap catatan tersimpan online antara HP dan Laptop.</p>
+                
+                <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3">
+                    <label class="font-black text-sm text-emerald-900 dark:text-emerald-200">Google Apps Script Web App URL (Connected):</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec" readonly class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
+                        <button onclick="window.saveGoogleScriptUrl()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shrink-0">Perbarui URL</button>
+                    </div>
+                </div>
+
                 <div class="flex flex-wrap items-center gap-4 pt-2">
                     <button onclick="window.exportDataToExcel()" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm flex items-center gap-2.5 shadow-md transition">
                         <i class="fa-solid fa-file-excel"></i> Download Excel (.csv)
@@ -708,7 +711,7 @@
 
             <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t flex items-center justify-between shrink-0">
                 <button onclick="window.closeEditModal()" class="px-6 py-3 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-base">Tutup Modal</button>
-                <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis di Local Storage browser</span>
+                <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis di Local Storage & Cloud Sheets</span>
             </div>
         </div>
     </div>
@@ -899,6 +902,7 @@
             if (tabId === 'materi') window.renderMateriList('utama');
             if (tabId === 'wa_report') window.initWaDropdown();
             if (tabId === 'class_report') window.generateClassReport();
+
             window.checkStorageUsage();
         };
 
@@ -983,6 +987,30 @@
                 window.showToast("Gagal mendengarkan suara. Coba ulangi.", "error");
             };
             recognition.start();
+        };
+
+        window.saveGoogleScriptUrl = function() {
+            const url = document.getElementById('googleScriptUrlInput')?.value.trim();
+            if (url) {
+                localStorage.setItem('rq_google_script_url', url);
+                window.showToast("URL Google Apps Script berhasil diperbarui!", "success");
+            } else {
+                window.showToast("Masukkan URL yang valid", "error");
+            }
+        };
+
+        window.syncToCloud = async function(payload) {
+            const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec';
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                console.error("Cloud sync error:", err);
+            }
         };
 
         window.saveMateri = function(type) {
@@ -1125,7 +1153,7 @@
                 }
             });
 
-            // Populate strictly from this specific santri's saved state
+            // Load BACAAN
             const b = s.dataBacaan || {};
             document.getElementById('bacaanStatusSelect').value = b.status || 'Lancar (A)';
             document.getElementById('bacaanCategorySelect').value = b.category1 || 'quran';
@@ -1155,6 +1183,7 @@
             }
             document.getElementById('bacaanCatatanInput').value = b.catatan || '';
 
+            // Load HAFALAN
             const h = s.dataHafalan || {};
             document.getElementById('hafalanStatusSelect').value = h.status || 'Lancar (A)';
             document.getElementById('hafalanSurahSelect1').value = h.surahId1 || 1;
@@ -1169,6 +1198,7 @@
 
             document.getElementById('hafalanCatatanInput').value = h.catatan || '';
 
+            // Load MUROJA'AH
             const m = s.dataMurojaah || {};
             document.getElementById('murojaahStatusSelect').value = m.status || 'Lancar (A)';
             document.getElementById('murojaahSurahSelect1').value = m.surahId1 || 1;
@@ -1183,6 +1213,7 @@
 
             document.getElementById('murojaahCatatanInput').value = m.catatan || '';
 
+            // Load TUGAS
             const t = s.dataTugas || {};
             document.getElementById('tugasStatusSelect').value = t.status || 'Selesai';
             document.getElementById('tugasJenisSelect').value = t.jenis1 || "Tugas Muroja'ah";
@@ -1355,17 +1386,39 @@
             if (catatanVal && catatanVal.trim() !== '') {
                 const rekapKey = 'rq_history_rekapan';
                 const rekapList = JSON.parse(localStorage.getItem(rekapKey) || '[]');
-                rekapList.unshift({
+                const newRekap = {
+                    tanggal: tanggalVal,
+                    id: s.id,
+                    name: s.name,
+                    category: sectionType.toUpperCase(),
+                    catatan: catatanVal
+                };
+                rekapList.unshift(newRekap);
+                localStorage.setItem(rekapKey, JSON.stringify(rekapList));
+
+                window.syncToCloud({
+                    type: 'rekapcatatan',
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
                     category: sectionType.toUpperCase(),
                     catatan: catatanVal
                 });
-                localStorage.setItem(rekapKey, JSON.stringify(rekapList));
             }
 
-            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan!`, "success");
+            window.syncToCloud({
+                type: sectionType,
+                tanggal: tanggalVal,
+                id: s.id,
+                name: s.name,
+                class: s.class,
+                teacher: s.teacher,
+                detail: detailSetoran,
+                status: statusVal,
+                catatan: catatanVal
+            });
+
+            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan!`, "success");
             window.renderSantriCardsAndTable();
         };
 
@@ -1476,7 +1529,6 @@
             window.showToast(`Riwayat ${cat} berhasil didownload!`, "success");
         };
 
-        // WA Personal Search & Autocomplete
         window.initWaDropdown = function() {
             window.filterWaDropdown('');
         };
@@ -1683,6 +1735,9 @@
             if (localStorage.getItem('rq_dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
                 document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-base';
+            }
+            if (!localStorage.getItem('rq_google_script_url')) {
+                localStorage.setItem('rq_google_script_url', 'https://script.google.com/macros/s/AKfycbzRv014Ca4EDwLeCcoIf70_lX-0jXvrNE5vl03HOalnCPUApR5qmcHVdp1GfajpPY6h/exec');
             }
             window.renderSantriCardsAndTable();
             window.checkStorageUsage();
