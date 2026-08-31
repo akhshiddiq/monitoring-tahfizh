@@ -42,23 +42,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; }
         .quran-font { font-family: 'Amiri', serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.4); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.7); }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200 text-sm sm:text-base">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200 text-base">
     
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-2.5">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-10 h-10 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-10 h-10 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-base font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-11 h-11 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-11 h-11 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-lg font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
@@ -67,43 +67,46 @@
                             <span>Monitoring Santri</span>
                             <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p class="text-xs text-emerald-200 font-bold">Local Storage High Performance</p>
+                        <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Memori Lokal: Menghitung...</p>
                     </div>
                 </div>
-                <button onclick="window.exportDataToExcel()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
-                    <i class="fa-solid fa-download"></i> Export
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.toggleDarkMode()" class="p-2 bg-emerald-700 dark:bg-emerald-900 rounded-xl text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
+                        <i id="darkModeIcon" class="fa-solid fa-moon text-base"></i>
+                    </button>
+                    <button onclick="window.exportDataToExcel()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-download"></i> Export
+                    </button>
+                </div>
             </div>
 
-            <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">1. Input</button>
-                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi Hari Ini</button>
-                <button onclick="window.switchTab('materi_tambahan')" id="btnTab-materi_tambahan" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi Tambahan</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
-                <button onclick="window.switchTab('santri')" id="btnTab-santri" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Data Santri</button>
-                <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
-                <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Export Data</button>
+            <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-2 rounded-xl text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input & Santri</button>
+                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-2 rounded-xl text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi Belajar</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-2 rounded-xl text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat & Rekap</button>
+                <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-3.5 py-2 rounded-xl text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
+                <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-3.5 py-2 rounded-xl text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Backup & Reset</button>
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- SECTION 1: INPUT SETORAN -->
+        <!-- SECTION 1: INPUT SETORAN & SANTRI -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="relative w-full sm:w-80">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass"></i>
+                <div class="relative w-full sm:w-96">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-base"></i>
                     </span>
-                    <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri, kelas..." class="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-base font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
-                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
-                    <button onclick="window.exportDataToExcel()" class="hidden sm:flex items-center gap-2 px-3.5 py-2.5 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-xs shadow-xs transition-all">
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                    <button onclick="window.exportDataToExcel()" class="hidden sm:flex items-center gap-2 px-4 py-3 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black rounded-xl text-sm shadow-xs transition-all">
                         <i class="fa-solid fa-download"></i> Download Data (Excel)
                     </button>
-                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl px-3 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
+                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl px-4 py-3 outline-none cursor-pointer flex-1 sm:flex-none">
                         <option value="ALL">Semua Kelas</option>
                         <option value="Abdurrahman">Abdurrahman</option>
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
@@ -116,9 +119,9 @@
                         <option value="Fatimah">Fatimah</option>
                         <option value="Umar">Umar</option>
                     </select>
-                    <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
-                        <button onclick="window.setViewMode('grid')" id="viewModeGridBtn" class="px-3 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700">Grid</button>
-                        <button onclick="window.setViewMode('table')" id="viewModeTableBtn" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-500">Tabel</button>
+                    <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
+                        <button onclick="window.setViewMode('grid')" id="viewModeGridBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 shadow-xs text-emerald-700">Grid</button>
+                        <button onclick="window.setViewMode('table')" id="viewModeTableBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-500">Tabel</button>
                     </div>
                 </div>
             </div>
@@ -130,11 +133,11 @@
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-extrabold uppercase">
-                                <th class="p-3">Santri</th>
-                                <th class="p-3">Kelas & Guru</th>
-                                <th class="p-3">Bacaan Terakhir</th>
-                                <th class="p-3">Hafalan Terakhir</th>
-                                <th class="p-3 text-center">Aksi</th>
+                                <th class="p-3.5">Santri</th>
+                                <th class="p-3.5">Kelas & Guru</th>
+                                <th class="p-3.5">Bacaan Terakhir</th>
+                                <th class="p-3.5">Hafalan Terakhir</th>
+                                <th class="p-3.5 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="santriTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -143,155 +146,152 @@
             </div>
         </section>
 
-        <!-- SECTION: MATERI HARI INI -->
-        <section id="section-materi" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Input Materi Belajar Hari Ini</h3>
-                    <span class="text-xs font-bold text-slate-400">Tersimpan di Local Storage</span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="font-extrabold text-xs text-slate-500">Pilih Kelas:</label>
-                        <select id="materiKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                            <option value="Abdurrahman">Abdurrahman</option>
-                            <option value="Abu Ubaidah">Abu Ubaidah</option>
-                            <option value="Zubair">Zubair</option>
-                            <option value="Ali">Ali</option>
-                            <option value="Utsman">Utsman</option>
-                            <option value="Abu Bakar">Abu Bakar</option>
-                            <option value="Bilal">Bilal</option>
-                            <option value="Hamzah">Hamzah</option>
-                            <option value="Fatimah">Fatimah</option>
-                            <option value="Umar">Umar</option>
-                            <option value="SEMUA KELAS">Semua Kelas</option>
-                        </select>
+        <!-- SECTION: MATERI BELAJAR -->
+        <section id="section-materi" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Materi Utama -->
+                <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
+                    <div class="flex items-center justify-between border-b pb-3">
+                        <h3 class="font-black text-lg text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+                            <i class="fa-solid fa-book text-emerald-600"></i> Materi Belajar Hari Ini
+                        </h3>
+                        <span class="text-xs font-bold text-slate-400">Local Storage</span>
                     </div>
-                    <div>
-                        <label class="font-extrabold text-xs text-slate-500">Judul Mata Pelajaran:</label>
-                        <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Pilih Kelas:</label>
+                            <select id="materiKelasSelect" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                                <option value="Abdurrahman">Abdurrahman</option>
+                                <option value="Abu Ubaidah">Abu Ubaidah</option>
+                                <option value="Zubair">Zubair</option>
+                                <option value="Ali">Ali</option>
+                                <option value="Utsman">Utsman</option>
+                                <option value="Abu Bakar">Abu Bakar</option>
+                                <option value="Bilal">Bilal</option>
+                                <option value="Hamzah">Hamzah</option>
+                                <option value="Fatimah">Fatimah</option>
+                                <option value="Umar">Umar</option>
+                                <option value="SEMUA KELAS">Semua Kelas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Judul Mata Pelajaran:</label>
+                            <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="font-black text-xs text-slate-600 dark:text-slate-300">Bab / Tema:</label>
+                                <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                            </div>
+                            <div>
+                                <label class="font-black text-xs text-slate-600 dark:text-slate-300">Tanggal:</label>
+                                <input type="date" id="materiTanggalInput" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Keterangan:</label>
+                            <textarea id="materiKeteranganInput" rows="3" placeholder="Rincian materi pembelajaran..." class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-sm font-semibold"></textarea>
+                        </div>
+                        <button onclick="window.saveMateri('utama')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan Materi Hari Ini</button>
                     </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="font-extrabold text-xs text-slate-500">Bab / Tema:</label>
-                        <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah / Surat An-Naba" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                    </div>
-                    <div>
-                        <label class="font-extrabold text-xs text-slate-500">Tanggal:</label>
-                        <input type="date" id="materiTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                    </div>
-                </div>
-                <div>
-                    <label class="font-extrabold text-xs text-slate-500">Keterangan Materi:</label>
-                    <textarea id="materiKeteranganInput" rows="3" placeholder="Rincian materi pembelajaran hari ini..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs"></textarea>
-                </div>
-                <button onclick="window.saveMateri('utama')" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md">💾 Simpan Materi Hari Ini</button>
 
-                <div class="pt-4 border-t">
-                    <h4 class="font-black text-sm text-slate-700 dark:text-slate-300 mb-2">Daftar Materi Tersimpan:</h4>
-                    <div id="materiListContainer" class="space-y-2"></div>
+                    <div class="pt-4 border-t space-y-3">
+                        <h4 class="font-black text-sm text-slate-700 dark:text-slate-300">Daftar Materi Tersimpan:</h4>
+                        <div id="materiListContainer" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar"></div>
+                    </div>
+                </div>
+
+                <!-- Materi Tambahan -->
+                <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
+                    <div class="flex items-center justify-between border-b pb-3">
+                        <h3 class="font-black text-lg text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-star text-amber-500"></i> Materi Tambahan Hari Ini
+                        </h3>
+                        <span class="text-xs font-bold text-slate-400">Local Storage</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Pilih Kelas:</label>
+                            <select id="materiTambahanKelasSelect" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                                <option value="Abdurrahman">Abdurrahman</option>
+                                <option value="Abu Ubaidah">Abu Ubaidah</option>
+                                <option value="Zubair">Zubair</option>
+                                <option value="Ali">Ali</option>
+                                <option value="Utsman">Utsman</option>
+                                <option value="Abu Bakar">Abu Bakar</option>
+                                <option value="Bilal">Bilal</option>
+                                <option value="Hamzah">Hamzah</option>
+                                <option value="Fatimah">Fatimah</option>
+                                <option value="Umar">Umar</option>
+                                <option value="SEMUA KELAS">Semua Kelas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Judul Mata Pelajaran (Tambahan):</label>
+                            <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="font-black text-xs text-slate-600 dark:text-slate-300">Bab / Tema:</label>
+                                <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                            </div>
+                            <div>
+                                <label class="font-black text-xs text-slate-600 dark:text-slate-300">Tanggal:</label>
+                                <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Keterangan Tambahan:</label>
+                            <textarea id="materiTambahanKeteranganInput" rows="3" placeholder="Rincian materi tambahan..." class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-sm font-semibold"></textarea>
+                        </div>
+                        <button onclick="window.saveMateri('tambahan')" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan Materi Tambahan</button>
+                    </div>
+
+                    <div class="pt-4 border-t space-y-3">
+                        <h4 class="font-black text-sm text-slate-700 dark:text-slate-300">Daftar Materi Tambahan Tersimpan:</h4>
+                        <div id="materiTambahanListContainer" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar"></div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION: MATERI TAMBAHAN HARI INI -->
-        <section id="section-materi_tambahan" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-amber-800 dark:text-amber-300">Input Materi Tambahan Hari Ini</h3>
-                    <span class="text-xs font-bold text-slate-400">Tersimpan di Local Storage</span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- SECTION: RIWAYAT & REKAP (UNIFIED WITH INDIVIDUAL DOWNLOADS) -->
+        <section id="section-history" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
                     <div>
-                        <label class="font-extrabold text-xs text-slate-500">Pilih Kelas:</label>
-                        <select id="materiTambahanKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                            <option value="Abdurrahman">Abdurrahman</option>
-                            <option value="Abu Ubaidah">Abu Ubaidah</option>
-                            <option value="Zubair">Zubair</option>
-                            <option value="Ali">Ali</option>
-                            <option value="Utsman">Utsman</option>
-                            <option value="Abu Bakar">Abu Bakar</option>
-                            <option value="Bilal">Bilal</option>
-                            <option value="Hamzah">Hamzah</option>
-                            <option value="Fatimah">Fatimah</option>
-                            <option value="Umar">Umar</option>
-                            <option value="SEMUA KELAS">Semua Kelas</option>
-                        </select>
+                        <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Semua catatan tersimpan di Local Storage. Pilih kategori dan download data jika diperlukan.</p>
                     </div>
-                    <div>
-                        <label class="font-extrabold text-xs text-slate-500">Judul Mata Pelajaran (Tambahan):</label>
-                        <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                    <div class="flex items-center gap-2 flex-wrap justify-end">
+                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-sm">Riwayat Bacaan</button>
+                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Riwayat Hafalan</button>
+                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Muroja'ah</button>
+                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Tugas</button>
+                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Rekap Catatan</button>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="font-extrabold text-xs text-slate-500">Bab / Tema:</label>
-                        <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                    </div>
-                    <div>
-                        <label class="font-extrabold text-xs text-slate-500">Tanggal:</label>
-                        <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                    </div>
-                </div>
-                <div>
-                    <label class="font-extrabold text-xs text-slate-500">Keterangan Materi Tambahan:</label>
-                    <textarea id="materiTambahanKeteranganInput" rows="3" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs"></textarea>
-                </div>
-                <button onclick="window.saveMateri('tambahan')" class="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs shadow-md">💾 Simpan Materi Tambahan</button>
 
-                <div class="pt-4 border-t">
-                    <h4 class="font-black text-sm text-slate-700 dark:text-slate-300 mb-2">Daftar Materi Tambahan Tersimpan:</h4>
-                    <div id="materiTambahanListContainer" class="space-y-2"></div>
+                <div class="flex items-center justify-between pt-2">
+                    <span id="activeHistoryTitle" class="font-black text-sm text-slate-700 dark:text-slate-200">Daftar Riwayat Bacaan</span>
+                    <button onclick="window.downloadCurrentHistory()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
+                        <i class="fa-solid fa-download"></i> Download Kategori Ini (.csv)
+                    </button>
                 </div>
-            </div>
-        </section>
 
-        <!-- SECTION: RIWAYAT -->
-        <section id="section-history" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Riwayat Setoran Harian (Local)</h3>
-                    <button onclick="window.renderHistoryTable()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">Perbarui</button>
-                </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase">
-                                <th class="p-3">Waktu & Tanggal</th>
-                                <th class="p-3">Nama Santri</th>
-                                <th class="p-3">Kategori</th>
-                                <th class="p-3">Detail Setoran</th>
-                                <th class="p-3">Catatan</th>
-                                <th class="p-3 text-center">Aksi</th>
+                            <tr id="historyTableHeader" class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                                <th class="p-3.5">Waktu & Tanggal</th>
+                                <th class="p-3.5">Nama Santri</th>
+                                <th class="p-3.5">Detail Bacaan</th>
+                                <th class="p-3.5">Status</th>
+                                <th class="p-3.5">Catatan</th>
+                                <th class="p-3.5 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="historyTableBody" class="divide-y"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: DATA SANTRI -->
-        <section id="section-santri" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Data Master Santri (87 Santri)</h3>
-                    <button onclick="window.exportDataToExcel()" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs">Export Excel</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase">
-                                <th class="p-3">No</th>
-                                <th class="p-3">ID Santri</th>
-                                <th class="p-3">Nama Santri</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Pengajar</th>
-                                <th class="p-3 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="santriMasterTableBody" class="divide-y"></tbody>
+                        <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
                     </table>
                 </div>
             </div>
@@ -299,38 +299,38 @@
 
         <!-- SECTION: WA PERSONAL -->
         <section id="section-wa_report" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
+            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between border-b pb-3">
                     <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Generator Laporan WhatsApp Orang Tua</h3>
-                    <button onclick="window.rotateWaGreeting()" class="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 font-bold rounded-xl text-xs border border-emerald-200">Acak Doa & Salam 🔄</button>
+                    <button onclick="window.rotateWaGreeting()" class="px-4 py-2 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 font-bold rounded-xl text-xs border border-emerald-200">Acak Doa & Salam 🔄</button>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="font-extrabold text-xs text-slate-500">Pilih Santri:</label>
-                        <select id="waSantriSelect" onchange="window.generateWaReport()" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold"></select>
+                        <label class="font-black text-xs text-slate-600 dark:text-slate-300">Pilih Santri:</label>
+                        <select id="waSantriSelect" onchange="window.generateWaReport()" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base"></select>
                     </div>
                     <div>
-                        <label class="font-extrabold text-xs text-slate-500">No WA Wali:</label>
-                        <input type="text" id="waPhoneInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold" value="+6285774042121">
+                        <label class="font-black text-xs text-slate-600 dark:text-slate-300">No WA Wali:</label>
+                        <input type="text" id="waPhoneInput" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base" value="+6285774042121">
                     </div>
                 </div>
                 <div>
-                    <label class="font-extrabold text-xs text-slate-500">Preview Pesan:</label>
-                    <textarea id="waMessagePreview" rows="15" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs"></textarea>
+                    <label class="font-black text-xs text-slate-600 dark:text-slate-300">Preview Pesan:</label>
+                    <textarea id="waMessagePreview" rows="15" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-900 border rounded-2xl font-mono text-sm leading-relaxed"></textarea>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="window.copyWaReportText()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-xl font-bold text-xs">Salin Teks</button>
-                    <button onclick="window.sendWaReportDirect()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md">Kirim WhatsApp</button>
+                    <button onclick="window.copyWaReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-sm">Salin Teks</button>
+                    <button onclick="window.sendWaReportDirect()" class="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">Kirim WhatsApp</button>
                 </div>
             </div>
         </section>
 
         <!-- SECTION: LAPORAN KELAS -->
         <section id="section-class_report" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between">
+            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
+                <div class="flex items-center justify-between border-b pb-3">
                     <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Laporan Rekapitulasi Per Kelas & Materi Belajar</h3>
-                    <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-2.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                    <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-sm">
                         <option value="Abdurrahman">Abdurrahman</option>
                         <option value="Abu Ubaidah" selected>Abu Ubaidah</option>
                         <option value="Zubair">Zubair</option>
@@ -344,56 +344,57 @@
                     </select>
                 </div>
                 <div>
-                    <textarea id="classReportMessagePreview" rows="16" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs"></textarea>
+                    <textarea id="classReportMessagePreview" rows="16" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border rounded-2xl font-mono text-sm leading-relaxed"></textarea>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="window.copyClassReportText()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-xl font-bold text-xs">Salin Teks Kelas</button>
-                    <button onclick="window.sendClassReportDirect()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md">Kirim WA Kelas</button>
+                    <button onclick="window.copyClassReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-sm">Salin Teks Kelas</button>
+                    <button onclick="window.sendClassReportDirect()" class="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">Kirim WA Kelas</button>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION: EXPORT DATA -->
+        <!-- SECTION: BACKUP & RESET -->
         <section id="section-export" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Backup & Export Data (Local Storage)</h3>
-                <p class="text-xs text-slate-500 font-bold">Semua data riwayat, setoran, dan materi tersimpan aman di browser Anda. Klik tombol di bawah untuk mendownload file Excel/CSV cadangan:</p>
-                <div class="flex items-center gap-3 pt-2">
-                    <button onclick="window.exportDataToExcel()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2">
-                        <i class="fa-solid fa-file-excel"></i> Download Excel (.xls / .csv)
+            <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
+                <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Backup & Reset Memori Lokal</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Semua data santri dan setoran Anda tersimpan aman di memori Local Storage browser Anda. Anda dapat mendownload file Excel/CSV kapan saja, atau mereset data harian (Bacaan, Hafalan, Muroja'ah, Tugas) tanpa menghapus rekapan catatan santri.</p>
+                <div class="flex flex-wrap items-center gap-4 pt-2">
+                    <button onclick="window.exportDataToExcel()" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm flex items-center gap-2.5 shadow-md transition">
+                        <i class="fa-solid fa-file-excel"></i> Download Excel (.csv)
                     </button>
-                    <button onclick="window.clearLocalStorage()" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs">Reset Data Lokal</button>
+                    <button onclick="window.resetDailyLogsOnly()" class="px-6 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-sm shadow-md transition">⚠️ Reset Data Setoran Harian Saja</button>
                 </div>
             </div>
         </section>
     </main>
 
-    <div id="setoranModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div class="px-5 py-3.5 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
+    <!-- MODAL INPUT SETORAN (BESAR & KONTRAS TINGGI) -->
+    <div id="setoranModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border-4 border-emerald-500 overflow-hidden">
+            <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex items-center justify-between shrink-0">
                 <div>
-                    <h3 id="modalSantriName" class="text-base sm:text-lg font-black tracking-tight">Setoran: Santri</h3>
-                    <p id="modalSantriMeta" class="text-xs text-emerald-200 font-bold">Kelas • Pengajar</p>
+                    <h3 id="modalSantriName" class="text-lg sm:text-xl font-black tracking-tight">Setoran: Santri</h3>
+                    <p id="modalSantriMeta" class="text-sm text-emerald-200 font-bold">Kelas • Pengajar</p>
                 </div>
-                <button onclick="window.closeEditModal()" class="p-2 rounded-xl hover:bg-white/10 text-white font-black text-xl">✕</button>
+                <button onclick="window.closeEditModal()" class="p-3 rounded-xl hover:bg-white/10 text-white font-black text-2xl">✕</button>
             </div>
             
-            <div class="p-3 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-5">
-                <div class="p-3 bg-slate-100 dark:bg-slate-900/80 rounded-2xl border flex items-center justify-between">
-                    <label class="font-extrabold text-xs text-slate-700 dark:text-slate-300">Tanggal Pertemuan:</label>
-                    <input type="date" id="modalTanggalInput" class="px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+            <div class="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-6">
+                <div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 flex items-center justify-between">
+                    <label class="font-black text-base text-slate-800 dark:text-slate-200">Tanggal Pertemuan:</label>
+                    <input type="date" id="modalTanggalInput" class="px-4 py-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     
-                    <!-- 1. BACAAN -->
-                    <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-300 dark:border-emerald-700 space-y-3 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between pb-2 border-b border-emerald-200 dark:border-emerald-800">
-                                <span class="font-black text-xs text-emerald-900 dark:text-emerald-200 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-book-open text-emerald-600"></i> 1. Bacaan
+                    <!-- 1. BACAAN (Emerald High Contrast) -->
+                    <div class="p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-3xl border-3 border-emerald-500 space-y-4 flex flex-col justify-between shadow-md">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b-2 border-emerald-300 dark:border-emerald-700">
+                                <span class="font-black text-sm text-emerald-900 dark:text-emerald-200 uppercase flex items-center gap-2">
+                                    <i class="fa-solid fa-book-open text-emerald-700 text-lg"></i> 1. Bacaan
                                 </span>
-                                <select id="bacaanStatusSelect" class="p-1 bg-white dark:bg-slate-800 border border-emerald-300 rounded-lg font-bold text-emerald-800 text-[11px]">
+                                <select id="bacaanStatusSelect" class="p-2 bg-white dark:bg-slate-900 border-2 border-emerald-400 rounded-xl font-black text-emerald-900 text-xs">
                                     <option value="Lancar (A)">Lancar (A)</option>
                                     <option value="Cukup (B)">Cukup (B)</option>
                                     <option value="Kurang (C)">Kurang (C)</option>
@@ -401,39 +402,39 @@
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[11px] text-slate-600">Sumber Bacaan:</label>
-                                <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                <label class="font-black text-xs text-slate-700 dark:text-slate-300">Sumber Bacaan:</label>
+                                <select id="bacaanCategorySelect" onchange="window.onBacaanCategoryChange(this.value)" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base">
                                     <option value="quran">Al-Qur'an</option>
                                     <option value="iqro">Iqro (1 - 6)</option>
                                 </select>
                             </div>
 
-                            <div id="bacaanQuranSection" class="space-y-2">
+                            <div id="bacaanQuranSection" class="space-y-3">
                                 <div>
-                                    <label class="font-extrabold text-[11px] text-slate-600">Surat:</label>
-                                    <select id="bacaanSurahSelect" onchange="window.updateMushafAuto('bacaan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
+                                    <label class="font-black text-xs text-slate-700 dark:text-slate-300">Surat:</label>
+                                    <select id="bacaanSurahSelect" onchange="window.updateMushafAuto('bacaan')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base"></select>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2">
+                                <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="font-extrabold text-[10px] text-slate-500">Ayat Mulai:</label>
-                                        <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.updateMushafAuto('bacaan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                        <label class="font-black text-xs text-slate-700 dark:text-slate-300">Ayat Mulai:</label>
+                                        <input type="number" id="bacaanAyatStartInput" value="1" min="1" oninput="window.updateMushafAuto('bacaan')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base">
                                     </div>
                                     <div>
-                                        <label class="font-extrabold text-[10px] text-slate-500">Ayat Selesai:</label>
-                                        <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.updateMushafAuto('bacaan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                        <label class="font-black text-xs text-slate-700 dark:text-slate-300">Ayat Selesai:</label>
+                                        <input type="number" id="bacaanAyatEndInput" value="7" min="1" oninput="window.updateMushafAuto('bacaan')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base">
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="font-extrabold text-[10px] text-emerald-700">Nomor Mushaf (Otomatis):</label>
-                                    <input type="text" id="bacaanMushafOutput" readonly class="w-full mt-1 p-2 bg-emerald-100/50 dark:bg-slate-900 border border-emerald-300 rounded-xl font-black text-xs text-emerald-900 dark:text-emerald-300" value="Hal. 1">
+                                    <label class="font-black text-xs text-emerald-800 dark:text-emerald-300">Nomor Mushaf:</label>
+                                    <input type="text" id="bacaanMushafOutput" readonly class="w-full mt-1.5 p-3.5 bg-emerald-200/50 dark:bg-slate-900 border-2 border-emerald-400 rounded-xl font-black text-base text-emerald-950 dark:text-emerald-200" value="Hal. 1">
                                 </div>
                             </div>
 
-                            <div id="bacaanIqroSection" class="space-y-2 hidden">
-                                <div class="grid grid-cols-2 gap-2">
+                            <div id="bacaanIqroSection" class="space-y-3 hidden">
+                                <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="font-extrabold text-[11px] text-slate-600">Jilid Iqro:</label>
-                                        <select id="bacaanIqroJilidSelect" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                        <label class="font-black text-xs text-slate-700 dark:text-slate-300">Jilid Iqro:</label>
+                                        <select id="bacaanIqroJilidSelect" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base">
                                             <option value="Iqro 1">Iqro 1</option>
                                             <option value="Iqro 2">Iqro 2</option>
                                             <option value="Iqro 3">Iqro 3</option>
@@ -443,28 +444,28 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="font-extrabold text-[11px] text-slate-600">Halaman:</label>
-                                        <input type="number" id="bacaanIqroHalInput" value="1" min="1" max="35" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                        <label class="font-black text-xs text-slate-700 dark:text-slate-300">Halaman:</label>
+                                        <input type="number" id="bacaanIqroHalInput" value="1" min="1" max="35" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="space-y-2 pt-2 border-t border-emerald-200">
-                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                            <textarea id="bacaanCatatanInput" rows="2" placeholder="Catatan tajwid..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            <button type="button" onclick="window.saveSectionData('bacaan')" class="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Bacaan</button>
+                        <div class="space-y-3 pt-3 border-t-2 border-emerald-200">
+                            <label class="font-black text-xs text-slate-700 dark:text-slate-300">Catatan:</label>
+                            <textarea id="bacaanCatatanInput" rows="3" placeholder="Catatan tajwid..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-base font-semibold"></textarea>
+                            <button type="button" onclick="window.saveSectionData('bacaan')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-base shadow-md transition">💾 Save Bacaan</button>
                         </div>
                     </div>
 
-                    <!-- 2. HAFALAN -->
-                    <div class="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border-2 border-amber-300 dark:border-amber-700 space-y-3 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between pb-2 border-b border-amber-200 dark:border-amber-800">
-                                <span class="font-black text-xs text-amber-900 dark:text-amber-200 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-award text-amber-600"></i> 2. Hafalan Baru
+                    <!-- 2. HAFALAN (Amber High Contrast) -->
+                    <div class="p-5 bg-amber-50 dark:bg-amber-950/40 rounded-3xl border-3 border-amber-500 space-y-4 flex flex-col justify-between shadow-md">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b-2 border-amber-300 dark:border-amber-700">
+                                <span class="font-black text-sm text-amber-900 dark:text-amber-200 uppercase flex items-center gap-2">
+                                    <i class="fa-solid fa-award text-amber-700 text-lg"></i> 2. Hafalan Baru
                                 </span>
-                                <select id="hafalanStatusSelect" class="p-1 bg-white dark:bg-slate-800 border border-amber-300 rounded-lg font-bold text-amber-800 text-[11px]">
+                                <select id="hafalanStatusSelect" class="p-2 bg-white dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-900 text-xs">
                                     <option value="Lancar (A)">Lancar (A)</option>
                                     <option value="Cukup (B)">Cukup (B)</option>
                                     <option value="Ulang (C)">Ulang (C)</option>
@@ -472,41 +473,41 @@
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[11px] text-slate-600">Pilih Surat Hafalan:</label>
-                                <select id="hafalanSurahSelect1" onchange="window.updateMushafAuto('hafalan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
+                                <label class="font-black text-xs text-slate-700 dark:text-slate-300">Pilih Surat Hafalan:</label>
+                                <select id="hafalanSurahSelect1" onchange="window.updateMushafAuto('hafalan')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base"></select>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="font-extrabold text-[10px] text-slate-500">Ayat Mulai:</label>
-                                    <input type="number" id="hafalanAyatStartInput1" value="1" min="1" oninput="window.updateMushafAuto('hafalan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <label class="font-black text-xs text-slate-700 dark:text-slate-300">Ayat Mulai:</label>
+                                    <input type="number" id="hafalanAyatStartInput1" value="1" min="1" oninput="window.updateMushafAuto('hafalan')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base">
                                 </div>
                                 <div>
-                                    <label class="font-extrabold text-[10px] text-slate-500">Ayat Selesai:</label>
-                                    <input type="number" id="hafalanAyatEndInput1" value="7" min="1" oninput="window.updateMushafAuto('hafalan')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <label class="font-black text-xs text-slate-700 dark:text-slate-300">Ayat Selesai:</label>
+                                    <input type="number" id="hafalanAyatEndInput1" value="7" min="1" oninput="window.updateMushafAuto('hafalan')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base">
                                 </div>
                             </div>
                             <div>
-                                <label class="font-extrabold text-[10px] text-amber-700">Nomor Mushaf (Otomatis):</label>
-                                <input type="text" id="hafalanMushafOutput" readonly class="w-full mt-1 p-2 bg-amber-100/50 dark:bg-slate-900 border border-amber-300 rounded-xl font-black text-xs text-amber-900 dark:text-amber-300" value="Hal. 604">
+                                <label class="font-black text-xs text-amber-800 dark:text-amber-300">Nomor Mushaf:</label>
+                                <input type="text" id="hafalanMushafOutput" readonly class="w-full mt-1.5 p-3.5 bg-amber-200/50 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-base text-amber-950 dark:text-amber-200" value="Hal. 604">
                             </div>
                         </div>
 
-                        <div class="space-y-2 pt-2 border-t border-amber-200">
-                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                            <textarea id="hafalanCatatanInput" rows="2" placeholder="Kelancaran hafalan..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            <button type="button" onclick="window.saveSectionData('hafalan')" class="w-full mt-2 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Hafalan</button>
+                        <div class="space-y-3 pt-3 border-t-2 border-amber-200">
+                            <label class="font-black text-xs text-slate-700 dark:text-slate-300">Catatan:</label>
+                            <textarea id="hafalanCatatanInput" rows="3" placeholder="Kelancaran hafalan..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-base font-semibold"></textarea>
+                            <button type="button" onclick="window.saveSectionData('hafalan')" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-base shadow-md transition">💾 Save Hafalan</button>
                         </div>
                     </div>
 
-                    <!-- 3. MUROJA'AH -->
-                    <div class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-300 dark:border-sky-700 space-y-3 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between pb-2 border-b border-sky-200 dark:border-sky-800">
-                                <span class="font-black text-xs text-sky-900 dark:text-sky-200 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-rotate text-sky-600"></i> 3. Muroja'ah
+                    <!-- 3. MUROJA'AH (Sky High Contrast) -->
+                    <div class="p-5 bg-sky-50 dark:bg-sky-950/40 rounded-3xl border-3 border-sky-500 space-y-4 flex flex-col justify-between shadow-md">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b-2 border-sky-300 dark:border-sky-700">
+                                <span class="font-black text-sm text-sky-900 dark:text-sky-200 uppercase flex items-center gap-2">
+                                    <i class="fa-solid fa-rotate text-sky-700 text-lg"></i> 3. Muroja'ah
                                 </span>
-                                <select id="murojaahStatusSelect" class="p-1 bg-white dark:bg-slate-800 border border-sky-300 rounded-lg font-bold text-sky-800 text-[11px]">
+                                <select id="murojaahStatusSelect" class="p-2 bg-white dark:bg-slate-900 border-2 border-sky-400 rounded-xl font-black text-sky-900 text-xs">
                                     <option value="Lancar (A)">Lancar (A)</option>
                                     <option value="Cukup (B)">Cukup (B)</option>
                                     <option value="Kurang (C)">Kurang (C)</option>
@@ -514,49 +515,49 @@
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[11px] text-slate-600">Pilih Surat Muroja'ah:</label>
-                                <select id="murojaahSurahSelect1" onchange="window.updateMushafAuto('murojaah')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs"></select>
+                                <label class="font-black text-xs text-slate-700 dark:text-slate-300">Pilih Surat Muroja'ah:</label>
+                                <select id="murojaahSurahSelect1" onchange="window.updateMushafAuto('murojaah')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base"></select>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="font-extrabold text-[10px] text-slate-500">Ayat Mulai:</label>
-                                    <input type="number" id="murojaahAyatStartInput1" value="1" min="1" oninput="window.updateMushafAuto('murojaah')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <label class="font-black text-xs text-slate-700 dark:text-slate-300">Ayat Mulai:</label>
+                                    <input type="number" id="murojaahAyatStartInput1" value="1" min="1" oninput="window.updateMushafAuto('murojaah')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base">
                                 </div>
                                 <div>
-                                    <label class="font-extrabold text-[10px] text-slate-500">Ayat Selesai:</label>
-                                    <input type="number" id="murojaahAyatEndInput1" value="10" min="1" oninput="window.updateMushafAuto('murojaah')" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                    <label class="font-black text-xs text-slate-700 dark:text-slate-300">Ayat Selesai:</label>
+                                    <input type="number" id="murojaahAyatEndInput1" value="10" min="1" oninput="window.updateMushafAuto('murojaah')" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base">
                                 </div>
                             </div>
                             <div>
-                                <label class="font-extrabold text-[10px] text-sky-700">Nomor Mushaf (Otomatis):</label>
-                                <input type="text" id="murojaahMushafOutput" readonly class="w-full mt-1 p-2 bg-sky-100/50 dark:bg-slate-900 border border-sky-300 rounded-xl font-black text-xs text-sky-900 dark:text-sky-300" value="Hal. 1">
+                                <label class="font-black text-xs text-sky-800 dark:text-sky-300">Nomor Mushaf:</label>
+                                <input type="text" id="murojaahMushafOutput" readonly class="w-full mt-1.5 p-3.5 bg-sky-200/50 dark:bg-slate-900 border-2 border-sky-400 rounded-xl font-black text-base text-sky-950 dark:text-sky-200" value="Hal. 1">
                             </div>
                         </div>
 
-                        <div class="space-y-2 pt-2 border-t border-sky-200">
-                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                            <textarea id="murojaahCatatanInput" rows="2" placeholder="Catatan muroja'ah..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            <button type="button" onclick="window.saveSectionData('murojaah')" class="w-full mt-2 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Muroja'ah</button>
+                        <div class="space-y-3 pt-3 border-t-2 border-sky-200">
+                            <label class="font-black text-xs text-slate-700 dark:text-slate-300">Catatan:</label>
+                            <textarea id="murojaahCatatanInput" rows="3" placeholder="Catatan muroja'ah..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-base font-semibold"></textarea>
+                            <button type="button" onclick="window.saveSectionData('murojaah')" class="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-base shadow-md transition">💾 Save Muroja'ah</button>
                         </div>
                     </div>
 
-                    <!-- 4. TUGAS -->
-                    <div class="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-2xl border-2 border-indigo-300 dark:border-indigo-700 space-y-3 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between pb-2 border-b border-indigo-200 dark:border-indigo-800">
-                                <span class="font-black text-xs text-indigo-900 dark:text-indigo-200 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-list-check text-indigo-600"></i> 4. Tugas Tambahan
+                    <!-- 4. TUGAS (Indigo High Contrast) -->
+                    <div class="p-5 bg-indigo-50 dark:bg-indigo-950/40 rounded-3xl border-3 border-indigo-500 space-y-4 flex flex-col justify-between shadow-md">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b-2 border-indigo-300 dark:border-indigo-700">
+                                <span class="font-black text-sm text-indigo-900 dark:text-indigo-200 uppercase flex items-center gap-2">
+                                    <i class="fa-solid fa-list-check text-indigo-700 text-lg"></i> 4. Tugas Tambahan
                                 </span>
-                                <select id="tugasStatusSelect" class="p-1 bg-white dark:bg-slate-800 border border-indigo-300 rounded-lg font-bold text-indigo-800 text-[11px]">
+                                <select id="tugasStatusSelect" class="p-2 bg-white dark:bg-slate-900 border-2 border-indigo-400 rounded-xl font-black text-indigo-900 text-xs">
                                     <option value="Selesai">Selesai</option>
                                     <option value="Belum">Belum</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[11px] text-slate-600">Jenis Tugas:</label>
-                                <select id="tugasJenisSelect" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                <label class="font-black text-xs text-slate-700 dark:text-slate-300">Jenis Tugas:</label>
+                                <select id="tugasJenisSelect" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base">
                                     <option value="Tugas Muroja'ah">Tugas Muroja'ah</option>
                                     <option value="Bacaan Iqro">Bacaan Iqro</option>
                                     <option value="Bacaan Al-Quran">Bacaan Al-Quran</option>
@@ -565,29 +566,29 @@
                             </div>
 
                             <div>
-                                <label class="font-extrabold text-[10px] text-slate-500">Detail Tugas:</label>
-                                <input type="text" id="tugasDetailInput" placeholder="Contoh: Halaman 15" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs">
+                                <label class="font-black text-xs text-slate-700 dark:text-slate-300">Detail Tugas:</label>
+                                <input type="text" id="tugasDetailInput" placeholder="Contoh: Halaman 15" class="w-full mt-1.5 p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base">
                             </div>
                         </div>
 
-                        <div class="space-y-2 pt-2 border-t border-indigo-200">
-                            <label class="font-extrabold text-[10px] text-slate-500">Catatan:</label>
-                            <textarea id="tugasCatatanInput" rows="2" placeholder="Catatan tugas..." class="w-full p-2 bg-white dark:bg-slate-800 border rounded-xl text-xs"></textarea>
-                            <button type="button" onclick="window.saveSectionData('tugas')" class="w-full mt-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs shadow-md">💾 Save Tugas</button>
+                        <div class="space-y-3 pt-3 border-t-2 border-indigo-200">
+                            <label class="font-black text-xs text-slate-700 dark:text-slate-300">Catatan:</label>
+                            <textarea id="tugasCatatanInput" rows="3" placeholder="Catatan tugas..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-base font-semibold"></textarea>
+                            <button type="button" onclick="window.saveSectionData('tugas')" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-base shadow-md transition">💾 Save Tugas</button>
                         </div>
                     </div>
 
                 </div>
             </div>
 
-            <div class="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t flex items-center justify-between shrink-0">
-                <button onclick="window.closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-xs">Tutup Modal</button>
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t flex items-center justify-between shrink-0">
+                <button onclick="window.closeEditModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-sm">Tutup Modal</button>
                 <span class="text-xs text-slate-500 font-bold">Tersimpan otomatis di Local Storage browser</span>
             </div>
         </div>
     </div>
 
-    <div id="toastContainer" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
     <script>
         window.santriList = [
@@ -695,39 +696,62 @@
             if (fallback) fallback.classList.remove('hidden');
         };
 
+        window.toggleDarkMode = function() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('rq_dark_mode', isDark ? 'true' : 'false');
+            document.getElementById('darkModeIcon').className = isDark ? 'fa-solid fa-sun text-base' : 'fa-solid fa-moon text-base';
+        };
+
+        window.checkStorageUsage = function() {
+            let total = 0;
+            for (let x in localStorage) {
+                if (localStorage.hasOwnProperty(x)) {
+                    total += ((localStorage[x].length + x.length) * 2);
+                }
+            }
+            const kb = (total / 1024).toFixed(2);
+            const mb = (total / (1024 * 1024)).toFixed(2);
+            const el = document.getElementById('storageInfoLabel');
+            if (el) {
+                el.innerText = `Memori Lokal: ${kb} KB / 5000 KB (${mb} MB)`;
+            }
+        };
+
         window.switchTab = function(tabId) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'materi_tambahan', 'history', 'santri', 'wa_report', 'class_report', 'export'].forEach(t => {
+            ['setoran', 'materi', 'history', 'wa_report', 'class_report', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     if (t === tabId) {
-                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
+                        btn.className = "px-3.5 py-2 rounded-xl text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0";
                     } else {
-                        btn.className = "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                        btn.className = "px-3.5 py-2 rounded-xl text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
                     }
                 }
             });
 
             if (tabId === 'setoran') window.renderSantriCardsAndTable();
-            if (tabId === 'history') window.renderHistoryTable();
-            if (tabId === 'santri') window.renderMasterSantriTable();
+            if (tabId === 'history') window.switchHistorySubTab('bacaan');
             if (tabId === 'materi') window.renderMateriList('utama');
-            if (tabId === 'materi_tambahan') window.renderMateriList('tambahan');
             if (tabId === 'wa_report') window.populateWaDropdown();
             if (tabId === 'class_report') window.generateClassReport();
+            window.checkStorageUsage();
         };
 
         window.showToast = function(msg, type = 'success') {
             const c = document.getElementById('toastContainer');
             if (!c) return;
             const t = document.createElement('div');
-            t.className = `p-3 rounded-2xl text-xs sm:text-sm font-bold text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
+            t.className = `p-3.5 rounded-2xl text-sm font-black text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
             t.innerText = msg;
             c.appendChild(t);
             setTimeout(() => t.remove(), 2500);
+            window.checkStorageUsage();
         };
 
         window.selectedClass = 'ALL';
@@ -817,35 +841,43 @@
                 return matchQ && matchC;
             });
 
-            grid.innerHTML = filtered.map(s => `
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400">${s.id}</span>
-                            <h3 class="text-base font-black text-slate-900 dark:text-white">${s.name}</h3>
-                            <p class="text-xs text-emerald-700 dark:text-emerald-400 font-bold">${s.class} • ${s.teacher}</p>
+            grid.innerHTML = filtered.map(s => {
+                const hasInputToday = s.lastBacaan !== '-' || s.lastHafalan !== '-';
+                const btnColor = hasInputToday ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white';
+                return `
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-slate-400">${s.id}</span>
+                                <h3 class="text-lg font-black text-slate-900 dark:text-white">${s.name}</h3>
+                                <p class="text-xs text-emerald-700 dark:text-emerald-400 font-bold mt-0.5">${s.class} • ${s.teacher}</p>
+                            </div>
+                            <button onclick="window.openEditModal('${s.id}')" class="px-4 py-2.5 rounded-xl ${btnColor} text-xs font-black shadow-xs transition">Input</button>
                         </div>
-                        <button onclick="window.openEditModal('${s.id}')" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-xs">Input Setoran</button>
+                        <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-3 border-t">
+                            <div>Bacaan: <strong class="text-slate-900 dark:text-slate-100">${s.lastBacaan || '-'}</strong></div>
+                            <div>Hafalan: <strong class="text-slate-900 dark:text-slate-100">${s.lastHafalan || '-'}</strong></div>
+                            <div>Muroja'ah: <strong class="text-slate-900 dark:text-slate-100">${s.lastMurojaah || '-'}</strong></div>
+                            <div>Tugas: <strong class="text-slate-900 dark:text-slate-100">${s.lastTugas || '-'}</strong></div>
+                        </div>
                     </div>
-                    <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1 pt-2 border-t">
-                        <div>Bacaan: <strong class="text-slate-900 dark:text-slate-100">${s.lastBacaan || '-'}</strong></div>
-                        <div>Hafalan: <strong class="text-slate-900 dark:text-slate-100">${s.lastHafalan || '-'}</strong></div>
-                        <div>Muroja'ah: <strong class="text-slate-900 dark:text-slate-100">${s.lastMurojaah || '-'}</strong></div>
-                        <div>Tugas: <strong class="text-slate-900 dark:text-slate-100">${s.lastTugas || '-'}</strong></div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             if (tbody) {
-                tbody.innerHTML = filtered.map(s => `
-                    <tr>
-                        <td class="p-3 font-black">${s.name}</td>
-                        <td class="p-3 text-xs">${s.class}</td>
-                        <td class="p-3 text-xs font-bold">${s.lastBacaan || '-'}</td>
-                        <td class="p-3 text-xs font-bold">${s.lastHafalan || '-'}</td>
-                        <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-3 py-1 bg-emerald-600 text-white rounded-xl font-bold text-xs">Input</button></td>
-                    </tr>
-                `).join('');
+                tbody.innerHTML = filtered.map(s => {
+                    const hasInputToday = s.lastBacaan !== '-' || s.lastHafalan !== '-';
+                    const btnColor = hasInputToday ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white';
+                    return `
+                        <tr>
+                            <td class="p-3.5 font-black">${s.name}</td>
+                            <td class="p-3.5 text-xs">${s.class}</td>
+                            <td class="p-3.5 text-xs font-bold">${s.lastBacaan || '-'}</td>
+                            <td class="p-3.5 text-xs font-bold">${s.lastHafalan || '-'}</td>
+                            <td class="p-3.5 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-3 py-1.5 ${btnColor} rounded-xl font-bold text-xs">Input</button></td>
+                        </tr>
+                    `;
+                }).join('');
             }
         };
 
@@ -933,66 +965,145 @@
                 s.lastTugas = statusVal;
             }
 
-            const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
+            // Save to specific history key
+            const histKey = `rq_history_${sectionType}`;
+            const history = JSON.parse(localStorage.getItem(histKey) || '[]');
             history.unshift({
                 id: s.id,
-                timestamp: new Date().toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+                timestamp: tanggalVal + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
                 name: s.name,
-                category: sectionType.toUpperCase(),
                 detail: detailSetoran,
                 status: statusVal,
                 catatan: catatanVal
             });
-            localStorage.setItem('rq_history_db', JSON.stringify(history));
+            localStorage.setItem(histKey, JSON.stringify(history));
 
-            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan ke Local Storage!`, "success");
+            // Also save to Rekap Catatan if notes exist
+            if (catatanVal && catatanVal.trim() !== '') {
+                const rekapKey = 'rq_history_rekapan';
+                const rekapList = JSON.parse(localStorage.getItem(rekapKey) || '[]');
+                rekapList.unshift({
+                    tanggal: tanggalVal,
+                    id: s.id,
+                    name: s.name,
+                    category: sectionType.toUpperCase(),
+                    catatan: catatanVal
+                });
+                localStorage.setItem(rekapKey, JSON.stringify(rekapList));
+            }
+
+            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan!`, "success");
             const notesField = document.getElementById(`${sectionType}CatatanInput`);
             if (notesField) notesField.value = '';
 
             window.renderSantriCardsAndTable();
         };
 
+        window.activeHistoryCategory = 'bacaan';
+
+        window.switchHistorySubTab = function(cat) {
+            window.activeHistoryCategory = cat;
+            ['bacaan', 'hafalan', 'murojaah', 'tugas', 'rekapan'].forEach(c => {
+                const btn = document.getElementById(`btnSubHistory-${c}`);
+                if (btn) {
+                    if (c === cat) {
+                        btn.className = "px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-sm";
+                    } else {
+                        btn.className = "px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700";
+                    }
+                }
+            });
+
+            const titleEl = document.getElementById('activeHistoryTitle');
+            const headerEl = document.getElementById('historyTableHeader');
+            const titles = { bacaan: 'Daftar Riwayat Bacaan', hafalan: 'Daftar Riwayat Hafalan', murojaah: "Daftar Riwayat Muroja'ah", tugas: 'Daftar Riwayat Tugas', rekapan: 'Daftar Rekapan Catatan Santri' };
+            if (titleEl) titleEl.innerText = titles[cat];
+
+            if (headerEl) {
+                if (cat === 'rekapan') {
+                    headerEl.innerHTML = `<th class="p-3.5">Tanggal</th><th class="p-3.5">ID Santri</th><th class="p-3.5">Nama Santri</th><th class="p-3.5">Kategori</th><th class="p-3.5">Catatan</th><th class="p-3.5 text-center">Aksi</th>`;
+                } else {
+                    headerEl.innerHTML = `<th class="p-3.5">Waktu & Tanggal</th><th class="p-3.5">Nama Santri</th><th class="p-3.5">Detail Setoran</th><th class="p-3.5">Status</th><th class="p-3.5">Catatan</th><th class="p-3.5 text-center">Aksi</th>`;
+                }
+            }
+
+            window.renderHistoryTable();
+        };
+
         window.renderHistoryTable = function() {
             const tbody = document.getElementById('historyTableBody');
             if (!tbody) return;
-            const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
-            if (history.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-bold">Belum ada riwayat setoran.</td></tr>`;
+            const cat = window.activeHistoryCategory;
+            const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">Belum ada data riwayat untuk kategori ini.</td></tr>`;
                 return;
             }
-            tbody.innerHTML = history.map((h, idx) => `
-                <tr>
-                    <td class="p-3 text-xs font-bold text-emerald-800">${h.timestamp}</td>
-                    <td class="p-3 font-black">${h.name}</td>
-                    <td class="p-3 text-xs font-extrabold text-amber-700">${h.category}</td>
-                    <td class="p-3 text-xs font-bold">${h.detail}</td>
-                    <td class="p-3 text-xs text-slate-600">${h.catatan || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="window.deleteHistoryItem(${idx})" class="p-1.5 bg-rose-100 text-rose-700 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('');
+
+            if (cat === 'rekapan') {
+                tbody.innerHTML = list.map((h, idx) => `
+                    <tr>
+                        <td class="p-3.5 text-xs font-bold text-emerald-800">${h.tanggal}</td>
+                        <td class="p-3.5 text-xs font-bold">${h.id}</td>
+                        <td class="p-3.5 font-black">${h.name}</td>
+                        <td class="p-3.5 text-xs font-extrabold text-amber-700">${h.category}</td>
+                        <td class="p-3.5 text-xs text-slate-700 dark:text-slate-300">${h.catatan}</td>
+                        <td class="p-3.5 text-center"><button onclick="window.deleteHistoryItem('${cat}', ${idx})" class="p-1.5 bg-rose-100 text-rose-700 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = list.map((h, idx) => `
+                    <tr>
+                        <td class="p-3.5 text-xs font-bold text-emerald-800">${h.timestamp}</td>
+                        <td class="p-3.5 font-black">${h.name}</td>
+                        <td class="p-3.5 text-xs font-bold">${h.detail}</td>
+                        <td class="p-3.5 text-xs font-bold text-emerald-700">${h.status}</td>
+                        <td class="p-3.5 text-xs text-slate-600 dark:text-slate-400">${h.catatan || '-'}</td>
+                        <td class="p-3.5 text-center"><button onclick="window.deleteHistoryItem('${cat}', ${idx})" class="p-1.5 bg-rose-100 text-rose-700 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            }
         };
 
-        window.deleteHistoryItem = function(index) {
-            const history = JSON.parse(localStorage.getItem('rq_history_db') || '[]');
-            history.splice(index, 1);
-            localStorage.setItem('rq_history_db', JSON.stringify(history));
+        window.deleteHistoryItem = function(cat, index) {
+            const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            list.splice(index, 1);
+            localStorage.setItem(key, JSON.stringify(list));
             window.renderHistoryTable();
-            window.showToast("Riwayat dihapus", "success");
+            window.showToast("Data riwayat dihapus", "success");
         };
 
-        window.renderMasterSantriTable = function() {
-            const tbody = document.getElementById('santriMasterTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = window.santriList.map((s, idx) => `
-                <tr>
-                    <td class="p-3 text-xs">${idx + 1}</td>
-                    <td class="p-3 font-bold text-xs">${s.id}</td>
-                    <td class="p-3 font-bold">${s.name}</td>
-                    <td class="p-3 text-xs">${s.class}</td>
-                    <td class="p-3 text-xs">${s.teacher}</td>
-                    <td class="p-3 text-center"><button onclick="window.openEditModal('${s.id}')" class="px-2.5 py-1 bg-amber-500 text-white rounded-lg font-bold text-xs">Input</button></td>
-                </tr>
-            `).join('');
+        window.downloadCurrentHistory = function() {
+            const cat = window.activeHistoryCategory;
+            const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            if (list.length === 0) {
+                window.showToast("Tidak ada data untuk didownload", "error");
+                return;
+            }
+
+            let csv = "";
+            if (cat === 'rekapan') {
+                csv = "Tanggal,ID Santri,Nama Santri,Kategori,Catatan\n";
+                list.forEach(item => {
+                    csv += `"${item.tanggal}","${item.id}","${item.name}","${item.category}","${item.catatan}"\n`;
+                });
+            } else {
+                csv = "Waktu,Nama Santri,Detail,Status,Catatan\n";
+                list.forEach(item => {
+                    csv += `"${item.timestamp}","${item.name}","${item.detail}","${item.status}","${item.catatan || '-'}"\n`;
+                });
+            }
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Riwayat_${cat.toUpperCase()}_RQ_AlKhansa_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            window.showToast(`Riwayat ${cat} berhasil didownload!`, "success");
         };
 
         window.populateWaDropdown = function() {
@@ -1007,20 +1118,23 @@
             const s = window.santriList.find(x => x.id === id);
             if (!s) return;
 
-            // Get Materi Utama & Tambahan for this santri's class
             const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
             const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            
             const filteredMateri = materiUtama.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
             const filteredTambahan = materiTambahan.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
 
-            let materiText = "\n📚 *Materi Belajar Hari Ini:*";
+            let bagianSetoran = "";
+            if (s.lastBacaan && s.lastBacaan !== '-') bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}\n`;
+            if (s.lastHafalan && s.lastHafalan !== '-') bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}\n`;
+            if (s.lastMurojaah && s.lastMurojaah !== '-') bagianSetoran += `🔄 *Muroja'ah:* ${s.lastMurojaah}\n`;
+            if (s.lastTugas && s.lastTugas !== '-') bagianSetoran += `📝 *Tugas:* ${s.lastTugas}\n`;
+
+            let materiText = "";
             if (filteredMateri.length > 0) {
+                materiText += "\n📚 *Materi Belajar Hari Ini:*";
                 filteredMateri.forEach(m => {
                     materiText += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
                 });
-            } else {
-                materiText += "\n- Belum ada materi utama.";
             }
 
             if (filteredTambahan.length > 0) {
@@ -1030,7 +1144,7 @@
                 });
             }
 
-            document.getElementById('waMessagePreview').value = `Assalamu'alaikum\nAyah/Bunda semoga sehat selalu.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n\n👤 *Nama:* ${s.name}\n🏫 *Kelas:* ${s.class}\n\n📖 *Bacaan:* ${s.lastBacaan || '-'}\n⭐ *Hafalan:* ${s.lastHafalan || '-'}\n🔄 *Muroja'ah:* ${s.lastMurojaah || '-'}\n📝 *Tugas:* ${s.lastTugas || '-'}\n${materiText}\n\nJazakumullah khairan katsiran.`;
+            document.getElementById('waMessagePreview').value = `Assalamu'alaikum\nAyah/Bunda semoga sehat selalu.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n\n👤 *Nama:* ${s.name}\n🏫 *Kelas:* ${s.class}\n\n${bagianSetoran}${materiText}\n\nJazakumullah khairan katsiran.`;
         };
 
         window.copyWaReportText = function() {
@@ -1053,31 +1167,33 @@
             
             const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
             const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            
             const filteredMateri = materiUtama.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
             const filteredTambahan = materiTambahan.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
 
             let msg = `📊 *LAPORAN REKAP KELAS ${className.toUpperCase()}*\n*Rumah Qur'an Al-Khansa*\n\n`;
             
-            msg += `📚 *Materi Belajar Hari Ini:*`;
             if (filteredMateri.length > 0) {
+                msg += `📚 *Materi Belajar Hari Ini:*`;
                 filteredMateri.forEach(m => {
-                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
-            } else {
-                msg += `\n- Belum ada materi utama kelas ini.`;
             }
 
             if (filteredTambahan.length > 0) {
-                msg += `\n\n⭐ *Materi Tambahan:*`;
+                msg += `\n⭐ *Materi Tambahan:*`;
                 filteredTambahan.forEach(m => {
-                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
             }
 
-            msg += `\n\n👥 *Daftar Santri & Prestasi:*`;
+            msg += `\n👥 *Daftar Santri & Prestasi:*`;
             list.forEach((s, idx) => {
-                msg += `\n${idx + 1}. *${s.name}*\n   - Bacaan: ${s.lastBacaan || '-'}\n   - Hafalan: ${s.lastHafalan || '-'}\n`;
+                let santriLine = `\n${idx + 1}. *${s.name}*`;
+                if (s.lastBacaan && s.lastBacaan !== '-') santriLine += `\n   - Bacaan: ${s.lastBacaan}`;
+                if (s.lastHafalan && s.lastHafalan !== '-') santriLine += `\n   - Hafalan: ${s.lastHafalan}`;
+                if (s.lastMurojaah && s.lastMurojaah !== '-') santriLine += `\n   - Muroja'ah: ${s.lastMurojaah}`;
+                if (s.lastTugas && s.lastTugas !== '-') santriLine += `\n   - Tugas: ${s.lastTugas}`;
+                msg += santriLine + `\n`;
             });
 
             document.getElementById('classReportMessagePreview').value = msg;
@@ -1105,19 +1221,30 @@
             window.showToast("File Excel/CSV berhasil didownload!", "success");
         };
 
-        window.clearLocalStorage = function() {
-            if (confirm("Reset seluruh data lokal?")) {
-                localStorage.clear();
-                location.reload();
+        window.resetDailyLogsOnly = function() {
+            if (confirm("Reset hanya data bacaan, hafalan, muroja'ah, dan tugas harian santri? Catatan rekap santri tetap aman.")) {
+                window.santriList.forEach(s => {
+                    s.lastBacaan = '-';
+                    s.lastHafalan = '-';
+                    s.lastMurojaah = '-';
+                    s.lastTugas = '-';
+                });
+                localStorage.removeItem('rq_history_bacaan');
+                localStorage.removeItem('rq_history_hafalan');
+                localStorage.removeItem('rq_history_murojaah');
+                localStorage.removeItem('rq_history_tugas');
+                window.renderSantriCardsAndTable();
+                window.showToast("Data setoran harian berhasil direset!", "success");
             }
         };
 
-        window.rotateWaGreeting = function() {
-            window.showToast("Salam & Doa diperbarui!", "success");
-        };
-
         document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('rq_dark_mode') === 'true') {
+                document.documentElement.classList.add('dark');
+                document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-base';
+            }
             window.renderSantriCardsAndTable();
+            window.checkStorageUsage();
         });
     </script>
 </body>
