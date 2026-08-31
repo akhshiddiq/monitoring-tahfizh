@@ -51,7 +51,10 @@
                             <span>Monitoring Santri</span>
                             <span class="px-2 py-0.5 bg-amber-400 text-emerald-950 text-xs font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
-                        <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Hybrid Storage: Local & Cloud Active</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
+                            <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Hybrid Storage: Local & Cloud Active</p>
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -259,13 +262,18 @@
                 </div>
 
                 <div class="flex items-center justify-between pt-2 flex-wrap gap-2">
-                    <span id="activeHistoryTitle" class="font-black text-sm text-slate-700 dark:text-slate-200">Daftar Riwayat Bacaan</span>
+                    <div class="flex items-center gap-3">
+                        <span id="activeHistoryTitle" class="font-black text-sm text-slate-700 dark:text-slate-200">Daftar Riwayat Bacaan</span>
+                        <a id="sheetTabLinkBtn" href="https://docs.google.com/spreadsheets/d/" target="_blank" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-xs font-black flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-table"></i> Buka Sheet Google 📊
+                        </a>
+                    </div>
                     <div class="flex items-center gap-2">
                         <button onclick="window.fetchHistoryFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
                             <i class="fa-solid fa-rotate"></i> Sinkronisasi Riwayat (Sync)
                         </button>
                         <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs flex items-center gap-2 shadow-xs transition">
-                            <i class="fa-solid fa-download"></i> Download Kategori Ini (.csv)
+                            <i class="fa-solid fa-download"></i> Download (.csv)
                         </button>
                     </div>
                 </div>
@@ -972,7 +980,20 @@
             }
         };
 
+        window.setSyncIndicator = function(status) {
+            const dot = document.getElementById('syncDotIndicator');
+            if (!dot) return;
+            if (status === 'success') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse";
+            } else if (status === 'pending') {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 inline-block shadow-sm animate-ping";
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-sm";
+            }
+        };
+
         window.syncToCloud = async function(payload) {
+            window.setSyncIndicator('pending');
             const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec';
             try {
                 await fetch(url, {
@@ -981,15 +1002,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                window.setSyncIndicator('success');
             } catch (err) {
                 console.error("Cloud sync error:", err);
+                window.setSyncIndicator('error');
             }
         };
 
         window.fetchAllDataFromCloud = async function() {
+            window.setSyncIndicator('pending');
             const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycbz2ABeTf0vznzVOzAV8GWxm2Eap04OPmixINXUD6LAnt5EcFZLusYUj6RNZExgmYmY/exec';
             try {
-                window.showToast("Menyinkronkan data...", "success");
+                window.showToast("Menyinkronkan data dari Sheet...", "success");
                 const res = await fetch(url);
                 const cloudData = await res.json();
                 
@@ -1002,10 +1026,12 @@
                     
                     window.renderSantriCardsAndTable();
                     window.renderHistoryTable();
-                    window.showToast("Sinkronisasi berhasil!", "success");
+                    window.setSyncIndicator('success');
+                    window.showToast("Sinkronisasi Google Sheets berhasil!", "success");
                 }
             } catch (err) {
-                window.showToast("Sinkronisasi lokal aktif.", "success");
+                window.setSyncIndicator('error');
+                window.showToast("Sinkronisasi lokal aktif (Offline Mode).", "success");
             }
         };
 
@@ -1401,7 +1427,7 @@
                 });
             }
 
-            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan!`, "success");
+            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan!`, "success");
             window.renderSantriCardsAndTable();
             window.renderHistoryTable();
         };
@@ -1426,6 +1452,19 @@
             const titles = { bacaan: 'Daftar Riwayat Bacaan', hafalan: 'Daftar Riwayat Hafalan', murojaah: "Daftar Riwayat Muroja'ah", tugas: 'Daftar Riwayat Tugas', rekapan: 'Daftar Rekapan Catatan Santri' };
             if (titleEl) titleEl.innerText = titles[cat];
 
+            const sheetTabMap = {
+                bacaan: 'bacaan',
+                hafalan: 'hafalan',
+                murojaah: 'murojaah',
+                tugas: 'tugas',
+                rekapan: 'rekapcatatan'
+            };
+            const sheetLinkBtn = document.getElementById('sheetTabLinkBtn');
+            if (sheetLinkBtn) {
+                sheetLinkBtn.href = `https://docs.google.com/spreadsheets/d/`;
+                sheetLinkBtn.title = `Buka Tab Google Sheet (${sheetTabMap[cat]})`;
+            }
+
             if (headerEl) {
                 if (cat === 'rekapan') {
                     headerEl.innerHTML = `<th class="p-4">Tanggal</th><th class="p-4">ID Santri</th><th class="p-4">Nama Santri</th><th class="p-4">Kategori</th><th class="p-4">Catatan</th>`;
@@ -1445,7 +1484,7 @@
             const list = JSON.parse(localStorage.getItem(key) || '[]');
 
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold text-base">Belum ada data riwayat untuk kategori ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold text-base">Belum ada data riwayat untuk kategori ini. Klik tombol Sinkronisasi untuk mengambil data terbaru dari Google Sheet.</td></tr>`;
                 return;
             }
 
