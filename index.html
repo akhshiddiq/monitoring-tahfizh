@@ -53,7 +53,7 @@
                         </h1>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
-                            <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Hybrid Storage: Local & Cloud Active</p>
+                            <p id="storageInfoLabel" class="text-xs text-emerald-200 font-bold">Google Sheets & Local Active</p>
                         </div>
                     </div>
                 </div>
@@ -80,6 +80,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
+        <!-- Section: Setoran Input -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -136,9 +137,10 @@
             </div>
         </section>
 
+        <!-- Section: Materi -->
         <section id="section-materi" class="hidden space-y-6">
             <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border flex-wrap gap-3">
-                <h3 class="font-black text-lg text-emerald-800 dark:text-emerald-300">Akses Google Sheet Materi Belajar</h3>
+                <h3 class="font-black text-lg text-emerald-800 dark:text-emerald-300">Pusat Sinkronisasi Google Sheets Materi</h3>
                 <div class="flex items-center gap-2 flex-wrap">
                     <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 transition shadow-xs">
                         <i class="fa-solid fa-table"></i> Sheet Materi Utama 📊
@@ -155,7 +157,7 @@
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
                             <i class="fa-solid fa-book text-emerald-600"></i> Materi Belajar Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Google Sheets Sync</span>
+                        <span class="text-xs font-bold text-emerald-600">Acuan Google Sheets</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -192,7 +194,7 @@
                             <label class="font-black text-sm text-slate-700 dark:text-slate-200">Keterangan:</label>
                             <textarea id="materiKeteranganInput" rows="3" placeholder="Rincian materi pembelajaran..." class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-900 border-2 rounded-2xl text-base font-semibold"></textarea>
                         </div>
-                        <button onclick="window.saveMateri('utama')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Materi</button>
+                        <button onclick="window.saveMateri('utama')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan & Sinkron Materi</button>
                     </div>
 
                     <div class="pt-4 border-t space-y-3">
@@ -206,7 +208,7 @@
                         <h3 class="font-black text-xl text-amber-800 dark:text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-star text-amber-500"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-slate-400">Google Sheets Sync</span>
+                        <span class="text-xs font-bold text-amber-600">Acuan Google Sheets</span>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -243,7 +245,7 @@
                             <label class="font-black text-sm text-slate-700 dark:text-slate-200">Keterangan Tambahan:</label>
                             <textarea id="materiTambahanKeteranganInput" rows="3" placeholder="Rincian materi tambahan..." class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-900 border-2 rounded-2xl text-base font-semibold"></textarea>
                         </div>
-                        <button onclick="window.saveMateri('tambahan')" class="w-full py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan Materi Tambahan</button>
+                        <button onclick="window.saveMateri('tambahan')" class="w-full py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-black text-base shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
                     </div>
 
                     <div class="pt-4 border-t space-y-3">
@@ -254,12 +256,13 @@
             </div>
         </section>
 
+        <!-- Section: History -->
         <section id="section-history" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4">
                     <div>
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
-                        <p class="text-xs text-slate-500 font-bold mt-0.5">Kelola data riwayat setoran harian langsung dari Google Sheet.</p>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas (maksimal 10 nomor terlihat, scroll ke bawah untuk nomor 11 dst).</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap justify-end">
                         <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-4 py-2.5 rounded-xl text-sm font-black bg-emerald-600 text-white shadow-md">Riwayat Bacaan</button>
@@ -287,10 +290,10 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
+                <div class="overflow-x-auto max-h-[500px] overflow-y-auto rounded-2xl border border-slate-200 dark:border-slate-700 custom-scrollbar">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr id="historyTableHeader" class="bg-slate-50 dark:bg-slate-900 border-b text-slate-500 font-extrabold uppercase text-xs">
+                        <thead class="sticky top-0 bg-slate-50 dark:bg-slate-900 z-10">
+                            <tr id="historyTableHeader" class="border-b text-slate-500 font-extrabold uppercase text-xs">
                                 <th class="p-3.5">Waktu & Tanggal</th>
                                 <th class="p-3.5">Nama Santri</th>
                                 <th class="p-3.5">Detail Setoran</th>
@@ -304,6 +307,7 @@
             </div>
         </section>
 
+        <!-- Section: WA Personal Report -->
         <section id="section-wa_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -312,14 +316,17 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="relative">
-                        <label class="font-black text-xs text-slate-600 dark:text-slate-300">Pilih / Cari Santri:</label>
-                        <div class="flex items-center gap-2 mt-1.5">
-                            <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri (min 1 huruf)..." class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base outline-none">
-                            <button type="button" onclick="window.startVoiceSearch('waSantriSearchInput')" class="p-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs shrink-0" title="Cari dengan Suara">
+                        <label class="font-black text-xs text-slate-600 dark:text-slate-300">Cari & Pilih Nama Santri:</label>
+                        <div class="relative mt-1.5">
+                            <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri (min 1 huruf)..." class="w-full pl-11 pr-12 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base outline-none">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-base"></i>
+                            </span>
+                            <button type="button" onclick="window.startVoiceSearch('waSantriSearchInput')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-emerald-600 hover:text-emerald-700" title="Cari dengan Suara">
                                 <i class="fa-solid fa-microphone text-lg"></i>
                             </button>
                         </div>
-                        <select id="waSantriSelect" size="4" onchange="window.onWaSantriSelectChange(this)" class="w-full mt-2 p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base hidden cursor-pointer"></select>
+                        <div id="waAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                     </div>
                     <div>
                         <label class="font-black text-xs text-slate-600 dark:text-slate-300">No WA Wali:</label>
@@ -337,6 +344,7 @@
             </div>
         </section>
 
+        <!-- Section: Class Report -->
         <section id="section-class_report" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3">
@@ -364,6 +372,7 @@
             </div>
         </section>
 
+        <!-- Section: Export & Cloud Settings -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
                 <div class="flex items-center justify-between">
@@ -413,12 +422,12 @@
             <div class="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-6">
                 <div class="p-5 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 flex items-center justify-between">
                     <label class="font-black text-lg text-slate-800 dark:text-slate-200">Tanggal Pertemuan:</label>
-                    <input type="date" id="modalTanggalInput" class="px-6 py-3.5 bg-white dark:bg-slate-900 border-2 rounded-2xl font-bold text-lg">
+                    <input type="date" id="modalTanggalInput" class="px-6 py-3.5 bg-white dark:bg-slate-900 border-2 rounded-2xl font-bold text-lg cursor-pointer">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     
-                    <!-- 1. BACAAN (GREEN) -->
+                    <!-- 1. BACAAN -->
                     <div class="p-6 bg-emerald-50 dark:bg-emerald-950/50 rounded-3xl border-4 border-emerald-500 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-emerald-400 dark:border-emerald-600">
@@ -432,7 +441,6 @@
                                 </select>
                             </div>
 
-                            <!-- SLOT 1 BACAAN -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-emerald-300 space-y-3">
                                 <span class="text-xs font-black text-emerald-800 uppercase tracking-wide">Slot 1 Bacaan</span>
                                 <div>
@@ -478,7 +486,6 @@
                                 </div>
                             </div>
 
-                            <!-- SLOT 2 BACAAN -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-emerald-300 space-y-3">
                                 <span class="text-xs font-black text-emerald-800 uppercase tracking-wide">Slot 2 Bacaan (Opsional)</span>
                                 <div>
@@ -533,7 +540,7 @@
                         </div>
                     </div>
 
-                    <!-- 2. HAFALAN (RED) -->
+                    <!-- 2. HAFALAN -->
                     <div class="p-6 bg-rose-50 dark:bg-rose-950/50 rounded-3xl border-4 border-rose-500 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-rose-400 dark:border-rose-600">
@@ -545,7 +552,6 @@
                                 </select>
                             </div>
 
-                            <!-- SLOT 1 HAFALAN -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-rose-300 space-y-2">
                                 <span class="text-xs font-black text-rose-800 uppercase tracking-wide">Slot 1 Hafalan</span>
                                 <div>
@@ -568,7 +574,6 @@
                                 </div>
                             </div>
 
-                            <!-- SLOT 2 HAFALAN -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-rose-300 space-y-2">
                                 <span class="text-xs font-black text-rose-800 uppercase tracking-wide">Slot 2 Hafalan (Opsional)</span>
                                 <div>
@@ -601,7 +606,7 @@
                         </div>
                     </div>
 
-                    <!-- 3. MUROJA'AH (BLUE) -->
+                    <!-- 3. MUROJA'AH -->
                     <div class="p-6 bg-sky-50 dark:bg-sky-950/50 rounded-3xl border-4 border-sky-500 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-sky-400 dark:border-sky-600">
@@ -613,7 +618,6 @@
                                 </select>
                             </div>
 
-                            <!-- SLOT 1 MUROJA'AH -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-sky-300 space-y-2">
                                 <span class="text-xs font-black text-sky-800 uppercase tracking-wide">Slot 1 Muroja'ah</span>
                                 <div>
@@ -636,7 +640,6 @@
                                 </div>
                             </div>
 
-                            <!-- SLOT 2 MUROJA'AH -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-sky-300 space-y-2">
                                 <span class="text-xs font-black text-sky-800 uppercase tracking-wide">Slot 2 Muroja'ah (Opsional)</span>
                                 <div>
@@ -669,7 +672,7 @@
                         </div>
                     </div>
 
-                    <!-- 4. TUGAS (BROWN) -->
+                    <!-- 4. TUGAS -->
                     <div class="p-6 bg-amberbrown-50 dark:bg-amberbrown-950/50 rounded-3xl border-4 border-amberbrown-600 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-amberbrown-400 dark:border-amberbrown-600">
@@ -678,7 +681,6 @@
                                 </span>
                             </div>
 
-                            <!-- SLOT 1 TUGAS -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-amberbrown-300 space-y-2">
                                 <span class="text-xs font-black text-amberbrown-800 uppercase tracking-wide">Slot 1 Tugas</span>
                                 <div>
@@ -693,7 +695,6 @@
                                 </div>
                             </div>
 
-                            <!-- SLOT 2 TUGAS -->
                             <div class="p-4 bg-white/60 dark:bg-slate-900/60 rounded-2xl border-2 border-amberbrown-300 space-y-2">
                                 <span class="text-xs font-black text-amberbrown-800 uppercase tracking-wide">Slot 2 Tugas (Opsional)</span>
                                 <div>
@@ -772,6 +773,25 @@
             { id: 109, name: "Al-Kafirun", ayat: 6, hal: 603 }, { id: 110, name: "An-Nashr", ayat: 3, hal: 603 }, { id: 111, name: "Al-Lahab", ayat: 5, hal: 603 },
             { id: 112, name: "Al-Ikhlas", ayat: 4, hal: 604 }, { id: 113, name: "Al-Falaq", ayat: 5, hal: 604 }, { id: 114, name: "An-Nas", ayat: 6, hal: 604 }
         ];
+
+        window.formatIndonesianDate = function(dateStr) {
+            if (!dateStr) return '-';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                const options = { weekday: 'long', day: 'numeric', month: 'short', year: '2-digit' };
+                return d.toLocaleDateString('id-ID', options);
+            } catch (e) {
+                return dateStr;
+            }
+        };
+
+        window.numberToEmoji = function(num) {
+            const emojis = ['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
+            const str = num.toString();
+            if (num <= 10) return emojis[num];
+            return str.split('').map(digit => emojis[parseInt(digit)]).join('');
+        };
 
         window.handleLogoError = function(img) {
             if (!img) return;
@@ -936,7 +956,7 @@
             window.setSyncIndicator('pending');
             const url = localStorage.getItem('rq_google_script_url') || 'https://script.google.com/macros/s/AKfycby8atLR5viI84lmuUzWdrViCWjOq_j9gumnViLYZw9gW9pjE7L1lKnASXnX6ym9eLa3/exec';
             try {
-                window.showToast("Menyinkronkan data dari Google Sheet...", "success");
+                window.showToast("Menyinkronkan data dari Google Sheets...", "success");
                 const res = await fetch(url);
                 const cloudData = await res.json();
                 
@@ -962,6 +982,7 @@
                         window.populateLatestFromHistory('tugas', cloudData.tugas);
                     }
                     if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
+                    
                     if (cloudData.materi) {
                         const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4] }));
                         localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
@@ -988,12 +1009,35 @@
             rows.forEach(r => {
                 const name = r[3] || r.name;
                 const detail = r[6] || r.detail;
+                const status = r[7] || r.status;
+                const catatan = r[8] || r.catatan;
+                const tanggal = r[1] || r.tanggal;
                 const santri = window.santriList.find(s => s.name.toLowerCase() === (name || '').toLowerCase());
                 if (santri) {
-                    if (type === 'bacaan' && (!santri.lastBacaan || santri.lastBacaan === '-')) santri.lastBacaan = detail;
-                    if (type === 'hafalan' && (!santri.lastHafalan || santri.lastHafalan === '-')) santri.lastHafalan = detail;
-                    if (type === 'murojaah' && (!santri.lastMurojaah || santri.lastMurojaah === '-')) santri.lastMurojaah = detail;
-                    if (type === 'tugas' && (!santri.lastTugas || santri.lastTugas === '-')) santri.lastTugas = detail;
+                    if (type === 'bacaan') {
+                        santri.lastBacaan = detail;
+                        santri.lastBacaanDate = tanggal;
+                        santri.dataBacaan = santri.dataBacaan || {};
+                        santri.dataBacaan.catatan = catatan;
+                    }
+                    if (type === 'hafalan') {
+                        santri.lastHafalan = detail;
+                        santri.lastHafalanDate = tanggal;
+                        santri.dataHafalan = santri.dataHafalan || {};
+                        santri.dataHafalan.catatan = catatan;
+                    }
+                    if (type === 'murojaah') {
+                        santri.lastMurojaah = detail;
+                        santri.lastMurojaahDate = tanggal;
+                        santri.dataMurojaah = santri.dataMurojaah || {};
+                        santri.dataMurojaah.catatan = catatan;
+                    }
+                    if (type === 'tugas') {
+                        santri.lastTugas = detail;
+                        santri.lastTugasDate = tanggal;
+                        santri.dataTugas = santri.dataTugas || {};
+                        santri.dataTugas.catatan = catatan;
+                    }
                 }
             });
         };
@@ -1021,7 +1065,7 @@
             list.unshift({ kelas, judul, bab, tanggal, ket });
             localStorage.setItem(key, JSON.stringify(list));
 
-            window.showToast("Materi berhasil disimpan!", "success");
+            window.showToast("Materi berhasil disimpan & disinkronkan!", "success");
             window.renderMateriList(type);
 
             window.syncToCloud({
@@ -1046,7 +1090,7 @@
             container.innerHTML = list.map((m, idx) => `
                 <div class="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-sm">
                     <div>
-                        <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${m.tanggal}</div>
+                        <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)}</div>
                         <div class="font-bold text-slate-600 dark:text-slate-400">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
                     </div>
                     <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-2.5 py-1">Hapus</button>
@@ -1075,9 +1119,9 @@
             });
 
             grid.innerHTML = filtered.map(s => {
-                const hasInputToday = s.lastBacaan && s.lastBacaan !== '-' || s.lastHafalan && s.lastHafalan !== '-' || s.lastMurojaah && s.lastMurojaah !== '-' || s.lastTugas && s.lastTugas !== '-';
-                const btnColor = hasInputToday ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md';
-                const badgeTag = hasInputToday ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-black rounded-lg">Sudah Input</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-lg">Belum Input</span>';
+                const hasInput = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
+                const btnColor = hasInput ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md';
+                const badgeTag = hasInput ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-black rounded-lg">Pernah Stor</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-lg">Belum Ada Stor</span>';
                 return `
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4">
                         <div class="flex items-start justify-between">
@@ -1103,8 +1147,8 @@
 
             if (tbody) {
                 tbody.innerHTML = filtered.map(s => {
-                    const hasInputToday = s.lastBacaan && s.lastBacaan !== '-' || s.lastHafalan && s.lastHafalan !== '-' || s.lastMurojaah && s.lastMurojaah !== '-' || s.lastTugas && s.lastTugas !== '-';
-                    const btnColor = hasInputToday ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white';
+                    const hasInput = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
+                    const btnColor = hasInput ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white';
                     return `
                         <tr>
                             <td class="p-4 font-black text-base">${s.name}</td>
@@ -1124,7 +1168,13 @@
             if (!s) return;
             document.getElementById('modalSantriName').innerText = `Setoran: ${s.name}`;
             document.getElementById('modalSantriMeta').innerText = `${s.class} • ${s.teacher}`;
-            document.getElementById('modalTanggalInput').value = new Date().toISOString().split('T')[0];
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('modalTanggalInput').value = `${year}-${month}-${day}`;
+            
             document.getElementById('setoranModal').classList.remove('hidden');
 
             const surahOptions = window.quranSurahs.map(x => `<option value="${x.id}">${x.id}. ${x.name} (${x.ayat} Ayat - Hal. ${x.hal})</option>`).join('');
@@ -1284,6 +1334,7 @@
                 detailSetoran = part2 ? `${part1}, ${part2}` : part1;
                 statusVal = document.getElementById('bacaanStatusSelect')?.value || 'Lancar (A)';
                 s.lastBacaan = detailSetoran;
+                s.lastBacaanDate = tanggalVal;
                 s.dataBacaan = {
                     category1: cat1, surahId1: document.getElementById('bacaanSurahSelect')?.value, ayatStart1: document.getElementById('bacaanAyatStartInput')?.value, ayatEnd1: document.getElementById('bacaanAyatEndInput')?.value, iqroJilid1: document.getElementById('bacaanIqroJilidSelect')?.value, iqroHal1: document.getElementById('bacaanIqroHalInput')?.value,
                     category2: cat2, surahId2: document.getElementById('bacaanSurahSelect2')?.value, ayatStart2: document.getElementById('bacaanAyatStartInput2')?.value, ayatEnd2: document.getElementById('bacaanAyatEndInput2')?.value, iqroJilid2: document.getElementById('bacaanIqroJilidSelect2')?.value, iqroHal2: document.getElementById('bacaanIqroHalInput2')?.value,
@@ -1308,6 +1359,7 @@
                 detailSetoran = part2 ? `${part1}, ${part2}` : part1;
                 statusVal = document.getElementById('hafalanStatusSelect')?.value || 'Lancar (A)';
                 s.lastHafalan = detailSetoran;
+                s.lastHafalanDate = tanggalVal;
                 s.dataHafalan = {
                     surahId1: h1Id, ayatStart1: start1, ayatEnd1: end1,
                     surahId2: h2IdVal, ayatStart2: document.getElementById('hafalanAyatStartInput2')?.value, ayatEnd2: document.getElementById('hafalanAyatEndInput2')?.value,
@@ -1332,6 +1384,7 @@
                 detailSetoran = part2 ? `${part1}, ${part2}` : part1;
                 statusVal = document.getElementById('murojaahStatusSelect')?.value || 'Lancar (A)';
                 s.lastMurojaah = detailSetoran;
+                s.lastMurojaahDate = tanggalVal;
                 s.dataMurojaah = {
                     surahId1: m1Id, ayatStart1: start1, ayatEnd1: end1,
                     surahId2: m2IdVal, ayatStart2: document.getElementById('murojaahAyatStartInput2')?.value, ayatEnd2: document.getElementById('murojaahAyatEndInput2')?.value,
@@ -1347,15 +1400,18 @@
                 let part2 = t2Jenis ? `${t2Jenis}: ${t2Detail}` : '';
 
                 detailSetoran = part2 ? `${part1} | ${part2}` : part1;
-                statusVal = 'Selesai';
+                statusVal = '-';
                 s.lastTugas = detailSetoran;
+                s.lastTugasDate = tanggalVal;
                 s.dataTugas = { jenis1: t1Jenis, detail1: t1Detail, jenis2: t2Jenis, detail2: t2Detail, status: statusVal, catatan: catatanVal };
             }
 
             const historyKey = `rq_history_${sectionType}`;
             const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
-            const timestampStr = tanggalVal + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            existingHistory.unshift({ timestamp: timestampStr, name: s.name, detail: detailSetoran, status: statusVal, catatan: catatanVal });
+            const formattedDateStr = window.formatIndonesianDate(tanggalVal);
+            const timestampStr = `${formattedDateStr} (${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })})`;
+            
+            existingHistory.unshift({ timestamp: timestampStr, tanggal: tanggalVal, name: s.name, detail: detailSetoran, status: statusVal, catatan: catatanVal });
             localStorage.setItem(historyKey, JSON.stringify(existingHistory));
 
             if (catatanVal && catatanVal.trim() !== '') {
@@ -1389,7 +1445,7 @@
                 });
             }
 
-            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan ke Google Sheet!`, "success");
+            window.showToast(`💾 ${sectionType.toUpperCase()} berhasil disimpan & disinkronkan!`, "success");
             window.renderSantriCardsAndTable();
             window.renderHistoryTable();
         };
@@ -1399,10 +1455,10 @@
             const s = window.santriList.find(x => x.id === window.activeSantriId);
             if (!s) return;
             window.switchTab('wa_report');
-            const waSelect = document.getElementById('waSantriSelect');
-            if (waSelect) {
-                waSelect.value = s.id;
-                window.generateWaReport();
+            const waSearchInput = document.getElementById('waSantriSearchInput');
+            if (waSearchInput) {
+                waSearchInput.value = s.name;
+                window.filterWaDropdown(s.name);
             }
             window.closeEditModal();
         };
@@ -1470,17 +1526,23 @@
             if (!tbody) return;
             const cat = window.activeHistoryCategory;
             const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
-            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            let list = JSON.parse(localStorage.getItem(key) || '[]');
 
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold text-base">Belum ada data riwayat untuk kategori ini. Klik tombol Sinkronisasi untuk mengambil data terbaru dari Google Sheet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold text-base">Belum ada data riwayat untuk kategori ini.</td></tr>`;
                 return;
             }
+
+            list.sort((a, b) => {
+                const tA = new Date(a.tanggal || a.timestamp || 0).getTime();
+                const tB = new Date(b.tanggal || b.timestamp || 0).getTime();
+                return tB - tA;
+            });
 
             if (cat === 'rekapan') {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-4 text-sm font-bold text-emerald-800">${h.tanggal || h[0] || '-'}</td>
+                        <td class="p-4 text-sm font-bold text-emerald-800">${window.formatIndonesianDate(h.tanggal || h[0])}</td>
                         <td class="p-4 text-sm font-bold">${h.id || h[1] || '-'}</td>
                         <td class="p-4 font-black text-base">${h.name || h[2] || '-'}</td>
                         <td class="p-4 text-sm font-extrabold text-amber-700">${h.category || h[3] || '-'}</td>
@@ -1530,36 +1592,64 @@
             window.showToast("Riwayat berhasil didownload!", "success");
         };
 
+        window.selectedWaSantriId = null;
+
         window.initWaDropdown = function() {
-            window.filterWaDropdown('');
+            const searchInput = document.getElementById('waSantriSearchInput');
+            if (searchInput) {
+                const currentVal = searchInput.value.trim();
+                if (!currentVal && window.santriList.length > 0) {
+                    searchInput.value = window.santriList[0].name;
+                    window.selectedWaSantriId = window.santriList[0].id;
+                } else if (currentVal) {
+                    const found = window.santriList.find(s => s.name.toLowerCase() === currentVal.toLowerCase());
+                    if (found) window.selectedWaSantriId = found.id;
+                }
+                window.filterWaDropdown(searchInput.value);
+            }
         };
 
         window.filterWaDropdown = function(query) {
             const q = (query || '').toLowerCase();
-            const sel = document.getElementById('waSantriSelect');
-            if (!sel) return;
+            const dropdown = document.getElementById('waAutocompleteDropdown');
+            if (!dropdown) return;
+
             const filtered = window.santriList.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q));
-            
+
             if (filtered.length > 0) {
-                sel.classList.remove('hidden');
-                sel.innerHTML = filtered.map(s => `<option value="${s.id}">${s.name} (${s.class} - ${s.teacher})</option>`).join('');
-                sel.selectedIndex = 0;
-                window.generateWaReport();
+                dropdown.classList.remove('hidden');
+                dropdown.innerHTML = filtered.map(s => `
+                    <div onclick="window.selectWaSantri('${s.id}', '${s.name}')" class="p-3 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">${s.name}</span>
+                        <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-lg">${s.class}</span>
+                    </div>
+                `).join('');
+                if (filtered.length === 1) {
+                    window.selectedWaSantriId = filtered[0].id;
+                }
             } else {
-                sel.classList.add('hidden');
-                sel.innerHTML = `<option value="">Santri tidak ditemukan</option>`;
+                dropdown.classList.add('hidden');
+            }
+
+            if (filtered.length > 0) {
+                if (!window.selectedWaSantriId) window.selectedWaSantriId = filtered[0].id;
+                window.generateWaReport();
             }
         };
 
-        window.onWaSantriSelectChange = function(sel) {
+        window.selectWaSantri = function(id, name) {
+            window.selectedWaSantriId = id;
+            const input = document.getElementById('waSantriSearchInput');
+            if (input) input.value = name;
+            document.getElementById('waAutocompleteDropdown').classList.add('hidden');
             window.generateWaReport();
         };
 
         window.generateWaReport = function() {
-            const sel = document.getElementById('waSantriSelect');
-            let id = sel ? sel.value : null;
+            let id = window.selectedWaSantriId;
             if (!id && window.santriList.length > 0) {
                 id = window.santriList[0].id;
+                window.selectedWaSantriId = id;
             }
             const s = window.santriList.find(x => x.id === id);
             if (!s) return;
@@ -1572,30 +1662,38 @@
             let bagianSetoran = "";
             if (s.lastBacaan && s.lastBacaan !== '-') {
                 bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}`;
-                if (s.dataBacaan && s.dataBacaan.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataBacaan.catatan}`;
+                if (s.dataBacaan && s.dataBacaan.catatan && s.dataBacaan.catatan.trim() !== '') {
+                    bagianSetoran += `\n   _Catatan:_ ${s.dataBacaan.catatan}`;
+                }
                 bagianSetoran += `\n`;
             }
             if (s.lastHafalan && s.lastHafalan !== '-') {
                 bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}`;
-                if (s.dataHafalan && s.dataHafalan.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataHafalan.catatan}`;
+                if (s.dataHafalan && s.dataHafalan.catatan && s.dataHafalan.catatan.trim() !== '') {
+                    bagianSetoran += `\n   _Catatan:_ ${s.dataHafalan.catatan}`;
+                }
                 bagianSetoran += `\n`;
             }
             if (s.lastMurojaah && s.lastMurojaah !== '-') {
                 bagianSetoran += `🔄 *Muroja'ah:* ${s.lastMurojaah}`;
-                if (s.dataMurojaah && s.dataMurojaah.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataMurojaah.catatan}`;
+                if (s.dataMurojaah && s.dataMurojaah.catatan && s.dataMurojaah.catatan.trim() !== '') {
+                    bagianSetoran += `\n   _Catatan:_ ${s.dataMurojaah.catatan}`;
+                }
                 bagianSetoran += `\n`;
             }
             if (s.lastTugas && s.lastTugas !== '-') {
                 bagianSetoran += `📝 *Tugas:* ${s.lastTugas}`;
-                if (s.dataTugas && s.dataTugas.catatan) bagianSetoran += `\n   _Catatan:_ ${s.dataTugas.catatan}`;
+                if (s.dataTugas && s.dataTugas.catatan && s.dataTugas.catatan.trim() !== '') {
+                    bagianSetoran += `\n   _Catatan:_ ${s.dataTugas.catatan}`;
+                }
                 bagianSetoran += `\n`;
             }
 
             let materiText = "";
             if (filteredMateri.length > 0) {
-                materiText += "📚 *Materi Belajar Hari Ini:*";
+                materiText += "📚 *Materi Belajar:*";
                 filteredMateri.forEach(m => {
-                    materiText += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                    materiText += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
                 });
             }
 
@@ -1603,18 +1701,18 @@
                 if (materiText) materiText += "\n\n";
                 materiText += "⭐ *Materi Tambahan:*";
                 filteredTambahan.forEach(m => {
-                    materiText += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
+                    materiText += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
                 });
             }
 
-            const currentDateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
             let fullMsg = `Assalamu'alaikum\nAyah/Bunda semoga senantiasa diberikan kesehatan, keberkahan, dan kemudahan dalam segala urusan.\n\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n`;
             
             if (bagianSetoran) {
                 fullMsg += `${bagianSetoran}_______________`;
             } else {
-                fullMsg += `Belum ada setoran hari ini\n_______________`;
+                fullMsg += `Belum ada data setoran tercatat\n_______________`;
             }
 
             if (materiText) {
@@ -1651,12 +1749,14 @@
             const filteredMateri = materiUtama.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
             const filteredTambahan = materiTambahan.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
 
-            let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}*:\n\n`;
+            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
+
+            let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
             
             if (filteredMateri.length > 0) {
-                msg += `📚 *Materi Belajar Hari Ini:*`;
+                msg += `📚 *Materi Belajar:*`;
                 filteredMateri.forEach(m => {
-                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
+                    msg += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
                 msg += `\n`;
             }
@@ -1664,7 +1764,7 @@
             if (filteredTambahan.length > 0) {
                 msg += `⭐ *Materi Tambahan:*`;
                 filteredTambahan.forEach(m => {
-                    msg += `\n- *${m.judul}* (${m.tanggal})\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
+                    msg += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
                 msg += `\n`;
             }
@@ -1675,22 +1775,19 @@
                 let hasAnySetoran = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
                 if (hasAnySetoran) {
                     activeSantriCount++;
-                    let santriLine = `\n${activeSantriCount}. *${s.name}*`;
+                    const emojiNum = window.numberToEmoji(activeSantriCount);
+                    let santriLine = `\n${emojiNum} *${s.name}*`;
                     if (s.lastBacaan && s.lastBacaan !== '-') {
                         santriLine += `\n   - Bacaan: ${s.lastBacaan}`;
-                        if (s.dataBacaan && s.dataBacaan.catatan) santriLine += ` (_Catatan: ${s.dataBacaan.catatan}_)`;
                     }
                     if (s.lastHafalan && s.lastHafalan !== '-') {
                         santriLine += `\n   - Hafalan: ${s.lastHafalan}`;
-                        if (s.dataHafalan && s.dataHafalan.catatan) santriLine += ` (_Catatan: ${s.dataHafalan.catatan}_)`;
                     }
                     if (s.lastMurojaah && s.lastMurojaah !== '-') {
                         santriLine += `\n   - Muroja'ah: ${s.lastMurojaah}`;
-                        if (s.dataMurojaah && s.dataMurojaah.catatan) santriLine += ` (_Catatan: ${s.dataMurojaah.catatan}_)`;
                     }
                     if (s.lastTugas && s.lastTugas !== '-') {
                         santriLine += `\n   - Tugas: ${s.lastTugas}`;
-                        if (s.dataTugas && s.dataTugas.catatan) santriLine += ` (_Catatan: ${s.dataTugas.catatan}_)`;
                     }
                     msg += santriLine + `\n`;
                 }
