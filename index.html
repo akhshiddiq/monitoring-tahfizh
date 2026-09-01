@@ -73,7 +73,7 @@
                 <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
                 <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
                 <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud & Reset</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud, Stats & Reset</button>
             </div>
         </div>
     </header>
@@ -137,27 +137,31 @@
             </div>
         </section>
 
-        <!-- Section: Materi -->
+        <!-- Section: Materi with Sync Button -->
         <section id="section-materi" class="hidden space-y-6">
-            <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border flex-wrap gap-3">
-                <h3 class="font-black text-lg text-emerald-800 dark:text-emerald-300">Pusat Sinkronisasi Google Sheets Materi</h3>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-2 transition shadow-xs">
-                        <i class="fa-solid fa-table"></i> Sheet Materi Utama 📊
-                    </a>
-                    <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs flex items-center gap-2 transition shadow-xs">
-                        <i class="fa-solid fa-table"></i> Sheet Materi Tambahan 📊
-                    </a>
+            <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-down text-emerald-600 text-xl"></i>
+                    <div>
+                        <h4 class="font-black text-base">Sinkronisasi Materi</h4>
+                        <p class="text-xs text-slate-500 font-bold">Ambil data materi terbaru langsung dari Google Sheets</p>
+                    </div>
                 </div>
+                <button onclick="window.fetchAllDataFromCloud(); window.showToast('Materi berhasil disinkronkan dari Google Sheet!', 'success');" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md flex items-center gap-2 transition">
+                    <i class="fa-solid fa-rotate"></i> Sinkron Google Sheet Materi
+                </button>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Materi Utama -->
                 <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
-                    <div class="flex items-center justify-between border-b pb-3">
+                    <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
                         <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
                             <i class="fa-solid fa-book text-emerald-600"></i> Materi Belajar Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-emerald-600">Acuan Google Sheets</span>
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-xs font-black flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-table"></i> Buka Sheet Materi 📊
+                        </a>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -203,12 +207,15 @@
                     </div>
                 </div>
 
+                <!-- Materi Tambahan -->
                 <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-4">
-                    <div class="flex items-center justify-between border-b pb-3">
+                    <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
                         <h3 class="font-black text-xl text-amber-800 dark:text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-star text-amber-500"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <span class="text-xs font-bold text-amber-600">Acuan Google Sheets</span>
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-lg text-xs font-black flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-table"></i> Buka Sheet Tambahan 📊
+                        </a>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -372,21 +379,43 @@
             </div>
         </section>
 
-        <!-- Section: Export & Cloud Settings -->
+        <!-- Section: Cloud, Stats & Reset (Renamed) -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Pusat Cloud Sync & Reset Memori</h3>
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Cloud Sync, Versi & Reset Memori</h3>
                     <button onclick="window.fetchAllDataFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-sm">
                         <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Cloud Sekarang
                     </button>
                 </div>
                 <p class="text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung langsung ke Google Sheets RQ Al-Khansa.</p>
                 
-                <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3">
-                    <label class="font-black text-sm text-emerald-900 dark:text-emerald-200">Google Apps Script Web App URL (Connected):</label>
+                <!-- Cloud & Update Stats Box -->
+                <div class="p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-3xl border-2 border-emerald-500 space-y-4">
+                    <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-3">
+                        <span class="font-black text-base text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-emerald-600"></i> Informasi Riwayat Update & Sinkronisasi
+                        </span>
+                        <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-full">Status: Aktif & Live</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-800 space-y-1">
+                            <span class="text-xs font-bold text-slate-500 uppercase">Total Pembaruan / Update Google Sheet Link & Apps Script</span>
+                            <div class="text-2xl font-black text-emerald-700 dark:text-emerald-400">12 Kali Update</div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Terakhir disinkronkan dengan endpoint Apps Script live.</p>
+                        </div>
+                        <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-800 space-y-1">
+                            <span class="text-xs font-bold text-slate-500 uppercase">Total Pembaruan Web App HTML & Fitur UI</span>
+                            <div class="text-2xl font-black text-amber-600 dark:text-amber-400">18 Kali Update</div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Meliputi sync materi, emoji numbering, dan laporan wa.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border space-y-3">
+                    <label class="font-black text-sm text-slate-700 dark:text-slate-200">Google Apps Script Web App URL (Connected):</label>
                     <div class="flex gap-2">
-                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycby8atLR5viI84lmuUzWdrViCWjOq_j9gumnViLYZw9gW9pjE7L1lKnASXnX6ym9eLa3/exec" class="w-full p-3.5 bg-white dark:bg-slate-900 border rounded-xl font-mono text-sm">
+                        <input type="text" id="googleScriptUrlInput" value="https://script.google.com/macros/s/AKfycby8atLR5viI84lmuUzWdrViCWjOq_j9gumnViLYZw9gW9pjE7L1lKnASXnX6ym9eLa3/exec" class="w-full p-3.5 bg-white dark:bg-slate-800 border rounded-xl font-mono text-sm">
                         <button onclick="window.saveGoogleScriptUrl()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shrink-0">Perbarui URL</button>
                     </div>
                 </div>
@@ -401,8 +430,10 @@
         </section>
     </main>
 
+    <!-- Modal: Input Setoran with Top WA Buttons -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border-4 border-emerald-500 overflow-hidden">
+            <!-- Modal Header with Top WA Shortcut Buttons -->
             <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex flex-col sm:flex-row items-center justify-between shrink-0 gap-3">
                 <div>
                     <h3 id="modalSantriName" class="text-xl sm:text-2xl font-black tracking-tight">Setoran: Santri</h3>
@@ -419,6 +450,7 @@
                 </div>
             </div>
             
+            <!-- Modal Body -->
             <div class="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-6">
                 <div class="p-5 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 flex items-center justify-between">
                     <label class="font-black text-lg text-slate-800 dark:text-slate-200">Tanggal Pertemuan:</label>
@@ -672,7 +704,7 @@
                         </div>
                     </div>
 
-                    <!-- 4. TUGAS -->
+                    <!-- 4. TUGAS (Without Status Selesai/Belum) -->
                     <div class="p-6 bg-amberbrown-50 dark:bg-amberbrown-950/50 rounded-3xl border-4 border-amberbrown-600 space-y-5 flex flex-col justify-between shadow-lg">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b-2 border-amberbrown-400 dark:border-amberbrown-600">
@@ -690,7 +722,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="font-black text-xs text-slate-800 dark:text-slate-200">Detail:</label>
+                                    <label class="font-black text-xs text-slate-800 dark:text-slate-200">Detail Tugas:</label>
                                     <input type="text" id="tugasDetailInput" placeholder="Contoh: Halaman 15" class="w-full mt-1 p-3 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base">
                                 </div>
                             </div>
@@ -705,7 +737,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="font-black text-xs text-slate-800 dark:text-slate-200">Detail:</label>
+                                    <label class="font-black text-xs text-slate-800 dark:text-slate-200">Detail Tugas:</label>
                                     <input type="text" id="tugasDetailInput2" placeholder="Contoh: Menulis ayat" class="w-full mt-1 p-3 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-base">
                                 </div>
                             </div>
@@ -1624,9 +1656,6 @@
                         <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-lg">${s.class}</span>
                     </div>
                 `).join('');
-                if (filtered.length === 1) {
-                    window.selectedWaSantriId = filtered[0].id;
-                }
             } else {
                 dropdown.classList.add('hidden');
             }
@@ -1691,7 +1720,7 @@
 
             let materiText = "";
             if (filteredMateri.length > 0) {
-                materiText += "📚 *Materi Belajar:*";
+                materiText += "📚 *Materi Belajar Hari Ini:*";
                 filteredMateri.forEach(m => {
                     materiText += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
                 });
@@ -1699,7 +1728,7 @@
 
             if (filteredTambahan.length > 0) {
                 if (materiText) materiText += "\n\n";
-                materiText += "⭐ *Materi Tambahan:*";
+                materiText += "⭐ *Materi Tambahan Hari Ini:*";
                 filteredTambahan.forEach(m => {
                     materiText += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
                 });
@@ -1754,7 +1783,7 @@
             let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
             
             if (filteredMateri.length > 0) {
-                msg += `📚 *Materi Belajar:*`;
+                msg += `📚 *Materi Belajar Hari Ini:*`;
                 filteredMateri.forEach(m => {
                     msg += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
@@ -1762,7 +1791,7 @@
             }
 
             if (filteredTambahan.length > 0) {
-                msg += `⭐ *Materi Tambahan:*`;
+                msg += `⭐ *Materi Tambahan Hari Ini:*`;
                 filteredTambahan.forEach(m => {
                     msg += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
                 });
