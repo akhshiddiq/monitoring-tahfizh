@@ -411,7 +411,7 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Preview Pesan Laporan Akumulasi Ayat untuk Wali Santri:</label>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Preview Pesan Laporan Akumulasi Jumlah Ayat untuk Wali Santri:</label>
                             <textarea id="ayatMessagePreview" rows="14" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-900 border rounded-2xl font-mono text-sm leading-relaxed"></textarea>
                         </div>
                         <div class="flex items-center gap-3">
@@ -720,34 +720,26 @@
                 if (santri) {
                     if (type === 'bacaan') {
                         santri.lastBacaan = detail;
-                        santri.lastBacaanDate = tanggal;
                         santri.dataBacaan = santri.dataBacaan || {};
                         santri.dataBacaan.status = status;
                         santri.dataBacaan.catatan = catatan;
-                        santri.dataBacaan.rawDetail = detail;
                     }
                     if (type === 'hafalan') {
                         santri.lastHafalan = detail;
-                        santri.lastHafalanDate = tanggal;
                         santri.dataHafalan = santri.dataHafalan || {};
                         santri.dataHafalan.status = status;
                         santri.dataHafalan.catatan = catatan;
-                        santri.dataHafalan.rawDetail = detail;
                     }
                     if (type === 'murojaah') {
                         santri.lastMurojaah = detail;
-                        santri.lastMurojaahDate = tanggal;
                         santri.dataMurojaah = santri.dataMurojaah || {};
                         santri.dataMurojaah.status = status;
                         santri.dataMurojaah.catatan = catatan;
-                        santri.dataMurojaah.rawDetail = detail;
                     }
                     if (type === 'tugas') {
                         santri.lastTugas = detail;
-                        santri.lastTugasDate = tanggal;
                         santri.dataTugas = santri.dataTugas || {};
                         santri.dataTugas.catatan = catatan;
-                        santri.dataTugas.rawDetail = detail;
                     }
                 }
             });
@@ -872,7 +864,7 @@
                             <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-400 space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="font-black text-xs text-emerald-900 dark:text-emerald-200 uppercase flex items-center gap-1.5">
-                                        <i class="fa-solid fa-book-open"></i> Bacaan
+                                        <i class="fa-solid fa-book-open"></i> BACAAN
                                     </span>
                                     <div class="flex items-center gap-1">
                                         <label class="text-[10px] font-bold text-slate-500">Nilai Bacaan:</label>
@@ -915,7 +907,7 @@
                             <div class="p-3.5 bg-rose-50 dark:bg-rose-950/40 rounded-2xl border-2 border-rose-400 space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="font-black text-xs text-rose-900 dark:text-rose-200 uppercase flex items-center gap-1.5">
-                                        <i class="fa-solid fa-award"></i> Hafalan Baru
+                                        <i class="fa-solid fa-award"></i> HAFALAN BARU
                                     </span>
                                     <div class="flex items-center gap-1">
                                         <label class="text-[10px] font-bold text-slate-500">Nilai Hafalan:</label>
@@ -958,7 +950,7 @@
                             <div class="p-3.5 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-400 space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="font-black text-xs text-sky-900 dark:text-sky-200 uppercase flex items-center gap-1.5">
-                                        <i class="fa-solid fa-rotate"></i> Muroja'ah
+                                        <i class="fa-solid fa-rotate"></i> MUROJA'AH
                                     </span>
                                     <div class="flex items-center gap-1">
                                         <label class="text-[10px] font-bold text-slate-500">Nilai Muroja'ah:</label>
@@ -999,7 +991,7 @@
                             <!-- TUGAS -->
                             <div class="p-3.5 bg-amberbrown-50 dark:bg-amberbrown-950/40 rounded-2xl border-2 border-amberbrown-500 space-y-2">
                                 <span class="font-black text-xs text-amberbrown-900 dark:text-amberbrown-200 uppercase flex items-center gap-1.5">
-                                    <i class="fa-solid fa-list-check"></i> Tugas Tambahan
+                                    <i class="fa-solid fa-list-check"></i> TUGAS TAMBAHAN
                                 </span>
                                 <input type="text" id="tug_detail_${s.id}" value="${t.detail || ''}" placeholder="Rincian Tugas..." class="w-full p-2.5 bg-white dark:bg-slate-900 border rounded-xl font-bold text-sm">
                                 <input type="text" id="tug_cat_${s.id}" value="${t.catatan || ''}" placeholder="Catatan Tugas..." class="w-full p-2 bg-white/80 dark:bg-slate-900/80 border rounded-lg text-xs font-semibold">
@@ -1484,8 +1476,8 @@
 
         window.sendAyatReportDirect = function() {
             const s = window.santriList.find(x => x.id === window.selectedAyatSantriId);
-            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
-            const targetPhone = (s && teacherClasses.includes(s.class)) ? '+6285697296114' : '+6285774042121';
+            const megaClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
+            const targetPhone = (s && megaClasses.includes(s.class)) ? '+6285697296114' : '+6285774042121';
             window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('ayatMessagePreview')?.value)}`, '_blank');
         };
 
@@ -1576,23 +1568,6 @@
             if (previewEl) previewEl.value = fullMsg;
         };
 
-        window.copyWaReportText = function() {
-            const text = document.getElementById('waMessagePreview')?.value;
-            if (text) {
-                navigator.clipboard.writeText(text);
-                window.showToast("Pesan WA disalin!", "success");
-            }
-        };
-
-        window.sendWaReportDirect = function() {
-            let id = window.selectedWaSantriId;
-            const s = window.santriList.find(x => x.id === id);
-            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
-            const targetPhone = (s && teacherClasses.includes(s.class)) ? '+6285697296114' : document.getElementById('waPhoneInput')?.value || '+6285774042121';
-            const text = document.getElementById('waMessagePreview')?.value;
-            if (text) window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
-        };
-
         window.generateClassReport = function() {
             const className = document.getElementById('reportClassSelect')?.value || 'Abu Ubaidah';
             const list = window.santriList.filter(s => s.class === className);
@@ -1632,19 +1607,16 @@
                     let santriLine = `\n${emojiNum} *${s.name}*`;
                     if (s.lastBacaan && s.lastBacaan !== '-') {
                         santriLine += `\n   - Bacaan: ${s.lastBacaan}`;
-                        if (s.dataBacaan && s.dataBacaan.catatan) santriLine += ` (${s.dataBacaan.catatan})`;
+                        // Catatan pribadi tidak dimasukkan ke rekap kelas
                     }
                     if (s.lastHafalan && s.lastHafalan !== '-') {
                         santriLine += `\n   - Hafalan: ${s.lastHafalan}`;
-                        if (s.dataHafalan && s.dataHafalan.catatan) santriLine += ` (${s.dataHafalan.catatan})`;
                     }
                     if (s.lastMurojaah && s.lastMurojaah !== '-') {
                         santriLine += `\n   - Muroja'ah: ${s.lastMurojaah}`;
-                        if (s.dataMurojaah && s.dataMurojaah.catatan) santriLine += ` (${s.dataMurojaah.catatan})`;
                     }
                     if (s.lastTugas && s.lastTugas !== '-') {
                         santriLine += `\n   - Tugas: ${s.lastTugas}`;
-                        if (s.dataTugas && s.dataTugas.catatan) santriLine += ` (${s.dataTugas.catatan})`;
                     }
                     msg += santriLine + `\n`;
                 }
