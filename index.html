@@ -81,7 +81,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-6">
         
-        <!-- Section: Setoran Input -->
+        <!-- Section: Setoran Input (Inline Form on Cards) -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[420px]">
@@ -119,7 +119,7 @@
             <div id="santriGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- Section: Materi with Sync Button -->
+        <!-- Section: Materi -->
         <section id="section-materi" class="hidden space-y-6">
             <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border">
                 <div class="flex items-center gap-2">
@@ -1388,7 +1388,7 @@
 
             const quote = "Rasulullah ﷺ bersabda: \"Sebaik-baik kalian adalah orang yang mempelajari Al-Qur'an dan mengajarkannya.\" (HR. Bukhari). Semoga setiap huruf dan ayat yang dibaca maupun dihafal kelak menjadi cahaya penolong serta mahkota kemuliaan bagi keluarga di surga.";
 
-            let msg = `Berikut kami sampaikan laporan akumulasi perkembangan ayat Ananda: ${s.name} (${s.class})\n\n${bacaanComment}\n\n${hafalanComment}\n\n${quote}`;
+            let msg = `Berikut kami sampaikan laporan akumulasi jumlah ayat Ananda: *${s.name}* (${s.class})\n\n${bacaanComment}\n\n${hafalanComment}\n\n${quote}`;
 
             document.getElementById('ayatMessagePreview').value = msg;
         };
@@ -1399,7 +1399,10 @@
         };
 
         window.sendAyatReportDirect = function() {
-            window.open(`https://wa.me/6285774042121?text=${encodeURIComponent(document.getElementById('ayatMessagePreview')?.value)}`, '_blank');
+            const s = window.santriList.find(x => x.id === window.selectedAyatSantriId);
+            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
+            const targetPhone = (s && teacherClasses.includes(s.class)) ? '+6285697296114' : '+6285774042121';
+            window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('ayatMessagePreview')?.value)}`, '_blank');
         };
 
         window.generateWaReport = function() {
@@ -1410,6 +1413,11 @@
             }
             const s = window.santriList.find(x => x.id === id);
             if (!s) return;
+
+            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
+            const targetPhone = teacherClasses.includes(s.class) ? '+6285697296114' : '+6285774042121';
+            const phoneInput = document.getElementById('waPhoneInput');
+            if (phoneInput) phoneInput.value = targetPhone;
 
             const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
             const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
@@ -1493,9 +1501,12 @@
         };
 
         window.sendWaReportDirect = function() {
-            const phone = document.getElementById('waPhoneInput')?.value || '+6285774042121';
+            let id = window.selectedWaSantriId;
+            const s = window.santriList.find(x => x.id === id);
+            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
+            const targetPhone = (s && teacherClasses.includes(s.class)) ? '+6285697296114' : document.getElementById('waPhoneInput')?.value || '+6285774042121';
             const text = document.getElementById('waMessagePreview')?.value;
-            if (text) window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
+            if (text) window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
         };
 
         window.generateClassReport = function() {
@@ -1564,7 +1575,10 @@
         };
 
         window.sendClassReportDirect = function() {
-            window.open(`https://wa.me/6285774042121?text=${encodeURIComponent(document.getElementById('classReportMessagePreview')?.value)}`, '_blank');
+            const className = document.getElementById('reportClassSelect')?.value || 'Abu Ubaidah';
+            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
+            const targetPhone = teacherClasses.includes(className) ? '+6285697296114' : '+6285774042121';
+            window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('classReportMessagePreview')?.value)}`, '_blank');
         };
 
         window.exportDataToExcel = function() {
