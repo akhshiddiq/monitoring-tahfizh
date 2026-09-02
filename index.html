@@ -73,6 +73,7 @@
                 <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
                 <button onclick="window.switchTab('wa_report')" id="btnTab-wa_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">WA Personal</button>
                 <button onclick="window.switchTab('class_report')" id="btnTab-class_report" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Kelas</button>
+                <button onclick="window.switchTab('laporan_ayat')" id="btnTab-laporan_ayat" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan Ayat</button>
                 <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2.5 rounded-xl text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud, Stats & Reset</button>
             </div>
         </div>
@@ -327,7 +328,7 @@
                     <div class="relative">
                         <label class="font-black text-xs text-slate-600 dark:text-slate-300">Cari & Pilih Nama Santri:</label>
                         <div class="relative mt-1.5">
-                            <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri (min 1 huruf)..." class="w-full pl-11 pr-12 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base outline-none">
+                            <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-11 pr-12 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base outline-none">
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <i class="fa-solid fa-magnifying-glass text-base"></i>
                             </span>
@@ -383,6 +384,73 @@
             </div>
         </section>
 
+        <!-- Section: Laporan Ayat (New Menu) -->
+        <section id="section-laporan_ayat" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-3xl shadow-sm border space-y-5">
+                <div class="flex flex-col sm:flex-row items-center justify-between border-b pb-4 gap-3">
+                    <div>
+                        <h3 class="font-black text-xl text-emerald-800 dark:text-emerald-300">Akumulasi Total Ayat Berdasarkan Rentang Tanggal</h3>
+                        <p class="text-xs text-slate-500 font-bold mt-0.5">Hitung total ayat bacaan dan hafalan baru dalam periode waktu tertentu serta hasilkan laporan personal untuk wali santri.</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500">Dari Tanggal:</label>
+                            <input type="date" id="filterStartDate" onchange="window.generateAkkAyatReport()" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500">Sampai Tanggal:</label>
+                            <input type="date" id="filterEndDate" onchange="window.generateAkkAyatReport()" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Cari & Pilih Nama Santri:</label>
+                            <div class="relative mt-1.5">
+                                <input type="text" id="ayatSantriSearchInput" oninput="window.filterAyatDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-11 pr-12 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-base outline-none">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass text-base"></i>
+                                </span>
+                                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
+                                    <button type="button" id="clearAyatSearchBtn" onclick="window.clearSearchInput('ayatSantriSearchInput', 'clearAyatSearchBtn')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden" title="Hapus Ketikan">
+                                        <i class="fa-solid fa-xmark text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="ayatAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
+                        </div>
+                        
+                        <div class="p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-300 space-y-3">
+                            <h4 class="font-black text-base text-emerald-900 dark:text-emerald-200">📊 Statistik Akumulasi Ayat</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border">
+                                    <span class="text-xs font-bold text-slate-500">Total Ayat Bacaan:</span>
+                                    <div id="statTotalBacaan" class="text-xl font-black text-emerald-700">0 Ayat</div>
+                                </div>
+                                <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border">
+                                    <span class="text-xs font-bold text-slate-500">Total Ayat Hafalan:</span>
+                                    <div id="statTotalHafalan" class="text-xl font-black text-rose-600">0 Ayat</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-black text-xs text-slate-600 dark:text-slate-300">Preview Pesan Laporan Ayat untuk Wali Santri:</label>
+                            <textarea id="ayatMessagePreview" rows="11" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-900 border rounded-2xl font-mono text-sm leading-relaxed"></textarea>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="window.copyAyatReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-sm">Salin Teks</button>
+                            <button onclick="window.sendAyatReportDirect()" class="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">Kirim WA Wali</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Section: Cloud, Stats & Reset -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-5">
@@ -433,7 +501,7 @@
         </section>
     </main>
 
-    <!-- Modal: Input Setoran with Pre-filled Previous Values -->
+    <!-- Modal: Input Setoran with Top WA Buttons -->
     <div id="setoranModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 hidden">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-7xl w-full max-h-[95vh] flex flex-col border-4 border-emerald-500 overflow-hidden">
             <div class="px-6 py-4 bg-emerald-800 dark:bg-emerald-950 text-white flex flex-col sm:flex-row items-center justify-between shrink-0 gap-3">
@@ -846,7 +914,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'history', 'wa_report', 'class_report', 'export'].forEach(t => {
+            ['setoran', 'materi', 'history', 'wa_report', 'class_report', 'laporan_ayat', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     if (t === tabId) {
@@ -862,6 +930,7 @@
             if (tabId === 'materi') window.renderMateriList('utama');
             if (tabId === 'wa_report') window.initWaDropdown();
             if (tabId === 'class_report') window.generateClassReport();
+            if (tabId === 'laporan_ayat') window.initAyatReportTab();
         };
 
         window.showToast = function(msg, type = 'success') {
@@ -879,7 +948,6 @@
 
         window.filterByClass = function(v) { window.selectedClass = v; window.renderSantriCardsAndTable(); };
 
-        // Toggle clear button helper
         window.toggleClearBtn = function(inputId, btnId) {
             const input = document.getElementById(inputId);
             const btn = document.getElementById(btnId);
@@ -904,6 +972,10 @@
                 } else if (inputId === 'waSantriSearchInput') {
                     window.filterWaDropdown('');
                     const dropdown = document.getElementById('waAutocompleteDropdown');
+                    if (dropdown) dropdown.classList.add('hidden');
+                } else if (inputId === 'ayatSantriSearchInput') {
+                    window.filterAyatDropdown('');
+                    const dropdown = document.getElementById('ayatAutocompleteDropdown');
                     if (dropdown) dropdown.classList.add('hidden');
                 }
             }
@@ -1650,7 +1722,7 @@
                     searchInput.value = window.santriList[0].name;
                     window.selectedWaSantriId = window.santriList[0].id;
                 } else if (currentVal) {
-                    const found = window.santriList.find(s => (s.name || '').toLowerCase() === currentVal.toLowerCase());
+                    const found = window.santriList.find(s => s.name.toLowerCase() === currentVal.toLowerCase());
                     if (found) window.selectedWaSantriId = found.id;
                 }
                 window.toggleClearBtn('waSantriSearchInput', 'clearWaSearchBtn');
@@ -1664,7 +1736,7 @@
             const dropdown = document.getElementById('waAutocompleteDropdown');
             if (!dropdown) return;
 
-            const filtered = window.santriList.filter(s => (s.name || '').toLowerCase().includes(q) || (s.class || '').toLowerCase().includes(q));
+            const filtered = window.santriList.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q));
 
             if (filtered.length > 0) {
                 dropdown.classList.remove('hidden');
@@ -1691,6 +1763,171 @@
             window.toggleClearBtn('waSantriSearchInput', 'clearWaSearchBtn');
             document.getElementById('waAutocompleteDropdown').classList.add('hidden');
             window.generateWaReport();
+        };
+
+        window.selectedAyatSantriId = null;
+
+        window.initAyatReportTab = function() {
+            const today = new Date().toISOString().split('T')[0];
+            const startInput = document.getElementById('filterStartDate');
+            const endInput = document.getElementById('filterEndDate');
+            if (startInput && !startInput.value) {
+                const firstDay = new Date();
+                firstDay.setDate(1);
+                startInput.value = firstDay.toISOString().split('T')[0];
+            }
+            if (endInput && !endInput.value) {
+                endInput.value = today;
+            }
+
+            const searchInput = document.getElementById('ayatSantriSearchInput');
+            if (searchInput) {
+                if (!searchInput.value && window.santriList.length > 0) {
+                    searchInput.value = window.santriList[0].name;
+                    window.selectedAyatSantriId = window.santriList[0].id;
+                } else if (searchInput.value) {
+                    const found = window.santriList.find(s => s.name.toLowerCase() === searchInput.value.toLowerCase());
+                    if (found) window.selectedAyatSantriId = found.id;
+                }
+                window.toggleClearBtn('ayatSantriSearchInput', 'clearAyatSearchBtn');
+                window.filterAyatDropdown(searchInput.value);
+            }
+        };
+
+        window.filterAyatDropdown = function(query) {
+            const q = (query || '').toLowerCase().trim();
+            window.toggleClearBtn('ayatSantriSearchInput', 'clearAyatSearchBtn');
+            const dropdown = document.getElementById('ayatAutocompleteDropdown');
+            if (!dropdown) return;
+
+            const filtered = window.santriList.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q));
+
+            if (filtered.length > 0) {
+                dropdown.classList.remove('hidden');
+                dropdown.innerHTML = filtered.map(s => `
+                    <div onclick="window.selectAyatSantri('${s.id}', '${s.name}')" class="p-3 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
+                        <span class="font-bold text-sm text-slate-800 dark:text-slate-200">${s.name}</span>
+                        <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-lg">${s.class}</span>
+                    </div>
+                `).join('');
+            } else {
+                dropdown.classList.add('hidden');
+            }
+
+            if (filtered.length > 0) {
+                if (!window.selectedAyatSantriId) window.selectedAyatSantriId = filtered[0].id;
+                window.generateAkkAyatReport();
+            }
+        };
+
+        window.selectAyatSantri = function(id, name) {
+            window.selectedAyatSantriId = id;
+            const input = document.getElementById('ayatSantriSearchInput');
+            if (input) input.value = name;
+            window.toggleClearBtn('ayatSantriSearchInput', 'clearAyatSearchBtn');
+            document.getElementById('ayatAutocompleteDropdown').classList.add('hidden');
+            window.generateAkkAyatReport();
+        };
+
+        window.calculateVersesFromDetail = function(detailStr) {
+            if (!detailStr || detailStr === '-') return 0;
+            let total = 0;
+            const parts = detailStr.split(',');
+            parts.forEach(part => {
+                const match = part.trim().match(/(\d+)\s*-\s*(\d+)$/);
+                if (match) {
+                    const start = parseInt(match[1]);
+                    const end = parseInt(match[2]);
+                    if (!isNaN(start) && !isNaN(end) && end >= start) {
+                        total += (end - start + 1);
+                    }
+                }
+            });
+            return total;
+        };
+
+        window.generateAkkAyatReport = function() {
+            let id = window.selectedAyatSantriId;
+            if (!id && window.santriList.length > 0) {
+                id = window.santriList[0].id;
+                window.selectedAyatSantriId = id;
+            }
+            const s = window.santriList.find(x => x.id === id);
+            if (!s) return;
+
+            const startDate = document.getElementById('filterStartDate')?.value || '';
+            const endDate = document.getElementById('filterEndDate')?.value || '';
+
+            let diffDays = 1;
+            if (startDate && endDate) {
+                const startD = new Date(startDate);
+                const endD = new Date(endDate);
+                const diffTime = Math.abs(endD - startD);
+                diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            }
+
+            const bacaanHistory = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistory = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+
+            let totalBacaanAyat = 0;
+            let totalHafalanAyat = 0;
+
+            bacaanHistory.forEach(item => {
+                const itemName = item.name || item[3];
+                const itemDate = item.tanggal || item[1];
+                const itemDetail = item.detail || item[6];
+                if ((itemName || '').toLowerCase() === s.name.toLowerCase()) {
+                    if ((!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate)) {
+                        totalBacaanAyat += window.calculateVersesFromDetail(itemDetail);
+                    }
+                }
+            });
+
+            hafalanHistory.forEach(item => {
+                const itemName = item.name || item[3];
+                const itemDate = item.tanggal || item[1];
+                const itemDetail = item.detail || item[6];
+                if ((itemName || '').toLowerCase() === s.name.toLowerCase()) {
+                    if ((!startDate || itemDate >= startDate) && (!endDate || itemDate <= endDate)) {
+                        totalHafalanAyat += window.calculateVersesFromDetail(itemDetail);
+                    }
+                }
+            });
+
+            document.getElementById('statTotalBacaan').innerText = `${totalBacaanAyat} Ayat`;
+            document.getElementById('statTotalHafalan').innerText = `${totalHafalanAyat} Ayat`;
+
+            const isFemale = /(putri|aishah|fatimah|zahrah|khansa|nabilah|marsha|haura|riska|zarina|alesha|yumna|almira|calista|ufaira|alya|quinsha|anggun|jovita|rayya|reyna|yasmin|afiqa|dilara|lujayn|syahda|anindya|novia|rianti|sakura|elmira|hevanika|iffa|nurhalimah|salsabila|yura)/i.test(s.name);
+            const sebutanAnak = isFemale ? "anak sholehah" : "anak sholeh";
+
+            let bacaanComment = "";
+            if (totalBacaanAyat < 3) {
+                bacaanComment = `Alhamdulillah jumlah bacaan Ananda dalam ${diffDays} hari ini yaitu ${totalBacaanAyat} ayat. Bacaannya masih perlu bimbingan dan perhatian lebih di rumah. Mohon Ayah dan Bunda untuk terus mengingatkan ${sebutanAnak} tercinta agar lebih giat lagi melatih bacaannya.`;
+            } else {
+                bacaanComment = `Alhamdulillah jumlah bacaan Ananda dalam ${diffDays} hari ini yaitu ${totalBacaanAyat} ayat. MasyaAllah, pertahankan dan tingkatkan terus semangat membacanya bersama ${sebutanAnak} tercinta.`;
+            }
+
+            let hafalanComment = "";
+            if (totalHafalanAyat < 3) {
+                hafalanComment = `Alhamdulillah jumlah hafalan baru Ananda dalam ${diffDays} hari ini yaitu ${totalHafalanAyat} ayat. Hafalan baru ananda pada rentang waktu ini masih memerlukan bimbingan serta perhatian di rumah. Mohon dukungan Ayah dan Bunda agar ${sebutanAnak} terus terdorong untuk menambah hafalannya.`;
+            } else {
+                hafalanComment = `Alhamdulillah jumlah hafalan baru Ananda dalam ${diffDays} hari ini yaitu ${totalHafalanAyat} ayat. MasyaAllah, setoran hafalan barunya sangat membanggakan! Pertahankan dan tingkatkan terus keistiqomahannya ya Ayah dan Bunda beserta ${sebutanAnak} tercinta.`;
+            }
+
+            const quote = "Rasulullah ﷺ bersabda: \"Sebaik-baik kalian adalah orang yang mempelajari Al-Qur'an dan mengajarkannya.\" (HR. Bukhari). Semoga setiap huruf dan ayat yang dibaca maupun dihafal kelak menjadi cahaya penolong serta mahkota kemuliaan bagi keluarga di surga.";
+
+            let msg = `Berikut kami sampaikan laporan akumulasi perkembangan ayat Ananda: ${s.name} (${s.class})\n\n${bacaanComment}\n\n${hafalanComment}\n\n${quote}`;
+
+            document.getElementById('ayatMessagePreview').value = msg;
+        };
+
+        window.copyAyatReportText = function() {
+            navigator.clipboard.writeText(document.getElementById('ayatMessagePreview')?.value);
+            window.showToast("Laporan ayat disalin!", "success");
+        };
+
+        window.sendAyatReportDirect = function() {
+            window.open(`https://wa.me/6285774042121?text=${encodeURIComponent(document.getElementById('ayatMessagePreview')?.value)}`, '_blank');
         };
 
         window.generateWaReport = function() {
