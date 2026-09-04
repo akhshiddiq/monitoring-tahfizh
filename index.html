@@ -26,7 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.4); border-radius: 9999px; }
@@ -152,7 +152,7 @@
             const isDark = html.classList.contains('dark');
             localStorage.setItem('rq_dark_mode', isDark ? 'true' : 'false');
             const icon = document.getElementById('darkModeIcon');
-            if (icon) icon.className = isDark ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
+            if (icon) icon.className = isDark ? 'fa-solid fa-sun text-xs sm:text-sm' : 'fa-solid fa-moon text-xs sm:text-sm';
         };
 
         window.switchTab = function(tabId) {
@@ -164,8 +164,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-3.5 py-1.5 rounded-lg text-xs font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-3.5 py-1.5 rounded-lg text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                        ? "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
                 }
             });
 
@@ -183,7 +183,7 @@
             const c = document.getElementById('toastContainer');
             if (!c) return;
             const t = document.createElement('div');
-            t.className = `p-3 rounded-xl text-xs font-black text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
+            t.className = `p-3 rounded-xl text-xs sm:text-sm font-black text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
             t.innerText = msg;
             c.appendChild(t);
             setTimeout(() => t.remove(), 2500);
@@ -232,9 +232,9 @@
                 if (matches.length > 0) {
                     listContainer.classList.remove('hidden');
                     listContainer.innerHTML = matches.map(s => `
-                        <div onclick="window.selectSantriFromAutocomplete('${s.id}', '${s.name}')" class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
-                            <span class="font-bold text-xs text-slate-800 dark:text-slate-200">${s.name}</span>
-                            <span class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-lg">${s.class}</span>
+                        <div onclick="window.selectSantriFromAutocomplete('${s.id}', '${s.name}')" class="p-3 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
+                            <span class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">${s.name}</span>
+                            <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-lg">${s.class}</span>
                         </div>
                     `).join('');
                 } else {
@@ -403,17 +403,17 @@
             const list = JSON.parse(localStorage.getItem(key) || '[]');
 
             if (list.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 font-bold">Belum ada materi tersimpan.</p>`;
+                container.innerHTML = `<p class="text-xs sm:text-sm text-slate-400 font-bold">Belum ada materi tersimpan.</p>`;
                 return;
             }
 
             container.innerHTML = list.map((m, idx) => `
-                <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs">
+                <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
                     <div>
                         <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)}</div>
-                        <div class="font-bold text-slate-600 dark:text-slate-400 text-[11px]">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
+                        <div class="font-bold text-slate-600 dark:text-slate-400 text-xs mt-0.5">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
                     </div>
-                    <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-2.5 py-1 text-[11px]">Hapus</button>
+                    <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-3 py-1.5 text-xs">Hapus</button>
                 </div>
             `).join('');
         };
@@ -439,15 +439,15 @@
             const labelEnd = document.getElementById(`lbl_end_${category}_${slot}_${santriId}`);
 
             if (mode === 'iqro') {
-                if (btnQ) btnQ.className = "px-2.5 py-1 rounded text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400";
-                if (btnI) btnI.className = "px-2.5 py-1 rounded text-[11px] font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700";
+                if (btnQ) btnQ.className = "px-3 py-1.5 rounded text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400";
+                if (btnI) btnI.className = "px-3 py-1.5 rounded text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700";
                 if (fieldQ) fieldQ.classList.add('hidden');
                 if (fieldI) fieldI.classList.remove('hidden');
                 if (labelStart) labelStart.innerText = "Halaman Mulai:";
                 if (labelEnd) labelEnd.innerText = "Halaman Sampai:";
             } else {
-                if (btnQ) btnQ.className = "px-2.5 py-1 rounded text-[11px] font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700";
-                if (btnI) btnI.className = "px-2.5 py-1 rounded text-[11px] font-bold text-slate-500";
+                if (btnQ) btnQ.className = "px-3 py-1.5 rounded text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700";
+                if (btnI) btnI.className = "px-3 py-1.5 rounded text-xs font-bold text-slate-500";
                 if (fieldQ) fieldQ.classList.remove('hidden');
                 if (fieldI) fieldI.classList.add('hidden');
                 if (labelStart) labelStart.innerText = "Ayat Mulai:";
@@ -491,33 +491,33 @@
 
                 return `
                     ${!isFirst ? `
-                        <div class="my-1.5">
-                            <button type="button" id="toggle_btn_${category}_${slot}_${santriId}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriId}')" class="px-3 py-1.5 bg-${primaryColor}-100 hover:bg-${primaryColor}-200 dark:bg-${primaryColor}-950 text-${primaryColor}-800 dark:text-primary-300 font-black rounded-lg text-[11px] flex items-center gap-1.5 transition">
+                        <div class="my-2">
+                            <button type="button" id="toggle_btn_${category}_${slot}_${santriId}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriId}')" class="px-3.5 py-2 bg-${primaryColor}-100 hover:bg-${primaryColor}-200 dark:bg-${primaryColor}-950 text-${primaryColor}-800 dark:text-primary-300 font-black rounded-lg text-xs flex items-center gap-2 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriId}" class="p-3.5 bg-white/95 dark:bg-slate-900/95 rounded-xl border-2 border-${primaryColor}-200 dark:border-${primaryColor}-900 space-y-2.5 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriId}" class="p-4 bg-white/95 dark:bg-slate-900/95 rounded-xl border-2 border-${primaryColor}-200 dark:border-${primaryColor}-900 space-y-3 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-black text-${primaryColor}-900 dark:text-${primaryColor}-200">
-                                Pilihan ${slot} ${isFirst ? '<span class="text-[10px] text-slate-400 font-normal">(Utama)</span>' : ''}
+                            <span class="text-xs sm:text-sm font-black text-${primaryColor}-900 dark:text-${primaryColor}-200">
+                                Pilihan ${slot} ${isFirst ? '<span class="text-xs text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-md">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriId}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriId}', 'quran')" class="px-2.5 py-1 rounded text-[11px] font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriId}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriId}', 'iqro')" class="px-2.5 py-1 rounded text-[11px] font-bold text-slate-500">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriId}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriId}', 'quran')" class="px-3 py-1.5 rounded text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriId}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriId}', 'iqro')" class="px-3 py-1.5 rounded text-xs font-bold text-slate-500">Iqro</button>
                             </div>
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriId}">
-                            <select id="${category}_surah_${slot}_${santriId}" class="w-full p-2.5 bg-white dark:bg-slate-800 border-2 rounded-lg font-bold text-xs">
+                            <select id="${category}_surah_${slot}_${santriId}" class="w-full p-3.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
                                 <option value="">-- Pilih Surat Al-Qur'an (114 Surat) --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${slotItem === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriId}" class="hidden">
-                            <select id="${category}_iqro_${slot}_${santriId}" class="w-full p-2.5 bg-white dark:bg-slate-800 border-2 rounded-lg font-bold text-xs">
+                            <select id="${category}_iqro_${slot}_${santriId}" class="w-full p-3.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${slotItem === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${slotItem === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -528,14 +528,14 @@
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-2 gap-2.5">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriId}" class="block text-[11px] font-bold text-slate-500 mb-0.5">Ayat Mulai:</label>
-                                <input type="number" id="${category}_start_${slot}_${santriId}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-2 bg-white dark:bg-slate-800 border-2 rounded-lg font-bold text-xs">
+                                <label id="lbl_start_${category}_${slot}_${santriId}" class="block text-xs font-bold text-slate-500 mb-1">Ayat Mulai:</label>
+                                <input type="number" id="${category}_start_${slot}_${santriId}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriId}" class="block text-[11px] font-bold text-slate-500 mb-0.5">Ayat Sampai:</label>
-                                <input type="number" id="${category}_end_${slot}_${santriId}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-2 bg-white dark:bg-slate-800 border-2 rounded-lg font-bold text-xs">
+                                <label id="lbl_end_${category}_${slot}_${santriId}" class="block text-xs font-bold text-slate-500 mb-1">Ayat Sampai:</label>
+                                <input type="number" id="${category}_end_${slot}_${santriId}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
                             </div>
                         </div>
                     </div>
@@ -558,48 +558,48 @@
 
             grid.innerHTML = filtered.map(s => {
                 const hasInput = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
-                const badgeTag = hasInput ? '<span class="px-2.5 py-0.5 bg-amber-100 text-amber-800 text-[11px] font-black rounded-md">Pernah Stor</span>' : '<span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[11px] font-black rounded-md">Belum Ada Stor</span>';
+                const badgeTag = hasInput ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-black rounded-md">Pernah Stor</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-md">Belum Ada Stor</span>';
 
                 return `
-                    <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4">
-                        <div class="flex items-start justify-between border-b pb-3">
+                    <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-5">
+                        <div class="flex items-start justify-between border-b pb-3.5">
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[11px] font-extrabold text-slate-400">${s.id}</span>
+                                    <span class="text-xs font-extrabold text-slate-400">${s.id}</span>
                                     ${badgeTag}
                                 </div>
-                                <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">${s.name}</h3>
-                                <p class="text-xs text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-1">${s.name}</h3>
+                                <p class="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
-                            <div class="flex items-center gap-1.5">
-                                <button type="button" onclick="window.sendCardWaPersonal('${s.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black text-[11px] flex items-center gap-1 shadow-xs transition" title="Kirim WA Personal">
-                                    <i class="fa-brands fa-whatsapp text-xs"></i> WA
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="window.sendCardWaPersonal('${s.id}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition" title="Kirim WA Personal">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i> WA
                                 </button>
-                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-lg font-black text-[11px] flex items-center gap-1 shadow-xs transition" title="Laporan Grup">
-                                    <i class="fa-solid fa-users text-xs"></i> Grup
+                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition" title="Laporan Grup">
+                                    <i class="fa-solid fa-users text-sm"></i> Grup
                                 </button>
                             </div>
                         </div>
 
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 p-2.5 rounded-xl">
-                                <span>Tanggal: <input type="date" id="tgl_${s.id}" value="${todayStr}" class="p-1.5 bg-white dark:bg-slate-800 border rounded font-bold text-[11px]"></span>
+                        <div class="space-y-5">
+                            <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl">
+                                <span>Tanggal: <input type="date" id="tgl_${s.id}" value="${todayStr}" class="p-2 bg-white dark:bg-slate-800 border rounded-lg font-bold text-xs sm:text-sm"></span>
                                 <span class="text-emerald-700 dark:text-emerald-400 font-black">Form Input Setoran</span>
                             </div>
 
                             <!-- BACAAN -->
-                            <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border-2 border-emerald-400 space-y-3">
-                                <div class="flex items-center justify-between border-b border-emerald-200 pb-2">
-                                    <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 uppercase flex items-center gap-1.5">
+                            <div class="p-4 sm:p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-400 space-y-4">
+                                <div class="flex items-center justify-between border-b border-emerald-200 pb-2.5">
+                                    <span class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200 uppercase flex items-center gap-2">
                                         <i class="fa-solid fa-book-open"></i> BACAAN — ${s.name}
                                     </span>
-                                    <span class="px-2 py-0.5 bg-emerald-200 text-emerald-900 text-[10px] font-black rounded">Bacaan</span>
+                                    <span class="px-2.5 py-1 bg-emerald-200 text-emerald-900 text-xs font-black rounded">Bacaan</span>
                                 </div>
                                 ${window.renderTripleInputSlot('bac', s.id, 'emerald')}
-                                <div class="pt-2.5 border-t border-emerald-200 space-y-2.5">
+                                <div class="pt-3 border-t border-emerald-200 space-y-3">
                                     <div>
-                                        <label class="block text-[11px] font-black text-emerald-900 mb-1">Nilai Bacaan (${s.name}):</label>
-                                        <select id="bac_stat_${s.id}" class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs">
+                                        <label class="block text-xs sm:text-sm font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
+                                        <select id="bac_stat_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="A — Sangat Baik">A — Sangat Baik (Bacaan lancar, makhraj dan tajwid tepat)</option>
                                             <option value="B — Baik">B — Baik (Bacaan cukup lancar, terdapat beberapa kesalahan ringan)</option>
                                             <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih terdapat beberapa kesalahan makhraj, tajwid)</option>
@@ -607,8 +607,8 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-[11px] font-black text-emerald-900 mb-1">Catatan Bacaan (${s.name}):</label>
-                                        <select id="bac_cat_type_${s.id}" class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-[11px] mb-1.5">
+                                        <label class="block text-xs sm:text-sm font-black text-emerald-900 mb-1.5">Catatan Bacaan (${s.name}):</label>
+                                        <select id="bac_cat_type_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                             <option value="Makharijul Huruf">Makharijul Huruf</option>
                                             <option value="Sifatul Huruf">Sifatul Huruf</option>
@@ -620,27 +620,27 @@
                                             <option value="Bacaan Gharib">Bacaan Gharib</option>
                                             <option value="Kesalahan Bacaan">Kesalahan Bacaan</option>
                                         </select>
-                                        <input type="text" id="bac_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-xs font-semibold">
+                                        <input type="text" id="bac_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-semibold">
                                     </div>
                                 </div>
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'bacaan')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'bacaan')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Bacaan (${s.name})
                                 </button>
                             </div>
 
                             <!-- HAFALAN BARU -->
-                            <div class="p-4 bg-rose-50 dark:bg-rose-950/40 rounded-xl border-2 border-rose-400 space-y-3">
-                                <div class="flex items-center justify-between border-b border-rose-200 pb-2">
-                                    <span class="font-black text-xs sm:text-sm text-rose-900 dark:text-rose-200 uppercase flex items-center gap-1.5">
+                            <div class="p-4 sm:p-5 bg-rose-50 dark:bg-rose-950/40 rounded-2xl border-2 border-rose-400 space-y-4">
+                                <div class="flex items-center justify-between border-b border-rose-200 pb-2.5">
+                                    <span class="font-black text-sm sm:text-base text-rose-900 dark:text-rose-200 uppercase flex items-center gap-2">
                                         <i class="fa-solid fa-award"></i> HAFALAN BARU — ${s.name}
                                     </span>
-                                    <span class="px-2 py-0.5 bg-rose-200 text-rose-900 text-[10px] font-black rounded">Hafalan Baru</span>
+                                    <span class="px-2.5 py-1 bg-rose-200 text-rose-900 text-xs font-black rounded">Hafalan Baru</span>
                                 </div>
                                 ${window.renderTripleInputSlot('haf', s.id, 'rose')}
-                                <div class="pt-2.5 border-t border-rose-200 space-y-2.5">
+                                <div class="pt-3 border-t border-rose-200 space-y-3">
                                     <div>
-                                        <label class="block text-[11px] font-black text-rose-900 mb-1">Nilai Hafalan (${s.name}):</label>
-                                        <select id="haf_stat_${s.id}" class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs">
+                                        <label class="block text-xs sm:text-sm font-black text-rose-900 mb-1.5">Nilai Hafalan (${s.name}):</label>
+                                        <select id="haf_stat_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="A — Sangat Baik">A — Sangat Baik (Hafalan sangat lancar, tepat, dan kuat)</option>
                                             <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa)</option>
                                             <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa, berhenti, atau salah urutan)</option>
@@ -648,8 +648,8 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-[11px] font-black text-rose-900 mb-1">Catatan Hafalan Baru (${s.name}):</label>
-                                        <select id="haf_cat_type_${s.id}" class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-[11px] mb-1.5">
+                                        <label class="block text-xs sm:text-sm font-black text-rose-900 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
+                                        <select id="haf_cat_type_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                             <option value="Kelancaran Hafalan">Kelancaran Hafalan</option>
                                             <option value="Ketepatan Hafalan">Ketepatan Hafalan</option>
@@ -661,27 +661,27 @@
                                             <option value="Hafalan Belum Selesai">Hafalan Belum Selesai</option>
                                             <option value="Hafalan Lulus">Hafalan Lulus</option>
                                         </select>
-                                        <input type="text" id="haf_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-xs font-semibold">
+                                        <input type="text" id="haf_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-semibold">
                                     </div>
                                 </div>
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'hafalan')" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'hafalan')" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Hafalan Baru (${s.name})
                                 </button>
                             </div>
 
                             <!-- MUROJA'AH DI KELAS -->
-                            <div class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-xl border-2 border-sky-400 space-y-3">
-                                <div class="flex items-center justify-between border-b border-sky-200 pb-2">
-                                    <span class="font-black text-xs sm:text-sm text-sky-900 dark:text-sky-200 uppercase flex items-center gap-1.5">
+                            <div class="p-4 sm:p-5 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-400 space-y-4">
+                                <div class="flex items-center justify-between border-b border-sky-200 pb-2.5">
+                                    <span class="font-black text-sm sm:text-base text-sky-900 dark:text-sky-200 uppercase flex items-center gap-2">
                                         <i class="fa-solid fa-rotate"></i> MUROJA'AH DI KELAS — ${s.name}
                                     </span>
-                                    <span class="px-2 py-0.5 bg-sky-200 text-sky-900 text-[10px] font-black rounded">Muroja'ah</span>
+                                    <span class="px-2.5 py-1 bg-sky-200 text-sky-900 text-xs font-black rounded">Muroja'ah</span>
                                 </div>
                                 ${window.renderTripleInputSlot('mur', s.id, 'sky')}
-                                <div class="pt-2.5 border-t border-sky-200 space-y-2.5">
+                                <div class="pt-3 border-t border-sky-200 space-y-3">
                                     <div>
-                                        <label class="block text-[11px] font-black text-sky-900 mb-1">Nilai Muroja'ah di Kelas (${s.name}):</label>
-                                        <select id="mur_stat_${s.id}" class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs">
+                                        <label class="block text-xs sm:text-sm font-black text-sky-900 mb-1.5">Nilai Muroja'ah di Kelas (${s.name}):</label>
+                                        <select id="mur_stat_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="A — Sangat Baik">A — Sangat Baik (Hafalan sangat lancar, tepat, dan kuat)</option>
                                             <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa)</option>
                                             <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa atau salah urutan)</option>
@@ -689,8 +689,8 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-[11px] font-black text-sky-900 mb-1">Catatan Muroja'ah di Kelas (${s.name}):</label>
-                                        <select id="mur_cat_type_${s.id}" class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-[11px] mb-1.5">
+                                        <label class="block text-xs sm:text-sm font-black text-sky-900 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
+                                        <select id="mur_cat_type_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                             <option value="Kelancaran">Kelancaran</option>
                                             <option value="Ketepatan Hafalan">Ketepatan Hafalan</option>
@@ -701,25 +701,25 @@
                                             <option value="Hafalan Lama">Hafalan Lama</option>
                                             <option value="Hafalan Juz">Hafalan Juz</option>
                                         </select>
-                                        <input type="text" id="mur_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-xs font-semibold">
+                                        <input type="text" id="mur_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-semibold">
                                     </div>
                                 </div>
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'murojaah')" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'murojaah')" class="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Muroja'ah (${s.name})
                                 </button>
                             </div>
 
                             <!-- TUGAS TAMBAHAN -->
-                            <div class="p-4 bg-amberbrown-50 dark:bg-amberbrown-950/40 rounded-xl border-2 border-amberbrown-500 space-y-2.5">
-                                <div class="flex items-center justify-between border-b border-amberbrown-200 pb-2">
-                                    <span class="font-black text-xs sm:text-sm text-amberbrown-900 dark:text-amberbrown-200 uppercase flex items-center gap-1.5">
+                            <div class="p-4 sm:p-5 bg-amberbrown-50 dark:bg-amberbrown-950/40 rounded-2xl border-2 border-amberbrown-500 space-y-3">
+                                <div class="flex items-center justify-between border-b border-amberbrown-200 pb-2.5">
+                                    <span class="font-black text-sm sm:text-base text-amberbrown-900 dark:text-amberbrown-200 uppercase flex items-center gap-2">
                                         <i class="fa-solid fa-list-check"></i> TUGAS TAMBAHAN — ${s.name}
                                     </span>
-                                    <span class="px-2 py-0.5 bg-amberbrown-200 text-amberbrown-900 text-[10px] font-black rounded">Tugas</span>
+                                    <span class="px-2.5 py-1 bg-amberbrown-200 text-amberbrown-900 text-xs font-black rounded">Tugas</span>
                                 </div>
-                                <input type="text" id="tug_detail_${s.id}" placeholder="Rincian Tugas..." value="${s.lastTugas && s.lastTugas !== '-' ? s.lastTugas : ''}" class="w-full p-2.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
-                                <input type="text" id="tug_cat_${s.id}" placeholder="Catatan Tugas..." class="w-full p-2.5 bg-white/80 dark:bg-slate-900/80 border-2 rounded-xl text-xs font-semibold">
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'tugas')" class="w-full py-3 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5 mt-1">
+                                <input type="text" id="tug_detail_${s.id}" placeholder="Rincian Tugas..." value="${s.lastTugas && s.lastTugas !== '-' ? s.lastTugas : ''}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-sm sm:text-base">
+                                <input type="text" id="tug_cat_${s.id}" placeholder="Catatan Tugas..." class="w-full p-3.5 bg-white/80 dark:bg-slate-900/80 border-2 rounded-xl text-sm sm:text-base font-semibold">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'tugas')" class="w-full py-3.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 mt-1">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
                                 </button>
                             </div>
@@ -948,8 +948,8 @@
                 const btn = document.getElementById(`btnSubHistory-${c}`);
                 if (btn) {
                     btn.className = (c === cat)
-                        ? "px-3 py-1.5 rounded-lg text-xs font-black bg-emerald-600 text-white shadow-md shrink-0"
-                        : "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0";
+                        ? "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0"
+                        : "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0";
                 }
             });
 
@@ -986,7 +986,7 @@
 
             if (cat === 'keseluruhan') {
                 if (window.santriList.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs">Belum ada data santri.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs sm:text-sm">Belum ada data santri.</td></tr>`;
                     return;
                 }
 
@@ -996,7 +996,7 @@
                 }
 
                 if (filteredSantri.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs">Santri tidak ditemukan.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs sm:text-sm">Santri tidak ditemukan.</td></tr>`;
                     return;
                 }
 
@@ -1013,11 +1013,11 @@
 
                     return `
                         <tr>
-                            <td class="p-3 font-black text-xs sm:text-sm">${s.name}<br><span class="text-[11px] text-slate-400 font-normal">${s.class}</span></td>
-                            <td class="p-3 text-xs font-bold text-emerald-700">${bacDetail}</td>
-                            <td class="p-3 text-xs font-bold text-rose-600">${hafDetail}</td>
-                            <td class="p-3 text-xs font-bold text-sky-600">${murDetail}</td>
-                            <td class="p-3 text-xs font-bold text-emerald-800 text-right">${latestTimestamp}</td>
+                            <td class="p-3.5 font-black text-xs sm:text-sm">${s.name}<br><span class="text-xs text-slate-400 font-normal">${s.class}</span></td>
+                            <td class="p-3.5 text-xs sm:text-sm font-bold text-emerald-700">${bacDetail}</td>
+                            <td class="p-3.5 text-xs sm:text-sm font-bold text-rose-600">${hafDetail}</td>
+                            <td class="p-3.5 text-xs sm:text-sm font-bold text-sky-600">${murDetail}</td>
+                            <td class="p-3.5 text-xs sm:text-sm font-bold text-emerald-800 text-right">${latestTimestamp}</td>
                         </tr>
                     `;
                 }).join('');
@@ -1037,7 +1037,7 @@
             }
 
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs">Belum ada data riwayat tercatat.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs sm:text-sm">Belum ada data riwayat tercatat.</td></tr>`;
                 return;
             }
 
@@ -1050,20 +1050,20 @@
             if (cat === 'rekapan') {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || h[2] || '-'}</td>
-                        <td class="p-3 text-xs font-extrabold text-amber-700">${h.category || h[3] || '-'}</td>
-                        <td class="p-3 text-xs text-slate-700 dark:text-slate-300 font-semibold">${h.catatan || h[4] || '-'}</td>
-                        <td class="p-3 text-xs font-bold text-emerald-800 text-right">${h.timestamp || h[0] || '-'}</td>
+                        <td class="p-3.5 font-black text-xs sm:text-sm">${h.name || h[2] || '-'}</td>
+                        <td class="p-3.5 text-xs sm:text-sm font-extrabold text-amber-700">${h.category || h[3] || '-'}</td>
+                        <td class="p-3.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-semibold">${h.catatan || h[4] || '-'}</td>
+                        <td class="p-3.5 text-xs sm:text-sm font-bold text-emerald-800 text-right">${h.timestamp || h[0] || '-'}</td>
                     </tr>
                 `).join('');
             } else {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || h[3] || '-'}</td>
-                        <td class="p-3 text-xs font-bold">${h.detail || h[6] || '-'}</td>
-                        <td class="p-3 text-xs font-bold text-emerald-700">${h.status || h[7] || '-'}</td>
-                        <td class="p-3 text-xs text-slate-600 dark:text-slate-400 font-semibold">${h.catatan || h[8] || '-'}</td>
-                        <td class="p-3 text-xs font-bold text-emerald-800 text-right">${h.timestamp || h[0] || '-'}</td>
+                        <td class="p-3.5 font-black text-xs sm:text-sm">${h.name || h[3] || '-'}</td>
+                        <td class="p-3.5 text-xs sm:text-sm font-bold">${h.detail || h[6] || '-'}</td>
+                        <td class="p-3.5 text-xs sm:text-sm font-bold text-emerald-700">${h.status || h[7] || '-'}</td>
+                        <td class="p-3.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-semibold">${h.catatan || h[8] || '-'}</td>
+                        <td class="p-3.5 text-xs sm:text-sm font-bold text-emerald-800 text-right">${h.timestamp || h[0] || '-'}</td>
                     </tr>
                 `).join('');
             }
@@ -1114,8 +1114,8 @@
                 }
                 if (btnEl) {
                     btnEl.className = (s === sub)
-                        ? "px-3.5 py-2 rounded-lg text-xs font-black bg-emerald-600 text-white shadow-md shrink-0"
-                        : "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0";
+                        ? "px-4 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0"
+                        : "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0";
                 }
             });
 
@@ -1151,9 +1151,9 @@
             if (filtered.length > 0) {
                 dropdown.classList.remove('hidden');
                 dropdown.innerHTML = filtered.map(s => `
-                    <div onclick="window.selectWaSantri('${s.id}', '${s.name}')" class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
-                        <span class="font-bold text-xs text-slate-800 dark:text-slate-200">${s.name}</span>
-                        <span class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-lg">${s.class}</span>
+                    <div onclick="window.selectWaSantri('${s.id}', '${s.name}')" class="p-3 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
+                        <span class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">${s.name}</span>
+                        <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2.5 py-1 rounded-lg">${s.class}</span>
                     </div>
                 `).join('');
             } else {
@@ -1211,9 +1211,9 @@
             if (filtered.length > 0) {
                 dropdown.classList.remove('hidden');
                 dropdown.innerHTML = filtered.map(s => `
-                    <div onclick="window.selectAyatSantri('${s.id}', '${s.name}')" class="p-2.5 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
-                        <span class="font-bold text-xs text-slate-800 dark:text-slate-200">${s.name}</span>
-                        <span class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2.5 py-0.5 rounded-lg">${s.class}</span>
+                    <div onclick="window.selectAyatSantri('${s.id}', '${s.name}')" class="p-3 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
+                        <span class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">${s.name}</span>
+                        <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2.5 py-1 rounded-lg">${s.class}</span>
                     </div>
                 `).join('');
             } else {
@@ -1531,41 +1531,41 @@
     
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-                <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-2 sm:gap-2.5">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-10 h-10 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-10 h-10 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-sm font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xs sm:text-sm font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
                     <div>
-                        <h1 class="text-sm sm:text-base font-black tracking-tight flex items-center gap-2">
+                        <h1 class="text-xs sm:text-base font-black tracking-tight flex items-center gap-1.5 sm:gap-2">
                             <span>Monitoring Santri</span>
-                            <span class="px-1.5 py-0.5 bg-amber-400 text-emerald-950 text-[10px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
+                            <span class="px-1.5 py-0.5 bg-amber-400 text-emerald-950 text-[9px] sm:text-[10px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
                         <div class="flex items-center gap-1.5 mt-0.5">
-                            <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
-                            <p id="storageInfoLabel" class="text-[11px] text-emerald-200 font-bold">Google Sheets & Local Active</p>
+                            <span id="syncDotIndicator" class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
+                            <p id="storageInfoLabel" class="text-[10px] sm:text-[11px] text-emerald-200 font-bold">Google Sheets & Local Active</p>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="window.toggleDarkMode()" class="p-2 bg-emerald-700 dark:bg-emerald-900 rounded-lg text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
-                        <i id="darkModeIcon" class="fa-solid fa-moon text-sm"></i>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="window.toggleDarkMode()" class="p-1.5 sm:p-2 bg-emerald-700 dark:bg-emerald-900 rounded-lg text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
+                        <i id="darkModeIcon" class="fa-solid fa-moon text-xs sm:text-sm"></i>
                     </button>
-                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-3 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-lg text-[11px] flex items-center gap-1">
+                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2.5 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-lg text-[10px] sm:text-xs flex items-center gap-1">
                         <i class="fa-solid fa-rotate"></i> Sync
                     </button>
                 </div>
             </div>
 
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-1.5 rounded-lg text-xs font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
-                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
-                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud & Reset</button>
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
+                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
+                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
     </header>
@@ -1577,9 +1577,9 @@
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="relative w-full sm:w-[380px]">
                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
                     </span>
-                    <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri (ketik)..." class="w-full pl-9 pr-9 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <input type="text" id="santriSearchInput" oninput="window.handleSearch(this.value)" placeholder="Cari nama santri (ketik)..." class="w-full pl-9 pr-9 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                     <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
                         <button type="button" id="clearSantriSearchBtn" onclick="window.clearSearchInput('santriSearchInput', 'clearSantriSearchBtn')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden" title="Hapus Ketikan">
                             <i class="fa-solid fa-xmark text-sm"></i>
@@ -1588,10 +1588,10 @@
                     <div id="santriAutocompleteList" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                    <button onclick="window.fetchAllDataFromCloud()" class="hidden sm:flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-xs transition-all">
+                    <button onclick="window.fetchAllDataFromCloud()" class="hidden sm:flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-xs transition-all">
                         <i class="fa-solid fa-rotate"></i> Sinkron Cloud
                     </button>
-                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
+                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-bold rounded-xl px-4 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
                         <option value="ALL">Semua Kelas</option>
                         <option value="Abdurrahman" selected>Abdurrahman</option>
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
@@ -1617,10 +1617,10 @@
                     <i class="fa-solid fa-cloud-arrow-down text-emerald-600 text-xl"></i>
                     <div>
                         <h4 class="font-black text-xs sm:text-sm">Sinkronisasi Materi</h4>
-                        <p class="text-[11px] text-slate-500 font-bold">Ambil data materi terbaru langsung dari Google Sheets</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-bold">Ambil data materi terbaru langsung dari Google Sheets</p>
                     </div>
                 </div>
-                <button onclick="window.fetchAllDataFromCloud(); window.showToast('Materi berhasil disinkronkan dari Google Sheet!', 'success');" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md flex items-center gap-1.5 transition">
+                <button onclick="window.fetchAllDataFromCloud(); window.showToast('Materi berhasil disinkronkan dari Google Sheet!', 'success');" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-rotate"></i> Sinkron Google Sheet
                 </button>
             </div>
@@ -1629,17 +1629,17 @@
                 <!-- Materi Utama -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
-                        <h3 class="font-black text-base text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                        <h3 class="font-black text-sm sm:text-base text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
                             <i class="fa-solid fa-book text-emerald-600 text-sm"></i> Materi Belajar Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-[11px] font-black flex items-center gap-1.5 transition">
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-3.5 py-1.5 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-xs font-black flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-table"></i> Buka Sheet Materi 📊
                         </a>
                     </div>
                     <div class="space-y-3">
                         <div>
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
-                            <select id="materiKelasSelect" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
+                            <select id="materiKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                                 <option value="Abdurrahman">Abdurrahman</option>
                                 <option value="Abu Ubaidah">Abu Ubaidah</option>
                                 <option value="Zubair">Zubair</option>
@@ -1654,28 +1654,28 @@
                             </select>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Judul Mata Pelajaran:</label>
-                            <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Judul Mata Pelajaran:</label>
+                            <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Bab / Tema:</label>
-                                <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Bab / Tema:</label>
+                                <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                             </div>
                             <div>
-                                <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Tanggal:</label>
-                                <input type="date" id="materiTanggalInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Tanggal:</label>
+                                <input type="date" id="materiTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                             </div>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Keterangan:</label>
-                            <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs font-semibold"></textarea>
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Keterangan:</label>
+                            <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs sm:text-sm font-semibold"></textarea>
                         </div>
-                        <button onclick="window.saveMateri('utama')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">💾 Simpan & Sinkron Materi</button>
+                        <button onclick="window.saveMateri('utama')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">💾 Simpan & Sinkron Materi</button>
                     </div>
 
                     <div class="pt-3 border-t space-y-2">
-                        <h4 class="font-black text-[11px] text-slate-700 dark:text-slate-300">Daftar Materi Tersimpan:</h4>
+                        <h4 class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-300">Daftar Materi Tersimpan:</h4>
                         <div id="materiListContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar"></div>
                     </div>
                 </div>
@@ -1683,17 +1683,17 @@
                 <!-- Materi Tambahan -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
-                        <h3 class="font-black text-base text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                        <h3 class="font-black text-sm sm:text-base text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
                             <i class="fa-solid fa-star text-amber-500 text-sm"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-lg text-[11px] font-black flex items-center gap-1.5 transition">
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-3.5 py-1.5 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-lg text-xs font-black flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-table"></i> Buka Sheet Tambahan 📊
                         </a>
                     </div>
                     <div class="space-y-3">
                         <div>
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
-                            <select id="materiTambahanKelasSelect" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
+                            <select id="materiTambahanKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                                 <option value="Abdurrahman">Abdurrahman</option>
                                 <option value="Abu Ubaidah">Abu Ubaidah</option>
                                 <option value="Zubair">Zubair</option>
@@ -1708,28 +1708,28 @@
                             </select>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Judul Mata Pelajaran (Tambahan):</label>
-                            <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Judul Mata Pelajaran (Tambahan):</label>
+                            <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Bab / Tema:</label>
-                                <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Bab / Tema:</label>
+                                <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                             </div>
                             <div>
-                                <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Tanggal:</label>
-                                <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
+                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Tanggal:</label>
+                                <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
                             </div>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Keterangan Tambahan:</label>
-                            <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs font-semibold"></textarea>
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Keterangan Tambahan:</label>
+                            <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs sm:text-sm font-semibold"></textarea>
                         </div>
-                        <button onclick="window.saveMateri('tambahan')" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
+                        <button onclick="window.saveMateri('tambahan')" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
                     </div>
 
                     <div class="pt-3 border-t space-y-2">
-                        <h4 class="font-black text-[11px] text-slate-700 dark:text-slate-300">Daftar Materi Tambahan Tersimpan:</h4>
+                        <h4 class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-300">Daftar Materi Tambahan Tersimpan:</h4>
                         <div id="materiTambahanListContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar"></div>
                     </div>
                 </div>
@@ -1742,54 +1742,54 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b pb-3">
                     <div>
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
-                        <p class="text-[11px] text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
+                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
                     </div>
                     <!-- Sub-menu buttons left-aligned -->
                     <div class="flex items-center gap-1.5 flex-wrap justify-start w-full sm:w-auto">
-                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3 py-1.5 rounded-lg text-xs font-black bg-emerald-600 text-white shadow-md shrink-0">Riwayat Keseluruhan</button>
-                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Riwayat Bacaan</button>
-                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Riwayat Hafalan</button>
-                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Muroja'ah di Kelas</button>
-                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Tugas</button>
-                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Rekap Catatan</button>
+                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0">Riwayat Keseluruhan</button>
+                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Riwayat Bacaan</button>
+                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Riwayat Hafalan</button>
+                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Muroja'ah di Kelas</button>
+                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Tugas</button>
+                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Rekap Catatan</button>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-1 flex-wrap gap-3">
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <span id="activeHistoryTitle" class="font-black text-sm text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
+                    <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+                        <span id="activeHistoryTitle" class="font-black text-sm sm:text-base text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
                         <!-- Search input with X clear button -->
-                        <div class="relative w-64">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        <div class="relative w-full sm:w-72">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
                             </span>
-                            <input type="text" id="historySearchInput" oninput="window.renderHistoryTable()" placeholder="Cari nama santri..." class="w-full pl-9 pr-9 py-2 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-bold outline-none">
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <input type="text" id="historySearchInput" oninput="window.renderHistoryTable()" placeholder="Cari nama santri..." class="w-full pl-9 pr-9 py-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs sm:text-sm font-bold outline-none">
+                            <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
                                 <button type="button" id="clearHistorySearchBtn" onclick="window.clearSearchInput('historySearchInput', 'clearHistorySearchBtn')" class="text-slate-400 hover:text-slate-600 hidden" title="Hapus Ketikan">
                                     <i class="fa-solid fa-xmark text-sm"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2.5">
-                        <button onclick="window.fetchHistoryFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition">
+                    <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                        <button onclick="window.fetchHistoryFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition">
                             <i class="fa-solid fa-rotate"></i> Sinkronisasi Riwayat
                         </button>
-                        <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition">
+                        <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition">
                             <i class="fa-solid fa-download"></i> Download (.csv)
                         </button>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto max-h-[440px] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 custom-scrollbar">
-                    <table class="w-full text-left border-collapse text-xs">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
                         <thead class="sticky top-0 bg-slate-100 dark:bg-slate-900 z-10">
-                            <tr id="historyTableHeader" class="border-b text-slate-600 dark:text-slate-300 font-black uppercase text-[11px]">
-                                <th class="p-3">Nama Santri</th>
-                                <th class="p-3">Bacaan Terakhir</th>
-                                <th class="p-3">Hafalan Terakhir</th>
-                                <th class="p-3">Muroja'ah Terakhir</th>
-                                <th class="p-3 text-right">Waktu & Tanggal</th>
+                            <tr id="historyTableHeader" class="border-b text-slate-600 dark:text-slate-300 font-black uppercase text-xs">
+                                <th class="p-3.5">Nama Santri</th>
+                                <th class="p-3.5">Bacaan Terakhir</th>
+                                <th class="p-3.5">Hafalan Terakhir</th>
+                                <th class="p-3.5">Muroja'ah Terakhir</th>
+                                <th class="p-3.5 text-right">Waktu & Tanggal</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -1805,12 +1805,12 @@
                 <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-3">
                     <div>
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Laporan Orang Tua & Akumulasi</h3>
-                        <p class="text-[11px] text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
+                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap justify-start w-full sm:w-auto">
-                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-2 rounded-lg text-xs font-black bg-emerald-600 text-white shadow-md shrink-0">WA Personal</button>
-                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Laporan Kelas</button>
-                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Laporan Akumulasi Ayat</button>
+                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0">WA Personal</button>
+                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Laporan Kelas</button>
+                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Laporan Akumulasi Ayat</button>
                     </div>
                 </div>
 
@@ -1818,11 +1818,11 @@
                 <div id="laporanTabContent-wa" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="relative">
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
                             <div class="relative mt-1">
-                                <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-9 pr-9 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs outline-none">
+                                <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-9 pr-9 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm outline-none">
                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                    <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
                                 </span>
                                 <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
                                     <button type="button" id="clearWaSearchBtn" onclick="window.clearSearchInput('waSantriSearchInput', 'clearWaSearchBtn')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden" title="Hapus Ketikan">
@@ -1833,25 +1833,25 @@
                             <div id="waAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">No WA Wali:</label>
-                            <input type="text" id="waPhoneInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs" value="+6285774042121">
+                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">No WA Wali:</label>
+                            <input type="text" id="waPhoneInput" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm" value="+6285774042121">
                         </div>
                     </div>
                     <div>
-                        <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Pesan:</label>
-                        <textarea id="waMessagePreview" rows="10" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                        <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Preview Pesan:</label>
+                        <textarea id="waMessagePreview" rows="10" class="w-full mt-1 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm leading-relaxed"></textarea>
                     </div>
                     <div class="flex items-center gap-2.5">
-                        <button onclick="window.copyWaReportText()" class="px-5 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs">Salin Teks</button>
-                        <button onclick="window.sendWaReportDirect()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">Kirim WhatsApp</button>
+                        <button onclick="window.copyWaReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm">Salin Teks</button>
+                        <button onclick="window.sendWaReportDirect()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">Kirim WhatsApp</button>
                     </div>
                 </div>
 
                 <!-- SUB 2: LAPORAN KELAS -->
                 <div id="laporanTabContent-kelas" class="space-y-4 hidden">
                     <div class="flex items-center justify-between flex-wrap gap-3">
-                        <h4 class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">Rekapitulasi Per Kelas & Materi Belajar</h4>
-                        <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-2.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                        <h4 class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200">Rekapitulasi Per Kelas & Materi Belajar</h4>
+                        <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm">
                             <option value="Abdurrahman" selected>Abdurrahman</option>
                             <option value="Abu Ubaidah">Abu Ubaidah</option>
                             <option value="Zubair">Zubair</option>
@@ -1865,11 +1865,11 @@
                         </select>
                     </div>
                     <div>
-                        <textarea id="classReportMessagePreview" rows="10" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                        <textarea id="classReportMessagePreview" rows="10" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm leading-relaxed"></textarea>
                     </div>
                     <div class="flex items-center gap-2.5">
-                        <button onclick="window.copyClassReportText()" class="px-5 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs">Salin Teks Kelas</button>
-                        <button onclick="window.sendClassReportDirect()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">Kirim WA Kelas</button>
+                        <button onclick="window.copyClassReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm">Salin Teks Kelas</button>
+                        <button onclick="window.sendClassReportDirect()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">Kirim WA Kelas</button>
                     </div>
                 </div>
 
@@ -1877,17 +1877,17 @@
                 <div id="laporanTabContent-ayat" class="space-y-4 hidden">
                     <div class="flex flex-col sm:flex-row items-center justify-between border-b pb-3 gap-3">
                         <div>
-                            <h4 class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">Laporan Akumulasi Jumlah Ayat</h4>
-                            <p class="text-[11px] text-slate-500 font-bold mt-0.5">Hitung total ayat bacaan dan hafalan baru dalam periode waktu tertentu.</p>
+                            <h4 class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200">Laporan Akumulasi Jumlah Ayat</h4>
+                            <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Hitung total ayat bacaan dan hafalan baru dalam periode waktu tertentu.</p>
                         </div>
                         <div class="flex items-center gap-2.5 flex-wrap">
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500">Dari Tanggal:</label>
-                                <input type="date" id="filterStartDate" onchange="window.generateAkkAyatReport()" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                                <label class="block text-xs font-bold text-slate-500">Dari Tanggal:</label>
+                                <input type="date" id="filterStartDate" onchange="window.generateAkkAyatReport()" class="p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500">Sampai Tanggal:</label>
-                                <input type="date" id="filterEndDate" onchange="window.generateAkkAyatReport()" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                                <label class="block text-xs font-bold text-slate-500">Sampai Tanggal:</label>
+                                <input type="date" id="filterEndDate" onchange="window.generateAkkAyatReport()" class="p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm">
                             </div>
                         </div>
                     </div>
@@ -1895,11 +1895,11 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div class="space-y-4">
                             <div class="relative">
-                                <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
+                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
                                 <div class="relative mt-1">
-                                    <input type="text" id="ayatSantriSearchInput" oninput="window.filterAyatDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-9 pr-9 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs outline-none">
+                                    <input type="text" id="ayatSantriSearchInput" oninput="window.filterAyatDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-9 pr-9 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm outline-none">
                                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                        <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
                                     </span>
                                     <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center">
                                         <button type="button" id="clearAyatSearchBtn" onclick="window.clearSearchInput('ayatSantriSearchInput', 'clearAyatSearchBtn')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden" title="Hapus Ketikan">
@@ -1910,16 +1910,16 @@
                                 <div id="ayatAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                             </div>
                             
-                            <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-300 space-y-3">
-                                <h4 class="font-black text-xs text-emerald-900 dark:text-emerald-200">📊 Statistik Akumulasi Ayat</h4>
-                                <div class="grid grid-cols-2 gap-2.5">
-                                    <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border">
-                                        <span class="text-[11px] font-bold text-slate-500">Total Ayat Bacaan:</span>
-                                        <div id="statTotalBacaan" class="text-base font-black text-emerald-700 mt-0.5">0 Ayat</div>
+                            <div class="p-4 sm:p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-300 space-y-3">
+                                <h4 class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">📊 Statistik Akumulasi Ayat</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border">
+                                        <span class="text-xs font-bold text-slate-500">Total Ayat Bacaan:</span>
+                                        <div id="statTotalBacaan" class="text-base sm:text-lg font-black text-emerald-700 mt-1">0 Ayat</div>
                                     </div>
-                                    <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border">
-                                        <span class="text-[11px] font-bold text-slate-500">Total Ayat Hafalan:</span>
-                                        <div id="statTotalHafalan" class="text-base font-black text-rose-600 mt-0.5">0 Ayat</div>
+                                    <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border">
+                                        <span class="text-xs font-bold text-slate-500">Total Ayat Hafalan:</span>
+                                        <div id="statTotalHafalan" class="text-base sm:text-lg font-black text-rose-600 mt-1">0 Ayat</div>
                                     </div>
                                 </div>
                             </div>
@@ -1927,12 +1927,12 @@
 
                         <div class="space-y-4">
                             <div>
-                                <label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Pesan Laporan Akumulasi Jumlah Ayat:</label>
-                                <textarea id="ayatMessagePreview" rows="8" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Preview Pesan Laporan Akumulasi Jumlah Ayat:</label>
+                                <textarea id="ayatMessagePreview" rows="8" class="w-full mt-1 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs sm:text-sm leading-relaxed"></textarea>
                             </div>
                             <div class="flex items-center gap-2.5">
-                                <button onclick="window.copyAyatReportText()" class="px-5 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs">Salin Teks</button>
-                                <button onclick="window.sendAyatReportDirect()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">Kirim WA Wali</button>
+                                <button onclick="window.copyAyatReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm">Salin Teks</button>
+                                <button onclick="window.sendAyatReportDirect()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">Kirim WA Wali</button>
                             </div>
                         </div>
                     </div>
@@ -1945,31 +1945,31 @@
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Cloud Sync & Reset Memori</h3>
-                    <button onclick="window.fetchAllDataFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center gap-1.5 shadow-sm">
+                    <button onclick="window.fetchAllDataFromCloud()" class="px-4.5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-sm">
                         <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Cloud Sekarang
                     </button>
                 </div>
-                <p class="text-xs text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung langsung ke Google Sheets RQ Al-Khansa.</p>
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Aplikasi ini terhubung langsung ke Google Sheets RQ Al-Khansa.</p>
                 
-                <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border-2 border-emerald-500 space-y-3">
+                <div class="p-4 sm:p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border-2 border-emerald-500 space-y-3">
                     <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2.5">
-                        <span class="font-black text-xs text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
+                        <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
                             <i class="fa-solid fa-circle-info text-emerald-600"></i> Status Sinkronisasi
                         </span>
-                        <span class="px-2.5 py-0.5 bg-emerald-600 text-white text-[11px] font-black rounded-full">Aktif & Live</span>
+                        <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-full">Aktif & Live</span>
                     </div>
-                    <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-emerald-200 dark:border-emerald-800 space-y-1.5">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
-                        <input type="text" id="customGsUrlInput" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border rounded-lg font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:ring-2 focus:ring-emerald-500" value="https://script.google.com/macros/s/AKfycbwFuP-mw4QYAc1LRCjiP6dGn0WkT2kZRQ6KCNT7yT7G4m5MdQmQlzOVmVaZvaz1ss2C/exec">
-                        <button onclick="window.saveCustomGsUrl()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-black transition mt-1">Simpan URL Endpoint GS Baru</button>
+                    <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
+                        <input type="text" id="customGsUrlInput" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border rounded-xl font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:ring-2 focus:ring-emerald-500" value="https://script.google.com/macros/s/AKfycbwFuP-mw4QYAc1LRCjiP6dGn0WkT2kZRQ6KCNT7yT7G4m5MdQmQlzOVmVaZvaz1ss2C/exec">
+                        <button onclick="window.saveCustomGsUrl()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-black transition mt-1">Simpan URL Endpoint GS Baru</button>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2.5 pt-1">
-                    <button onclick="window.exportDataToExcel()" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-md transition">
+                    <button onclick="window.exportDataToExcel()" class="px-5 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition">
                         <i class="fa-solid fa-file-excel text-sm"></i> Download Excel (.csv)
                     </button>
-                    <button onclick="window.resetDailyLogsOnly()" class="px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs shadow-md transition">⚠️ Reset Data Setoran Harian Saja</button>
+                    <button onclick="window.resetDailyLogsOnly()" class="px-5 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">⚠️ Reset Data Setoran Harian Saja</button>
                 </div>
             </div>
         </section>
@@ -1982,7 +1982,7 @@
             if (localStorage.getItem('rq_dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
                 const icon = document.getElementById('darkModeIcon');
-                if (icon) icon.className = 'fa-solid fa-sun text-sm';
+                if (icon) icon.className = 'fa-solid fa-sun text-xs sm:text-sm';
             }
             const classFilter = document.getElementById('classFilterSelect');
             if (classFilter) classFilter.value = 'Abdurrahman';
