@@ -562,7 +562,6 @@
                 }
             });
 
-            if (tabId === 'setoran') window.renderSantriCardsAndTable();
             if (tabId === 'history') window.switchHistorySubTab('bacaan');
             if (tabId === 'materi') window.renderMateriList('utama');
             if (tabId === 'wa_report') window.initWaDropdown();
@@ -686,9 +685,7 @@
                     }
                     if (cloudData.bacaan) {
                         localStorage.setItem('rq_history_bacaan', JSON.stringify(cloudData.bacaan));
-                        // Reconstruct lastBacaan from cloud history for persistence across tabs/reloads
                         cloudData.bacaan.forEach(row => {
-                            // row: [timestamp, tanggal, id, name, class, teacher, detail, status, catatan]
                             const santriObj = window.santriList.find(s => s.name.toLowerCase() === (row[3] || '').toLowerCase());
                             if (santriObj && (!santriObj.lastBacaan || santriObj.lastBacaan === '-')) {
                                 santriObj.lastBacaan = row[6] || '-';
@@ -833,7 +830,7 @@
                 if (labelEnd) labelEnd.innerText = "Halaman Sampai:";
             } else {
                 if (btnQ) btnQ.className = "px-3 py-1.5 rounded-lg text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700";
-                if (btnI) btnI.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400";
+                if (btnI) btnI.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500";
                 if (fieldQ) fieldQ.classList.remove('hidden');
                 if (fieldI) fieldI.classList.add('hidden');
                 if (labelStart) labelStart.innerText = "Ayat Mulai:";
@@ -1278,7 +1275,7 @@
             }
 
             localStorage.setItem('rq_history_rekapan', JSON.stringify(rekapanList));
-            // Note: intentionally NOT clearing input fields so user can retain their entered inputs.
+            // Note: Intentionally NOT resetting input fields so they stay intact on screen.
         };
 
         window.sendCardWaPersonal = function(id) {
