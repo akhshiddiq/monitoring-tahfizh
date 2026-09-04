@@ -950,7 +950,7 @@
                 if (cat === 'rekapan') {
                     headerEl.innerHTML = `<th class="p-5">Nama Santri</th><th class="p-5">Kategori</th><th class="p-5">Catatan</th><th class="p-5 text-right">Waktu & Tanggal</th>`;
                 } else if (cat === 'keseluruhan') {
-                    headerEl.innerHTML = `<th class="p-5">Nama Santri</th><th class="p-5">Jenis Aktivitas</th><th class="p-5">Detail</th><th class="p-5">Status / Catatan</th><th class="p-5 text-right">Waktu & Tanggal</th>`;
+                    headerEl.innerHTML = `<th class="p-5">Nama Santri</th><th class="p-5">Bacaan Terakhir</th><th class="p-5">Hafalan Terakhir</th><th class="p-5">Muroja'ah Terakhir</th><th class="p-5 text-right">Waktu & Tanggal</th>`;
                 } else {
                     headerEl.innerHTML = `<th class="p-5">Nama Santri</th><th class="p-5">Detail Setoran</th><th class="p-5">Status</th><th class="p-5">Catatan</th><th class="p-5 text-right">Waktu & Tanggal</th>`;
                 }
@@ -966,17 +966,54 @@
             const searchQ = (document.getElementById('historySearchInput')?.value || '').toLowerCase().trim();
             window.toggleClearBtn('historySearchInput', 'clearHistorySearchBtn');
 
-            let list = [];
+            let bac = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            let haf = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            let mur = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            let tug = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
             if (cat === 'keseluruhan') {
-                const bac = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-                const haf = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-                const mur = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-                const tug = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-                list = [...bac, ...haf, ...mur, ...tug];
-            } else {
-                const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
-                list = JSON.parse(localStorage.getItem(key) || '[]');
+                if (window.santriList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold text-xl">Belum ada data santri.</td></tr>`;
+                    return;
+                }
+
+                let filteredSantri = window.santriList;
+                if (searchQ) {
+                    filteredSantri = window.santriList.filter(s => (s.name || '').toLowerCase().includes(searchQ) || (s.class || '').toLowerCase().includes(searchQ));
+                }
+
+                if (filteredSantri.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold text-xl">Santri tidak ditemukan.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filteredSantri.map(s => {
+                    const sBac = bac.find(item => (item.name || item[3] || '').toLowerCase() === s.name.toLowerCase());
+                    const sHaf = haf.find(item => (item.name || item[3] || '').toLowerCase() === s.name.toLowerCase());
+                    const sMur = mur.find(item => (item.name || item[3] || '').toLowerCase() === s.name.toLowerCase());
+
+                    const bacDetail = sBac ? (sBac.detail || sBac[6] || '-') : (s.lastBacaan || '-');
+                    const hafDetail = sHaf ? (sHaf.detail || sHaf[6] || '-') : (s.lastHafalan || '-');
+                    const murDetail = sMur ? (sMur.detail || sMur[6] || '-') : (s.lastMurojaah || '-');
+
+                    const latestTimestamp = [sBac?.timestamp || sBac?.[0], sHaf?.timestamp || sHaf?.[0], sMur?.timestamp || sMur?.[0]].filter(Boolean)[0] || '-';
+
+                    return `
+                        <tr>
+                            <td class="p-5 font-black text-2xl">${s.name}<br><span class="text-lg text-slate-400 font-normal">${s.class}</span></td>
+                            <td class="p-5 text-xl font-bold text-emerald-700">${bacDetail}</td>
+                            <td class="p-5 text-xl font-bold text-rose-600">${hafDetail}</td>
+                            <td class="p-5 text-xl font-bold text-sky-600">${murDetail}</td>
+                            <td class="p-5 text-xl font-bold text-emerald-800 text-right">${latestTimestamp}</td>
+                        </tr>
+                    `;
+                }).join('');
+                return;
             }
+
+            let list = [];
+            const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
+            list = JSON.parse(localStorage.getItem(key) || '[]');
 
             if (searchQ) {
                 list = list.filter(item => {
@@ -1006,24 +1043,6 @@
                         <td class="p-5 text-xl font-bold text-emerald-800 text-right">${h.timestamp || h[0] || '-'}</td>
                     </tr>
                 `).join('');
-            } else if (cat === 'keseluruhan') {
-                tbody.innerHTML = list.map((h) => {
-                    let typeBadge = h.type ? h.type.toUpperCase() : 'AKTIVITAS';
-                    let colorBadge = 'bg-emerald-100 text-emerald-800';
-                    if (h.type === 'hafalan') colorBadge = 'bg-rose-100 text-rose-800';
-                    if (h.type === 'murojaah') colorBadge = 'bg-sky-100 text-sky-800';
-                    if (h.type === 'tugas') colorBadge = 'bg-amber-100 text-amber-800';
-
-                    return `
-                        <tr>
-                            <td class="p-5 font-black text-2xl">${h.name || h[3] || '-'}</td>
-                            <td class="p-5"><span class="px-3 py-1 rounded-xl text-base font-black ${colorBadge}">${typeBadge}</span></td>
-                            <td class="p-5 text-xl font-bold">${h.detail || h[6] || '-'}</td>
-                            <td class="p-5 text-xl font-semibold text-slate-600 dark:text-slate-400">${h.status || h[7] || '-'} ${h.catatan ? '• ' + h.catatan : ''}</td>
-                            <td class="p-5 text-xl font-bold text-emerald-800 text-right">${h.timestamp || h[0] || '-'}</td>
-                        </tr>
-                    `;
-                }).join('');
             } else {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
@@ -1041,11 +1060,7 @@
             const cat = window.activeHistoryCategory;
             let list = [];
             if (cat === 'keseluruhan') {
-                const bac = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-                const haf = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-                const mur = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-                const tug = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-                list = [...bac, ...haf, ...mur, ...tug];
+                list = window.santriList;
             } else {
                 const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
                 list = JSON.parse(localStorage.getItem(key) || '[]');
@@ -1056,10 +1071,17 @@
                 return;
             }
 
-            let csv = "Nama Santri,Aktivitas/Detail,Status,Catatan,Waktu\n";
-            list.forEach(item => {
-                csv += `"${item.name || item[3] || item[2]}","${item.detail || item[6] || item.category}","${item.status || item[3] || '-'}","${item.catatan || item[4] || '-'}","${item.timestamp || item[0]}"\n`;
-            });
+            let csv = "Nama Santri,Kelas,Bacaan Terakhir,Hafalan Terakhir,Murojaah Terakhir\n";
+            if (cat === 'keseluruhan') {
+                list.forEach(s => {
+                    csv += `"${s.name}","${s.class}","${s.lastBacaan || '-'}","${s.lastHafalan || '-'}","${s.lastMurojaah || '-'}"\n`;
+                });
+            } else {
+                csv = "Nama Santri,Aktivitas/Detail,Status,Catatan,Waktu\n";
+                list.forEach(item => {
+                    csv += `"${item.name || item[3] || item[2]}","${item.detail || item[6] || item.category}","${item.status || item[3] || '-'}","${item.catatan || item[4] || '-'}","${item.timestamp || item[0]}"\n`;
+                });
+            }
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
@@ -1749,9 +1771,9 @@
                         <thead class="sticky top-0 bg-slate-100 dark:bg-slate-900 z-10">
                             <tr id="historyTableHeader" class="border-b text-slate-600 dark:text-slate-300 font-black uppercase text-lg">
                                 <th class="p-5">Nama Santri</th>
-                                <th class="p-5">Jenis Aktivitas</th>
-                                <th class="p-5">Detail</th>
-                                <th class="p-5">Status / Catatan</th>
+                                <th class="p-5">Bacaan Terakhir</th>
+                                <th class="p-5">Hafalan Terakhir</th>
+                                <th class="p-5">Muroja'ah Terakhir</th>
                                 <th class="p-5 text-right">Waktu & Tanggal</th>
                             </tr>
                         </thead>
@@ -1761,7 +1783,7 @@
             </div>
         </section>
 
-        <!-- SECTION LAPORAN (COMBINED WA PERSONAL, KELAS, & JUMLAH AYAT) -->
+        <!-- SECTION LAPORAN -->
         <section id="section-laporan" class="hidden space-y-6">
             <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-sm border space-y-6">
                 <!-- Sub Menu Bar for Laporan -->
