@@ -440,9 +440,10 @@
                         </span>
                         <span class="px-3.5 py-1 bg-emerald-600 text-white text-sm font-black rounded-full">Aktif & Live</span>
                     </div>
-                    <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-800 space-y-1">
-                        <span class="text-sm font-bold text-slate-500 uppercase">Google Apps Script Web App URL</span>
-                        <div class="text-base font-mono font-bold text-emerald-700 dark:text-emerald-400">Terhubung ke Endpoint Live</div>
+                    <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-800 space-y-2">
+                        <span class="text-sm font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
+                        <input type="text" id="customGsUrlInput" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border-2 rounded-xl font-mono text-sm font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:ring-2 focus:ring-emerald-500" value="https://script.google.com/macros/s/AKfycbwFuP-mw4QYAc1LRCjiP6dGn0WkT2kZRQ6KCNT7yT7G4m5MdQmQlzOVmVaZvaz1ss2C/exec">
+                        <button onclick="window.saveCustomGsUrl()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-black transition">Simpan URL Endpoint GS Baru</button>
                     </div>
                 </div>
 
@@ -502,6 +503,19 @@
             { no: 112, name: "Al-Ikhlash", ayat: 4 }, { no: 113, name: "Al-Falaq", ayat: 5 }, { no: 114, name: "An-Nas", ayat: 6 }
         ];
 
+        window.getGsUrl = function() {
+            return localStorage.getItem('rq_gs_url') || 'https://script.google.com/macros/s/AKfycbwFuP-mw4QYAc1LRCjiP6dGn0WkT2kZRQ6KCNT7yT7G4m5MdQmQlzOVmVaZvaz1ss2C/exec';
+        };
+
+        window.saveCustomGsUrl = function() {
+            const input = document.getElementById('customGsUrlInput');
+            if (input && input.value.trim()) {
+                localStorage.setItem('rq_gs_url', input.value.trim());
+                window.showToast("URL Endpoint GS berhasil diperbarui!", "success");
+                window.fetchAllDataFromCloud();
+            }
+        };
+
         window.formatIndonesianDate = function(dateStr) {
             if (!dateStr) return '-';
             try {
@@ -554,6 +568,10 @@
             if (tabId === 'wa_report') window.initWaDropdown();
             if (tabId === 'class_report') window.generateClassReport();
             if (tabId === 'laporan_ayat') window.initAyatReportTab();
+            if (tabId === 'export') {
+                const urlInput = document.getElementById('customGsUrlInput');
+                if (urlInput) urlInput.value = window.getGsUrl();
+            }
         };
 
         window.showToast = function(msg, type = 'success') {
@@ -639,7 +657,7 @@
 
         window.syncToCloud = async function(payload) {
             window.setSyncIndicator('pending');
-            const url = 'https://script.google.com/macros/s/AKfycbzvDoI-a9dfjEP82Hx6G7smnIerLcuDH-sFIgWshMLqPrgw9pVd30nlew4QYQO_Fq5O/exec';
+            const url = window.getGsUrl();
             try {
                 await fetch(url, {
                     method: 'POST',
@@ -656,7 +674,7 @@
 
         window.fetchAllDataFromCloud = async function() {
             window.setSyncIndicator('pending');
-            const url = 'https://script.google.com/macros/s/AKfycbzvDoI-a9dfjEP82Hx6G7smnIerLcuDH-sFIgWshMLqPrgw9pVd30nlew4QYQO_Fq5O/exec';
+            const url = window.getGsUrl();
             try {
                 const res = await fetch(url);
                 const cloudData = await res.json();
@@ -1070,6 +1088,24 @@
             return entries.length > 0 ? entries.join(', ') : '-';
         };
 
+        window.extractSlotsStructured = function(category, santriId) {
+            const slots = [1, 2, 3];
+            const slotData = [];
+            slots.forEach(slot => {
+                const mode = window.itemSourceMode[`${santriId}_${category}_${slot}`] || 'quran';
+                let itemVal = '';
+                if (mode === 'iqro') {
+                    itemVal = document.getElementById(`${category}_iqro_${slot}_${santriId}`)?.value || '-';
+                } else {
+                    itemVal = document.getElementById(`${category}_surah_${slot}_${santriId}`)?.value || '-';
+                }
+                const start = document.getElementById(`${category}_start_${slot}_${santriId}`)?.value.trim() || '-';
+                const end = document.getElementById(`${category}_end_${slot}_${santriId}`)?.value.trim() || '-';
+                slotData.push({ item: itemVal, start: start, end: end });
+            });
+            return slotData;
+        };
+
         window.saveSectionData = function(id, sectionType) {
             const s = window.santriList.find(x => x.id === id);
             if (!s) return;
@@ -1089,12 +1125,26 @@
                 const bacType = document.getElementById(`bac_cat_type_${id}`)?.value || '';
                 const bacDesc = document.getElementById(`bac_cat_desc_${id}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
+                const structuredSlots = window.extractSlotsStructured('bac', id);
 
                 s.lastBacaan = bacaanFormatted;
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
                 hist.unshift({ timestamp: timestampStr, tanggal: tanggalVal, name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined });
                 localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
-                window.syncToCloud({ type: 'bacaan', timestamp: timestampStr, tanggal: tanggalVal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined });
+                
+                window.syncToCloud({
+                    type: 'bacaan',
+                    timestamp: timestampStr,
+                    tanggal: tanggalVal,
+                    id: s.id,
+                    name: s.name,
+                    class: s.class,
+                    teacher: s.teacher,
+                    detail: bacaanFormatted,
+                    status: bacaanStat,
+                    catatan: bacaanCatCombined,
+                    slots: structuredSlots
+                });
 
                 if (bacaanCatCombined) {
                     rekapanList.unshift({ tanggal: tanggalVal, id: s.id, name: s.name, category: 'BACAAN', catatan: bacaanCatCombined });
@@ -1111,12 +1161,26 @@
                 const hafType = document.getElementById(`haf_cat_type_${id}`)?.value || '';
                 const hafDesc = document.getElementById(`haf_cat_desc_${id}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
+                const structuredSlotsHaf = window.extractSlotsStructured('haf', id);
 
                 s.lastHafalan = hafalanFormatted;
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
                 hist.unshift({ timestamp: timestampStr, tanggal: tanggalVal, name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined });
                 localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
-                window.syncToCloud({ type: 'hafalan', timestamp: timestampStr, tanggal: tanggalVal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined });
+                
+                window.syncToCloud({
+                    type: 'hafalan',
+                    timestamp: timestampStr,
+                    tanggal: tanggalVal,
+                    id: s.id,
+                    name: s.name,
+                    class: s.class,
+                    teacher: s.teacher,
+                    detail: hafalanFormatted,
+                    status: hafalanStat,
+                    catatan: hafalanCatCombined,
+                    slots: structuredSlotsHaf
+                });
 
                 if (hafalanCatCombined) {
                     rekapanList.unshift({ tanggal: tanggalVal, id: s.id, name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined });
@@ -1133,12 +1197,26 @@
                 const murType = document.getElementById(`mur_cat_type_${id}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${id}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murDesc;
+                const structuredSlotsMur = window.extractSlotsStructured('mur', id);
 
                 s.lastMurojaah = murojaahFormatted;
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
                 hist.unshift({ timestamp: timestampStr, tanggal: tanggalVal, name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined });
                 localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
-                window.syncToCloud({ type: 'murojaah', timestamp: timestampStr, tanggal: tanggalVal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined });
+                
+                window.syncToCloud({
+                    type: 'murojaah',
+                    timestamp: timestampStr,
+                    tanggal: tanggalVal,
+                    id: s.id,
+                    name: s.name,
+                    class: s.class,
+                    teacher: s.teacher,
+                    detail: murojaahFormatted,
+                    status: murojaahStat,
+                    catatan: murojaahCatCombined,
+                    slots: structuredSlotsMur
+                });
 
                 if (murojaahCatCombined) {
                     rekapanList.unshift({ tanggal: tanggalVal, id: s.id, name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined });
@@ -1166,7 +1244,6 @@
             }
 
             localStorage.setItem('rq_history_rekapan', JSON.stringify(rekapanList));
-            window.renderSantriCardsAndTable();
         };
 
         window.sendCardWaPersonal = function(id) {
