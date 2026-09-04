@@ -26,7 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15.5px; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.4); border-radius: 9999px; }
@@ -498,7 +498,7 @@
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriId}" class="p-4 bg-white/95 dark:bg-slate-900/95 rounded-xl border-2 border-${primaryColor}-200 dark:border-${primaryColor}-900 space-y-3 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriId}" class="p-3.5 sm:p-4 bg-white/95 dark:bg-slate-900/95 rounded-xl border-2 border-${primaryColor}-200 dark:border-${primaryColor}-900 space-y-3 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
                             <span class="text-xs sm:text-sm font-black text-${primaryColor}-900 dark:text-${primaryColor}-200">
                                 Pilihan ${slot} ${isFirst ? '<span class="text-xs text-slate-400 font-normal">(Utama)</span>' : ''}
@@ -510,14 +510,14 @@
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriId}">
-                            <select id="${category}_surah_${slot}_${santriId}" class="w-full p-3.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
+                            <select id="${category}_surah_${slot}_${santriId}" class="w-full p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-base sm:text-lg">
                                 <option value="">-- Pilih Surat Al-Qur'an (114 Surat) --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${slotItem === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriId}" class="hidden">
-                            <select id="${category}_iqro_${slot}_${santriId}" class="w-full p-3.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
+                            <select id="${category}_iqro_${slot}_${santriId}" class="w-full p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-base sm:text-lg">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${slotItem === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${slotItem === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -528,14 +528,14 @@
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2.5">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriId}" class="block text-xs font-bold text-slate-500 mb-1">Ayat Mulai:</label>
-                                <input type="number" id="${category}_start_${slot}_${santriId}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
+                                <label id="lbl_start_${category}_${slot}_${santriId}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1">Ayat Mulai:</label>
+                                <input type="number" id="${category}_start_${slot}_${santriId}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-base sm:text-lg">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriId}" class="block text-xs font-bold text-slate-500 mb-1">Ayat Sampai:</label>
-                                <input type="number" id="${category}_end_${slot}_${santriId}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-sm sm:text-base">
+                                <label id="lbl_end_${category}_${slot}_${santriId}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1">Ayat Sampai:</label>
+                                <input type="number" id="${category}_end_${slot}_${santriId}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-base sm:text-lg">
                             </div>
                         </div>
                     </div>
@@ -599,7 +599,7 @@
                                 <div class="pt-3 border-t border-emerald-200 space-y-3">
                                     <div>
                                         <label class="block text-xs sm:text-sm font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
-                                        <select id="bac_stat_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
+                                        <select id="bac_stat_${s.id}" class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base sm:text-lg">
                                             <option value="A — Sangat Baik">A — Sangat Baik (Bacaan lancar, makhraj dan tajwid tepat)</option>
                                             <option value="B — Baik">B — Baik (Bacaan cukup lancar, terdapat beberapa kesalahan ringan)</option>
                                             <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih terdapat beberapa kesalahan makhraj, tajwid)</option>
@@ -608,7 +608,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs sm:text-sm font-black text-emerald-900 mb-1.5">Catatan Bacaan (${s.name}):</label>
-                                        <select id="bac_cat_type_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2">
+                                        <select id="bac_cat_type_${s.id}" class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-sm sm:text-base mb-2">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                             <option value="Makharijul Huruf">Makharijul Huruf</option>
                                             <option value="Sifatul Huruf">Sifatul Huruf</option>
@@ -620,10 +620,10 @@
                                             <option value="Bacaan Gharib">Bacaan Gharib</option>
                                             <option value="Kesalahan Bacaan">Kesalahan Bacaan</option>
                                         </select>
-                                        <input type="text" id="bac_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-semibold">
+                                        <input type="text" id="bac_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-base sm:text-lg font-bold">
                                     </div>
                                 </div>
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'bacaan')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'bacaan')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-base sm:text-lg shadow-md transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Bacaan (${s.name})
                                 </button>
                             </div>
@@ -640,7 +640,7 @@
                                 <div class="pt-3 border-t border-rose-200 space-y-3">
                                     <div>
                                         <label class="block text-xs sm:text-sm font-black text-rose-900 mb-1.5">Nilai Hafalan (${s.name}):</label>
-                                        <select id="haf_stat_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
+                                        <select id="haf_stat_${s.id}" class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base sm:text-lg">
                                             <option value="A — Sangat Baik">A — Sangat Baik (Hafalan sangat lancar, tepat, dan kuat)</option>
                                             <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa)</option>
                                             <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa, berhenti, atau salah urutan)</option>
@@ -649,7 +649,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs sm:text-sm font-black text-rose-900 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
-                                        <select id="haf_cat_type_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2">
+                                        <select id="haf_cat_type_${s.id}" class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-sm sm:text-base mb-2">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                             <option value="Kelancaran Hafalan">Kelancaran Hafalan</option>
                                             <option value="Ketepatan Hafalan">Ketepatan Hafalan</option>
@@ -661,10 +661,10 @@
                                             <option value="Hafalan Belum Selesai">Hafalan Belum Selesai</option>
                                             <option value="Hafalan Lulus">Hafalan Lulus</option>
                                         </select>
-                                        <input type="text" id="haf_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-semibold">
+                                        <input type="text" id="haf_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-base sm:text-lg font-bold">
                                     </div>
                                 </div>
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'hafalan')" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'hafalan')" class="w-full py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-base sm:text-lg shadow-md transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Hafalan Baru (${s.name})
                                 </button>
                             </div>
@@ -681,7 +681,7 @@
                                 <div class="pt-3 border-t border-sky-200 space-y-3">
                                     <div>
                                         <label class="block text-xs sm:text-sm font-black text-sky-900 mb-1.5">Nilai Muroja'ah di Kelas (${s.name}):</label>
-                                        <select id="mur_stat_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
+                                        <select id="mur_stat_${s.id}" class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-base sm:text-lg">
                                             <option value="A — Sangat Baik">A — Sangat Baik (Hafalan sangat lancar, tepat, dan kuat)</option>
                                             <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa)</option>
                                             <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa atau salah urutan)</option>
@@ -690,7 +690,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs sm:text-sm font-black text-sky-900 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
-                                        <select id="mur_cat_type_${s.id}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2">
+                                        <select id="mur_cat_type_${s.id}" class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-sm sm:text-base mb-2">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                             <option value="Kelancaran">Kelancaran</option>
                                             <option value="Ketepatan Hafalan">Ketepatan Hafalan</option>
@@ -701,10 +701,10 @@
                                             <option value="Hafalan Lama">Hafalan Lama</option>
                                             <option value="Hafalan Juz">Hafalan Juz</option>
                                         </select>
-                                        <input type="text" id="mur_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-semibold">
+                                        <input type="text" id="mur_cat_desc_${s.id}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-base sm:text-lg font-bold">
                                     </div>
                                 </div>
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'murojaah')" class="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'murojaah')" class="w-full py-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-base sm:text-lg shadow-md transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Muroja'ah (${s.name})
                                 </button>
                             </div>
@@ -717,9 +717,9 @@
                                     </span>
                                     <span class="px-2.5 py-1 bg-amberbrown-200 text-amberbrown-900 text-xs font-black rounded">Tugas</span>
                                 </div>
-                                <input type="text" id="tug_detail_${s.id}" placeholder="Rincian Tugas..." value="${s.lastTugas && s.lastTugas !== '-' ? s.lastTugas : ''}" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-sm sm:text-base">
-                                <input type="text" id="tug_cat_${s.id}" placeholder="Catatan Tugas..." class="w-full p-3.5 bg-white/80 dark:bg-slate-900/80 border-2 rounded-xl text-sm sm:text-base font-semibold">
-                                <button type="button" onclick="window.saveSectionData('${s.id}', 'tugas')" class="w-full py-3.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 mt-1">
+                                <input type="text" id="tug_detail_${s.id}" placeholder="Rincian Tugas..." value="${s.lastTugas && s.lastTugas !== '-' ? s.lastTugas : ''}" class="w-full p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-extrabold text-base sm:text-lg">
+                                <input type="text" id="tug_cat_${s.id}" placeholder="Catatan Tugas..." class="w-full p-4 bg-white/80 dark:bg-slate-900/80 border-2 rounded-xl text-base sm:text-lg font-bold">
+                                <button type="button" onclick="window.saveSectionData('${s.id}', 'tugas')" class="w-full py-4 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-base sm:text-lg shadow-md transition flex items-center justify-center gap-2 mt-1">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
                                 </button>
                             </div>
@@ -948,8 +948,8 @@
                 const btn = document.getElementById(`btnSubHistory-${c}`);
                 if (btn) {
                     btn.className = (c === cat)
-                        ? "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0"
-                        : "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0";
+                        ? "px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all"
+                        : "px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all";
                 }
             });
 
@@ -1114,8 +1114,8 @@
                 }
                 if (btnEl) {
                     btnEl.className = (s === sub)
-                        ? "px-4 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0"
-                        : "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0";
+                        ? "px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all"
+                        : "px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all";
                 }
             });
 
@@ -1337,8 +1337,15 @@
         };
 
         window.copyAyatReportText = function() {
-            navigator.clipboard.writeText(document.getElementById('ayatMessagePreview')?.value);
-            window.showToast("Laporan akumulasi ayat disalin!", "success");
+            const textarea = document.getElementById('ayatMessagePreview');
+            if (!textarea) return;
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                window.showToast("Laporan akumulasi ayat disalin!", "success");
+            } catch (err) {
+                window.showToast("Gagal menyalin teks.", "error");
+            }
         };
 
         window.sendAyatReportDirect = function() {
@@ -1420,8 +1427,15 @@
         };
 
         window.copyWaReportText = function() {
-            navigator.clipboard.writeText(document.getElementById('waMessagePreview')?.value);
-            window.showToast("Laporan WA Personal disalin!", "success");
+            const textarea = document.getElementById('waMessagePreview');
+            if (!textarea) return;
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                window.showToast("Laporan WA Personal disalin!", "success");
+            } catch (err) {
+                window.showToast("Gagal menyalin teks.", "error");
+            }
         };
 
         window.sendWaReportDirect = function() {
@@ -1482,8 +1496,15 @@
         };
 
         window.copyClassReportText = function() {
-            navigator.clipboard.writeText(document.getElementById('classReportMessagePreview')?.value);
-            window.showToast("Laporan kelas disalin!", "success");
+            const textarea = document.getElementById('classReportMessagePreview');
+            if (!textarea) return;
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                window.showToast("Laporan kelas disalin!", "success");
+            } catch (err) {
+                window.showToast("Gagal menyalin teks.", "error");
+            }
         };
 
         window.sendClassReportDirect = function() {
@@ -1534,15 +1555,15 @@
             <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-2 sm:gap-2.5">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xs sm:text-sm font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xs font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
                     <div>
                         <h1 class="text-xs sm:text-base font-black tracking-tight flex items-center gap-1.5 sm:gap-2">
                             <span>Monitoring Santri</span>
-                            <span class="px-1.5 py-0.5 bg-amber-400 text-emerald-950 text-[9px] sm:text-[10px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
+                            <span class="px-1.5 py-0.5 bg-amber-400 text-emerald-950 text-[9px] sm:text-[10px] font-black rounded shadow-xs">AL-KHANSA</span>
                         </h1>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span id="syncDotIndicator" class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
@@ -1554,7 +1575,7 @@
                     <button onclick="window.toggleDarkMode()" class="p-1.5 sm:p-2 bg-emerald-700 dark:bg-emerald-900 rounded-lg text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
                         <i id="darkModeIcon" class="fa-solid fa-moon text-xs sm:text-sm"></i>
                     </button>
-                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2.5 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-lg text-[10px] sm:text-xs flex items-center gap-1">
+                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2.5 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-lg text-[10px] flex items-center gap-1">
                         <i class="fa-solid fa-rotate"></i> Sync
                     </button>
                 </div>
@@ -1626,7 +1647,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <!-- Materi Utama -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
                         <h3 class="font-black text-sm sm:text-base text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
@@ -1639,7 +1659,7 @@
                     <div class="space-y-3">
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
-                            <select id="materiKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <select id="materiKelasSelect" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                                 <option value="Abdurrahman">Abdurrahman</option>
                                 <option value="Abu Ubaidah">Abu Ubaidah</option>
                                 <option value="Zubair">Zubair</option>
@@ -1655,23 +1675,23 @@
                         </div>
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Judul Mata Pelajaran:</label>
-                            <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Bab / Tema:</label>
-                                <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                             </div>
                             <div>
                                 <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Tanggal:</label>
-                                <input type="date" id="materiTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <input type="date" id="materiTanggalInput" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                             </div>
                         </div>
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Keterangan:</label>
-                            <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs sm:text-sm font-semibold"></textarea>
+                            <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-sm font-semibold"></textarea>
                         </div>
-                        <button onclick="window.saveMateri('utama')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">💾 Simpan & Sinkron Materi</button>
+                        <button onclick="window.saveMateri('utama')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan & Sinkron Materi</button>
                     </div>
 
                     <div class="pt-3 border-t space-y-2">
@@ -1680,7 +1700,6 @@
                     </div>
                 </div>
 
-                <!-- Materi Tambahan -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
                         <h3 class="font-black text-sm sm:text-base text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
@@ -1693,7 +1712,7 @@
                     <div class="space-y-3">
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
-                            <select id="materiTambahanKelasSelect" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <select id="materiTambahanKelasSelect" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                                 <option value="Abdurrahman">Abdurrahman</option>
                                 <option value="Abu Ubaidah">Abu Ubaidah</option>
                                 <option value="Zubair">Zubair</option>
@@ -1709,23 +1728,23 @@
                         </div>
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Judul Mata Pelajaran (Tambahan):</label>
-                            <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Bab / Tema:</label>
-                                <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                             </div>
                             <div>
                                 <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Tanggal:</label>
-                                <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-sm">
                             </div>
                         </div>
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Keterangan Tambahan:</label>
-                            <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs sm:text-sm font-semibold"></textarea>
+                            <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-sm font-semibold"></textarea>
                         </div>
-                        <button onclick="window.saveMateri('tambahan')" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
+                        <button onclick="window.saveMateri('tambahan')" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
                     </div>
 
                     <div class="pt-3 border-t space-y-2">
@@ -1744,21 +1763,21 @@
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
                         <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
                     </div>
-                    <!-- Sub-menu buttons left-aligned -->
-                    <div class="flex items-center gap-1.5 flex-wrap justify-start w-full sm:w-auto">
-                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0">Riwayat Keseluruhan</button>
-                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Riwayat Bacaan</button>
-                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Riwayat Hafalan</button>
-                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Muroja'ah di Kelas</button>
-                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Tugas</button>
-                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Rekap Catatan</button>
+                    <!-- Left-aligned Sub-menu Buttons -->
+                    <div class="flex items-center gap-2 flex-wrap justify-start w-full">
+                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
+                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
+                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
+                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
+                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
+                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-1 flex-wrap gap-3">
                     <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
                         <span id="activeHistoryTitle" class="font-black text-sm sm:text-base text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
-                        <!-- Search input with X clear button -->
+                        <!-- Search input with 'X' clear button -->
                         <div class="relative w-full sm:w-72">
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
@@ -1801,16 +1820,16 @@
         <!-- SECTION LAPORAN -->
         <section id="section-laporan" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <!-- Sub Menu Bar for Laporan -->
+                <!-- Left-aligned Sub Menu Bar for Laporan -->
                 <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-3">
                     <div>
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Laporan Orang Tua & Akumulasi</h3>
                         <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
                     </div>
-                    <div class="flex items-center gap-2 flex-wrap justify-start w-full sm:w-auto">
-                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0">WA Personal</button>
-                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Laporan Kelas</button>
-                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 shrink-0">Laporan Akumulasi Ayat</button>
+                    <div class="flex items-center gap-2 flex-wrap justify-start w-full">
+                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
+                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
+                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
                     </div>
                 </div>
 
