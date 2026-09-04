@@ -104,7 +104,7 @@
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
                         <option value="Zubair">Zubair</option>
                         <option value="Ali">Ali</option>
-                        <option value="Utsman">Utsman</option>
+                        <option value="Utsman" selected>Utsman</option>
                         <option value="Abu Bakar">Abu Bakar</option>
                         <option value="Bilal">Bilal</option>
                         <option value="Hamzah">Hamzah</option>
@@ -336,10 +336,10 @@
                     <h3 class="font-black text-2xl text-emerald-800 dark:text-emerald-300">Laporan Rekapitulasi Per Kelas & Materi Belajar</h3>
                     <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-3.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-base">
                         <option value="Abdurrahman">Abdurrahman</option>
-                        <option value="Abu Ubaidah" selected>Abu Ubaidah</option>
+                        <option value="Abu Ubaidah">Abu Ubaidah</option>
                         <option value="Zubair">Zubair</option>
                         <option value="Ali">Ali</option>
-                        <option value="Utsman">Utsman</option>
+                        <option value="Utsman" selected>Utsman</option>
                         <option value="Abu Bakar">Abu Bakar</option>
                         <option value="Bilal">Bilal</option>
                         <option value="Hamzah">Hamzah</option>
@@ -584,7 +584,7 @@
             setTimeout(() => t.remove(), 2500);
         };
 
-        window.selectedClass = 'ALL';
+        window.selectedClass = 'Utsman';
         window.filterByClass = function(v) { window.selectedClass = v; window.renderSantriCardsAndTable(); };
 
         window.toggleClearBtn = function(inputId, btnId) {
@@ -684,10 +684,44 @@
                         window.santriList = cloudData.santri;
                         localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
                     }
-                    if (cloudData.bacaan) localStorage.setItem('rq_history_bacaan', JSON.stringify(cloudData.bacaan));
-                    if (cloudData.hafalan) localStorage.setItem('rq_history_hafalan', JSON.stringify(cloudData.hafalan));
-                    if (cloudData.murojaah) localStorage.setItem('rq_history_murojaah', JSON.stringify(cloudData.murojaah));
-                    if (cloudData.tugas) localStorage.setItem('rq_history_tugas', JSON.stringify(cloudData.tugas));
+                    if (cloudData.bacaan) {
+                        localStorage.setItem('rq_history_bacaan', JSON.stringify(cloudData.bacaan));
+                        // Reconstruct lastBacaan from cloud history for persistence across tabs/reloads
+                        cloudData.bacaan.forEach(row => {
+                            // row: [timestamp, tanggal, id, name, class, teacher, detail, status, catatan]
+                            const santriObj = window.santriList.find(s => s.name.toLowerCase() === (row[3] || '').toLowerCase());
+                            if (santriObj && (!santriObj.lastBacaan || santriObj.lastBacaan === '-')) {
+                                santriObj.lastBacaan = row[6] || '-';
+                            }
+                        });
+                    }
+                    if (cloudData.hafalan) {
+                        localStorage.setItem('rq_history_hafalan', JSON.stringify(cloudData.hafalan));
+                        cloudData.hafalan.forEach(row => {
+                            const santriObj = window.santriList.find(s => s.name.toLowerCase() === (row[3] || '').toLowerCase());
+                            if (santriObj && (!santriObj.lastHafalan || santriObj.lastHafalan === '-')) {
+                                santriObj.lastHafalan = row[6] || '-';
+                            }
+                        });
+                    }
+                    if (cloudData.murojaah) {
+                        localStorage.setItem('rq_history_murojaah', JSON.stringify(cloudData.murojaah));
+                        cloudData.murojaah.forEach(row => {
+                            const santriObj = window.santriList.find(s => s.name.toLowerCase() === (row[3] || '').toLowerCase());
+                            if (santriObj && (!santriObj.lastMurojaah || santriObj.lastMurojaah === '-')) {
+                                santriObj.lastMurojaah = row[6] || '-';
+                            }
+                        });
+                    }
+                    if (cloudData.tugas) {
+                        localStorage.setItem('rq_history_tugas', JSON.stringify(cloudData.tugas));
+                        cloudData.tugas.forEach(row => {
+                            const santriObj = window.santriList.find(s => s.name.toLowerCase() === (row[3] || '').toLowerCase());
+                            if (santriObj && (!santriObj.lastTugas || santriObj.lastTugas === '-')) {
+                                santriObj.lastTugas = row[6] || '-';
+                            }
+                        });
+                    }
                     if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
                     
                     if (cloudData.materi) {
@@ -1196,7 +1230,7 @@
                 const murojaahStat = document.getElementById(`mur_stat_${id}`)?.value || 'A — Sangat Baik';
                 const murType = document.getElementById(`mur_cat_type_${id}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${id}`)?.value.trim() || '';
-                const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murDesc;
+                const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
                 const structuredSlotsMur = window.extractSlotsStructured('mur', id);
 
                 s.lastMurojaah = murojaahFormatted;
@@ -1244,6 +1278,7 @@
             }
 
             localStorage.setItem('rq_history_rekapan', JSON.stringify(rekapanList));
+            // Note: intentionally NOT clearing input fields so user can retain their entered inputs.
         };
 
         window.sendCardWaPersonal = function(id) {
@@ -1677,7 +1712,7 @@
         };
 
         window.generateClassReport = function() {
-            const className = document.getElementById('reportClassSelect')?.value || 'Abu Ubaidah';
+            const className = document.getElementById('reportClassSelect')?.value || 'Utsman';
             const list = window.santriList.filter(s => s.class === className);
             
             const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
@@ -1734,7 +1769,7 @@
         };
 
         window.sendClassReportDirect = function() {
-            const className = document.getElementById('reportClassSelect')?.value || 'Abu Ubaidah';
+            const className = document.getElementById('reportClassSelect')?.value || 'Utsman';
             const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
             const targetPhone = teacherClasses.includes(className) ? '+6285697296114' : '+6285774042121';
             window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('classReportMessagePreview')?.value)}`, '_blank');
@@ -1775,6 +1810,10 @@
                 document.documentElement.classList.add('dark');
                 document.getElementById('darkModeIcon').className = 'fa-solid fa-sun text-lg';
             }
+            const classFilter = document.getElementById('classFilterSelect');
+            if (classFilter) classFilter.value = 'Utsman';
+            window.selectedClass = 'Utsman';
+
             await window.fetchAllDataFromCloud();
             window.renderSantriCardsAndTable();
         });
