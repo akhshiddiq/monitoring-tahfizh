@@ -615,15 +615,31 @@
                                 </div>
                                 ${window.renderTripleInputSlot('bac', s.name, 'emerald')}
                                 <div class="pt-3 border-t border-emerald-200 space-y-3">
-                                    <div>
-                                        <label class="block text-xs font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
-                                        <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.">B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.">C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
-                                            <option value="D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.">D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.</option>
-                                        </select>
-                                    </div>
+                           <div>
+    <label class="block text-xs font-black text-emerald-900 mb-1.5">
+        Nilai Bacaan (${s.name}):
+    </label>
+
+    <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
+
+        <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.">
+            B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.
+        </option>
+
+        <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.">
+            A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.
+        </option>
+
+        <option value="C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.">
+            C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.
+        </option>
+
+        <option value="D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.">
+            D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.
+        </option>
+
+    </select>
+</div>
                                     <div>
                                         <label class="block text-xs font-black text-emerald-900 mb-1.5">Catatan Bacaan (${s.name}):</label>
                                         <select id="bac_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
