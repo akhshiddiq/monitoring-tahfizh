@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Tahfizh RQ Al-Khansa</title>
+    <title>Monitoring Tahfizh RQ Al-Khansa - Canvas View</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -55,9 +55,9 @@
         window.itemSourceMode = {};
         window.activeSlotState = {};
         window.activeHistoryCategory = 'keseluruhan';
-        window.historyClassFilter = 'ALL';
         window.selectedWaSantriName = null;
         window.selectedAyatSantriName = null;
+        window.historyClassFilter = 'ALL';
 
         window.surahList = [
             { no: 1, name: "Al-Fatihah", ayat: 7 }, { no: 2, name: "Al-Baqarah", ayat: 286 }, { no: 3, name: "Ali 'Imran", ayat: 200 },
@@ -189,7 +189,7 @@
             const c = document.getElementById('toastContainer');
             if (!c) return;
             const t = document.createElement('div');
-            t.className = `p-3 rounded-xl text-xs sm:text-sm font-black text-white shadow-xl ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
+            t.className = `p-3 rounded-xl text-xs sm:text-sm font-black text-white shadow-xl pointer-events-auto ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
             t.innerText = msg;
             c.appendChild(t);
             setTimeout(() => t.remove(), 2500);
@@ -198,11 +198,6 @@
         window.filterByClass = function(v) { 
             window.selectedClass = v; 
             window.renderSantriCardsAndTable(); 
-        };
-
-        window.filterHistoryByClass = function(v) {
-            window.historyClassFilter = v;
-            window.renderHistoryTable();
         };
 
         window.scrollToSantri = function(santriName) {
@@ -292,33 +287,20 @@
                     if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
                     
                     if (cloudData.materi) {
-                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], showInReport: true }));
+                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
                         localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
                     }
                     if (cloudData.materi_tambahan) {
-                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], showInReport: true }));
+                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
                         localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
                     }
 
                     if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
-                        // Map input_bacaan rows
-                        const bacHist = cloudData.input_bacaan.map(row => ({
-                            timestamp: row[0], tanggal: row[1], name: row[3], class: row[4], teacher: row[5],
-                            detail: `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`,
-                            status: row[15] || '-', catatan: row[16] || '-',
-                            slots: [
-                                { item: row[6], start: row[7], end: row[8] },
-                                { item: row[9], start: row[10], end: row[11] },
-                                { item: row[12], start: row[13], end: row[14] }
-                            ]
-                        }));
-                        localStorage.setItem('rq_history_bacaan', JSON.stringify(bacHist));
-
                         cloudData.input_bacaan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastBacaan = `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`;
+                                sObj.lastBacaan = row[6] || '-';
                                 sObj.cloudBacSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -329,23 +311,11 @@
                     }
 
                     if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
-                        const hafHist = cloudData.input_hafalan.map(row => ({
-                            timestamp: row[0], tanggal: row[1], name: row[3], class: row[4], teacher: row[5],
-                            detail: `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`,
-                            status: row[15] || '-', catatan: row[16] || '-',
-                            slots: [
-                                { item: row[6], start: row[7], end: row[8] },
-                                { item: row[9], start: row[10], end: row[11] },
-                                { item: row[12], start: row[13], end: row[14] }
-                            ]
-                        }));
-                        localStorage.setItem('rq_history_hafalan', JSON.stringify(hafHist));
-
                         cloudData.input_hafalan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastHafalan = `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`;
+                                sObj.lastHafalan = row[6] || '-';
                                 sObj.cloudHafSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -356,23 +326,11 @@
                     }
 
                     if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
-                        const murHist = cloudData.input_murojaah_dikelas.map(row => ({
-                            timestamp: row[0], tanggal: row[1], name: row[3], class: row[4], teacher: row[5],
-                            detail: `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`,
-                            status: row[15] || '-', catatan: row[16] || '-',
-                            slots: [
-                                { item: row[6], start: row[7], end: row[8] },
-                                { item: row[9], start: row[10], end: row[11] },
-                                { item: row[12], start: row[13], end: row[14] }
-                            ]
-                        }));
-                        localStorage.setItem('rq_history_murojaah', JSON.stringify(murHist));
-
                         cloudData.input_murojaah_dikelas.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastMurojaah = `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`;
+                                sObj.lastMurojaah = row[6] || '-';
                                 sObj.cloudMurSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -410,7 +368,7 @@
             const bab = document.getElementById(isUtama ? 'materiBabInput' : 'materiTambahanBabInput').value;
             const tanggal = document.getElementById(isUtama ? 'materiTanggalInput' : 'materiTambahanTanggalInput').value || new Date().toISOString().split('T')[0];
             const ket = document.getElementById(isUtama ? 'materiKeteranganInput' : 'materiTambahanKeteranganInput').value;
-            const showInReport = document.getElementById(isUtama ? 'materiShowInReport' : 'materiTambahanShowInReport')?.checked ?? true;
+            const tampilWa = document.getElementById(isUtama ? 'materiTampilWaCheckbox' : 'materiTambahanTampilWaCheckbox')?.checked ?? true;
 
             if (!judul) {
                 window.showToast("Judul mata pelajaran wajib diisi!", "error");
@@ -419,13 +377,13 @@
 
             const key = isUtama ? 'rq_materi_utama' : 'rq_materi_tambahan';
             const list = JSON.parse(localStorage.getItem(key) || '[]');
-            list.unshift({ kelas, judul, bab, tanggal, ket, showInReport });
+            list.unshift({ kelas, judul, bab, tanggal, ket, tampilWa });
             localStorage.setItem(key, JSON.stringify(list));
 
             window.showToast("Materi berhasil disimpan & disinkronkan!", "success");
             window.renderMateriList(type);
 
-            window.syncToCloud({ type: 'materi', subType: type, kelas, judul, bab, tanggal, ket, showInReport });
+            window.syncToCloud({ type: 'materi', subType: type, kelas, judul, bab, tanggal, ket, tampilWa });
         };
 
         window.renderMateriList = function(type) {
@@ -443,26 +401,12 @@
             container.innerHTML = list.map((m, idx) => `
                 <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs">
                     <div>
-                        <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)} ${m.showInReport ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Masuk Laporan</span>' : '<span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">Sembunyikan dari Laporan</span>'}</div>
+                        <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)} ${m.tampilWa !== false ? '<span class="text-emerald-600 font-bold">[Tampil Laporan]</span>' : '<span class="text-slate-400">[Disembunyikan]</span>'}</div>
                         <div class="font-bold text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="window.toggleMateriReport('${type}', ${idx})" class="text-xs font-bold px-2 py-1 bg-slate-200 dark:bg-slate-800 rounded hover:bg-slate-300">${m.showInReport ? 'Sembunyikan' : 'Tampilkan'}</button>
-                        <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-2 py-1 text-xs">Hapus</button>
-                    </div>
+                    <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-3 py-1.5 text-xs">Hapus</button>
                 </div>
             `).join('');
-        };
-
-        window.toggleMateriReport = function(type, idx) {
-            const key = type === 'utama' ? 'rq_materi_utama' : 'rq_materi_tambahan';
-            const list = JSON.parse(localStorage.getItem(key) || '[]');
-            if (list[idx]) {
-                list[idx].showInReport = !list[idx].showInReport;
-                localStorage.setItem(key, JSON.stringify(list));
-                window.renderMateriList(type);
-                window.showToast("Status laporan materi diperbarui", "success");
-            }
         };
 
         window.deleteMateri = function(type, idx) {
@@ -530,14 +474,11 @@
             return slots.map(slot => {
                 const isFirst = slot === 1;
                 const stateKey = `${santriName}_${category}_slot_${slot}`;
-                const slotData = cloudSlots ? cloudSlots[slot-1] : null;
-                const hasData = slotData && slotData.item && slotData.item !== '-' && slotData.item !== '';
-                const isVisible = isFirst || !!window.activeSlotState[stateKey] || hasData;
+                const isVisible = isFirst || !!window.activeSlotState[stateKey] || (cloudSlots && cloudSlots[slot-1]?.item && cloudSlots[slot-1]?.item !== '-');
 
-                const slotItem = slotData ? (slotData.item || '') : '';
-                const slotStart = slotData ? (slotData.start !== '-' ? (slotData.start || '') : '') : '';
-                const slotEnd = slotData ? (slotData.end !== '-' ? (slotData.end || '') : '') : '';
-                const isIqroItem = slotItem.startsWith('Iqro');
+                const slotItem = cloudSlots ? (cloudSlots[slot-1]?.item || '') : '';
+                const slotStart = cloudSlots ? (cloudSlots[slot-1]?.start || '') : '';
+                const slotEnd = cloudSlots ? (cloudSlots[slot-1]?.end || '') : '';
 
                 return `
                     ${!isFirst ? `
@@ -554,19 +495,19 @@
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs ${!isIqroItem ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs ${isIqroItem ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-500">Iqro</button>
                             </div>
                         </div>
 
-                        <div id="field_quran_${category}_${slot}_${santriName}" class="${isIqroItem ? 'hidden' : ''}">
+                        <div id="field_quran_${category}_${slot}_${santriName}">
                             <select id="${category}_surah_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Surat Al-Qur'an (114 Surat) --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${slotItem === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
-                        <div id="field_iqro_${category}_${slot}_${santriName}" class="${!isIqroItem ? 'hidden' : ''}">
+                        <div id="field_iqro_${category}_${slot}_${santriName}" class="hidden">
                             <select id="${category}_iqro_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${slotItem === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
@@ -580,12 +521,12 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${isIqroItem ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Mulai:</label>
+                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${isIqroItem ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Sampai:</label>
+                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                         </div>
                     </div>
@@ -657,10 +598,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
                                         <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Bacaan Lancar, makhroj dan tajwid tepat">A — Alhamdulillah Bacaan Lancar, makhroj dan tajwid tepat</option>
-                                            <option value="B — Baik">B — Baik</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan</option>
+                                            <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.">B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.">C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
+                                            <option value="D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.">D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.</option>
                                         </select>
                                     </div>
                                     <div>
@@ -696,12 +637,12 @@
                                 ${window.renderTripleInputSlot('haf', s.name, 'rose')}
                                 <div class="pt-3 border-t border-rose-200 space-y-3">
                                     <div>
-                                        <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan (${s.name}):</label>
+                                        <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan (dirumah) (${s.name}):</label>
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk (Hafalan sangat lancar, tepat, dan kuat. Hampir tidak ada kesalahan.)</option>
-                                            <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.)</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa, berhenti, atau salah urutan ayat.)</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan (Hafalan belum lancar dan masih membutuhkan banyak bantuan/pancingan.)</option>
+                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.</option>
+                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.</option>
                                         </select>
                                     </div>
                                     <div>
@@ -737,12 +678,12 @@
                                 ${window.renderTripleInputSlot('mur', s.name, 'sky')}
                                 <div class="pt-3 border-t border-sky-200 space-y-3">
                                     <div>
-                                        <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di Kelas (${s.name}):</label>
+                                        <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah dirumah (${s.name}):</label>
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk (Hafalan sangat lancar, tepat, dan kuat. Hampir tidak ada kesalahan.)</option>
-                                            <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.)</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa, berhenti, atau salah urutan ayat.)</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan (Hafalan belum lancar dan masih membutuhkan banyak bantuan/pancingan.)</option>
+                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.</option>
+                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.</option>
                                         </select>
                                     </div>
                                     <div>
@@ -847,18 +788,16 @@
                     window.showToast("Pilih minimal 1 surat/iqro bacaan!", "error");
                     return;
                 }
-                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'A — Alhamdulillah Bacaan Lancar, makhroj dan tajwid tepat';
+                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'A — Sangat Baik';
                 const bacType = document.getElementById(`bac_cat_type_${name}`)?.value || '';
                 const bacDesc = document.getElementById(`bac_cat_desc_${name}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
                 const structuredSlots = window.extractSlotsStructured('bac', name);
 
                 s.lastBacaan = bacaanFormatted;
-                s.lastBacaanStat = bacaanStat;
-                s.lastBacaanCat = bacaanCatCombined;
                 s.cloudBacSlots = structuredSlots;
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan', slots: structuredSlots });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
                 localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -875,7 +814,7 @@
                 });
 
                 if (bacaanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Bacaan berhasil disimpan & disinkronkan!", "success");
             } 
@@ -885,18 +824,16 @@
                     window.showToast("Pilih minimal 1 surat hafalan baru!", "error");
                     return;
                 }
-                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'A — Alhamdulillah Baik Baikk';
+                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'A — Sangat Baik';
                 const hafType = document.getElementById(`haf_cat_type_${name}`)?.value || '';
                 const hafDesc = document.getElementById(`haf_cat_desc_${name}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
                 const structuredSlotsHaf = window.extractSlotsStructured('haf', name);
 
                 s.lastHafalan = hafalanFormatted;
-                s.lastHafalanStat = hafalanStat;
-                s.lastHafalanCat = hafalanCatCombined;
                 s.cloudHafSlots = structuredSlotsHaf;
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan', slots: structuredSlotsHaf });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
                 localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -913,7 +850,7 @@
                 });
 
                 if (hafalanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Hafalan Baru berhasil disimpan & disinkronkan!", "success");
             } 
@@ -923,18 +860,16 @@
                     window.showToast("Pilih minimal 1 surat muroja'ah!", "error");
                     return;
                 }
-                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'A — Alhamdulillah Baik Baikk';
+                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'A — Sangat Baik';
                 const murType = document.getElementById(`mur_cat_type_${name}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
                 const structuredSlotsMur = window.extractSlotsStructured('mur', name);
 
                 s.lastMurojaah = murojaahFormatted;
-                s.lastMurojaahStat = murojaahStat;
-                s.lastMurojaahCat = murojaahCatCombined;
                 s.cloudMurSlots = structuredSlotsMur;
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah', slots: structuredSlotsMur });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
                 localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -951,7 +886,7 @@
                 });
 
                 if (murojaahCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Muroja'ah berhasil disimpan & disinkronkan!", "success");
             } 
@@ -964,14 +899,13 @@
                 const tugasCat = document.getElementById(`tug_cat_${name}`)?.value.trim() || '';
 
                 s.lastTugas = tugasVal;
-                s.lastTugasCat = tugasCat;
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
                 localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
                 window.syncToCloud({ type: 'tugas', timestamp: formattedTimeStr, tanggal: tanggalVal, name: s.name, class: s.class, teacher: s.teacher, detail: tugasVal, status: '-', catatan: tugasCat });
 
                 if (tugasCat) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
                 }
                 window.showToast("💾 Tugas berhasil disimpan & disinkronkan!", "success");
             }
@@ -1032,13 +966,17 @@
             window.renderHistoryTable();
         };
 
+        window.filterHistoryByClass = function(cls) {
+            window.historyClassFilter = cls;
+            window.renderHistoryTable();
+        };
+
         window.renderHistoryTable = function() {
             const tbody = document.getElementById('historyTableBody');
             if (!tbody) return;
             const cat = window.activeHistoryCategory;
             const searchInput = document.getElementById('historySearchInput');
             const searchQ = (searchInput?.value || '').toLowerCase().trim();
-            const classFilterVal = window.historyClassFilter || 'ALL';
             window.toggleClearBtn('historySearchInput', 'clearHistorySearchBtn');
 
             let bac = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
@@ -1052,11 +990,13 @@
                     return;
                 }
 
-                let filteredSantri = window.santriList.filter(s => {
-                    const matchClass = (classFilterVal === 'ALL' || s.class === classFilterVal);
-                    const matchSearch = !searchQ || (s.name || '').toLowerCase().includes(searchQ) || (s.class || '').toLowerCase().includes(searchQ);
-                    return matchClass && matchSearch;
-                });
+                let filteredSantri = window.santriList;
+                if (window.historyClassFilter && window.historyClassFilter !== 'ALL') {
+                    filteredSantri = filteredSantri.filter(s => s.class === window.historyClassFilter);
+                }
+                if (searchQ) {
+                    filteredSantri = filteredSantri.filter(s => (s.name || '').toLowerCase().includes(searchQ) || (s.class || '').toLowerCase().includes(searchQ));
+                }
 
                 if (filteredSantri.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs">Santri tidak ditemukan.</td></tr>`;
@@ -1091,13 +1031,20 @@
             const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
             list = JSON.parse(localStorage.getItem(key) || '[]');
 
-            list = list.filter(item => {
-                const sObj = window.santriList.find(s => (s.name || '').toLowerCase() === (item.name || '').toLowerCase());
-                const itemClass = item.class || sObj?.class || '';
-                const matchClass = (classFilterVal === 'ALL' || itemClass === classFilterVal);
-                const matchSearch = !searchQ || (item.name || '').toLowerCase().includes(searchQ) || (item.detail || item.catatan || '').toLowerCase().includes(searchQ);
-                return matchClass && matchSearch;
-            });
+            if (window.historyClassFilter && window.historyClassFilter !== 'ALL') {
+                list = list.filter(item => {
+                    const sObj = window.santriList.find(s => s.name.toLowerCase() === (item.name || '').toLowerCase());
+                    return sObj && sObj.class === window.historyClassFilter;
+                });
+            }
+
+            if (searchQ) {
+                list = list.filter(item => {
+                    const name = (item.name || '').toLowerCase();
+                    const detail = (item.detail || item.catatan || '').toLowerCase();
+                    return name.includes(searchQ) || detail.includes(searchQ);
+                });
+            }
 
             if (list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs">Belum ada data riwayat tercatat.</td></tr>`;
@@ -1113,7 +1060,7 @@
             if (cat === 'rekapan') {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}<br><span class="text-[10px] text-slate-400 font-normal">${h.class || ''}</span></td>
+                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-extrabold text-amber-700">${h.category || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-semibold">${h.catatan || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-bold text-emerald-800 text-right">${h.timestamp || '-'}</td>
@@ -1122,7 +1069,7 @@
             } else {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}<br><span class="text-[10px] text-slate-400 font-normal">${h.class || ''}</span></td>
+                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-bold">${h.detail || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-bold text-emerald-700">${h.status || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-semibold">${h.catatan || '-'}</td>
@@ -1432,54 +1379,67 @@
             const phoneInput = document.getElementById('waPhoneInput');
             if (phoneInput) phoneInput.value = targetPhone;
 
-            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const filteredMateri = materiUtama.filter(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
-            const filteredTambahan = materiTambahan.filter(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
+            const bacaanVal = lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
+            const bacaanStat = lastBacObj ? lastBacObj.status : '';
+            const bacaanCat = lastBacObj ? lastBacObj.catatan : '';
+
+            const hafalanVal = lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
+            const hafalanStat = lastHafObj ? lastHafObj.status : '';
+            const hafalanCat = lastHafObj ? lastHafObj.catatan : '';
+
+            const murojaahVal = lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
+            const murojaahStat = lastMurObj ? lastMurObj.status : '';
+            const murojaahCat = lastMurObj ? lastMurObj.catatan : '';
+
+            const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+            const tugasCat = lastTugObj ? lastTugObj.catatan : '';
 
             let bagianSetoran = "";
-            if (s.lastBacaan && s.lastBacaan !== '-') {
-                const totalBacAyat = window.calculateVersesFromDetail(s.lastBacaan);
-                bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}`;
-                if (totalBacAyat > 0) bagianSetoran += ` (${totalBacAyat} ayat)`;
-                if (s.lastBacaanStat) bagianSetoran += `\n   - Nilai: ${s.lastBacaanStat}`;
-                if (s.lastBacaanCat) bagianSetoran += `\n   - Catatan: ${s.lastBacaanCat}`;
+            if (bacaanVal && bacaanVal !== '-') {
+                bagianSetoran += `📖 *Bacaan:* ${bacaanVal}`;
+                if (bacaanStat) bagianSetoran += `\n   - Nilai: ${bacaanStat}`;
+                if (bacaanCat) bagianSetoran += `\n   - Catatan: ${bacaanCat}`;
+                bagianSetoran += `\n`;
+            }
+            if (hafalanVal && hafalanVal !== '-') {
+                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}`;
+                if (hafalanStat) bagianSetoran += `\n   - Nilai: ${hafalanStat}`;
+                if (hafalanCat) bagianSetoran += `\n   - Catatan: ${hafalanCat}`;
+                bagianSetoran += `\n`;
+            }
+            if (murojaahVal && murojaahVal !== '-') {
+                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}`;
+                if (murojaahStat) bagianSetoran += `\n   - Nilai: ${murojaahStat}`;
+                if (murojaahCat) bagianSetoran += `\n   - Catatan: ${murojaahCat}`;
+                bagianSetoran += `\n`;
+            }
+            if (tugasVal && tugasVal !== '-') {
+                bagianSetoran += `📝 *Tugas:* ${tugasVal}`;
+                if (tugasCat) bagianSetoran += `\n   - Catatan: ${tugasCat}`;
                 bagianSetoran += `\n`;
             }
 
-            if (s.lastHafalan && s.lastHafalan !== '-') {
-                const totalHafAyat = window.calculateVersesFromDetail(s.lastHafalan);
-                bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}`;
-                if (totalHafAyat > 0) bagianSetoran += ` (${totalHafAyat} ayat)`;
-                if (s.lastHafalanStat) bagianSetoran += `\n   - Nilai: ${s.lastHafalanStat}`;
-                if (s.lastHafalanCat) bagianSetoran += `\n   - Catatan: ${s.lastHafalanCat}`;
-                bagianSetoran += `\n`;
-            }
-
-            if (s.lastMurojaah && s.lastMurojaah !== '-') {
-                const totalMurAyat = window.calculateVersesFromDetail(s.lastMurojaah);
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${s.lastMurojaah}`;
-                if (totalMurAyat > 0) bagianSetoran += ` (${totalMurAyat} ayat)`;
-                if (s.lastMurojaahStat) bagianSetoran += `\n   - Nilai: ${s.lastMurojaahStat}`;
-                if (s.lastMurojaahCat) bagianSetoran += `\n   - Catatan: ${s.lastMurojaahCat}`;
-                bagianSetoran += `\n`;
-            }
-
-            if (s.lastTugas && s.lastTugas !== '-') {
-                bagianSetoran += `📝 *Tugas:* ${s.lastTugas}`;
-                if (s.lastTugasCat) bagianSetoran += `\n   - Catatan: ${s.lastTugasCat}`;
-                bagianSetoran += `\n`;
-            }
+            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+            const latestMateri = materiUtama.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            const latestTambahan = materiTambahan.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
 
             let materiText = "";
-            if (filteredMateri.length > 0) {
-                const latestMateri = filteredMateri[0];
+            if (latestMateri) {
                 materiText += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}`;
             }
-
-            if (filteredTambahan.length > 0) {
+            if (latestTambahan) {
                 if (materiText) materiText += "\n\n";
-                const latestTambahan = filteredTambahan[0];
                 materiText += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}`;
             }
 
@@ -1528,41 +1488,41 @@
             
             const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
             const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const filteredMateri = materiUtama.filter(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
-            const filteredTambahan = materiTambahan.filter(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
+            const latestMateri = materiUtama.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            const latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
             let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
             
-            if (filteredMateri.length > 0) {
-                const latestMateri = filteredMateri[0];
+            if (latestMateri) {
                 msg += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}\n\n`;
             }
 
-            if (filteredTambahan.length > 0) {
-                const latestTambahan = filteredTambahan[0];
+            if (latestTambahan) {
                 msg += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}\n\n`;
             }
 
             msg += `👥 *Daftar Santri & Prestasi:*`;
             let activeSantriCount = 0;
             list.forEach((s) => {
-                let hasAnySetoran = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
+                const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+
+                let hasAnySetoran = (tugasVal && tugasVal !== '-');
                 if (hasAnySetoran) {
                     activeSantriCount++;
                     const emojiNum = window.numberToEmoji(activeSantriCount);
                     let santriLine = `\n${emojiNum} *${s.name}*`;
-                    if (s.lastBacaan && s.lastBacaan !== '-') santriLine += `\n    - Bacaan: ${s.lastBacaan}`;
-                    if (s.lastHafalan && s.lastHafalan !== '-') santriLine += `\n    - Hafalan: ${s.lastHafalan}`;
-                    if (s.lastMurojaah && s.lastMurojaah !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${s.lastMurojaah}`;
-                    if (s.lastTugas && s.lastTugas !== '-') santriLine += `\n    - Tugas: ${s.lastTugas}`;
+                    if (tugasVal && tugasVal !== '-') santriLine += `\n    - Tugas: ${tugasVal}`;
                     msg += santriLine + `\n`;
                 }
             });
 
             if (activeSantriCount === 0) {
-                msg += `\n_Belum ada santri yang melakukan setoran tercatat._`;
+                msg += `\n_Belum ada santri yang melakukan setoran tugas tercatat._`;
             }
 
             document.getElementById('classReportMessagePreview').value = msg;
@@ -1773,8 +1733,8 @@
                             <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-sm font-semibold"></textarea>
                         </div>
                         <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" id="materiShowInReport" checked class="w-4 h-4 accent-emerald-600 rounded">
-                            <label for="materiShowInReport" class="text-xs font-black text-slate-700 dark:text-slate-300">Tampilkan materi ini di Laporan WA / Kelas</label>
+                            <input type="checkbox" id="materiTampilWaCheckbox" checked class="w-4 h-4 text-emerald-600 rounded">
+                            <label for="materiTampilWaCheckbox" class="text-xs font-bold text-slate-700 dark:text-slate-300">Tampilkan di Laporan WA / Kelas</label>
                         </div>
                         <button onclick="window.saveMateri('utama')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan & Sinkron Materi</button>
                     </div>
@@ -1830,8 +1790,8 @@
                             <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-sm font-semibold"></textarea>
                         </div>
                         <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" id="materiTambahanShowInReport" checked class="w-4 h-4 accent-amber-600 rounded">
-                            <label for="materiTambahanShowInReport" class="text-xs font-black text-slate-700 dark:text-slate-300">Tampilkan materi tambahan ini di Laporan WA / Kelas</label>
+                            <input type="checkbox" id="materiTambahanTampilWaCheckbox" checked class="w-4 h-4 text-amber-600 rounded">
+                            <label for="materiTambahanTampilWaCheckbox" class="text-xs font-bold text-slate-700 dark:text-slate-300">Tampilkan di Laporan WA / Kelas</label>
                         </div>
                         <button onclick="window.saveMateri('tambahan')" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
                     </div>
@@ -1864,21 +1824,19 @@
                 <div class="flex items-center justify-between pt-1 flex-wrap gap-3">
                     <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
                         <span id="activeHistoryTitle" class="font-black text-sm sm:text-base text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
-                        <div class="flex items-center gap-2">
-                            <select id="historyClassFilterSelect" onchange="window.filterHistoryByClass(this.value)" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm outline-none cursor-pointer">
-                                <option value="ALL">Semua Kelas</option>
-                                <option value="Abdurrahman">Abdurrahman</option>
-                                <option value="Abu Ubaidah">Abu Ubaidah</option>
-                                <option value="Zubair">Zubair</option>
-                                <option value="Ali">Ali</option>
-                                <option value="Utsman">Utsman</option>
-                                <option value="Abu Bakar">Abu Bakar</option>
-                                <option value="Bilal">Bilal</option>
-                                <option value="Hamzah">Hamzah</option>
-                                <option value="Fatimah">Fatimah</option>
-                                <option value="Umar">Umar</option>
-                            </select>
-                        </div>
+                        <select id="historyClassSelect" onchange="window.filterHistoryByClass(this.value)" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs sm:text-sm font-bold">
+                            <option value="ALL">Semua Kelas</option>
+                            <option value="Abdurrahman">Abdurrahman</option>
+                            <option value="Abu Ubaidah">Abu Ubaidah</option>
+                            <option value="Zubair">Zubair</option>
+                            <option value="Ali">Ali</option>
+                            <option value="Utsman">Utsman</option>
+                            <option value="Abu Bakar">Abu Bakar</option>
+                            <option value="Bilal">Bilal</option>
+                            <option value="Hamzah">Hamzah</option>
+                            <option value="Fatimah">Fatimah</option>
+                            <option value="Umar">Umar</option>
+                        </select>
                         <div class="relative w-full sm:w-64">
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
