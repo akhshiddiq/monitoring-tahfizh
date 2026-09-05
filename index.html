@@ -291,99 +291,66 @@
                         localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
                     }
 
-                    // Map cloud input_bacaan latest records to santri object & cache
                     if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
-                        const bacHist = [];
                         cloudData.input_bacaan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
-                            const itemDetail = row[6] !== '-' ? row[6] : '-';
-                            const itemStatus = row[15] || 'B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
-                            const itemCat = row[16] || '';
-                            const itemTimestamp = row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-';
-                            const itemTanggal = row[1] || '-';
-
-                            bacHist.unshift({ timestamp: itemTimestamp, tanggal: itemTanggal, rawTime: new Date(row[0] || 0).getTime(), name: nameSantri, detail: itemDetail, status: itemStatus, catatan: itemCat, type: 'bacaan' });
-
                             if (sObj) {
-                                sObj.lastBacaan = itemDetail;
+                                sObj.lastBacaan = row[6] || '-';
                                 sObj.cloudBacSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
                                     { item: row[12], start: row[13], end: row[14] }
                                 ];
+                                sObj.cloudBacStat = row[15] || '';
+                                sObj.cloudBacCat = row[16] || '';
                             }
                         });
-                        localStorage.setItem('rq_history_bacaan', JSON.stringify(bacHist));
                     }
 
                     if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
-                        const hafHist = [];
                         cloudData.input_hafalan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
-                            const itemDetail = row[6] !== '-' ? row[6] : '-';
-                            const itemStatus = row[15] || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
-                            const itemCat = row[16] || '';
-                            const itemTimestamp = row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-';
-                            const itemTanggal = row[1] || '-';
-
-                            hafHist.unshift({ timestamp: itemTimestamp, tanggal: itemTanggal, rawTime: new Date(row[0] || 0).getTime(), name: nameSantri, detail: itemDetail, status: itemStatus, catatan: itemCat, type: 'hafalan' });
-
                             if (sObj) {
-                                sObj.lastHafalan = itemDetail;
+                                sObj.lastHafalan = row[6] || '-';
                                 sObj.cloudHafSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
                                     { item: row[12], start: row[13], end: row[14] }
                                 ];
+                                sObj.cloudHafStat = row[15] || '';
+                                sObj.cloudHafCat = row[16] || '';
                             }
                         });
-                        localStorage.setItem('rq_history_hafalan', JSON.stringify(hafHist));
                     }
 
                     if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
-                        const murHist = [];
                         cloudData.input_murojaah_dikelas.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
-                            const itemDetail = row[6] !== '-' ? row[6] : '-';
-                            const itemStatus = row[15] || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
-                            const itemCat = row[16] || '';
-                            const itemTimestamp = row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-';
-                            const itemTanggal = row[1] || '-';
-
-                            murHist.unshift({ timestamp: itemTimestamp, tanggal: itemTanggal, rawTime: new Date(row[0] || 0).getTime(), name: nameSantri, detail: itemDetail, status: itemStatus, catatan: itemCat, type: 'murojaah' });
-
                             if (sObj) {
-                                sObj.lastMurojaah = itemDetail;
+                                sObj.lastMurojaah = row[6] || '-';
                                 sObj.cloudMurSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
                                     { item: row[12], start: row[13], end: row[14] }
                                 ];
+                                sObj.cloudMurStat = row[15] || '';
+                                sObj.cloudMurCat = row[16] || '';
                             }
                         });
-                        localStorage.setItem('rq_history_murojaah', JSON.stringify(murHist));
                     }
 
                     if (cloudData.input_tugas && cloudData.input_tugas.length > 0) {
-                        const tugHist = [];
                         cloudData.input_tugas.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
-                            const itemDetail = row[6] !== '-' ? row[6] : '-';
-                            const itemCat = row[8] || '';
-                            const itemTimestamp = row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-';
-                            const itemTanggal = row[1] || '-';
-
-                            tugHist.unshift({ timestamp: itemTimestamp, tanggal: itemTanggal, rawTime: new Date(row[0] || 0).getTime(), name: nameSantri, detail: itemDetail, status: '-', catatan: itemCat, type: 'tugas' });
-
                             if (sObj) {
-                                sObj.lastTugas = itemDetail;
+                                sObj.lastTugas = row[6] || '-';
+                                sObj.cloudTugCat = row[8] || '';
                             }
                         });
-                        localStorage.setItem('rq_history_tugas', JSON.stringify(tugHist));
                     }
                     
                     window.renderSantriCardsAndTable();
@@ -621,6 +588,43 @@
                 const hasInput = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
                 const badgeTag = hasInput ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[11px] font-black rounded-lg">Pernah Stor</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[11px] font-black rounded-lg">Belum Ada Stor</span>';
 
+                const defaultBacStat = s.cloudBacStat || 'B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
+                const defaultHafStat = s.cloudHafStat || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const defaultMurStat = s.cloudMurStat || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                
+                let parsedBacCatType = '';
+                let parsedBacCatDesc = s.cloudBacCat || '';
+                if (s.cloudBacCat && s.cloudBacCat.startsWith('[')) {
+                    const matchType = s.cloudBacCat.match(/\[(.*?)\]/);
+                    if (matchType) {
+                        parsedBacCatType = matchType[1];
+                        parsedBacCatDesc = s.cloudBacCat.replace(`[${parsedBacCatType}]`, '').trim();
+                    }
+                }
+
+                let parsedHafCatType = '';
+                let parsedHafCatDesc = s.cloudHafCat || '';
+                if (s.cloudHafCat && s.cloudHafCat.startsWith('[')) {
+                    const matchType = s.cloudHafCat.match(/\[(.*?)\]/);
+                    if (matchType) {
+                        parsedHafCatType = matchType[1];
+                        parsedHafCatDesc = s.cloudHafCat.replace(`[${parsedHafCatType}]`, '').trim();
+                    }
+                }
+
+                let parsedMurCatType = '';
+                let parsedMurCatDesc = s.cloudMurCat || '';
+                if (s.cloudMurCat && s.cloudMurCat.startsWith('[')) {
+                    const matchType = s.cloudMurCat.match(/\[(.*?)\]/);
+                    if (matchType) {
+                        parsedMurCatType = matchType[1];
+                        parsedMurCatDesc = s.cloudMurCat.replace(`[${parsedMurCatType}]`, '').trim();
+                    }
+                }
+
+                const defaultTugDetail = s.lastTugas && s.lastTugas !== '-' ? s.lastTugas : '';
+                const defaultTugCat = s.cloudTugCat || '';
+
                 return `
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all">
                         <div class="flex items-start justify-between border-b pb-3">
@@ -653,7 +657,7 @@
                                     </span>
                                     <div class="flex items-center gap-2">
                                         <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2.5 py-1 bg-emerald-200 hover:bg-emerald-300 text-emerald-950 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet Bacaan 📊
+                                            <i class="fa-solid fa-table"></i> Sheet Input Bacaan 📊
                                         </a>
                                         <span class="px-2.5 py-0.5 bg-emerald-200 text-emerald-900 text-[11px] font-black rounded-lg">Bacaan</span>
                                     </div>
@@ -663,27 +667,27 @@
                                     <div>
                                         <label class="block text-xs font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
                                         <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." selected>B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.">C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
-                                            <option value="D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.">D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.</option>
+                                            <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.startsWith('A') ? 'selected' : ''}>A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.startsWith('B') || !defaultBacStat ? 'selected' : ''}>B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.startsWith('C') ? 'selected' : ''}>C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
+                                            <option value="D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz." ${defaultBacStat.startsWith('D') ? 'selected' : ''}>D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-black text-emerald-900 mb-1.5">Catatan Bacaan (${s.name}):</label>
                                         <select id="bac_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
-                                            <option value="Makharijul Huruf">Makharijul Huruf</option>
-                                            <option value="Sifatul Huruf">Sifatul Huruf</option>
-                                            <option value="Tajwid">Tajwid</option>
-                                            <option value="Kelancaran Bacaan">Kelancaran Bacaan</option>
-                                            <option value="Panjang Pendek">Panjang Pendek</option>
-                                            <option value="Ghunnah">Ghunnah</option>
-                                            <option value="Waqaf & Ibtida'">Waqaf & Ibtida'</option>
-                                            <option value="Bacaan Gharib">Bacaan Gharib</option>
-                                            <option value="Kesalahan Bacaan">Kesalahan Bacaan</option>
+                                            <option value="Makharijul Huruf" ${parsedBacCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
+                                            <option value="Sifatul Huruf" ${parsedBacCatType === 'Sifatul Huruf' ? 'selected' : ''}>Sifatul Huruf</option>
+                                            <option value="Tajwid" ${parsedBacCatType === 'Tajwid' ? 'selected' : ''}>Tajwid</option>
+                                            <option value="Kelancaran Bacaan" ${parsedBacCatType === 'Kelancaran Bacaan' ? 'selected' : ''}>Kelancaran Bacaan</option>
+                                            <option value="Panjang Pendek" ${parsedBacCatType === 'Panjang Pendek' ? 'selected' : ''}>Panjang Pendek</option>
+                                            <option value="Ghunnah" ${parsedBacCatType === 'Ghunnah' ? 'selected' : ''}>Ghunnah</option>
+                                            <option value="Waqaf & Ibtida'" ${parsedBacCatType === "Waqaf & Ibtida'" ? 'selected' : ''}>Waqaf & Ibtida'</option>
+                                            <option value="Bacaan Gharib" ${parsedBacCatType === 'Bacaan Gharib' ? 'selected' : ''}>Bacaan Gharib</option>
+                                            <option value="Kesalahan Bacaan" ${parsedBacCatType === 'Kesalahan Bacaan' ? 'selected' : ''}>Kesalahan Bacaan</option>
                                         </select>
-                                        <input type="text" id="bac_cat_desc_${s.name}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-bold">
+                                        <input type="text" id="bac_cat_desc_${s.name}" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-bold">
                                     </div>
                                 </div>
                                 <button type="button" onclick="window.saveSectionData('${s.name}', 'bacaan')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
@@ -699,7 +703,7 @@
                                     </span>
                                     <div class="flex items-center gap-2">
                                         <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2.5 py-1 bg-rose-200 hover:bg-rose-300 text-rose-950 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet Hafalan 📊
+                                            <i class="fa-solid fa-table"></i> Sheet Input Hafalan 📊
                                         </a>
                                         <span class="px-2.5 py-0.5 bg-rose-200 text-rose-900 text-[11px] font-black rounded-lg">Hafalan Baru</span>
                                     </div>
@@ -709,27 +713,27 @@
                                     <div>
                                         <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." selected>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
+                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.startsWith('A') ? 'selected' : ''}>A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.startsWith('B') || !defaultHafStat ? 'selected' : ''}>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.startsWith('C') ? 'selected' : ''}>C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan." ${defaultHafStat.startsWith('D') ? 'selected' : ''}>D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-black text-rose-900 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
                                         <select id="haf_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
-                                            <option value="Kelancaran Hafalan">Kelancaran Hafalan</option>
-                                            <option value="Ketepatan Hafalan">Ketepatan Hafalan</option>
-                                            <option value="Tajwid Hafalan">Tajwid Hafalan</option>
-                                            <option value="Makharijul Huruf">Makharijul Huruf</option>
-                                            <option value="Panjang Pendek">Panjang Pendek</option>
-                                            <option value="Kelancaran Ayat">Kelancaran Ayat</option>
-                                            <option value="Sambung Ayat">Sambung Ayat</option>
-                                            <option value="Hafalan Belum Selesai">Hafalan Belum Selesai</option>
-                                            <option value="Hafalan Lulus">Hafalan Lulus</option>
+                                            <option value="Kelancaran Hafalan" ${parsedHafCatType === 'Kelancaran Hafalan' ? 'selected' : ''}>Kelancaran Hafalan</option>
+                                            <option value="Ketepatan Hafalan" ${parsedHafCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
+                                            <option value="Tajwid Hafalan" ${parsedHafCatType === 'Tajwid Hafalan' ? 'selected' : ''}>Tajwid Hafalan</option>
+                                            <option value="Makharijul Huruf" ${parsedHafCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
+                                            <option value="Panjang Pendek" ${parsedHafCatType === 'Panjang Pendek' ? 'selected' : ''}>Panjang Pendek</option>
+                                            <option value="Kelancaran Ayat" ${parsedHafCatType === 'Kelancaran Ayat' ? 'selected' : ''}>Kelancaran Ayat</option>
+                                            <option value="Sambung Ayat" ${parsedHafCatType === 'Sambung Ayat' ? 'selected' : ''}>Sambung Ayat</option>
+                                            <option value="Hafalan Belum Selesai" ${parsedHafCatType === 'Hafalan Belum Selesai' ? 'selected' : ''}>Hafalan Belum Selesai</option>
+                                            <option value="Hafalan Lulus" ${parsedHafCatType === 'Hafalan Lulus' ? 'selected' : ''}>Hafalan Lulus</option>
                                         </select>
-                                        <input type="text" id="haf_cat_desc_${s.name}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-bold">
+                                        <input type="text" id="haf_cat_desc_${s.name}" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-bold">
                                     </div>
                                 </div>
                                 <button type="button" onclick="window.saveSectionData('${s.name}', 'hafalan')" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
@@ -745,7 +749,7 @@
                                     </span>
                                     <div class="flex items-center gap-2">
                                         <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2.5 py-1 bg-sky-200 hover:bg-sky-300 text-sky-950 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet Muroja'ah 📊
+                                            <i class="fa-solid fa-table"></i> Sheet Muroja'ah Dikelas 📊
                                         </a>
                                         <span class="px-2.5 py-0.5 bg-sky-200 text-sky-900 text-[11px] font-black rounded-lg">Muroja'ah</span>
                                     </div>
@@ -755,26 +759,26 @@
                                     <div>
                                         <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." selected>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
+                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.startsWith('A') ? 'selected' : ''}>A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.startsWith('B') || !defaultMurStat ? 'selected' : ''}>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.startsWith('C') ? 'selected' : ''}>C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan." ${defaultMurStat.startsWith('D') ? 'selected' : ''}>D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-black text-sky-900 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
                                         <select id="mur_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
-                                            <option value="Kelancaran">Kelancaran</option>
-                                            <option value="Ketepatan Hafalan">Ketepatan Hafalan</option>
-                                            <option value="Sambung Ayat">Sambung Ayat</option>
-                                            <option value="Lupa Ayat">Lupa Ayat</option>
-                                            <option value="Pengulangan">Pengulangan</option>
-                                            <option value="Kekuatan Hafalan">Kekuatan Hafalan</option>
-                                            <option value="Hafalan Lama">Hafalan Lama</option>
-                                            <option value="Hafalan Juz">Hafalan Juz</option>
+                                            <option value="Kelancaran" ${parsedMurCatType === 'Kelancaran' ? 'selected' : ''}>Kelancaran</option>
+                                            <option value="Ketepatan Hafalan" ${parsedMurCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
+                                            <option value="Sambung Ayat" ${parsedMurCatType === 'Sambung Ayat' ? 'selected' : ''}>Sambung Ayat</option>
+                                            <option value="Lupa Ayat" ${parsedMurCatType === 'Lupa Ayat' ? 'selected' : ''}>Lupa Ayat</option>
+                                            <option value="Pengulangan" ${parsedMurCatType === 'Pengulangan' ? 'selected' : ''}>Pengulangan</option>
+                                            <option value="Kekuatan Hafalan" ${parsedMurCatType === 'Kekuatan Hafalan' ? 'selected' : ''}>Kekuatan Hafalan</option>
+                                            <option value="Hafalan Lama" ${parsedMurCatType === 'Hafalan Lama' ? 'selected' : ''}>Hafalan Lama</option>
+                                            <option value="Hafalan Juz" ${parsedMurCatType === 'Hafalan Juz' ? 'selected' : ''}>Hafalan Juz</option>
                                         </select>
-                                        <input type="text" id="mur_cat_desc_${s.name}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-bold">
+                                        <input type="text" id="mur_cat_desc_${s.name}" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-bold">
                                     </div>
                                 </div>
                                 <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
@@ -795,8 +799,8 @@
                                         <span class="px-2.5 py-0.5 bg-amberbrown-200 text-amberbrown-900 text-[11px] font-black rounded-lg">Tugas</span>
                                     </div>
                                 </div>
-                                <input type="text" id="tug_detail_${s.name}" placeholder="Rincian Tugas..." value="${s.lastTugas && s.lastTugas !== '-' ? s.lastTugas : ''}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-extrabold text-sm sm:text-base">
-                                <input type="text" id="tug_cat_${s.name}" placeholder="Catatan Tugas..." class="w-full p-3.5 sm:p-4 bg-white/80 dark:bg-slate-900/80 border-2 rounded-xl text-sm sm:text-base font-bold">
+                                <input type="text" id="tug_detail_${s.name}" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <input type="text" id="tug_cat_${s.name}" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-3.5 sm:p-4 bg-white/80 dark:bg-slate-900/80 border-2 rounded-xl text-sm sm:text-base font-bold">
                                 <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="w-full py-3.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 mt-1">
                                     <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
                                 </button>
@@ -876,6 +880,9 @@
 
                 s.lastBacaan = bacaanFormatted;
                 s.cloudBacSlots = structuredSlots;
+                s.cloudBacStat = bacaanStat;
+                s.cloudBacCat = bacaanCatCombined;
+
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
                 localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
@@ -913,6 +920,9 @@
 
                 s.lastHafalan = hafalanFormatted;
                 s.cloudHafSlots = structuredSlotsHaf;
+                s.cloudHafStat = hafalanStat;
+                s.cloudHafCat = hafalanCatCombined;
+
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
                 localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
@@ -950,6 +960,9 @@
 
                 s.lastMurojaah = murojaahFormatted;
                 s.cloudMurSlots = structuredSlotsMur;
+                s.cloudMurStat = murojaahStat;
+                s.cloudMurCat = murojaahCatCombined;
+
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
                 localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
@@ -982,6 +995,8 @@
                 const tugasCat = document.getElementById(`tug_cat_${name}`)?.value.trim() || '';
 
                 s.lastTugas = tugasVal;
+                s.cloudTugCat = tugasCat;
+
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
                 localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
@@ -1255,6 +1270,13 @@
                     s.cloudBacSlots = null;
                     s.cloudHafSlots = null;
                     s.cloudMurSlots = null;
+                    s.cloudBacStat = '';
+                    s.cloudBacCat = '';
+                    s.cloudHafStat = '';
+                    s.cloudHafCat = '';
+                    s.cloudMurStat = '';
+                    s.cloudMurCat = '';
+                    s.cloudTugCat = '';
                 });
                 localStorage.removeItem('rq_history_bacaan');
                 localStorage.removeItem('rq_history_hafalan');
