@@ -301,11 +301,24 @@
                     }
 
                     if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
+                        // Map input_bacaan rows
+                        const bacHist = cloudData.input_bacaan.map(row => ({
+                            timestamp: row[0], tanggal: row[1], name: row[3], class: row[4], teacher: row[5],
+                            detail: `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`,
+                            status: row[15] || '-', catatan: row[16] || '-',
+                            slots: [
+                                { item: row[6], start: row[7], end: row[8] },
+                                { item: row[9], start: row[10], end: row[11] },
+                                { item: row[12], start: row[13], end: row[14] }
+                            ]
+                        }));
+                        localStorage.setItem('rq_history_bacaan', JSON.stringify(bacHist));
+
                         cloudData.input_bacaan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastBacaan = row[6] || '-';
+                                sObj.lastBacaan = `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`;
                                 sObj.cloudBacSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -316,11 +329,23 @@
                     }
 
                     if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
+                        const hafHist = cloudData.input_hafalan.map(row => ({
+                            timestamp: row[0], tanggal: row[1], name: row[3], class: row[4], teacher: row[5],
+                            detail: `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`,
+                            status: row[15] || '-', catatan: row[16] || '-',
+                            slots: [
+                                { item: row[6], start: row[7], end: row[8] },
+                                { item: row[9], start: row[10], end: row[11] },
+                                { item: row[12], start: row[13], end: row[14] }
+                            ]
+                        }));
+                        localStorage.setItem('rq_history_hafalan', JSON.stringify(hafHist));
+
                         cloudData.input_hafalan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastHafalan = row[6] || '-';
+                                sObj.lastHafalan = `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`;
                                 sObj.cloudHafSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -331,11 +356,23 @@
                     }
 
                     if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
+                        const murHist = cloudData.input_murojaah_dikelas.map(row => ({
+                            timestamp: row[0], tanggal: row[1], name: row[3], class: row[4], teacher: row[5],
+                            detail: `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`,
+                            status: row[15] || '-', catatan: row[16] || '-',
+                            slots: [
+                                { item: row[6], start: row[7], end: row[8] },
+                                { item: row[9], start: row[10], end: row[11] },
+                                { item: row[12], start: row[13], end: row[14] }
+                            ]
+                        }));
+                        localStorage.setItem('rq_history_murojaah', JSON.stringify(murHist));
+
                         cloudData.input_murojaah_dikelas.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastMurojaah = row[6] || '-';
+                                sObj.lastMurojaah = `${row[6] || '-'} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] ? row[7] : '')}`;
                                 sObj.cloudMurSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -765,7 +802,7 @@
 
                 if (itemVal) {
                     if (start && end) {
-                        const rangeLabel = mode === 'iqro' ? `Hlm ${start}-${end}` : `Ayat ${start}-${end}`;
+                        const rangeLabel = mode === 'iqro' ? `Hlm ${start}-${end}` : `${start}-${end}`;
                         entries.push(`${itemVal} ${rangeLabel}`);
                     } else if (start) {
                         const rangeLabel = mode === 'iqro' ? `Hlm ${start}` : `Ayat ${start}`;
@@ -821,7 +858,7 @@
                 s.lastBacaanCat = bacaanCatCombined;
                 s.cloudBacSlots = structuredSlots;
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan', slots: structuredSlots });
                 localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -859,7 +896,7 @@
                 s.lastHafalanCat = hafalanCatCombined;
                 s.cloudHafSlots = structuredSlotsHaf;
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan', slots: structuredSlotsHaf });
                 localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -897,7 +934,7 @@
                 s.lastMurojaahCat = murojaahCatCombined;
                 s.cloudMurSlots = structuredSlotsMur;
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah', slots: structuredSlotsMur });
                 localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -2078,7 +2115,6 @@
         </section>
     </main>
 
-    <!-- Toast Container positioned at the top of the screen -->
     <div id="toastContainer" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
     <script>
