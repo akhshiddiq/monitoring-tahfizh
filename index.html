@@ -286,11 +286,11 @@
                     if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
                     
                     if (cloudData.materi) {
-                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4] }));
+                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], showInReport: true }));
                         localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
                     }
                     if (cloudData.materi_tambahan) {
-                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4] }));
+                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], showInReport: true }));
                         localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
                     }
 
@@ -373,6 +373,7 @@
             const bab = document.getElementById(isUtama ? 'materiBabInput' : 'materiTambahanBabInput').value;
             const tanggal = document.getElementById(isUtama ? 'materiTanggalInput' : 'materiTambahanTanggalInput').value || new Date().toISOString().split('T')[0];
             const ket = document.getElementById(isUtama ? 'materiKeteranganInput' : 'materiTambahanKeteranganInput').value;
+            const showInReport = document.getElementById(isUtama ? 'materiShowInReport' : 'materiTambahanShowInReport')?.checked ?? true;
 
             if (!judul) {
                 window.showToast("Judul mata pelajaran wajib diisi!", "error");
@@ -381,13 +382,13 @@
 
             const key = isUtama ? 'rq_materi_utama' : 'rq_materi_tambahan';
             const list = JSON.parse(localStorage.getItem(key) || '[]');
-            list.unshift({ kelas, judul, bab, tanggal, ket });
+            list.unshift({ kelas, judul, bab, tanggal, ket, showInReport });
             localStorage.setItem(key, JSON.stringify(list));
 
             window.showToast("Materi berhasil disimpan & disinkronkan!", "success");
             window.renderMateriList(type);
 
-            window.syncToCloud({ type: 'materi', subType: type, kelas, judul, bab, tanggal, ket });
+            window.syncToCloud({ type: 'materi', subType: type, kelas, judul, bab, tanggal, ket, showInReport });
         };
 
         window.renderMateriList = function(type) {
@@ -405,12 +406,26 @@
             container.innerHTML = list.map((m, idx) => `
                 <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs">
                     <div>
-                        <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)}</div>
+                        <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)} ${m.showInReport ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Masuk Laporan</span>' : '<span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">Sembunyikan dari Laporan</span>'}</div>
                         <div class="font-bold text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
                     </div>
-                    <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-3 py-1.5 text-xs">Hapus</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.toggleMateriReport('${type}', ${idx})" class="text-xs font-bold px-2 py-1 bg-slate-200 dark:bg-slate-800 rounded hover:bg-slate-300">${m.showInReport ? 'Sembunyikan' : 'Tampilkan'}</button>
+                        <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-2 py-1 text-xs">Hapus</button>
+                    </div>
                 </div>
             `).join('');
+        };
+
+        window.toggleMateriReport = function(type, idx) {
+            const key = type === 'utama' ? 'rq_materi_utama' : 'rq_materi_tambahan';
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            if (list[idx]) {
+                list[idx].showInReport = !list[idx].showInReport;
+                localStorage.setItem(key, JSON.stringify(list));
+                window.renderMateriList(type);
+                window.showToast("Status laporan materi diperbarui", "success");
+            }
         };
 
         window.deleteMateri = function(type, idx) {
@@ -478,11 +493,14 @@
             return slots.map(slot => {
                 const isFirst = slot === 1;
                 const stateKey = `${santriName}_${category}_slot_${slot}`;
-                const isVisible = isFirst || !!window.activeSlotState[stateKey] || (cloudSlots && cloudSlots[slot-1]?.item && cloudSlots[slot-1]?.item !== '-');
+                const slotData = cloudSlots ? cloudSlots[slot-1] : null;
+                const hasData = slotData && slotData.item && slotData.item !== '-' && slotData.item !== '';
+                const isVisible = isFirst || !!window.activeSlotState[stateKey] || hasData;
 
-                const slotItem = cloudSlots ? (cloudSlots[slot-1]?.item || '') : '';
-                const slotStart = cloudSlots ? (cloudSlots[slot-1]?.start || '') : '';
-                const slotEnd = cloudSlots ? (cloudSlots[slot-1]?.end || '') : '';
+                const slotItem = slotData ? (slotData.item || '') : '';
+                const slotStart = slotData ? (slotData.start !== '-' ? (slotData.start || '') : '') : '';
+                const slotEnd = slotData ? (slotData.end !== '-' ? (slotData.end || '') : '') : '';
+                const isIqroItem = slotItem.startsWith('Iqro');
 
                 return `
                     ${!isFirst ? `
@@ -499,19 +517,19 @@
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-500">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs ${!isIqroItem ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs ${isIqroItem ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
-                        <div id="field_quran_${category}_${slot}_${santriName}">
+                        <div id="field_quran_${category}_${slot}_${santriName}" class="${isIqroItem ? 'hidden' : ''}">
                             <select id="${category}_surah_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Surat Al-Qur'an (114 Surat) --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${slotItem === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
-                        <div id="field_iqro_${category}_${slot}_${santriName}" class="hidden">
+                        <div id="field_iqro_${category}_${slot}_${santriName}" class="${!isIqroItem ? 'hidden' : ''}">
                             <select id="${category}_iqro_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${slotItem === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
@@ -525,12 +543,12 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Mulai:</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${isIqroItem ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
+                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Sampai:</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${isIqroItem ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
+                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                         </div>
                     </div>
@@ -643,10 +661,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan (${s.name}):</label>
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk</option>
-                                            <option value="B — Baik">B — Baik</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan</option>
+                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk (Hafalan sangat lancar, tepat, dan kuat. Hampir tidak ada kesalahan.)</option>
+                                            <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.)</option>
+                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa, berhenti, atau salah urutan ayat.)</option>
+                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan (Hafalan belum lancar dan masih membutuhkan banyak bantuan/pancingan.)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -684,10 +702,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di Kelas (${s.name}):</label>
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk</option>
-                                            <option value="B — Baik">B — Baik</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan</option>
+                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk (Hafalan sangat lancar, tepat, dan kuat. Hampir tidak ada kesalahan.)</option>
+                                            <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.)</option>
+                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa, berhenti, atau salah urutan ayat.)</option>
+                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan (Hafalan belum lancar dan masih membutuhkan banyak bantuan/pancingan.)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -747,7 +765,7 @@
 
                 if (itemVal) {
                     if (start && end) {
-                        const rangeLabel = mode === 'iqro' ? `Hlm ${start}-${end}` : `${start}-${end}`;
+                        const rangeLabel = mode === 'iqro' ? `Hlm ${start}-${end}` : `Ayat ${start}-${end}`;
                         entries.push(`${itemVal} ${rangeLabel}`);
                     } else if (start) {
                         const rangeLabel = mode === 'iqro' ? `Hlm ${start}` : `Ayat ${start}`;
@@ -1377,29 +1395,26 @@
 
             const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
             const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const filteredMateri = materiUtama.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
-            const filteredTambahan = materiTambahan.filter(m => m.kelas === s.class || m.kelas === 'SEMUA KELAS');
+            const filteredMateri = materiUtama.filter(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
+            const filteredTambahan = materiTambahan.filter(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
 
             let bagianSetoran = "";
             if (s.lastBacaan && s.lastBacaan !== '-') {
-                const ayatBac = window.calculateVersesFromDetail(s.lastBacaan);
-                bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan} (${ayatBac} ayat)`;
+                bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}`;
                 if (s.lastBacaanStat) bagianSetoran += `\n   - Nilai: ${s.lastBacaanStat}`;
                 if (s.lastBacaanCat) bagianSetoran += `\n   - Catatan: ${s.lastBacaanCat}`;
                 bagianSetoran += `\n`;
             }
 
             if (s.lastHafalan && s.lastHafalan !== '-') {
-                const ayatHaf = window.calculateVersesFromDetail(s.lastHafalan);
-                bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan} (${ayatHaf} ayat)`;
+                bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}`;
                 if (s.lastHafalanStat) bagianSetoran += `\n   - Nilai: ${s.lastHafalanStat}`;
                 if (s.lastHafalanCat) bagianSetoran += `\n   - Catatan: ${s.lastHafalanCat}`;
                 bagianSetoran += `\n`;
             }
 
             if (s.lastMurojaah && s.lastMurojaah !== '-') {
-                const ayatMur = window.calculateVersesFromDetail(s.lastMurojaah);
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${s.lastMurojaah} (${ayatMur} ayat)`;
+                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${s.lastMurojaah}`;
                 if (s.lastMurojaahStat) bagianSetoran += `\n   - Nilai: ${s.lastMurojaahStat}`;
                 if (s.lastMurojaahCat) bagianSetoran += `\n   - Catatan: ${s.lastMurojaahCat}`;
                 bagianSetoran += `\n`;
@@ -1413,18 +1428,16 @@
 
             let materiText = "";
             if (filteredMateri.length > 0) {
-                materiText += "📚 *Materi Belajar Hari Ini:*";
-                filteredMateri.forEach(m => {
-                    materiText += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
-                });
+                // Get strictly the latest material
+                const latestMateri = filteredMateri[0];
+                materiText += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}`;
             }
 
             if (filteredTambahan.length > 0) {
                 if (materiText) materiText += "\n\n";
-                materiText += "⭐ *Materi Tambahan Hari Ini:*";
-                filteredTambahan.forEach(m => {
-                    materiText += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}`;
-                });
+                // Get strictly the latest additional material
+                const latestTambahan = filteredTambahan[0];
+                materiText += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}`;
             }
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
@@ -1472,27 +1485,21 @@
             
             const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
             const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const filteredMateri = materiUtama.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
-            const filteredTambahan = materiTambahan.filter(m => m.kelas === className || m.kelas === 'SEMUA KELAS');
+            const filteredMateri = materiUtama.filter(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
+            const filteredTambahan = materiTambahan.filter(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.showInReport !== false);
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
             let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
             
             if (filteredMateri.length > 0) {
-                msg += `📚 *Materi Belajar Hari Ini:*`;
-                filteredMateri.forEach(m => {
-                    msg += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
-                });
-                msg += `\n`;
+                const latestMateri = filteredMateri[0];
+                msg += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}\n\n`;
             }
 
             if (filteredTambahan.length > 0) {
-                msg += `⭐ *Materi Tambahan Hari Ini:*`;
-                filteredTambahan.forEach(m => {
-                    msg += `\n- *${m.judul}*\n  Bab: ${m.bab || '-'}\n  Ket: ${m.ket || '-'}\n`;
-                });
-                msg += `\n`;
+                const latestTambahan = filteredTambahan[0];
+                msg += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}\n\n`;
             }
 
             msg += `👥 *Daftar Santri & Prestasi:*`;
@@ -1503,20 +1510,10 @@
                     activeSantriCount++;
                     const emojiNum = window.numberToEmoji(activeSantriCount);
                     let santriLine = `\n${emojiNum} *${s.name}*`;
-                    
-                    if (s.lastBacaan && s.lastBacaan !== '-') {
-                        santriLine += `\n    - Bacaan: ${s.lastBacaan}`;
-                    }
-                    if (s.lastHafalan && s.lastHafalan !== '-') {
-                        santriLine += `\n    - Hafalan: ${s.lastHafalan}`;
-                    }
-                    if (s.lastMurojaah && s.lastMurojaah !== '-') {
-                        santriLine += `\n    - Muroja'ah di Kelas: ${s.lastMurojaah}`;
-                    }
-                    if (s.lastTugas && s.lastTugas !== '-') {
-                        santriLine += `\n    - Tugas: ${s.lastTugas}`;
-                    }
-                    
+                    if (s.lastBacaan && s.lastBacaan !== '-') santriLine += `\n    - Bacaan: ${s.lastBacaan}`;
+                    if (s.lastHafalan && s.lastHafalan !== '-') santriLine += `\n    - Hafalan: ${s.lastHafalan}`;
+                    if (s.lastMurojaah && s.lastMurojaah !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${s.lastMurojaah}`;
+                    if (s.lastTugas && s.lastTugas !== '-') santriLine += `\n    - Tugas: ${s.lastTugas}`;
                     msg += santriLine + `\n`;
                 }
             });
@@ -1567,13 +1564,6 @@
                     s.lastHafalan = '-';
                     s.lastMurojaah = '-';
                     s.lastTugas = '-';
-                    s.lastBacaanStat = '';
-                    s.lastHafalanStat = '';
-                    s.lastMurojaahStat = '';
-                    s.lastBacaanCat = '';
-                    s.lastHafalanCat = '';
-                    s.lastMurojaahCat = '';
-                    s.lastTugasCat = '';
                     s.cloudBacSlots = null;
                     s.cloudHafSlots = null;
                     s.cloudMurSlots = null;
@@ -1739,6 +1729,10 @@
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Keterangan:</label>
                             <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-sm font-semibold"></textarea>
                         </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" id="materiShowInReport" checked class="w-4 h-4 accent-emerald-600 rounded">
+                            <label for="materiShowInReport" class="text-xs font-black text-slate-700 dark:text-slate-300">Tampilkan materi ini di Laporan WA / Kelas</label>
+                        </div>
                         <button onclick="window.saveMateri('utama')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan & Sinkron Materi</button>
                     </div>
 
@@ -1791,6 +1785,10 @@
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Keterangan Tambahan:</label>
                             <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-sm font-semibold"></textarea>
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" id="materiTambahanShowInReport" checked class="w-4 h-4 accent-amber-600 rounded">
+                            <label for="materiTambahanShowInReport" class="text-xs font-black text-slate-700 dark:text-slate-300">Tampilkan materi tambahan ini di Laporan WA / Kelas</label>
                         </div>
                         <button onclick="window.saveMateri('tambahan')" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-sm shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
                     </div>
