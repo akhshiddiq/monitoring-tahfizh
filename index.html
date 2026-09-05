@@ -588,9 +588,9 @@
                 const hasInput = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
                 const badgeTag = hasInput ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[11px] font-black rounded-lg">Pernah Stor</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[11px] font-black rounded-lg">Belum Ada Stor</span>';
 
-                const defaultBacStat = s.cloudBacStat || 'B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
-                const defaultHafStat = s.cloudHafStat || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
-                const defaultMurStat = s.cloudMurStat || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const defaultBacStat = s.cloudBacStat || 'Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
+                const defaultHafStat = s.cloudHafStat || 'Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const defaultMurStat = s.cloudMurStat || 'Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
                 
                 let parsedBacCatType = '';
                 let parsedBacCatDesc = s.cloudBacCat || '';
@@ -600,6 +600,8 @@
                         parsedBacCatType = matchType[1];
                         parsedBacCatDesc = s.cloudBacCat.replace(`[${parsedBacCatType}]`, '').trim();
                     }
+                } else if (s.cloudBacCat) {
+                    parsedBacCatDesc = s.cloudBacCat;
                 }
 
                 let parsedHafCatType = '';
@@ -610,6 +612,8 @@
                         parsedHafCatType = matchType[1];
                         parsedHafCatDesc = s.cloudHafCat.replace(`[${parsedHafCatType}]`, '').trim();
                     }
+                } else if (s.cloudHafCat) {
+                    parsedHafCatDesc = s.cloudHafCat;
                 }
 
                 let parsedMurCatType = '';
@@ -620,6 +624,8 @@
                         parsedMurCatType = matchType[1];
                         parsedMurCatDesc = s.cloudMurCat.replace(`[${parsedMurCatType}]`, '').trim();
                     }
+                } else if (s.cloudMurCat) {
+                    parsedMurCatDesc = s.cloudMurCat;
                 }
 
                 const defaultTugDetail = s.lastTugas && s.lastTugas !== '-' ? s.lastTugas : '';
@@ -667,10 +673,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
                                         <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.startsWith('A') ? 'selected' : ''}>A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.startsWith('B') || !defaultBacStat ? 'selected' : ''}>B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.startsWith('C') ? 'selected' : ''}>C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
-                                            <option value="D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz." ${defaultBacStat.startsWith('D') ? 'selected' : ''}>D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.</option>
+                                            <option value="Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
+                                            <option value="Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.includes('cukup lancar') || !defaultBacStat ? 'selected' : ''}>Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
+                                            <option value="Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.includes('Perbaikan') || defaultBacStat.includes('75') ? 'selected' : ''}>Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
+                                            <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultBacStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                         </select>
                                     </div>
                                     <div>
@@ -713,10 +719,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.startsWith('A') ? 'selected' : ''}>A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.startsWith('B') || !defaultHafStat ? 'selected' : ''}>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.startsWith('C') ? 'selected' : ''}>C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan." ${defaultHafStat.startsWith('D') ? 'selected' : ''}>D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
+                                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                            <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('cukup lancar') || !defaultHafStat ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('Perbaikan') || defaultHafStat.includes('75') ? 'selected' : ''}>Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultHafStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                         </select>
                                     </div>
                                     <div>
@@ -759,10 +765,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.startsWith('A') ? 'selected' : ''}>A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.startsWith('B') || !defaultMurStat ? 'selected' : ''}>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.startsWith('C') ? 'selected' : ''}>C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan." ${defaultMurStat.startsWith('D') ? 'selected' : ''}>D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
+                                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                            <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('cukup lancar') || !defaultMurStat ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('Perbaikan') || defaultMurStat.includes('75') ? 'selected' : ''}>Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultMurStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                         </select>
                                     </div>
                                     <div>
@@ -872,7 +878,7 @@
                     window.showToast("Pilih minimal 1 surat/iqro bacaan!", "error");
                     return;
                 }
-                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
+                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
                 const bacType = document.getElementById(`bac_cat_type_${name}`)?.value || '';
                 const bacDesc = document.getElementById(`bac_cat_desc_${name}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
@@ -912,7 +918,7 @@
                     window.showToast("Pilih minimal 1 surat hafalan baru!", "error");
                     return;
                 }
-                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
                 const hafType = document.getElementById(`haf_cat_type_${name}`)?.value || '';
                 const hafDesc = document.getElementById(`haf_cat_desc_${name}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
@@ -952,7 +958,7 @@
                     window.showToast("Pilih minimal 1 surat muroja'ah!", "error");
                     return;
                 }
-                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
                 const murType = document.getElementById(`mur_cat_type_${name}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
