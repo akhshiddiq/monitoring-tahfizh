@@ -55,6 +55,7 @@
         window.itemSourceMode = {};
         window.activeSlotState = {};
         window.activeHistoryCategory = 'keseluruhan';
+        window.historyClassFilter = 'ALL';
         window.selectedWaSantriName = null;
         window.selectedAyatSantriName = null;
 
@@ -199,6 +200,11 @@
             window.renderSantriCardsAndTable(); 
         };
 
+        window.filterHistoryByClass = function(v) {
+            window.historyClassFilter = v;
+            window.renderHistoryTable();
+        };
+
         window.scrollToSantri = function(santriName) {
             const card = document.getElementById(`santri_card_${CSS.escape(santriName)}`);
             if (card) {
@@ -300,8 +306,6 @@
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
                                 sObj.lastBacaan = row[6] || '-';
-                                sObj.lastBacaanStat = row[15] || '';
-                                sObj.lastBacaanCat = row[16] || '';
                                 sObj.cloudBacSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -317,8 +321,6 @@
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
                                 sObj.lastHafalan = row[6] || '-';
-                                sObj.lastHafalanStat = row[15] || '';
-                                sObj.lastHafalanCat = row[16] || '';
                                 sObj.cloudHafSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -334,8 +336,6 @@
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
                                 sObj.lastMurojaah = row[6] || '-';
-                                sObj.lastMurojaahStat = row[15] || '';
-                                sObj.lastMurojaahCat = row[16] || '';
                                 sObj.cloudMurSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -821,7 +821,7 @@
                 s.lastBacaanCat = bacaanCatCombined;
                 s.cloudBacSlots = structuredSlots;
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
                 localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -838,7 +838,7 @@
                 });
 
                 if (bacaanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Bacaan berhasil disimpan & disinkronkan!", "success");
             } 
@@ -859,7 +859,7 @@
                 s.lastHafalanCat = hafalanCatCombined;
                 s.cloudHafSlots = structuredSlotsHaf;
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
                 localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -876,7 +876,7 @@
                 });
 
                 if (hafalanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Hafalan Baru berhasil disimpan & disinkronkan!", "success");
             } 
@@ -897,7 +897,7 @@
                 s.lastMurojaahCat = murojaahCatCombined;
                 s.cloudMurSlots = structuredSlotsMur;
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
                 localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -914,7 +914,7 @@
                 });
 
                 if (murojaahCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Muroja'ah berhasil disimpan & disinkronkan!", "success");
             } 
@@ -929,12 +929,12 @@
                 s.lastTugas = tugasVal;
                 s.lastTugasCat = tugasCat;
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
                 localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
                 window.syncToCloud({ type: 'tugas', timestamp: formattedTimeStr, tanggal: tanggalVal, name: s.name, class: s.class, teacher: s.teacher, detail: tugasVal, status: '-', catatan: tugasCat });
 
                 if (tugasCat) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, class: s.class, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
                 }
                 window.showToast("💾 Tugas berhasil disimpan & disinkronkan!", "success");
             }
@@ -1001,6 +1001,7 @@
             const cat = window.activeHistoryCategory;
             const searchInput = document.getElementById('historySearchInput');
             const searchQ = (searchInput?.value || '').toLowerCase().trim();
+            const classFilterVal = window.historyClassFilter || 'ALL';
             window.toggleClearBtn('historySearchInput', 'clearHistorySearchBtn');
 
             let bac = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
@@ -1014,10 +1015,11 @@
                     return;
                 }
 
-                let filteredSantri = window.santriList;
-                if (searchQ) {
-                    filteredSantri = window.santriList.filter(s => (s.name || '').toLowerCase().includes(searchQ) || (s.class || '').toLowerCase().includes(searchQ));
-                }
+                let filteredSantri = window.santriList.filter(s => {
+                    const matchClass = (classFilterVal === 'ALL' || s.class === classFilterVal);
+                    const matchSearch = !searchQ || (s.name || '').toLowerCase().includes(searchQ) || (s.class || '').toLowerCase().includes(searchQ);
+                    return matchClass && matchSearch;
+                });
 
                 if (filteredSantri.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs">Santri tidak ditemukan.</td></tr>`;
@@ -1052,13 +1054,13 @@
             const key = cat === 'rekapan' ? 'rq_history_rekapan' : `rq_history_${cat}`;
             list = JSON.parse(localStorage.getItem(key) || '[]');
 
-            if (searchQ) {
-                list = list.filter(item => {
-                    const name = (item.name || '').toLowerCase();
-                    const detail = (item.detail || item.catatan || '').toLowerCase();
-                    return name.includes(searchQ) || detail.includes(searchQ);
-                });
-            }
+            list = list.filter(item => {
+                const sObj = window.santriList.find(s => (s.name || '').toLowerCase() === (item.name || '').toLowerCase());
+                const itemClass = item.class || sObj?.class || '';
+                const matchClass = (classFilterVal === 'ALL' || itemClass === classFilterVal);
+                const matchSearch = !searchQ || (item.name || '').toLowerCase().includes(searchQ) || (item.detail || item.catatan || '').toLowerCase().includes(searchQ);
+                return matchClass && matchSearch;
+            });
 
             if (list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold text-xs">Belum ada data riwayat tercatat.</td></tr>`;
@@ -1074,7 +1076,7 @@
             if (cat === 'rekapan') {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}</td>
+                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}<br><span class="text-[10px] text-slate-400 font-normal">${h.class || ''}</span></td>
                         <td class="p-3 text-xs sm:text-sm font-extrabold text-amber-700">${h.category || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-semibold">${h.catatan || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-bold text-emerald-800 text-right">${h.timestamp || '-'}</td>
@@ -1083,7 +1085,7 @@
             } else {
                 tbody.innerHTML = list.map((h) => `
                     <tr>
-                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}</td>
+                        <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}<br><span class="text-[10px] text-slate-400 font-normal">${h.class || ''}</span></td>
                         <td class="p-3 text-xs sm:text-sm font-bold">${h.detail || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-bold text-emerald-700">${h.status || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-semibold">${h.catatan || '-'}</td>
@@ -1400,21 +1402,27 @@
 
             let bagianSetoran = "";
             if (s.lastBacaan && s.lastBacaan !== '-') {
+                const totalBacAyat = window.calculateVersesFromDetail(s.lastBacaan);
                 bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}`;
+                if (totalBacAyat > 0) bagianSetoran += ` (${totalBacAyat} ayat)`;
                 if (s.lastBacaanStat) bagianSetoran += `\n   - Nilai: ${s.lastBacaanStat}`;
                 if (s.lastBacaanCat) bagianSetoran += `\n   - Catatan: ${s.lastBacaanCat}`;
                 bagianSetoran += `\n`;
             }
 
             if (s.lastHafalan && s.lastHafalan !== '-') {
+                const totalHafAyat = window.calculateVersesFromDetail(s.lastHafalan);
                 bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}`;
+                if (totalHafAyat > 0) bagianSetoran += ` (${totalHafAyat} ayat)`;
                 if (s.lastHafalanStat) bagianSetoran += `\n   - Nilai: ${s.lastHafalanStat}`;
                 if (s.lastHafalanCat) bagianSetoran += `\n   - Catatan: ${s.lastHafalanCat}`;
                 bagianSetoran += `\n`;
             }
 
             if (s.lastMurojaah && s.lastMurojaah !== '-') {
+                const totalMurAyat = window.calculateVersesFromDetail(s.lastMurojaah);
                 bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${s.lastMurojaah}`;
+                if (totalMurAyat > 0) bagianSetoran += ` (${totalMurAyat} ayat)`;
                 if (s.lastMurojaahStat) bagianSetoran += `\n   - Nilai: ${s.lastMurojaahStat}`;
                 if (s.lastMurojaahCat) bagianSetoran += `\n   - Catatan: ${s.lastMurojaahCat}`;
                 bagianSetoran += `\n`;
@@ -1428,14 +1436,12 @@
 
             let materiText = "";
             if (filteredMateri.length > 0) {
-                // Get strictly the latest material
                 const latestMateri = filteredMateri[0];
                 materiText += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}`;
             }
 
             if (filteredTambahan.length > 0) {
                 if (materiText) materiText += "\n\n";
-                // Get strictly the latest additional material
                 const latestTambahan = filteredTambahan[0];
                 materiText += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}`;
             }
@@ -1821,7 +1827,22 @@
                 <div class="flex items-center justify-between pt-1 flex-wrap gap-3">
                     <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
                         <span id="activeHistoryTitle" class="font-black text-sm sm:text-base text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
-                        <div class="relative w-full sm:w-72">
+                        <div class="flex items-center gap-2">
+                            <select id="historyClassFilterSelect" onchange="window.filterHistoryByClass(this.value)" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm outline-none cursor-pointer">
+                                <option value="ALL">Semua Kelas</option>
+                                <option value="Abdurrahman">Abdurrahman</option>
+                                <option value="Abu Ubaidah">Abu Ubaidah</option>
+                                <option value="Zubair">Zubair</option>
+                                <option value="Ali">Ali</option>
+                                <option value="Utsman">Utsman</option>
+                                <option value="Abu Bakar">Abu Bakar</option>
+                                <option value="Bilal">Bilal</option>
+                                <option value="Hamzah">Hamzah</option>
+                                <option value="Fatimah">Fatimah</option>
+                                <option value="Umar">Umar</option>
+                            </select>
+                        </div>
+                        <div class="relative w-full sm:w-64">
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
                             </span>
