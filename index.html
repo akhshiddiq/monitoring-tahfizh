@@ -619,7 +619,7 @@
                                         <label class="block text-xs font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
                                         <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.">B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
+                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." selected>B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
                                             <option value="C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.">C — Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
                                             <option value="D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.">D — Perlu Bimbingan, Bacaan masih banyak kesalahan dan membutuhkan bimbingan langsung dari ustadz.</option>
                                         </select>
@@ -657,12 +657,12 @@
                                 ${window.renderTripleInputSlot('haf', s.name, 'rose')}
                                 <div class="pt-3 border-t border-rose-200 space-y-3">
                                     <div>
-                                        <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan di Rumah (${s.name}):</label>
+                                        <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.</option>
-                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.</option>
+                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." selected>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
                                         </select>
                                     </div>
                                     <div>
@@ -698,12 +698,12 @@
                                 ${window.renderTripleInputSlot('mur', s.name, 'sky')}
                                 <div class="pt-3 border-t border-sky-200 space-y-3">
                                     <div>
-                                        <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di Rumah (${s.name}):</label>
+                                        <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di rumah, berhenti, atau salah urutan ayat.</option>
-                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di rumah dan masih membutuhkan banyak bantuan/pancingan.</option>
+                                            <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                            <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." selected>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                            <option value="C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">C — Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.">D — Perlu Bimbingan, Hafalan belum lancar di kelas pertemuan terakhir dan masih membutuhkan banyak bantuan/pancingan.</option>
                                         </select>
                                     </div>
                                     <div>
