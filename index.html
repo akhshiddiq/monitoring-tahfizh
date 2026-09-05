@@ -15,6 +15,7 @@
                         amber: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f', 950: '#451a03' },
                         sky: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e', 950: '#082f49' },
                         rose: { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' },
+                        purple: { 50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 300: '#d8b4fe', 400: '#c084fc', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce', 800: '#6b21a8', 900: '#581c87', 950: '#3b0764' },
                         amberbrown: { 50: '#fdf8f6', 100: '#fbeee6', 200: '#f5dcd0', 300: '#eac2ae', 400: '#dc9c7f', 500: '#cb7a55', 600: '#bc623d', 700: '#9c4e30', 800: '#7e4028', 900: '#683624', 950: '#381c12' }
                     }
                 }
@@ -528,7 +529,7 @@
             }
         };
 
-        window.renderTripleInputSlot = function(category, santriName, primaryColor) {
+        window.renderTripleInputSlot = function(category, santriName) {
             const slots = [1, 2, 3];
             const sObj = window.santriList.find(x => x.name === santriName);
             let cloudSlots = null;
@@ -548,15 +549,15 @@
                 return `
                     ${!isFirst ? `
                         <div class="my-2">
-                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3.5 py-2.5 bg-${primaryColor}-100 hover:bg-${primaryColor}-200 dark:bg-${primaryColor}-950 text-${primaryColor}-800 dark:text-primary-300 font-black rounded-xl text-xs flex items-center gap-2 transition">
+                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3.5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-2 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-4 sm:p-5 bg-white/95 dark:bg-slate-900/95 rounded-2xl border-2 border-${primaryColor}-200 dark:border-${primaryColor}-900 space-y-3 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-black text-${primaryColor}-900 dark:text-${primaryColor}-200">
+                            <span class="text-xs font-black text-slate-800 dark:text-slate-200">
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl">
@@ -624,9 +625,9 @@
                 const hasInput = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
                 const badgeTag = hasInput ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[11px] font-black rounded-lg">Pernah Stor</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[11px] font-black rounded-lg">Belum Ada Stor</span>';
 
-                const defaultBacStat = s.cloudBacStat || 'Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.';
-                const defaultHafStat = s.cloudHafStat || 'Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.';
-                const defaultMurStat = s.cloudMurStat || 'Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.';
+                const defaultBacStat = s.cloudBacStat || 'B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
+                const defaultHafStat = s.cloudHafStat || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const defaultMurStat = s.cloudMurStat || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
                 
                 let parsedBacCatType = '';
                 let parsedBacCatDesc = s.cloudBacCat || '';
@@ -699,31 +700,31 @@
                             </div>
 
                             <!-- BACAAN (Selalu Terbuka Default) -->
-                            <div class="p-4 sm:p-5 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-400 space-y-4">
-                                <div class="flex items-center justify-between border-b border-emerald-200 pb-2.5 flex-wrap gap-2">
-                                    <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 uppercase flex items-center gap-1.5">
+                            <div class="p-4 sm:p-5 rounded-2xl border-2 border-emerald-500 space-y-4">
+                                <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2.5 flex-wrap gap-2">
+                                    <span class="font-black text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 uppercase flex items-center gap-1.5">
                                         <i class="fa-solid fa-book-open"></i> BACAAN — ${s.name}
                                     </span>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2.5 py-1 bg-emerald-200 hover:bg-emerald-300 text-emerald-950 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet Input Bacaan 📊
                                         </a>
-                                        <span class="px-2.5 py-0.5 bg-emerald-200 text-emerald-900 text-[11px] font-black rounded-lg">Bacaan</span>
+                                        <span class="px-2.5 py-0.5 bg-emerald-200 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200 text-[11px] font-black rounded-lg">Bacaan</span>
                                     </div>
                                 </div>
-                                ${window.renderTripleInputSlot('bac', s.name, 'emerald')}
-                                <div class="pt-3 border-t border-emerald-200 space-y-3">
+                                ${window.renderTripleInputSlot('bac', s.name)}
+                                <div class="pt-3 border-t border-emerald-200 dark:border-emerald-800 space-y-3">
                                     <div>
-                                        <label class="block text-xs font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
+                                        <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Bacaan (${s.name}):</label>
                                         <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.includes('A —') ? 'selected' : ''}>A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
-                                            <option value="B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.includes('B —') || !defaultBacStat.includes('A —') ? 'selected' : ''}>B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
+                                            <option value="Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
+                                            <option value="Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.includes('Baik Bacaan cukup') || !defaultBacStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
                                             <option value="Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.includes('kesalahan makhraj') || defaultBacStat.includes('Perbaikan') ? 'selected' : ''}>Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
                                             <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultBacStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-black text-emerald-900 mb-1.5">Catatan Bacaan (${s.name}):</label>
+                                        <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Bacaan (${s.name}):</label>
                                         <select id="bac_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                             <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                             <option value="Makharijul Huruf" ${parsedBacCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
@@ -745,34 +746,34 @@
                             </div>
 
                             <!-- HAFALAN BARU (Buka/Tutup) -->
-                            <div class="p-4 sm:p-5 bg-rose-50 dark:bg-rose-950/40 rounded-2xl border-2 border-rose-400 space-y-4">
-                                <div class="flex items-center justify-between border-b border-rose-200 pb-2.5 flex-wrap gap-2">
-                                    <span class="font-black text-xs sm:text-sm text-rose-900 dark:text-rose-200 uppercase flex items-center gap-1.5">
+                            <div class="p-4 sm:p-5 rounded-2xl border-2 border-rose-500 space-y-4">
+                                <div class="flex items-center justify-between border-b border-rose-200 dark:border-rose-800 pb-2.5 flex-wrap gap-2">
+                                    <span class="font-black text-xs sm:text-sm text-rose-800 dark:text-rose-300 uppercase flex items-center gap-1.5">
                                         <i class="fa-solid fa-award"></i> HAFALAN BARU — ${s.name}
                                     </span>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2.5 py-1 bg-rose-200 hover:bg-rose-300 text-rose-950 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2.5 py-1 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet Input Hafalan 📊
                                         </a>
-                                        <button type="button" id="card_section_btn_hafalan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'hafalan')" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
+                                        <button type="button" id="card_section_btn_hafalan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'hafalan')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
                                             <i class="fa-solid ${isHafalanOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanOpen ? 'Tutup Form Hafalan' : 'Buka Form Hafalan'}
                                         </button>
                                     </div>
                                 </div>
                                 <div id="card_section_content_hafalan_${s.name}" class="space-y-4 ${!isHafalanOpen ? 'hidden' : ''}">
-                                    ${window.renderTripleInputSlot('haf', s.name, 'rose')}
-                                    <div class="pt-3 border-t border-rose-200 space-y-3">
+                                    ${window.renderTripleInputSlot('haf', s.name)}
+                                    <div class="pt-3 border-t border-rose-200 dark:border-rose-800 space-y-3">
                                         <div>
-                                            <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
+                                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
                                             <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                                <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('A —') ? 'selected' : ''}>A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                                <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('B —') || !defaultHafStat.includes('A —') ? 'selected' : ''}>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                                <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                                <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('Baik, Hafalan cukup') || !defaultHafStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('beberapa kali lupa') || defaultHafStat.includes('Perbaikan') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
                                                 <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultHafStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-black text-rose-900 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
+                                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
                                             <select id="haf_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran Hafalan" ${parsedHafCatType === 'Kelancaran Hafalan' ? 'selected' : ''}>Kelancaran Hafalan</option>
@@ -795,34 +796,34 @@
                             </div>
 
                             <!-- MUROJA'AH DI KELAS (Buka/Tutup) -->
-                            <div class="p-4 sm:p-5 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border-2 border-sky-400 space-y-4">
-                                <div class="flex items-center justify-between border-b border-sky-200 pb-2.5 flex-wrap gap-2">
-                                    <span class="font-black text-xs sm:text-sm text-sky-900 dark:text-sky-200 uppercase flex items-center gap-1.5">
+                            <div class="p-4 sm:p-5 rounded-2xl border-2 border-purple-500 space-y-4">
+                                <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800 pb-2.5 flex-wrap gap-2">
+                                    <span class="font-black text-xs sm:text-sm text-purple-800 dark:text-purple-300 uppercase flex items-center gap-1.5">
                                         <i class="fa-solid fa-rotate"></i> MUROJA'AH DI KELAS — ${s.name}
                                     </span>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2.5 py-1 bg-sky-200 hover:bg-sky-300 text-sky-950 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2.5 py-1 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet Muroja'ah Dikelas 📊
                                         </a>
-                                        <button type="button" id="card_section_btn_murojaah_${s.name}" onclick="window.toggleCardSection('${s.name}', 'murojaah')" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
+                                        <button type="button" id="card_section_btn_murojaah_${s.name}" onclick="window.toggleCardSection('${s.name}', 'murojaah')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
                                             <i class="fa-solid ${isMurojaahOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahOpen ? 'Tutup Form Murojaah' : 'Buka Form Murojaah'}
                                         </button>
                                     </div>
                                 </div>
                                 <div id="card_section_content_murojaah_${s.name}" class="space-y-4 ${!isMurojaahOpen ? 'hidden' : ''}">
-                                    ${window.renderTripleInputSlot('mur', s.name, 'sky')}
-                                    <div class="pt-3 border-t border-sky-200 space-y-3">
+                                    ${window.renderTripleInputSlot('mur', s.name)}
+                                    <div class="pt-3 border-t border-purple-200 dark:border-purple-800 space-y-3">
                                         <div>
-                                            <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
+                                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
                                             <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                                <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('A —') ? 'selected' : ''}>A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                                <option value="B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('B —') || !defaultMurStat.includes('A —') ? 'selected' : ''}>B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                                                <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                                                <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('Baik, Hafalan cukup') || !defaultMurStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('beberapa kali lupa') || defaultMurStat.includes('Perbaikan') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
                                                 <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultMurStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-black text-sky-900 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
+                                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
                                             <select id="mur_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran" ${parsedMurCatType === 'Kelancaran' ? 'selected' : ''}>Kelancaran</option>
@@ -837,23 +838,23 @@
                                             <input type="text" id="mur_cat_desc_${s.name}" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl text-sm sm:text-base font-bold">
                                         </div>
                                     </div>
-                                    <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="w-full py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                                    <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="w-full py-3.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
                                         <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Muroja'ah (${s.name})
                                     </button>
                                 </div>
                             </div>
 
                             <!-- TUGAS TAMBAHAN (Buka/Tutup) -->
-                            <div class="p-4 sm:p-5 bg-amberbrown-50 dark:bg-amberbrown-950/40 rounded-2xl border-2 border-amberbrown-500 space-y-3">
-                                <div class="flex items-center justify-between border-b border-amberbrown-200 pb-2.5 flex-wrap gap-2">
+                            <div class="p-4 sm:p-5 rounded-2xl border-2 border-amberbrown-600 space-y-3">
+                                <div class="flex items-center justify-between border-b border-amberbrown-200 dark:border-amberbrown-800 pb-2.5 flex-wrap gap-2">
                                     <span class="font-black text-xs sm:text-sm text-amberbrown-900 dark:text-amberbrown-200 uppercase flex items-center gap-1.5">
                                         <i class="fa-solid fa-list-check"></i> TUGAS TAMBAHAN — ${s.name}
                                     </span>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-2.5 py-1 bg-amberbrown-200 hover:bg-amberbrown-300 text-amberbrown-950 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet Tugas 📊
                                         </a>
-                                        <button type="button" id="card_section_btn_tugas_${s.name}" onclick="window.toggleCardSection('${s.name}', 'tugas')" class="px-3.5 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
+                                        <button type="button" id="card_section_btn_tugas_${s.name}" onclick="window.toggleCardSection('${s.name}', 'tugas')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
                                             <i class="fa-solid ${isTugasOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasOpen ? 'Tutup Form Tugas' : 'Buka Form Tugas'}
                                         </button>
                                     </div>
@@ -933,7 +934,7 @@
                     window.showToast("Pilih minimal 1 surat/iqro bacaan!", "error");
                     return;
                 }
-                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'B — Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
+                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.';
                 const bacType = document.getElementById(`bac_cat_type_${name}`)?.value || '';
                 const bacDesc = document.getElementById(`bac_cat_desc_${name}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
@@ -973,7 +974,7 @@
                     window.showToast("Pilih minimal 1 surat hafalan baru!", "error");
                     return;
                 }
-                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
                 const hafType = document.getElementById(`haf_cat_type_${name}`)?.value || '';
                 const hafDesc = document.getElementById(`haf_cat_desc_${name}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
@@ -1013,7 +1014,7 @@
                     window.showToast("Pilih minimal 1 surat muroja'ah!", "error");
                     return;
                 }
-                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'B — Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
                 const murType = document.getElementById(`mur_cat_type_${name}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
@@ -1807,8 +1808,8 @@
             <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-2 sm:gap-2.5">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xs font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-14 h-14 sm:w-20 sm:h-20 object-contain rounded-full bg-white p-1 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xl font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
