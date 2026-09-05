@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Tahfizh RQ Al-Khansa - Canvas View</title>
+    <title>Monitoring Tahfizh RQ Al-Khansa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -37,19 +37,19 @@
     </style>
     <script>
         window.santriList = [
-            { name: "Ahsan Ruzain Ramadhan", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Muhamad Yudanta Irham", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Muhammad Yusuf Wiranatanagara", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Atthar Raffasya Alghifarl", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Muhammad Rasyldd Albarr", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
-            { name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Fauzan", gender: "L" },
-            { name: "Fatimah Az-Zahra", class: "Fatimah", teacher: "Ustadzah Aisyah", gender: "P" },
-            { name: "Aisyah Humairah", class: "Fatimah", teacher: "Ustadzah Aisyah", gender: "P" }
+            { id: "S01", name: "Ahsan Ruzain Ramadhan", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S02", name: "Muhamad Yudanta Irham", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S03", name: "Muhammad Yusuf Wiranatanagara", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S04", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S05", name: "Atthar Raffasya Alghifarl", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S06", name: "Muhammad Atthaya Azka", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S07", name: "Muhammad Rasyldd Albarr", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S08", name: "Muhammad Tristan Arka Santosa", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S09", name: "Naufal Giebran Jayadi", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S10", name: "Sabran Nur Awal", class: "Abdurrahman", teacher: "Ustadz Ahmad", gender: "L" },
+            { id: "S11", name: "R. Tsabit Arsakha Mahdan", class: "Abu Ubaidah", teacher: "Ustadz Fauzan", gender: "L" },
+            { id: "S12", name: "Fatimah Az-Zahra", class: "Fatimah", teacher: "Ustadzah Aisyah", gender: "P" },
+            { id: "S13", name: "Aisyah Humairah", class: "Fatimah", teacher: "Ustadzah Aisyah", gender: "P" }
         ];
         window.selectedClass = 'Abdurrahman';
         window.itemSourceMode = {};
@@ -339,6 +339,16 @@
                             }
                         });
                     }
+
+                    if (cloudData.input_tugas && cloudData.input_tugas.length > 0) {
+                        cloudData.input_tugas.forEach(row => {
+                            const nameSantri = row[3];
+                            const sObj = window.santriList.find(s => s.name === nameSantri);
+                            if (sObj) {
+                                sObj.lastTugas = row[6] || '-';
+                            }
+                        });
+                    }
                     
                     window.renderSantriCardsAndTable();
                     window.renderHistoryTable();
@@ -399,14 +409,30 @@
             }
 
             container.innerHTML = list.map((m, idx) => `
-                <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs">
-                    <div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-2">
+                    <div class="flex-1">
                         <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)} ${m.tampilWa !== false ? '<span class="text-emerald-600 font-bold">[Tampil Laporan]</span>' : '<span class="text-slate-400">[Disembunyikan]</span>'}</div>
                         <div class="font-bold text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
                     </div>
-                    <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-3 py-1.5 text-xs">Hapus</button>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="window.toggleMateriTampil('${type}', ${idx})" class="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-lg font-bold text-[11px] text-slate-700 dark:text-slate-200 transition">
+                            ${m.tampilWa !== false ? 'Sembunyikan' : 'Tampilkan'}
+                        </button>
+                        <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-bold hover:underline px-2.5 py-1.5 text-xs">Hapus</button>
+                    </div>
                 </div>
             `).join('');
+        };
+
+        window.toggleMateriTampil = function(type, idx) {
+            const key = type === 'utama' ? 'rq_materi_utama' : 'rq_materi_tambahan';
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            if (list[idx]) {
+                list[idx].tampilWa = list[idx].tampilWa === false ? true : false;
+                localStorage.setItem(key, JSON.stringify(list));
+                window.renderMateriList(type);
+                window.showToast("Status tampil laporan diperbarui", "success");
+            }
         };
 
         window.deleteMateri = function(type, idx) {
@@ -637,7 +663,7 @@
                                 ${window.renderTripleInputSlot('haf', s.name, 'rose')}
                                 <div class="pt-3 border-t border-rose-200 space-y-3">
                                     <div>
-                                        <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan (dirumah) (${s.name}):</label>
+                                        <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan di Rumah (${s.name}):</label>
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.</option>
                                             <option value="B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
@@ -678,7 +704,7 @@
                                 ${window.renderTripleInputSlot('mur', s.name, 'sky')}
                                 <div class="pt-3 border-t border-sky-200 space-y-3">
                                     <div>
-                                        <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah dirumah (${s.name}):</label>
+                                        <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di Rumah (${s.name}):</label>
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.">A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.</option>
                                             <option value="B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">B — Baik, Hafalan cukup lancar di rumah, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
@@ -788,7 +814,7 @@
                     window.showToast("Pilih minimal 1 surat/iqro bacaan!", "error");
                     return;
                 }
-                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'A — Sangat Baik';
+                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'A — Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.';
                 const bacType = document.getElementById(`bac_cat_type_${name}`)?.value || '';
                 const bacDesc = document.getElementById(`bac_cat_desc_${name}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
@@ -804,6 +830,7 @@
                     type: 'bacaan',
                     timestamp: formattedTimeStr,
                     tanggal: tanggalVal,
+                    id: s.id,
                     name: s.name,
                     class: s.class,
                     teacher: s.teacher,
@@ -814,7 +841,7 @@
                 });
 
                 if (bacaanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Bacaan berhasil disimpan & disinkronkan!", "success");
             } 
@@ -824,7 +851,7 @@
                     window.showToast("Pilih minimal 1 surat hafalan baru!", "error");
                     return;
                 }
-                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'A — Sangat Baik';
+                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.';
                 const hafType = document.getElementById(`haf_cat_type_${name}`)?.value || '';
                 const hafDesc = document.getElementById(`haf_cat_desc_${name}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
@@ -840,6 +867,7 @@
                     type: 'hafalan',
                     timestamp: formattedTimeStr,
                     tanggal: tanggalVal,
+                    id: s.id,
                     name: s.name,
                     class: s.class,
                     teacher: s.teacher,
@@ -850,7 +878,7 @@
                 });
 
                 if (hafalanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Hafalan Baru berhasil disimpan & disinkronkan!", "success");
             } 
@@ -860,7 +888,7 @@
                     window.showToast("Pilih minimal 1 surat muroja'ah!", "error");
                     return;
                 }
-                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'A — Sangat Baik';
+                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'A — Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di rumah. Hampir tidak ada kesalahan.';
                 const murType = document.getElementById(`mur_cat_type_${name}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
@@ -876,6 +904,7 @@
                     type: 'murojaah',
                     timestamp: formattedTimeStr,
                     tanggal: tanggalVal,
+                    id: s.id,
                     name: s.name,
                     class: s.class,
                     teacher: s.teacher,
@@ -886,7 +915,7 @@
                 });
 
                 if (murojaahCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
                 }
                 window.showToast("💾 Muroja'ah berhasil disimpan & disinkronkan!", "success");
             } 
@@ -902,10 +931,10 @@
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
                 localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
-                window.syncToCloud({ type: 'tugas', timestamp: formattedTimeStr, tanggal: tanggalVal, name: s.name, class: s.class, teacher: s.teacher, detail: tugasVal, status: '-', catatan: tugasCat });
+                window.syncToCloud({ type: 'tugas', timestamp: formattedTimeStr, tanggal: tanggalVal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail: tugasVal, status: '-', catatan: tugasCat });
 
                 if (tugasCat) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
                 }
                 window.showToast("💾 Tugas berhasil disimpan & disinkronkan!", "success");
             }
@@ -934,6 +963,240 @@
             if (classSelect) {
                 classSelect.value = className;
                 window.generateClassReport();
+            }
+        };
+
+        window.generateWaReport = function() {
+            let name = window.selectedWaSantriName;
+            if (!name && window.santriList.length > 0) {
+                name = window.santriList[0].name;
+                window.selectedWaSantriName = name;
+            }
+            const s = window.santriList.find(x => x.name === name);
+            if (!s) return;
+
+            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
+            const targetPhone = teacherClasses.includes(s.class) ? '+6285697296114' : '+6285774042121';
+            const phoneInput = document.getElementById('waPhoneInput');
+            if (phoneInput) phoneInput.value = targetPhone;
+
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
+            const bacaanVal = lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
+            const bacaanStat = lastBacObj ? lastBacObj.status : '';
+            const bacaanCat = lastBacObj ? lastBacObj.catatan : '';
+            const bacaanAyatCount = window.calculateVersesFromDetail(bacaanVal);
+
+            const hafalanVal = lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
+            const hafalanStat = lastHafObj ? lastHafObj.status : '';
+            const hafalanCat = lastHafObj ? lastHafObj.catatan : '';
+            const hafalanAyatCount = window.calculateVersesFromDetail(hafalanVal);
+
+            const murojaahVal = lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
+            const murojaahStat = lastMurObj ? lastMurObj.status : '';
+            const murojaahCat = lastMurObj ? lastMurObj.catatan : '';
+
+            const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+            const tugasCat = lastTugObj ? lastTugObj.catatan : '';
+
+            let bagianSetoran = "";
+            if (bacaanVal && bacaanVal !== '-') {
+                bagianSetoran += `📖 *Bacaan:* ${bacaanVal} (${bacaanAyatCount} Ayat)`;
+                if (bacaanStat) bagianSetoran += `\n   - Nilai: ${bacaanStat}`;
+                if (bacaanCat) bagianSetoran += `\n   - Catatan: ${bacaanCat}`;
+                bagianSetoran += `\n`;
+            }
+            if (hafalanVal && hafalanVal !== '-') {
+                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal} (${hafalanAyatCount} Ayat)`;
+                if (hafalanStat) bagianSetoran += `\n   - Nilai: ${hafalanStat}`;
+                if (hafalanCat) bagianSetoran += `\n   - Catatan: ${hafalanCat}`;
+                bagianSetoran += `\n`;
+            }
+            if (murojaahVal && murojaahVal !== '-') {
+                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}`;
+                if (murojaahStat) bagianSetoran += `\n   - Nilai: ${murojaahStat}`;
+                if (murojaahCat) bagianSetoran += `\n   - Catatan: ${murojaahCat}`;
+                bagianSetoran += `\n`;
+            }
+            if (tugasVal && tugasVal !== '-') {
+                bagianSetoran += `📝 *Tugas:* ${tugasVal}`;
+                if (tugasCat) bagianSetoran += `\n   - Catatan: ${tugasCat}`;
+                bagianSetoran += `\n`;
+            }
+
+            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+            const latestMateri = materiUtama.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            const latestTambahan = materiTambahan.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+
+            let materiText = "";
+            if (latestMateri) {
+                materiText += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}`;
+            }
+            if (latestTambahan) {
+                if (materiText) materiText += "\n\n";
+                materiText += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}`;
+            }
+
+            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
+
+            let fullMsg = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n`;
+            
+            if (bagianSetoran) {
+                fullMsg += `${bagianSetoran}_______________`;
+            } else {
+                fullMsg += `Belum ada data setoran tercatat\n_______________`;
+            }
+
+            if (materiText) {
+                fullMsg += `\n${materiText}\n____________________\n`;
+            } else {
+                fullMsg += `\n____________________\n`;
+            }
+
+            fullMsg += `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
+
+            const previewEl = document.getElementById('waMessagePreview');
+            if (previewEl) previewEl.value = fullMsg;
+        };
+
+        window.copyWaReportText = function() {
+            const textarea = document.getElementById('waMessagePreview');
+            if (!textarea) return;
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                window.showToast("Laporan WA Personal disalin!", "success");
+            } catch (err) {
+                window.showToast("Gagal menyalin teks.", "error");
+            }
+        };
+
+        window.sendWaReportDirect = function() {
+            const phone = document.getElementById('waPhoneInput')?.value || '+6285774042121';
+            window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('waMessagePreview')?.value)}`, '_blank');
+        };
+
+        window.generateClassReport = function() {
+            const className = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
+            const list = window.santriList.filter(s => s.class === className);
+            
+            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+            const latestMateri = materiUtama.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            const latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
+
+            let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
+            
+            if (latestMateri) {
+                msg += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}\n\n`;
+            }
+
+            if (latestTambahan) {
+                msg += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}\n\n`;
+            }
+
+            msg += `👥 *Daftar Santri & Prestasi:*`;
+            let activeSantriCount = 0;
+            list.forEach((s) => {
+                const sBac = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const sHaf = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const sMur = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
+                const bacaanVal = sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
+                const bacaanAyatCount = window.calculateVersesFromDetail(bacaanVal);
+
+                const hafalanVal = sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
+                const hafalanAyatCount = window.calculateVersesFromDetail(hafalanVal);
+
+                const murojaahVal = sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
+                const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+
+                let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
+                if (hasAnySetoran) {
+                    activeSantriCount++;
+                    const emojiNum = window.numberToEmoji(activeSantriCount);
+                    let santriLine = `\n${emojiNum} *${s.name}*`;
+                    if (bacaanVal && bacaanVal !== '-') santriLine += `\n    - Bacaan: ${bacaanVal} (${bacaanAyatCount} Ayat)`;
+                    if (hafalanVal && hafalanVal !== '-') santriLine += `\n    - Hafalan: ${hafalanVal} (${hafalanAyatCount} Ayat)`;
+                    if (murojaahVal && murojaahVal !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${murojaahVal}`;
+                    if (tugasVal && tugasVal !== '-') santriLine += `\n    - Tugas: ${tugasVal}`;
+                    msg += santriLine + `\n`;
+                }
+            });
+
+            if (activeSantriCount === 0) {
+                msg += `\n_Belum ada santri yang melakukan setoran tercatat._`;
+            }
+
+            document.getElementById('classReportMessagePreview').value = msg;
+        };
+
+        window.copyClassReportText = function() {
+            const textarea = document.getElementById('classReportMessagePreview');
+            if (!textarea) return;
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                window.showToast("Laporan kelas disalin!", "success");
+            } catch (err) {
+                window.showToast("Gagal menyalin teks.", "error");
+            }
+        };
+
+        window.sendClassReportDirect = function() {
+            const className = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
+            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
+            const targetPhone = teacherClasses.includes(className) ? '+6285697296114' : '+6285774042121';
+            window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('classReportMessagePreview')?.value)}`, '_blank');
+        };
+
+        window.exportDataToExcel = function() {
+            let csv = "Nama Santri,Kelas,Pengajar,Bacaan Terakhir,Hafalan Terakhir,Murojaah Terakhir,Tugas Terakhir\n";
+            window.santriList.forEach(s => {
+                csv += `"${s.name}","${s.class}","${s.teacher}","${s.lastBacaan}","${s.lastHafalan}","${s.lastMurojaah}","${s.lastTugas}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Data_Santri_RQ_AlKhansa_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            window.showToast("File Excel berhasil didownload!", "success");
+        };
+
+        window.resetDailyLogsOnly = function() {
+            if (confirm("Reset data setoran harian?")) {
+                window.santriList.forEach(s => {
+                    s.lastBacaan = '-';
+                    s.lastHafalan = '-';
+                    s.lastMurojaah = '-';
+                    s.lastTugas = '-';
+                    s.cloudBacSlots = null;
+                    s.cloudHafSlots = null;
+                    s.cloudMurSlots = null;
+                });
+                localStorage.removeItem('rq_history_bacaan');
+                localStorage.removeItem('rq_history_hafalan');
+                localStorage.removeItem('rq_history_murojaah');
+                localStorage.removeItem('rq_history_tugas');
+                window.renderSantriCardsAndTable();
+                window.showToast("Data setoran harian direset!", "success");
             }
         };
 
@@ -1363,221 +1626,6 @@
             const megaClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
             const targetPhone = (s && megaClasses.includes(s.class)) ? '+6285697296114' : '+6285774042121';
             window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('ayatMessagePreview')?.value)}`, '_blank');
-        };
-
-        window.generateWaReport = function() {
-            let name = window.selectedWaSantriName;
-            if (!name && window.santriList.length > 0) {
-                name = window.santriList[0].name;
-                window.selectedWaSantriName = name;
-            }
-            const s = window.santriList.find(x => x.name === name);
-            if (!s) return;
-
-            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
-            const targetPhone = teacherClasses.includes(s.class) ? '+6285697296114' : '+6285774042121';
-            const phoneInput = document.getElementById('waPhoneInput');
-            if (phoneInput) phoneInput.value = targetPhone;
-
-            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-
-            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-
-            const bacaanVal = lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
-            const bacaanStat = lastBacObj ? lastBacObj.status : '';
-            const bacaanCat = lastBacObj ? lastBacObj.catatan : '';
-
-            const hafalanVal = lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
-            const hafalanStat = lastHafObj ? lastHafObj.status : '';
-            const hafalanCat = lastHafObj ? lastHafObj.catatan : '';
-
-            const murojaahVal = lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
-            const murojaahStat = lastMurObj ? lastMurObj.status : '';
-            const murojaahCat = lastMurObj ? lastMurObj.catatan : '';
-
-            const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
-            const tugasCat = lastTugObj ? lastTugObj.catatan : '';
-
-            let bagianSetoran = "";
-            if (bacaanVal && bacaanVal !== '-') {
-                bagianSetoran += `📖 *Bacaan:* ${bacaanVal}`;
-                if (bacaanStat) bagianSetoran += `\n   - Nilai: ${bacaanStat}`;
-                if (bacaanCat) bagianSetoran += `\n   - Catatan: ${bacaanCat}`;
-                bagianSetoran += `\n`;
-            }
-            if (hafalanVal && hafalanVal !== '-') {
-                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}`;
-                if (hafalanStat) bagianSetoran += `\n   - Nilai: ${hafalanStat}`;
-                if (hafalanCat) bagianSetoran += `\n   - Catatan: ${hafalanCat}`;
-                bagianSetoran += `\n`;
-            }
-            if (murojaahVal && murojaahVal !== '-') {
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}`;
-                if (murojaahStat) bagianSetoran += `\n   - Nilai: ${murojaahStat}`;
-                if (murojaahCat) bagianSetoran += `\n   - Catatan: ${murojaahCat}`;
-                bagianSetoran += `\n`;
-            }
-            if (tugasVal && tugasVal !== '-') {
-                bagianSetoran += `📝 *Tugas:* ${tugasVal}`;
-                if (tugasCat) bagianSetoran += `\n   - Catatan: ${tugasCat}`;
-                bagianSetoran += `\n`;
-            }
-
-            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const latestMateri = materiUtama.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-            const latestTambahan = materiTambahan.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-
-            let materiText = "";
-            if (latestMateri) {
-                materiText += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}`;
-            }
-            if (latestTambahan) {
-                if (materiText) materiText += "\n\n";
-                materiText += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}`;
-            }
-
-            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
-
-            let fullMsg = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n`;
-            
-            if (bagianSetoran) {
-                fullMsg += `${bagianSetoran}_______________`;
-            } else {
-                fullMsg += `Belum ada data setoran tercatat\n_______________`;
-            }
-
-            if (materiText) {
-                fullMsg += `\n${materiText}\n____________________\n`;
-            } else {
-                fullMsg += `\n____________________\n`;
-            }
-
-            fullMsg += `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
-
-            const previewEl = document.getElementById('waMessagePreview');
-            if (previewEl) previewEl.value = fullMsg;
-        };
-
-        window.copyWaReportText = function() {
-            const textarea = document.getElementById('waMessagePreview');
-            if (!textarea) return;
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                window.showToast("Laporan WA Personal disalin!", "success");
-            } catch (err) {
-                window.showToast("Gagal menyalin teks.", "error");
-            }
-        };
-
-        window.sendWaReportDirect = function() {
-            const phone = document.getElementById('waPhoneInput')?.value || '+6285774042121';
-            window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('waMessagePreview')?.value)}`, '_blank');
-        };
-
-        window.generateClassReport = function() {
-            const className = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
-            const list = window.santriList.filter(s => s.class === className);
-            
-            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const latestMateri = materiUtama.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-            const latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-
-            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-
-            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
-
-            let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
-            
-            if (latestMateri) {
-                msg += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*\n  Bab: ${latestMateri.bab || '-'}\n  Ket: ${latestMateri.ket || '-'}\n\n`;
-            }
-
-            if (latestTambahan) {
-                msg += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*\n  Bab: ${latestTambahan.bab || '-'}\n  Ket: ${latestTambahan.ket || '-'}\n\n`;
-            }
-
-            msg += `👥 *Daftar Santri & Prestasi:*`;
-            let activeSantriCount = 0;
-            list.forEach((s) => {
-                const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-                const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
-
-                let hasAnySetoran = (tugasVal && tugasVal !== '-');
-                if (hasAnySetoran) {
-                    activeSantriCount++;
-                    const emojiNum = window.numberToEmoji(activeSantriCount);
-                    let santriLine = `\n${emojiNum} *${s.name}*`;
-                    if (tugasVal && tugasVal !== '-') santriLine += `\n    - Tugas: ${tugasVal}`;
-                    msg += santriLine + `\n`;
-                }
-            });
-
-            if (activeSantriCount === 0) {
-                msg += `\n_Belum ada santri yang melakukan setoran tugas tercatat._`;
-            }
-
-            document.getElementById('classReportMessagePreview').value = msg;
-        };
-
-        window.copyClassReportText = function() {
-            const textarea = document.getElementById('classReportMessagePreview');
-            if (!textarea) return;
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                window.showToast("Laporan kelas disalin!", "success");
-            } catch (err) {
-                window.showToast("Gagal menyalin teks.", "error");
-            }
-        };
-
-        window.sendClassReportDirect = function() {
-            const className = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
-            const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
-            const targetPhone = teacherClasses.includes(className) ? '+6285697296114' : '+6285774042121';
-            window.open(`https://wa.me/${targetPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('classReportMessagePreview')?.value)}`, '_blank');
-        };
-
-        window.exportDataToExcel = function() {
-            let csv = "Nama Santri,Kelas,Pengajar,Bacaan Terakhir,Hafalan Terakhir,Murojaah Terakhir,Tugas Terakhir\n";
-            window.santriList.forEach(s => {
-                csv += `"${s.name}","${s.class}","${s.teacher}","${s.lastBacaan}","${s.lastHafalan}","${s.lastMurojaah}","${s.lastTugas}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Data_Santri_RQ_AlKhansa_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            window.showToast("File Excel berhasil didownload!", "success");
-        };
-
-        window.resetDailyLogsOnly = function() {
-            if (confirm("Reset data setoran harian?")) {
-                window.santriList.forEach(s => {
-                    s.lastBacaan = '-';
-                    s.lastHafalan = '-';
-                    s.lastMurojaah = '-';
-                    s.lastTugas = '-';
-                    s.cloudBacSlots = null;
-                    s.cloudHafSlots = null;
-                    s.cloudMurSlots = null;
-                });
-                localStorage.removeItem('rq_history_bacaan');
-                localStorage.removeItem('rq_history_hafalan');
-                localStorage.removeItem('rq_history_murojaah');
-                localStorage.removeItem('rq_history_tugas');
-                window.renderSantriCardsAndTable();
-                window.showToast("Data setoran harian direset!", "success");
-            }
         };
 
         window.addEventListener('scroll', () => {
