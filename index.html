@@ -27,9 +27,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; }
-        @media (min-width: 640px) {
-            body { font-size: 15px; }
-        }
+        @media (min-width: 640px) { body { font-size: 15px; } }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.4); border-radius: 9999px; }
@@ -211,9 +209,7 @@
 
         window.scrollToTopGrid = function() {
             const gridBox = document.getElementById('santriKotakContainer');
-            if (gridBox) {
-                gridBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            if (gridBox) gridBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
         window.toggleClearBtn = function(inputId, btnId) {
@@ -589,9 +585,7 @@
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all">
                         <div class="flex items-start justify-between border-b pb-3">
                             <div>
-                                <div class="flex items-center gap-2">
-                                    ${badgeTag}
-                                </div>
+                                <div class="flex items-center gap-2">${badgeTag}</div>
                                 <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-1.5">${s.name}</h3>
                                 <p class="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
@@ -931,7 +925,18 @@
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
                 localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
-                window.syncToCloud({ type: 'tugas', timestamp: formattedTimeStr, tanggal: tanggalVal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail: tugasVal, status: '-', catatan: tugasCat });
+                window.syncToCloud({
+                    type: 'tugas',
+                    timestamp: formattedTimeStr,
+                    tanggal: tanggalVal,
+                    id: s.id,
+                    name: s.name,
+                    class: s.class,
+                    teacher: s.teacher,
+                    detail: tugasVal,
+                    status: '-',
+                    catatan: tugasCat
+                });
 
                 if (tugasCat) {
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
@@ -1631,11 +1636,8 @@
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('floatingScrollTopBtn');
             if (!btn) return;
-            if (window.scrollY > 350) {
-                btn.classList.remove('opacity-0', 'pointer-events-none');
-            } else {
-                btn.classList.add('opacity-0', 'pointer-events-none');
-            }
+            if (window.scrollY > 350) btn.classList.remove('opacity-0', 'pointer-events-none');
+            else btn.classList.add('opacity-0', 'pointer-events-none');
         });
     </script>
 </head>
@@ -1683,7 +1685,6 @@
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-4 relative">
-        
         <button id="floatingScrollTopBtn" onclick="window.scrollToTopGrid()" class="fixed bottom-6 right-6 z-50 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-2xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all opacity-0 pointer-events-none border-2 border-emerald-400">
             <i class="fa-solid fa-arrow-up animate-bounce"></i> Klik ke Kolom Nama Santri
         </button>
