@@ -492,6 +492,24 @@
             }
         };
 
+        window.onInputLiveChange = function(santriName, category) {
+            const s = window.santriList.find(x => x.name === santriName);
+            if (!s) return;
+            const formatted = window.extractSlotEntries(category, santriName);
+            const structured = window.extractSlotsStructured(category, santriName);
+
+            if (category === 'bac') {
+                s.lastBacaan = formatted;
+                s.cloudBacSlots = structured;
+            } else if (category === 'haf') {
+                s.lastHafalan = formatted;
+                s.cloudHafSlots = structured;
+            } else if (category === 'mur') {
+                s.lastMurojaah = formatted;
+                s.cloudMurSlots = structured;
+            }
+        };
+
         window.renderTripleInputSlot = function(category, santriName, primaryColor) {
             const slots = [1, 2, 3];
             const sObj = window.santriList.find(x => x.name === santriName);
@@ -530,14 +548,14 @@
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}">
-                            <select id="${category}_surah_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.onInputLiveChange('${santriName}', '${category}')" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Surat Al-Qur'an (114 Surat) --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${slotItem === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="hidden">
-                            <select id="${category}_iqro_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.onInputLiveChange('${santriName}', '${category}')" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${slotItem === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${slotItem === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -551,11 +569,11 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Mulai:</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.onInputLiveChange('${santriName}', '${category}')" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                             <div>
                                 <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Sampai:</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.onInputLiveChange('${santriName}', '${category}')" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                         </div>
                     </div>
@@ -675,7 +693,7 @@
                                         <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
                                             <option value="Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.includes('cukup lancar') || !defaultBacStat ? 'selected' : ''}>Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
-                                            <option value="Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.includes('Perbaikan') || defaultBacStat.includes('75') ? 'selected' : ''}>Perlu Perbaikan, Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
+                                            <option value="Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.includes('Perbaikan') || defaultBacStat.includes('Masih terdapat') ? 'selected' : ''}>Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
                                             <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultBacStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                         </select>
                                     </div>
@@ -721,7 +739,7 @@
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                             <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('cukup lancar') || !defaultHafStat ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('Perbaikan') || defaultHafStat.includes('75') ? 'selected' : ''}>Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('Perbaikan') || defaultHafStat.includes('Masih beberapa') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
                                             <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultHafStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                         </select>
                                     </div>
@@ -767,7 +785,7 @@
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
                                             <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                             <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('cukup lancar') || !defaultMurStat ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                                            <option value="Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('Perbaikan') || defaultMurStat.includes('75') ? 'selected' : ''}>Perlu Perbaikan, Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                            <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('Perbaikan') || defaultMurStat.includes('Masih beberapa') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
                                             <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultMurStat.includes('Semangat') ? 'selected' : ''}>Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                         </select>
                                     </div>
@@ -1076,17 +1094,21 @@
             const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
             const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
 
-            const bacaanVal = lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
+            const liveBac = window.extractSlotEntries('bac', s.name);
+            const liveHaf = window.extractSlotEntries('haf', s.name);
+            const liveMur = window.extractSlotEntries('mur', s.name);
+
+            const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
             const bacaanStat = lastBacObj ? lastBacObj.status : '';
             const bacaanCat = lastBacObj ? lastBacObj.catatan : '';
             const bacaanAyatCount = window.calculateVersesFromDetail(bacaanVal);
 
-            const hafalanVal = lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
+            const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
             const hafalanStat = lastHafObj ? lastHafObj.status : '';
             const hafalanCat = lastHafObj ? lastHafObj.catatan : '';
             const hafalanAyatCount = window.calculateVersesFromDetail(hafalanVal);
 
-            const murojaahVal = lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
+            const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
             const murojaahStat = lastMurObj ? lastMurObj.status : '';
             const murojaahCat = lastMurObj ? lastMurObj.catatan : '';
 
@@ -1205,13 +1227,17 @@
                 const sMur = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
                 const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
 
-                const bacaanVal = sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
+                const liveBac = window.extractSlotEntries('bac', s.name);
+                const liveHaf = window.extractSlotEntries('haf', s.name);
+                const liveMur = window.extractSlotEntries('mur', s.name);
+
+                const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
                 const bacaanAyatCount = window.calculateVersesFromDetail(bacaanVal);
 
-                const hafalanVal = sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
+                const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
                 const hafalanAyatCount = window.calculateVersesFromDetail(hafalanVal);
 
-                const murojaahVal = sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
+                const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
                 const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
