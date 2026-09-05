@@ -300,6 +300,8 @@
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
                                 sObj.lastBacaan = row[6] || '-';
+                                sObj.lastBacaanStat = row[15] || '';
+                                sObj.lastBacaanCat = row[16] || '';
                                 sObj.cloudBacSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -315,6 +317,8 @@
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
                                 sObj.lastHafalan = row[6] || '-';
+                                sObj.lastHafalanStat = row[15] || '';
+                                sObj.lastHafalanCat = row[16] || '';
                                 sObj.cloudHafSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -330,6 +334,8 @@
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
                                 sObj.lastMurojaah = row[6] || '-';
+                                sObj.lastMurojaahStat = row[15] || '';
+                                sObj.lastMurojaahCat = row[16] || '';
                                 sObj.cloudMurSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -539,7 +545,6 @@
 
             const filtered = window.santriList.filter(s => window.selectedClass === 'ALL' || s.class === window.selectedClass);
 
-            // Render name cards without icons, full name displayed, sized appropriately
             kotakContainer.innerHTML = filtered.map(s => {
                 const isFemale = s.gender === 'P' || /(putri|aishah|fatimah|zahrah|khansa|nabilah|marsha|haura|riska|zarina|alesha|yumna|almira|calista|ufaira|alya|quinsha|anggun|jovita|rayya|reyna|yasmin|afiqa|dilara|lujayn|syahda|anindya|novia|rianti|sakura|elmira|hevanika|iffa|nurhalimah|salsabila|yura)/i.test(s.name);
                 const cardBg = isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800';
@@ -597,10 +602,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-emerald-900 mb-1.5">Nilai Bacaan (${s.name}):</label>
                                         <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Sangat Baik">A — Sangat Baik (Bacaan lancar, makhraj dan tajwid tepat)</option>
-                                            <option value="B — Baik">B — Baik (Bacaan cukup lancar, terdapat beberapa kesalahan ringan)</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih terdapat beberapa kesalahan makhraj, tajwid)</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan (Bacaan masih banyak kesalahan dan butuh bimbingan)</option>
+                                            <option value="A — Alhamdulillah Bacaan Lancar, makhroj dan tajwid tepat">A — Alhamdulillah Bacaan Lancar, makhroj dan tajwid tepat</option>
+                                            <option value="B — Baik">B — Baik</option>
+                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan</option>
+                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan</option>
                                         </select>
                                     </div>
                                     <div>
@@ -638,10 +643,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-rose-900 mb-1.5">Nilai Hafalan (${s.name}):</label>
                                         <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Sangat Baik">A — Sangat Baik (Hafalan sangat lancar, tepat, dan kuat)</option>
-                                            <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa)</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa, berhenti, atau salah urutan)</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan (Hafalan belum lancar dan membutuhkan bantuan)</option>
+                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk</option>
+                                            <option value="B — Baik">B — Baik</option>
+                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan</option>
+                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan</option>
                                         </select>
                                     </div>
                                     <div>
@@ -679,10 +684,10 @@
                                     <div>
                                         <label class="block text-xs font-black text-sky-900 mb-1.5">Nilai Muroja'ah di Kelas (${s.name}):</label>
                                         <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-sm sm:text-base">
-                                            <option value="A — Sangat Baik">A — Sangat Baik (Hafalan sangat lancar, tepat, dan kuat)</option>
-                                            <option value="B — Baik">B — Baik (Hafalan cukup lancar, ada sedikit kesalahan atau lupa)</option>
-                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan (Masih beberapa kali lupa atau salah urutan)</option>
-                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan (Hafalan belum lancar dan membutuhkan bantuan)</option>
+                                            <option value="A — Alhamdulillah Baik Baikk">A — Alhamdulillah Baik Baikk</option>
+                                            <option value="B — Baik">B — Baik</option>
+                                            <option value="C — Perlu Perbaikan">C — Perlu Perbaikan</option>
+                                            <option value="D — Perlu Bimbingan">D — Perlu Bimbingan</option>
                                         </select>
                                     </div>
                                     <div>
@@ -787,13 +792,15 @@
                     window.showToast("Pilih minimal 1 surat/iqro bacaan!", "error");
                     return;
                 }
-                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'A — Sangat Baik';
+                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || 'A — Alhamdulillah Bacaan Lancar, makhroj dan tajwid tepat';
                 const bacType = document.getElementById(`bac_cat_type_${name}`)?.value || '';
                 const bacDesc = document.getElementById(`bac_cat_desc_${name}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
                 const structuredSlots = window.extractSlotsStructured('bac', name);
 
                 s.lastBacaan = bacaanFormatted;
+                s.lastBacaanStat = bacaanStat;
+                s.lastBacaanCat = bacaanCatCombined;
                 s.cloudBacSlots = structuredSlots;
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
@@ -823,13 +830,15 @@
                     window.showToast("Pilih minimal 1 surat hafalan baru!", "error");
                     return;
                 }
-                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'A — Sangat Baik';
+                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || 'A — Alhamdulillah Baik Baikk';
                 const hafType = document.getElementById(`haf_cat_type_${name}`)?.value || '';
                 const hafDesc = document.getElementById(`haf_cat_desc_${name}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
                 const structuredSlotsHaf = window.extractSlotsStructured('haf', name);
 
                 s.lastHafalan = hafalanFormatted;
+                s.lastHafalanStat = hafalanStat;
+                s.lastHafalanCat = hafalanCatCombined;
                 s.cloudHafSlots = structuredSlotsHaf;
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
@@ -859,13 +868,15 @@
                     window.showToast("Pilih minimal 1 surat muroja'ah!", "error");
                     return;
                 }
-                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'A — Sangat Baik';
+                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || 'A — Alhamdulillah Baik Baikk';
                 const murType = document.getElementById(`mur_cat_type_${name}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
                 const structuredSlotsMur = window.extractSlotsStructured('mur', name);
 
                 s.lastMurojaah = murojaahFormatted;
+                s.lastMurojaahStat = murojaahStat;
+                s.lastMurojaahCat = murojaahCatCombined;
                 s.cloudMurSlots = structuredSlotsMur;
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
@@ -898,6 +909,7 @@
                 const tugasCat = document.getElementById(`tug_cat_${name}`)?.value.trim() || '';
 
                 s.lastTugas = tugasVal;
+                s.lastTugasCat = tugasCat;
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
                 hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
                 localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
@@ -1370,16 +1382,33 @@
 
             let bagianSetoran = "";
             if (s.lastBacaan && s.lastBacaan !== '-') {
-                bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan}\n`;
+                const ayatBac = window.calculateVersesFromDetail(s.lastBacaan);
+                bagianSetoran += `📖 *Bacaan:* ${s.lastBacaan} (${ayatBac} ayat)`;
+                if (s.lastBacaanStat) bagianSetoran += `\n   - Nilai: ${s.lastBacaanStat}`;
+                if (s.lastBacaanCat) bagianSetoran += `\n   - Catatan: ${s.lastBacaanCat}`;
+                bagianSetoran += `\n`;
             }
+
             if (s.lastHafalan && s.lastHafalan !== '-') {
-                bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan}\n`;
+                const ayatHaf = window.calculateVersesFromDetail(s.lastHafalan);
+                bagianSetoran += `⭐ *Hafalan:* ${s.lastHafalan} (${ayatHaf} ayat)`;
+                if (s.lastHafalanStat) bagianSetoran += `\n   - Nilai: ${s.lastHafalanStat}`;
+                if (s.lastHafalanCat) bagianSetoran += `\n   - Catatan: ${s.lastHafalanCat}`;
+                bagianSetoran += `\n`;
             }
+
             if (s.lastMurojaah && s.lastMurojaah !== '-') {
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${s.lastMurojaah}\n`;
+                const ayatMur = window.calculateVersesFromDetail(s.lastMurojaah);
+                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${s.lastMurojaah} (${ayatMur} ayat)`;
+                if (s.lastMurojaahStat) bagianSetoran += `\n   - Nilai: ${s.lastMurojaahStat}`;
+                if (s.lastMurojaahCat) bagianSetoran += `\n   - Catatan: ${s.lastMurojaahCat}`;
+                bagianSetoran += `\n`;
             }
+
             if (s.lastTugas && s.lastTugas !== '-') {
-                bagianSetoran += `📝 *Tugas:* ${s.lastTugas}\n`;
+                bagianSetoran += `📝 *Tugas:* ${s.lastTugas}`;
+                if (s.lastTugasCat) bagianSetoran += `\n   - Catatan: ${s.lastTugasCat}`;
+                bagianSetoran += `\n`;
             }
 
             let materiText = "";
@@ -1474,10 +1503,20 @@
                     activeSantriCount++;
                     const emojiNum = window.numberToEmoji(activeSantriCount);
                     let santriLine = `\n${emojiNum} *${s.name}*`;
-                    if (s.lastBacaan && s.lastBacaan !== '-') santriLine += `\n   - Bacaan: ${s.lastBacaan}`;
-                    if (s.lastHafalan && s.lastHafalan !== '-') santriLine += `\n   - Hafalan: ${s.lastHafalan}`;
-                    if (s.lastMurojaah && s.lastMurojaah !== '-') santriLine += `\n   - Muroja'ah di Kelas: ${s.lastMurojaah}`;
-                    if (s.lastTugas && s.lastTugas !== '-') santriLine += `\n   - Tugas: ${s.lastTugas}`;
+                    
+                    if (s.lastBacaan && s.lastBacaan !== '-') {
+                        santriLine += `\n    - Bacaan: ${s.lastBacaan}`;
+                    }
+                    if (s.lastHafalan && s.lastHafalan !== '-') {
+                        santriLine += `\n    - Hafalan: ${s.lastHafalan}`;
+                    }
+                    if (s.lastMurojaah && s.lastMurojaah !== '-') {
+                        santriLine += `\n    - Muroja'ah di Kelas: ${s.lastMurojaah}`;
+                    }
+                    if (s.lastTugas && s.lastTugas !== '-') {
+                        santriLine += `\n    - Tugas: ${s.lastTugas}`;
+                    }
+                    
                     msg += santriLine + `\n`;
                 }
             });
@@ -1528,6 +1567,13 @@
                     s.lastHafalan = '-';
                     s.lastMurojaah = '-';
                     s.lastTugas = '-';
+                    s.lastBacaanStat = '';
+                    s.lastHafalanStat = '';
+                    s.lastMurojaahStat = '';
+                    s.lastBacaanCat = '';
+                    s.lastHafalanCat = '';
+                    s.lastMurojaahCat = '';
+                    s.lastTugasCat = '';
                     s.cloudBacSlots = null;
                     s.cloudHafSlots = null;
                     s.cloudMurSlots = null;
@@ -1541,7 +1587,6 @@
             }
         };
 
-        // Scroll listener for floating quick-jump button
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('floatingScrollTopBtn');
             if (!btn) return;
@@ -1598,12 +1643,10 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-4 relative">
         
-        <!-- Floating Quick-Jump Pop up Button -->
         <button id="floatingScrollTopBtn" onclick="window.scrollToTopGrid()" class="fixed bottom-6 right-6 z-50 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-2xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all opacity-0 pointer-events-none border-2 border-emerald-400">
             <i class="fa-solid fa-arrow-up animate-bounce"></i> Klik ke Kolom Nama Santri
         </button>
 
-        <!-- SECTION SETORAN -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="w-full sm:w-auto flex items-center gap-2">
@@ -1629,7 +1672,6 @@
                 </div>
             </div>
 
-            <!-- Santri Quick Box Grid Navigation (Color-coded: Light blue for boys, light pink for girls, no icons, full names) -->
             <div id="santriKotakContainerWrapper" class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
                 <h4 class="text-xs sm:text-sm font-black text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">Daftar Nama Santri (Klik untuk Melompat ke Input):</h4>
                 <div id="santriKotakContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-56 overflow-y-auto custom-scrollbar p-1"></div>
@@ -1638,7 +1680,6 @@
             <div id="santriGridContainer" class="space-y-6"></div>
         </section>
 
-        <!-- SECTION MATERI -->
         <section id="section-materi" class="hidden space-y-4">
             <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border">
                 <div class="flex items-center gap-3">
@@ -1762,7 +1803,6 @@
             </div>
         </section>
 
-        <!-- SECTION HISTORY / RIWAYAT -->
         <section id="section-history" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b pb-3">
@@ -1770,7 +1810,6 @@
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
                         <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
                     </div>
-                    <!-- Left-aligned Sub-menu Buttons -->
                     <div class="flex items-center gap-2 flex-wrap justify-start w-full">
                         <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
                         <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
@@ -1784,7 +1823,6 @@
                 <div class="flex items-center justify-between pt-1 flex-wrap gap-3">
                     <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
                         <span id="activeHistoryTitle" class="font-black text-sm sm:text-base text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
-                        <!-- Search input with 'X' clear button -->
                         <div class="relative w-full sm:w-72">
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
@@ -1824,10 +1862,8 @@
             </div>
         </section>
 
-        <!-- SECTION LAPORAN -->
         <section id="section-laporan" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
-                <!-- Left-aligned Sub Menu Bar for Laporan -->
                 <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-3">
                     <div>
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Laporan Orang Tua & Akumulasi</h3>
@@ -1840,7 +1876,6 @@
                     </div>
                 </div>
 
-                <!-- SUB 1: WA PERSONAL -->
                 <div id="laporanTabContent-wa" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="relative">
@@ -1873,7 +1908,6 @@
                     </div>
                 </div>
 
-                <!-- SUB 2: LAPORAN KELAS -->
                 <div id="laporanTabContent-kelas" class="space-y-4 hidden">
                     <div class="flex items-center justify-between flex-wrap gap-3">
                         <h4 class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200">Rekapitulasi Per Kelas & Materi Belajar</h4>
@@ -1899,7 +1933,6 @@
                     </div>
                 </div>
 
-                <!-- SUB 3: LAPORAN AKUMULASI AYAT -->
                 <div id="laporanTabContent-ayat" class="space-y-4 hidden">
                     <div class="flex flex-col sm:flex-row items-center justify-between border-b pb-3 gap-3">
                         <div>
@@ -1966,7 +1999,6 @@
             </div>
         </section>
 
-        <!-- SECTION CLOUD & RELATED WEB LINKS -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between flex-wrap gap-3">
@@ -1977,7 +2009,6 @@
                 </div>
                 <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">Akses cepat ke berbagai web sistem pembelajaran Rumah Qur'an Al-Khansa serta sinkronisasi database.</p>
                 
-                <!-- Related Web Links Section -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                     <a href="https://akhshiddiq.github.io/presensi-rq/" target="_blank" class="p-4 bg-slate-50 dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-slate-800 border rounded-2xl flex flex-col justify-between space-y-2 transition shadow-xs group">
                         <div>
