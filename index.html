@@ -97,7 +97,8 @@
             { no: 103, name: "Al-'Ashr", ayat: 3 }, { no: 104, name: "Al-Humazah", ayat: 9 }, { no: 105, name: "Al-Fil", ayat: 5 },
             { no: 106, name: "Quraisy", ayat: 4 }, { no: 107, name: "Al-Ma'un", ayat: 7 }, { no: 108, name: "Al-Kautsar", ayat: 3 },
             { no: 109, name: "Al-Kafirun", ayat: 6 }, { no: 110, name: "An-Nashr", ayat: 3 }, { no: 111, name: "Al-Lahab", ayat: 5 },
-            { no: 112, name: "Al-Ikhlash", ayat: 4 }, { no: 113, name: "Al-Falaq", ayat: 5 }, { no: 114, name: "An-Nas", ayat: 6 ]
+            { no: 112, name: "Al-Ikhlash", ayat: 4 }, { no: 113, name: "Al-Falaq", ayat: 5 }, { no: 114, name: "An-Nas", ayat: 6 }
+        ];
 
         window.getGsUrl = function() {
             return localStorage.getItem('rq_gs_url') || 'https://script.google.com/macros/s/AKfycbwFuP-mw4QYAc1LRCjiP6dGn0WkT2kZRQ6KCNT7yT7G4m5MdQmQlzOVmVaZvaz1ss2C/exec';
@@ -242,9 +243,9 @@
         window.setSyncIndicator = function(status) {
             const dot = document.getElementById('syncDotIndicator');
             if (!dot) return;
-            if (status === 'success') dot.className = "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse";
-            else if (status === 'pending') dot.className = "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-400 inline-block shadow-sm animate-ping";
-            else dot.className = "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 inline-block shadow-sm";
+            if (status === 'success') dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse";
+            else if (status === 'pending') dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 inline-block shadow-sm animate-ping";
+            else dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-sm";
         };
 
         window.syncToCloud = async function(payload) {
@@ -473,6 +474,7 @@
                 if (labelStart) labelStart.innerText = "Ayat Mulai:";
                 if (labelEnd) labelEnd.innerText = "Ayat Sampai:";
             }
+            window.onInputLiveChange(santriName, category);
         };
 
         window.toggleSlotVisibility = function(category, slot, santriName) {
@@ -1761,7 +1763,7 @@
 
             const quote = "Rasulullah ﷺ bersabda: \"Sebaik-baik kalian adalah orang yang mempelajari Al-Qur'an dan mengajarkannya.\" (HR. Bukhari)";
 
-            let msg = `Voici kami sampaikan laporan akumulasi perkembangan ayat Ananda: *${s.name}* (${s.class})\n\n${bacaanComment}\n\n${hafalanComment}\n\n${quote}`;
+            let msg = `Berikut kami sampaikan laporan akumulasi perkembangan ayat Ananda: *${s.name}* (${s.class})\n\n${bacaanComment}\n\n${hafalanComment}\n\n${quote}`;
 
             document.getElementById('ayatMessagePreview').value = msg;
         };
@@ -1800,8 +1802,8 @@
             <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-3">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-16 h-16 sm:w-24 sm:h-24 object-contain rounded-full bg-white p-1 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-2xl font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-full bg-white p-1 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-xl font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
