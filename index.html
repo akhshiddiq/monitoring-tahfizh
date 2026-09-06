@@ -1312,6 +1312,14 @@
             }
         };
 
+        window.formatProgressLabel = function(detailStr) {
+            if (!detailStr || detailStr === '-') return '';
+            const count = window.calculateVersesFromDetail(detailStr);
+            const isIqro = detailStr.toLowerCase().includes('iqro');
+            const unitName = isIqro ? 'halaman' : 'ayat';
+            return ` (bertambah ${count} ${unitName})`;
+        };
+
         window.generateWaReport = function() {
             let name = window.selectedWaSantriName;
             if (!name && window.santriList.length > 0) {
@@ -1343,35 +1351,36 @@
             const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
             const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanAyatCount = window.calculateVersesFromDetail(bacaanVal);
+            const bacaanProgress = window.formatProgressLabel(bacaanVal);
 
             const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
             const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanAyatCount = window.calculateVersesFromDetail(hafalanVal);
+            const hafalanProgress = window.formatProgressLabel(hafalanVal);
 
             const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
             const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
+            const murojaahProgress = window.formatProgressLabel(murojaahVal);
 
             const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
             const tugasCat = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
 
             let bagianSetoran = "";
             if (bacaanVal && bacaanVal !== '-') {
-                bagianSetoran += `📖 *Bacaan:* ${bacaanVal} (${bacaanAyatCount} Ayat)`;
+                bagianSetoran += `📖 *Bacaan:* ${bacaanVal}${bacaanProgress}`;
                 if (bacaanStat) bagianSetoran += `\n   - Nilai: ${bacaanStat}`;
                 if (bacaanCat) bagianSetoran += `\n   - Catatan: ${bacaanCat}`;
                 bagianSetoran += `\n`;
             }
             if (hafalanVal && hafalanVal !== '-') {
-                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal} (${hafalanAyatCount} Ayat)`;
+                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}${hafalanProgress}`;
                 if (hafalanStat) bagianSetoran += `\n   - Nilai: ${hafalanStat}`;
                 if (hafalanCat) bagianSetoran += `\n   - Catatan: ${hafalanCat}`;
                 bagianSetoran += `\n`;
             }
             if (murojaahVal && murojaahVal !== '-') {
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}`;
+                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}${murojaahProgress}`;
                 if (murojaahStat) bagianSetoran += `\n   - Nilai: ${murojaahStat}`;
                 if (murojaahCat) bagianSetoran += `\n   - Catatan: ${murojaahCat}`;
                 bagianSetoran += `\n`;
@@ -1476,12 +1485,14 @@
                 const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
 
                 const bacaanVal = sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
-                const bacaanAyatCount = window.calculateVersesFromDetail(bacaanVal);
+                const bacaanProgress = window.formatProgressLabel(bacaanVal);
 
                 const hafalanVal = sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
-                const hafalanAyatCount = window.calculateVersesFromDetail(hafalanVal);
+                const hafalanProgress = window.formatProgressLabel(hafalanVal);
 
                 const murojaahVal = sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
+                const murojaahProgress = window.formatProgressLabel(murojaahVal);
+
                 const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
@@ -1489,9 +1500,9 @@
                     activeSantriCount++;
                     const emojiNum = window.numberToEmoji(activeSantriCount);
                     let santriLine = `\n${emojiNum} *${s.name}*`;
-                    if (bacaanVal && bacaanVal !== '-') santriLine += `\n    - Bacaan: ${bacaanVal} (${bacaanAyatCount} Ayat)`;
-                    if (hafalanVal && hafalanVal !== '-') santriLine += `\n    - Hafalan: ${hafalanVal} (${hafalanAyatCount} Ayat)`;
-                    if (murojaahVal && murojaahVal !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${murojaahVal}`;
+                    if (bacaanVal && bacaanVal !== '-') santriLine += `\n    - Bacaan: ${bacaanVal}${bacaanProgress}`;
+                    if (hafalanVal && hafalanVal !== '-') santriLine += `\n    - Hafalan: ${hafalanVal}${hafalanProgress}`;
+                    if (murojaahVal && murojaahVal !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${murojaahVal}${murojaahProgress}`;
                     if (tugasVal && tugasVal !== '-') santriLine += `\n    - Tugas: ${tugasVal}`;
                     msg += santriLine + `\n`;
                 }
