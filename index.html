@@ -171,8 +171,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-5 py-3 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                        ? "px-4 py-2 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
                 }
             });
 
@@ -280,7 +280,6 @@
                         localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
                     }
 
-                    // Map cloud input_bacaan to history and slots
                     if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
                         const bacHist = cloudData.input_bacaan.map(row => ({
                             timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
@@ -309,9 +308,9 @@
                                 ].filter(Boolean).join(', ') || '-';
 
                                 sObj.cloudBacSlots = [
-                                    { item: row[6], start: row[7], end: row[8] },
-                                    { item: row[9], start: row[10], end: row[11] },
-                                    { item: row[12], start: row[13], end: row[14] }
+                                    { item: row[6], start: row[7], end: row[8], mode: row[6] && row[6].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
+                                    { item: row[9], start: row[10], end: row[11], mode: row[9] && row[9].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
+                                    { item: row[12], start: row[13], end: row[14], mode: row[12] && row[12].toLowerCase().includes('iqro') ? 'iqro' : 'quran' }
                                 ];
                                 if (row[15]) sObj.cloudBacStat = row[15];
                                 if (row[16]) sObj.cloudBacCat = row[16];
@@ -347,9 +346,9 @@
                                 ].filter(Boolean).join(', ') || '-';
 
                                 sObj.cloudHafSlots = [
-                                    { item: row[6], start: row[7], end: row[8] },
-                                    { item: row[9], start: row[10], end: row[11] },
-                                    { item: row[12], start: row[13], end: row[14] }
+                                    { item: row[6], start: row[7], end: row[8], mode: row[6] && row[6].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
+                                    { item: row[9], start: row[10], end: row[11], mode: row[9] && row[9].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
+                                    { item: row[12], start: row[13], end: row[14], mode: row[12] && row[12].toLowerCase().includes('iqro') ? 'iqro' : 'quran' }
                                 ];
                                 if (row[15]) sObj.cloudHafStat = row[15];
                                 if (row[16]) sObj.cloudHafCat = row[16];
@@ -385,9 +384,9 @@
                                 ].filter(Boolean).join(', ') || '-';
 
                                 sObj.cloudMurSlots = [
-                                    { item: row[6], start: row[7], end: row[8] },
-                                    { item: row[9], start: row[10], end: row[11] },
-                                    { item: row[12], start: row[13], end: row[14] }
+                                    { item: row[6], start: row[7], end: row[8], mode: row[6] && row[6].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
+                                    { item: row[9], start: row[10], end: row[11], mode: row[9] && row[9].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
+                                    { item: row[12], start: row[13], end: row[14], mode: row[12] && row[12].toLowerCase().includes('iqro') ? 'iqro' : 'quran' }
                                 ];
                                 if (row[15]) sObj.cloudMurStat = row[15];
                                 if (row[16]) sObj.cloudMurCat = row[16];
@@ -418,7 +417,19 @@
                         });
                     }
                     
-                    if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
+                    if (cloudData.rekapcatatan && cloudData.rekapcatatan.length > 0) {
+                        const rekapHist = cloudData.rekapcatatan.map(row => ({
+                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                            tanggal: row[0] || new Date().toISOString().split('T')[0],
+                            rawTime: new Date(row[0] || 0).getTime(),
+                            id: row[1],
+                            name: row[2],
+                            category: row[3],
+                            catatan: row[4],
+                            type: 'rekapan'
+                        }));
+                        localStorage.setItem('rq_history_rekapan', JSON.stringify(rekapHist));
+                    }
                     
                     if (cloudData.materi) {
                         const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
@@ -614,11 +625,17 @@
             return slots.map(slot => {
                 const isFirst = slot === 1;
                 const stateKey = `${santriName}_${category}_slot_${slot}`;
-                const isVisible = isFirst || !!window.activeSlotState[stateKey] || (cloudSlots && cloudSlots[slot-1]?.item && cloudSlots[slot-1]?.item !== '-');
+                const slotData = cloudSlots && cloudSlots[slot-1] ? cloudSlots[slot-1] : null;
+                const isCloudActive = slotData && slotData.item && slotData.item !== '-';
+                const isVisible = isFirst || !!window.activeSlotState[stateKey] || isCloudActive;
 
-                const slotItem = cloudSlots ? (cloudSlots[slot-1]?.item || '') : '';
-                const slotStart = cloudSlots ? (cloudSlots[slot-1]?.start || '') : '';
-                const slotEnd = cloudSlots ? (cloudSlots[slot-1]?.end || '') : '';
+                const slotItem = slotData ? (slotData.item || '') : '';
+                const slotStart = slotData ? (slotData.start || '') : '';
+                const slotEnd = slotData ? (slotData.end || '') : '';
+                
+                let currentMode = slotData && slotData.mode ? slotData.mode : 'quran';
+                if (!slotData && slotItem.toLowerCase().includes('iqro')) currentMode = 'iqro';
+                window.itemSourceMode[`${santriName}_${category}_${slot}`] = currentMode;
 
                 return `
                     ${!isFirst ? `
@@ -635,19 +652,19 @@
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs font-bold text-slate-500">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs ${currentMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs ${currentMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
-                        <div id="field_quran_${category}_${slot}_${santriName}">
+                        <div id="field_quran_${category}_${slot}_${santriName}" class="${currentMode === 'iqro' ? 'hidden' : ''}">
                             <select id="${category}_surah_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Surat Al-Qur'an (114 Surat) --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${slotItem === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
-                        <div id="field_iqro_${category}_${slot}_${santriName}" class="hidden">
+                        <div id="field_iqro_${category}_${slot}_${santriName}" class="${currentMode === 'quran' ? 'hidden' : ''}">
                             <select id="${category}_iqro_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${slotItem === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
@@ -661,11 +678,11 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Mulai:</label>
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${currentMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
                                 <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart && slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Sampai:</label>
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${currentMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
                                 <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd && slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                         </div>
@@ -823,14 +840,14 @@
                                 <p class="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
                             <div class="flex items-center gap-2 flex-wrap">
-                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition" title="Input & Sinkron Semua">
+                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition" title="Input & Sinkron Semua">
                                     <i class="fa-solid fa-floppy-disk"></i> Input Semua
                                 </button>
-                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1 shadow-xs transition" title="Kirim WA Personal">
-                                    <i class="fa-brands fa-whatsapp text-sm"></i> WA
+                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition" title="Kirim WA Personal">
+                                    <i class="fa-brands fa-whatsapp text-base"></i> WA
                                 </button>
-                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs flex items-center gap-1 shadow-xs transition" title="Laporan Grup">
-                                    <i class="fa-solid fa-users text-sm"></i> Grup
+                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition" title="Laporan Grup">
+                                    <i class="fa-solid fa-users text-base"></i> Grup
                                 </button>
                             </div>
                         </div>
@@ -1093,7 +1110,7 @@
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '-';
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '-';
-                slotData.push({ item: itemVal, start: start, end: end });
+                slotData.push({ item: itemVal, start: start, end: end, mode: mode });
             });
             return slotData;
         };
@@ -1984,17 +2001,17 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
     
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-2">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-[8px] font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-6 h-6 sm:w-7 sm:h-7 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-[7px] font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
                     <div>
-                        <h1 class="text-[10px] sm:text-xs font-black tracking-tight flex items-center gap-1">
+                        <h1 class="text-[9px] sm:text-[10px] font-black tracking-tight flex items-center gap-1">
                             <span>Monitoring</span>
                             <span class="px-1 py-0.5 bg-amber-400 text-emerald-950 text-[7px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
@@ -2014,12 +2031,12 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-5 py-3 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
-                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
-                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud & Reset</button>
+            <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-4 py-2 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
+                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat</button>
+                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
     </header>
