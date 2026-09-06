@@ -171,8 +171,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-4 py-2.5 rounded-xl text-sm sm:text-base font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-4 py-2.5 rounded-xl text-sm sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
+                        ? "px-5 py-3 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0";
                 }
             });
 
@@ -279,27 +279,35 @@
                         window.santriList = cloudData.santri;
                         localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
                     }
-                    if (cloudData.bacaan) localStorage.setItem('rq_history_bacaan', JSON.stringify(cloudData.bacaan));
-                    if (cloudData.hafalan) localStorage.setItem('rq_history_hafalan', JSON.stringify(cloudData.hafalan));
-                    if (cloudData.murojaah) localStorage.setItem('rq_history_murojaah', JSON.stringify(cloudData.murojaah));
-                    if (cloudData.tugas) localStorage.setItem('rq_history_tugas', JSON.stringify(cloudData.tugas));
-                    if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
-                    
-                    if (cloudData.materi) {
-                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
-                        localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
-                    }
-                    if (cloudData.materi_tambahan) {
-                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
-                        localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
-                    }
 
+                    // Map cloud input_bacaan to history and slots
                     if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
+                        const bacHist = cloudData.input_bacaan.map(row => ({
+                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                            tanggal: row[1] || new Date().toISOString().split('T')[0],
+                            rawTime: new Date(row[0] || 0).getTime(),
+                            name: row[3],
+                            detail: [
+                                row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
+                                row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
+                                row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
+                            ].filter(Boolean).join(', ') || '-',
+                            status: row[15] || '-',
+                            catatan: row[16] || '',
+                            type: 'bacaan'
+                        }));
+                        localStorage.setItem('rq_history_bacaan', JSON.stringify(bacHist));
+
                         cloudData.input_bacaan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastBacaan = row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] || '')}` : '-';
+                                sObj.lastBacaan = [
+                                    row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
+                                    row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
+                                    row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
+                                ].filter(Boolean).join(', ') || '-';
+
                                 sObj.cloudBacSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -312,11 +320,32 @@
                     }
 
                     if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
+                        const hafHist = cloudData.input_hafalan.map(row => ({
+                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                            tanggal: row[1] || new Date().toISOString().split('T')[0],
+                            rawTime: new Date(row[0] || 0).getTime(),
+                            name: row[3],
+                            detail: [
+                                row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
+                                row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
+                                row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
+                            ].filter(Boolean).join(', ') || '-',
+                            status: row[15] || '-',
+                            catatan: row[16] || '',
+                            type: 'hafalan'
+                        }));
+                        localStorage.setItem('rq_history_hafalan', JSON.stringify(hafHist));
+
                         cloudData.input_hafalan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastHafalan = row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] || '')}` : '-';
+                                sObj.lastHafalan = [
+                                    row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
+                                    row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
+                                    row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
+                                ].filter(Boolean).join(', ') || '-';
+
                                 sObj.cloudHafSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -329,11 +358,32 @@
                     }
 
                     if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
+                        const murHist = cloudData.input_murojaah_dikelas.map(row => ({
+                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                            tanggal: row[1] || new Date().toISOString().split('T')[0],
+                            rawTime: new Date(row[0] || 0).getTime(),
+                            name: row[3],
+                            detail: [
+                                row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
+                                row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
+                                row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
+                            ].filter(Boolean).join(', ') || '-',
+                            status: row[15] || '-',
+                            catatan: row[16] || '',
+                            type: 'murojaah'
+                        }));
+                        localStorage.setItem('rq_history_murojaah', JSON.stringify(murHist));
+
                         cloudData.input_murojaah_dikelas.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastMurojaah = row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] ? row[7]+'-'+row[8] : (row[7] || '')}` : '-';
+                                sObj.lastMurojaah = [
+                                    row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
+                                    row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
+                                    row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
+                                ].filter(Boolean).join(', ') || '-';
+
                                 sObj.cloudMurSlots = [
                                     { item: row[6], start: row[7], end: row[8] },
                                     { item: row[9], start: row[10], end: row[11] },
@@ -346,6 +396,18 @@
                     }
 
                     if (cloudData.input_tugas && cloudData.input_tugas.length > 0) {
+                        const tugHist = cloudData.input_tugas.map(row => ({
+                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                            tanggal: row[1] || new Date().toISOString().split('T')[0],
+                            rawTime: new Date(row[0] || 0).getTime(),
+                            name: row[3],
+                            detail: row[6] || '-',
+                            status: '-',
+                            catatan: row[8] || '',
+                            type: 'tugas'
+                        }));
+                        localStorage.setItem('rq_history_tugas', JSON.stringify(tugHist));
+
                         cloudData.input_tugas.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
@@ -354,6 +416,17 @@
                                 if (row[8]) sObj.cloudTugCat = row[8];
                             }
                         });
+                    }
+                    
+                    if (cloudData.rekapcatatan) localStorage.setItem('rq_history_rekapan', JSON.stringify(cloudData.rekapcatatan));
+                    
+                    if (cloudData.materi) {
+                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
+                        localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
+                    }
+                    if (cloudData.materi_tambahan) {
+                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
+                        localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
                     }
                     
                     window.renderSantriCardsAndTable();
@@ -525,7 +598,7 @@
                     btnEl.innerHTML = `<i class="fa-solid fa-chevron-up"></i> Tutup Riwayat`;
                 } else {
                     contentEl.classList.add('hidden');
-                    btnEl.innerHTML = `<i class="fa-solid fa-chevron-down"></i> Buka Riwayat (${categoryKey})`;
+                    btnEl.innerHTML = `<i class="fa-solid fa-chevron-down"></i> Buka Riwayat`;
                 }
             }
         };
@@ -589,11 +662,11 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Mulai:</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart && slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                             <div>
                                 <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Ayat Sampai:</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd && slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                         </div>
                     </div>
@@ -619,7 +692,7 @@
                 <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-2">
                     <div class="flex-1 space-y-0.5">
                         <div class="font-black text-emerald-800 dark:text-emerald-300">${h.detail || '-'}</div>
-                        <div class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Status: ${h.status || '-'} | Catatan: ${h.catatan || '-'}</div>
+                        <div class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'} | Catatan: ${h.catatan || '-'}</div>
                         <div class="text-[10px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
                     </div>
                     <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-2.5 py-1.5 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-lg font-black text-[11px] hover:bg-rose-200 transition shrink-0">Hapus</button>
@@ -818,7 +891,7 @@
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Bacaan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Bacaan')" class="text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1.5">
-                                        <i class="fa-solid ${isBacaanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isBacaanHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat (Bacaan)'}
+                                        <i class="fa-solid ${isBacaanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isBacaanHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
                                     </button>
                                     <div id="card_history_content_Bacaan_${s.name}" class="mt-2 space-y-2 ${!isBacaanHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Bacaan')}
@@ -876,7 +949,7 @@
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Hafalan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Hafalan')" class="text-xs font-black text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1.5">
-                                        <i class="fa-solid ${isHafalanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat (Hafalan)'}
+                                        <i class="fa-solid ${isHafalanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
                                     </button>
                                     <div id="card_history_content_Hafalan_${s.name}" class="mt-2 space-y-2 ${!isHafalanHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Hafalan')}
@@ -933,7 +1006,7 @@
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Murojaah_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Murojaah')" class="text-xs font-black text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1.5">
-                                        <i class="fa-solid ${isMurojaahHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat (Murojaah)'}
+                                        <i class="fa-solid ${isMurojaahHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
                                     </button>
                                     <div id="card_history_content_Murojaah_${s.name}" class="mt-2 space-y-2 ${!isMurojaahHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Murojaah')}
@@ -965,7 +1038,7 @@
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Tugas_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Tugas')" class="text-xs font-black text-amber-800 dark:text-amber-300 hover:underline flex items-center gap-1.5">
-                                        <i class="fa-solid ${isTugasHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat (Tugas)'}
+                                        <i class="fa-solid ${isTugasHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
                                     </button>
                                     <div id="card_history_content_Tugas_${s.name}" class="mt-2 space-y-2 ${!isTugasHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Tugas')}
@@ -1606,7 +1679,7 @@
                     <tr>
                         <td class="p-3 font-black text-xs sm:text-sm">${h.name || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-bold">${h.detail || '-'}</td>
-                        <td class="p-3 text-xs sm:text-sm font-bold text-emerald-700">${h.status || '-'}</td>
+                        <td class="p-3 text-xs sm:text-sm font-bold text-emerald-700">${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'}</td>
                         <td class="p-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-semibold">${h.catatan || '-'}</td>
                         <td class="p-3 text-xs sm:text-sm font-bold text-emerald-800 text-right">${h.timestamp || '-'}</td>
                     </tr>
@@ -1911,49 +1984,49 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
     
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-2">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-5 h-5 sm:w-6 sm:h-6 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-[7px] font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-[8px] font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
                     <div>
-                        <h1 class="text-[9px] sm:text-[10px] font-black tracking-tight flex items-center gap-1">
+                        <h1 class="text-[10px] sm:text-xs font-black tracking-tight flex items-center gap-1">
                             <span>Monitoring</span>
-                            <span class="px-1 py-0.5 bg-amber-400 text-emerald-950 text-[6px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
+                            <span class="px-1 py-0.5 bg-amber-400 text-emerald-950 text-[7px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
-                            <p id="storageInfoLabel" class="text-[8px] text-emerald-200 font-bold">Sheets & Local Active</p>
+                            <p id="storageInfoLabel" class="text-[9px] text-emerald-200 font-bold">Sheets & Local Active</p>
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <button onclick="window.toggleDarkMode()" class="p-1.5 bg-emerald-700 dark:bg-emerald-900 rounded-lg text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
-                        <i id="darkModeIcon" class="fa-solid fa-moon text-xs"></i>
+                        <i id="darkModeIcon" class="fa-solid fa-moon text-sm"></i>
                     </button>
-                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2 py-1 bg-amber-400 text-emerald-950 font-black rounded-lg text-[10px] flex items-center gap-1">
+                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2.5 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-lg text-xs flex items-center gap-1">
                         <i class="fa-solid fa-rotate"></i> Sync
                     </button>
                 </div>
             </div>
 
-            <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-4 py-2.5 rounded-xl text-sm sm:text-base font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
-                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-4 py-2.5 rounded-xl text-sm sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2.5 rounded-xl text-sm sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
-                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-4 py-2.5 rounded-xl text-sm sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2.5 rounded-xl text-sm sm:text-base font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud & Reset</button>
+            <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-5 py-3 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
+                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Materi</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Riwayat</button>
+                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Laporan</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/60 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-4 relative">
         <button id="floatingScrollTopBtn" onclick="window.scrollToTopGrid()" class="fixed bottom-6 right-6 z-50 px-4 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-2xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all opacity-0 pointer-events-none border-2 border-rose-300">
-            <i class="fa-solid fa-arrow-up animate-bounce"></i> Menuju Paling Atas
+            <i class="fa-solid fa-arrow-up animate-bounce"></i> Kembali Ke Atas
         </button>
 
         <section id="section-setoran" class="space-y-4">
