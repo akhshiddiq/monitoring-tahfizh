@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13.5px; }
-        @media (min-width: 640px) { body { font-size: 14.5px; } }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; }
+        @media (min-width: 640px) { body { font-size: 13.5px; } }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.4); border-radius: 9999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.7); }
@@ -114,8 +114,15 @@
             }
         };
 
-        window.formatTimestampCustom = function(dateObj = new Date()) {
+        window.formatTimestampCustom = function(inputDate) {
             try {
+                let dateObj = inputDate;
+                if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
+                    dateObj = new Date(inputDate);
+                }
+                if (isNaN(dateObj.getTime())) {
+                    dateObj = new Date();
+                }
                 const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
                 const d = days[dateObj.getDay()];
@@ -125,7 +132,7 @@
                 const mm = String(dateObj.getMinutes()).padStart(2, '0');
                 return `${d}, ${dayNum} ${m}, ${hh}.${mm} WIB`;
             } catch (e) {
-                return dateObj.toString();
+                return String(inputDate || '-');
             }
         };
 
@@ -173,8 +180,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
+                        ? "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
                 }
             });
 
@@ -316,7 +323,7 @@
                             const slots = parseCloudSlots(row);
                             const detailStr = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                             return {
-                                timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                                timestamp: row[0] ? window.formatTimestampCustom(row[0]) : '-',
                                 tanggal: row[1] || new Date().toISOString().split('T')[0],
                                 rawTime: new Date(row[0] || 0).getTime(),
                                 name: row[3],
@@ -384,7 +391,7 @@
 
                     if (cloudData.input_tugas && cloudData.input_tugas.length > 0) {
                         const tugHist = cloudData.input_tugas.map(row => ({
-                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                            timestamp: row[0] ? window.formatTimestampCustom(row[0]) : '-',
                             tanggal: row[1] || new Date().toISOString().split('T')[0],
                             rawTime: new Date(row[0] || 0).getTime(),
                             name: row[3],
@@ -470,21 +477,21 @@
             const list = JSON.parse(localStorage.getItem(key) || '[]');
 
             if (list.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 font-extrabold">Belum ada materi tersimpan.</p>`;
+                container.innerHTML = `<p class="text-[11px] text-slate-400 font-extrabold">Belum ada materi tersimpan.</p>`;
                 return;
             }
 
             container.innerHTML = list.map((m, idx) => `
-                <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs sm:text-sm gap-3">
+                <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
                     <div class="flex-1">
                         <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)} ${m.tampilWa !== false ? '<span class="text-emerald-600 font-extrabold">[Tampil Laporan]</span>' : '<span class="text-slate-400">[Disembunyikan]</span>'}</div>
-                        <div class="font-bold text-slate-600 dark:text-slate-400 text-xs mt-0.5">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
+                        <div class="font-bold text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <button onclick="window.toggleMateriTampil('${type}', ${idx})" class="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-lg font-extrabold text-[11px] text-slate-700 dark:text-slate-200 transition">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="window.toggleMateriTampil('${type}', ${idx})" class="px-2 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-lg font-extrabold text-[10px] text-slate-700 dark:text-slate-200 transition">
                             ${m.tampilWa !== false ? 'Sembunyikan' : 'Tampilkan'}
                         </button>
-                        <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-black hover:underline px-2 py-1.5 text-[11px]">Hapus</button>
+                        <button onclick="window.deleteMateri('${type}', ${idx})" class="text-rose-500 font-black hover:underline px-1.5 py-1 text-[10px]">Hapus</button>
                     </div>
                 </div>
             `).join('');
@@ -541,15 +548,15 @@
             const labelEnd = document.getElementById(`lbl_end_${category}_${slot}_${santriName}`);
 
             if (mode === 'iqro') {
-                if (btnQ) btnQ.className = "px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400";
-                if (btnI) btnI.className = "px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700";
+                if (btnQ) btnQ.className = "px-2 py-1 rounded-md text-[10px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400";
+                if (btnI) btnI.className = "px-2 py-1 rounded-md text-[10px] font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700";
                 if (fieldQ) fieldQ.classList.add('hidden');
                 if (fieldI) fieldI.classList.remove('hidden');
                 if (labelStart) labelStart.innerText = "Halaman Mulai:";
                 if (labelEnd) labelEnd.innerText = "Halaman Sampai:";
             } else {
-                if (btnQ) btnQ.className = "px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700";
-                if (btnI) btnI.className = "px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold text-slate-500";
+                if (btnQ) btnQ.className = "px-2 py-1 rounded-md text-[10px] font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700";
+                if (btnI) btnI.className = "px-2 py-1 rounded-md text-[10px] font-bold text-slate-500";
                 if (fieldQ) fieldQ.classList.remove('hidden');
                 if (fieldI) fieldI.classList.add('hidden');
                 if (labelStart) labelStart.innerText = "Ayat Mulai:";
@@ -600,10 +607,10 @@
             if (contentEl && btnEl) {
                 if (window.cardHistoryToggleState[key]) {
                     contentEl.classList.remove('hidden');
-                    btnEl.innerHTML = `<i class="fa-solid fa-chevron-up"></i> Tutup Riwayat`;
+                    btnEl.innerHTML = `▲ Tutup Riwayat`;
                 } else {
                     contentEl.classList.add('hidden');
-                    btnEl.innerHTML = `<i class="fa-solid fa-chevron-down"></i> Buka Riwayat`;
+                    btnEl.innerHTML = `▼ Buka Riwayat`;
                 }
             }
         };
@@ -655,33 +662,33 @@
 
                 return `
                     ${!isFirst ? `
-                        <div class="my-1.5">
-                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-lg text-xs flex items-center gap-1.5 transition">
+                        <div class="my-1">
+                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-lg text-[11px] flex items-center gap-1 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-3 bg-transparent rounded-xl border-2 ${borderClass} space-y-2.5 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-2.5 bg-transparent rounded-xl border-2 ${borderClass} space-y-2 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-black text-slate-800 dark:text-slate-200">
-                                Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
+                            <span class="text-[11px] font-black text-slate-800 dark:text-slate-200">
+                                Pilihan ${slot} ${isFirst ? '<span class="text-[10px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
-                            <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-lg">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-2.5 py-1 rounded-md text-[11px] ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-2.5 py-1 rounded-md text-[11px] ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                            <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-md">
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-2 py-1 rounded text-[10px] ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-2 py-1 rounded text-[10px] ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs">
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
-                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${defaultIqroVal === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${defaultIqroVal === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -692,14 +699,14 @@
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2.5">
+                        <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-[11px] font-black text-slate-600 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm">
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-[10px] font-black text-slate-600 dark:text-slate-300 mb-0.5">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-[11px] font-black text-slate-600 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm">
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-[10px] font-black text-slate-600 dark:text-slate-300 mb-0.5">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs">
                             </div>
                         </div>
                     </div>
@@ -718,17 +725,17 @@
             const santriHistory = list.filter(item => (item.name || '').toLowerCase() === santriName.toLowerCase());
 
             if (santriHistory.length === 0) {
-                return `<p class="text-xs text-slate-400 font-extrabold p-2">Belum ada riwayat ${categoryKey.toLowerCase()} untuk ${santriName}.</p>`;
+                return `<p class="text-[11px] text-slate-400 font-extrabold p-2">Belum ada riwayat ${categoryKey.toLowerCase()} untuk ${santriName}.</p>`;
             }
 
             return santriHistory.map((h, idx) => `
-                <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs sm:text-sm gap-3">
-                    <div class="flex-1 space-y-1">
-                        <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm">${h.detail || '-'}</div>
-                        <div class="text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'} | Catatan: ${h.catatan || '-'}</div>
+                <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
+                    <div class="flex-1 space-y-0.5">
+                        <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">${h.detail || '-'}</div>
+                        <div class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'} | Catatan: ${h.catatan || '-'}</div>
                         <div class="text-[10px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
                     </div>
-                    <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-3 py-1.5 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-lg font-black text-[11px] hover:bg-rose-200 transition shrink-0">Hapus</button>
+                    <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-lg font-black text-[10px] hover:bg-rose-200 transition shrink-0">Hapus</button>
                 </div>
             `).join('');
         };
@@ -781,7 +788,7 @@
                 const cardBg = isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800';
 
                 return `
-                    <button type="button" onclick="window.scrollToSantri('${s.name}')" class="p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs sm:text-sm flex flex-col items-center justify-center transition text-center">
+                    <button type="button" onclick="window.scrollToSantri('${s.name}')" class="p-2.5 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center">
                         <span>${s.name}</span>
                     </button>
                 `;
@@ -796,10 +803,10 @@
                 const isTodayMur = s.lastMurojaahDate === todayStr;
                 const isTodayTug = s.lastTugasDate === todayStr;
 
-                const badgeBac = isTodayBac ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[11px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-black rounded-lg">Belum di input</span>';
-                const badgeHaf = isTodayHaf ? '<span class="px-2 py-0.5 bg-rose-100 text-rose-800 text-[11px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-black rounded-lg">Belum di input</span>';
-                const badgeMur = isTodayMur ? '<span class="px-2 py-0.5 bg-purple-100 text-purple-800 text-[11px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-black rounded-lg">Belum di input</span>';
-                const badgeTug = isTodayTug ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[11px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-black rounded-lg">Belum di input</span>';
+                const badgeBac = isTodayBac ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
+                const badgeHaf = isTodayHaf ? '<span class="px-2 py-0.5 bg-rose-100 text-rose-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
+                const badgeMur = isTodayMur ? '<span class="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
+                const badgeTug = isTodayTug ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
 
                 const defaultBacStat = s.cloudBacStat || 'Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.';
                 const defaultHafStat = s.cloudHafStat || 'Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.';
@@ -855,56 +862,56 @@
                 const isTugasHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Tugas`];
 
                 return `
-                    <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all">
-                        <div class="flex items-start justify-between border-b pb-3 flex-wrap gap-3">
+                    <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3.5 transition-all">
+                        <div class="flex items-start justify-between border-b pb-2.5 flex-wrap gap-2">
                             <div>
-                                <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">${s.name}</h3>
-                                <p class="text-xs text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
+                                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">${s.name}</h3>
+                                <p class="text-[11px] text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition" title="Input & Sinkron Semua">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[11px] flex items-center gap-1 shadow-xs transition" title="Input & Sinkron Semua">
                                     <i class="fa-solid fa-floppy-disk"></i> Input Semua
                                 </button>
-                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition" title="Kirim WA Personal">
-                                    <i class="fa-brands fa-whatsapp text-sm"></i> WA
+                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[11px] flex items-center gap-1 shadow-xs transition" title="Kirim WA Personal">
+                                    <i class="fa-brands fa-whatsapp text-xs"></i> WA
                                 </button>
-                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs flex items-center gap-1.5 shadow-xs transition" title="Laporan Grup">
-                                    <i class="fa-solid fa-users text-sm"></i> Grup
+                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-[11px] flex items-center gap-1 shadow-xs transition" title="Laporan Grup">
+                                    <i class="fa-solid fa-users text-xs"></i> Grup
                                 </button>
                             </div>
                         </div>
 
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl">
-                                <span>Tanggal: <input type="date" id="tgl_${s.name}" value="${todayStr}" class="p-1.5 bg-white dark:bg-slate-800 border rounded-lg font-bold text-xs"></span>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 p-2.5 rounded-xl">
+                                <span>Tanggal: <input type="date" id="tgl_${s.name}" value="${todayStr}" class="p-1 bg-white dark:bg-slate-800 border rounded-lg font-bold text-[11px]"></span>
                                 <span class="text-emerald-700 dark:text-emerald-400 font-black">Form Input Setoran</span>
                             </div>
 
                             <!-- BACAAN -->
-                            <div class="p-3.5 sm:p-4 rounded-xl border-2 border-emerald-500 space-y-3">
-                                <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2.5 flex-wrap gap-2">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="font-black text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 uppercase flex items-center gap-1.5">
+                            <div class="p-3 rounded-xl border-2 border-emerald-500 space-y-2.5">
+                                <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2 flex-wrap gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-black text-xs text-emerald-800 dark:text-emerald-300 uppercase flex items-center gap-1">
                                             <i class="fa-solid fa-book-open"></i> BACAAN — ${s.name}
                                         </span>
                                         ${badgeBac}
-                                        <span id="save_badge_bacaan_${s.name}" class="text-[11px] font-black text-emerald-600 hidden">Alhamdulillah sudah di input</span>
+                                        <span id="save_badge_bacaan_${s.name}" class="text-[10px] font-black text-emerald-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2.5 py-1.5 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                    <div class="flex items-center gap-1.5">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2 py-1 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
-                                        <button type="button" id="card_section_btn_bacaan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'bacaan')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-black shadow-xs transition flex items-center gap-1">
+                                        <button type="button" id="card_section_btn_bacaan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'bacaan')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isBacaanOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isBacaanOpen ? 'Tutup Form' : 'Buka Form'}
                                         </button>
                                     </div>
                                 </div>
-                                <div id="card_section_content_bacaan_${s.name}" class="space-y-3 ${!isBacaanOpen ? 'hidden' : ''}">
+                                <div id="card_section_content_bacaan_${s.name}" class="space-y-2.5 ${!isBacaanOpen ? 'hidden' : ''}">
                                     ${window.renderTripleInputSlot('bac', s.name, 'border-emerald-500')}
-                                    <div class="pt-3 border-t border-emerald-200 dark:border-emerald-800 space-y-2.5">
+                                    <div class="pt-2.5 border-t border-emerald-200 dark:border-emerald-800 space-y-2">
                                         <div>
-                                            <label class="block text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Bacaan (${s.name}):</label>
-                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-black text-xs sm:text-sm">
+                                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-0.5">Nilai Bacaan (${s.name}):</label>
+                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-black text-xs">
                                                 <option value="Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
                                                 <option value="Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.includes('Baik Bacaan cukup') || !defaultBacStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
                                                 <option value="Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.includes('kesalahan makhraj') ? 'selected' : ''}>Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
@@ -912,8 +919,8 @@
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Catatan Bacaan (${s.name}):</label>
-                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm mb-2">
+                                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-0.5">Catatan Bacaan (${s.name}):</label>
+                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs mb-1.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Makharijul Huruf" ${parsedBacCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
                                                 <option value="Sifatul Huruf" ${parsedBacCatType === 'Sifatul Huruf' ? 'selected' : ''}>Sifatul Huruf</option>
@@ -925,50 +932,50 @@
                                                 <option value="Bacaan Gharib" ${parsedBacCatType === 'Bacaan Gharib' ? 'selected' : ''}>Bacaan Gharib</option>
                                                 <option value="Kesalahan Bacaan" ${parsedBacCatType === 'Kesalahan Bacaan' ? 'selected' : ''}>Kesalahan Bacaan</option>
                                             </select>
-                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm font-extrabold">
+                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs font-extrabold">
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'bacaan')" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'bacaan')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Bacaan (${s.name})
                                         </button>
                                     </div>
                                 </div>
-                                <div class="pt-2 border-t">
-                                    <button type="button" id="card_history_btn_Bacaan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Bacaan')" class="text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1">
-                                        <i class="fa-solid ${isBacaanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isBacaanHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
+                                <div class="pt-1.5 border-t">
+                                    <button type="button" id="card_history_btn_Bacaan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Bacaan')" class="text-[11px] font-black text-emerald-700 dark:text-emerald-400 hover:underline">
+                                        ${isBacaanHistoryOpen ? '▲ Tutup Riwayat' : '▼ Buka Riwayat'}
                                     </button>
-                                    <div id="card_history_content_Bacaan_${s.name}" class="mt-2 space-y-2 max-h-48 overflow-y-auto custom-scrollbar ${!isBacaanHistoryOpen ? 'hidden' : ''}">
+                                    <div id="card_history_content_Bacaan_${s.name}" class="mt-1.5 space-y-2 max-h-40 overflow-y-auto custom-scrollbar ${!isBacaanHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Bacaan')}
                                     </div>
                                 </div>
                             </div>
 
                             <!-- HAFALAN BARU -->
-                            <div class="p-3.5 sm:p-4 rounded-xl border-2 border-rose-500 space-y-3">
-                                <div class="flex items-center justify-between border-b border-rose-200 dark:border-rose-800 pb-2.5 flex-wrap gap-2">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="font-black text-xs sm:text-sm text-rose-800 dark:text-rose-300 uppercase flex items-center gap-1.5">
+                            <div class="p-3 rounded-xl border-2 border-rose-500 space-y-2.5">
+                                <div class="flex items-center justify-between border-b border-rose-200 dark:border-rose-800 pb-2 flex-wrap gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-black text-xs text-rose-800 dark:text-rose-300 uppercase flex items-center gap-1">
                                             <i class="fa-solid fa-award"></i> HAFALAN BARU — ${s.name}
                                         </span>
                                         ${badgeHaf}
-                                        <span id="save_badge_hafalan_${s.name}" class="text-[11px] font-black text-rose-600 hidden">Alhamdulillah sudah di input</span>
+                                        <span id="save_badge_hafalan_${s.name}" class="text-[10px] font-black text-rose-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2.5 py-1.5 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                    <div class="flex items-center gap-1.5">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2 py-1 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
-                                        <button type="button" id="card_section_btn_hafalan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'hafalan')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-black shadow-xs transition flex items-center gap-1">
+                                        <button type="button" id="card_section_btn_hafalan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'hafalan')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isHafalanOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanOpen ? 'Tutup Form' : 'Buka Form'}
                                         </button>
                                     </div>
                                 </div>
-                                <div id="card_section_content_hafalan_${s.name}" class="space-y-3 ${!isHafalanOpen ? 'hidden' : ''}">
+                                <div id="card_section_content_hafalan_${s.name}" class="space-y-2.5 ${!isHafalanOpen ? 'hidden' : ''}">
                                     ${window.renderTripleInputSlot('haf', s.name, 'border-rose-500')}
-                                    <div class="pt-3 border-t border-rose-200 dark:border-rose-800 space-y-2.5">
+                                    <div class="pt-2.5 border-t border-rose-200 dark:border-rose-800 space-y-2">
                                         <div>
-                                            <label class="block text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
-                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-black text-xs sm:text-sm">
+                                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-0.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
+                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-black text-xs">
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('Baik, Hafalan cukup') || !defaultHafStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('beberapa kali lupa') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -976,8 +983,8 @@
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Catatan Hafalan Baru (${s.name}):</label>
-                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm mb-2">
+                                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-0.5">Catatan Hafalan Baru (${s.name}):</label>
+                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs mb-1.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran Hafalan" ${parsedHafCatType === 'Kelancaran Hafalan' ? 'selected' : ''}>Kelancaran Hafalan</option>
                                                 <option value="Ketepatan Hafalan" ${parsedHafCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -989,50 +996,50 @@
                                                 <option value="Hafalan Belum Selesai" ${parsedHafCatType === 'Hafalan Belum Selesai' ? 'selected' : ''}>Hafalan Belum Selesai</option>
                                                 <option value="Hafalan Lulus" ${parsedHafCatType === 'Hafalan Lulus' ? 'selected' : ''}>Hafalan Lulus</option>
                                             </select>
-                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm font-extrabold">
+                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs font-extrabold">
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'hafalan')" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'hafalan')" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Hafalan Baru (${s.name})
                                         </button>
                                     </div>
                                 </div>
-                                <div class="pt-2 border-t">
-                                    <button type="button" id="card_history_btn_Hafalan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Hafalan')" class="text-xs font-black text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1">
-                                        <i class="fa-solid ${isHafalanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
+                                <div class="pt-1.5 border-t">
+                                    <button type="button" id="card_history_btn_Hafalan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Hafalan')" class="text-[11px] font-black text-rose-600 dark:text-rose-400 hover:underline">
+                                        ${isHafalanHistoryOpen ? '▲ Tutup Riwayat' : '▼ Buka Riwayat'}
                                     </button>
-                                    <div id="card_history_content_Hafalan_${s.name}" class="mt-2 space-y-2 max-h-48 overflow-y-auto custom-scrollbar ${!isHafalanHistoryOpen ? 'hidden' : ''}">
+                                    <div id="card_history_content_Hafalan_${s.name}" class="mt-1.5 space-y-2 max-h-40 overflow-y-auto custom-scrollbar ${!isHafalanHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Hafalan')}
                                     </div>
                                 </div>
                             </div>
 
                             <!-- MUROJA'AH DI KELAS -->
-                            <div class="p-3.5 sm:p-4 rounded-xl border-2 border-purple-500 space-y-3">
-                                <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800 pb-2.5 flex-wrap gap-2">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="font-black text-xs sm:text-sm text-purple-800 dark:text-purple-300 uppercase flex items-center gap-1.5">
+                            <div class="p-3 rounded-xl border-2 border-purple-500 space-y-2.5">
+                                <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800 pb-2 flex-wrap gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-black text-xs text-purple-800 dark:text-purple-300 uppercase flex items-center gap-1">
                                             <i class="fa-solid fa-rotate"></i> MUROJA'AH DI KELAS — ${s.name}
                                         </span>
                                         ${badgeMur}
-                                        <span id="save_badge_murojaah_${s.name}" class="text-[11px] font-black text-purple-600 hidden">Alhamdulillah sudah di input</span>
+                                        <span id="save_badge_murojaah_${s.name}" class="text-[10px] font-black text-purple-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2.5 py-1.5 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                    <div class="flex items-center gap-1.5">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2 py-1 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
-                                        <button type="button" id="card_section_btn_murojaah_${s.name}" onclick="window.toggleCardSection('${s.name}', 'murojaah')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-black shadow-xs transition flex items-center gap-1">
+                                        <button type="button" id="card_section_btn_murojaah_${s.name}" onclick="window.toggleCardSection('${s.name}', 'murojaah')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isMurojaahOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahOpen ? 'Tutup Form' : 'Buka Form'}
                                         </button>
                                     </div>
                                 </div>
-                                <div id="card_section_content_murojaah_${s.name}" class="space-y-3 ${!isMurojaahOpen ? 'hidden' : ''}">
+                                <div id="card_section_content_murojaah_${s.name}" class="space-y-2.5 ${!isMurojaahOpen ? 'hidden' : ''}">
                                     ${window.renderTripleInputSlot('mur', s.name, 'border-purple-500')}
-                                    <div class="pt-3 border-t border-purple-200 dark:border-purple-800 space-y-2.5">
+                                    <div class="pt-2.5 border-t border-purple-200 dark:border-purple-800 space-y-2">
                                         <div>
-                                            <label class="block text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
-                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-black text-xs sm:text-sm">
+                                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-0.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
+                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-black text-xs">
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('Baik, Hafalan cukup') || !defaultMurStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('beberapa kali lupa') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -1040,8 +1047,8 @@
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Catatan Muroja'ah di Kelas (${s.name}):</label>
-                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm mb-2">
+                                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-0.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
+                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs mb-1.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran" ${parsedMurCatType === 'Kelancaran' ? 'selected' : ''}>Kelancaran</option>
                                                 <option value="Ketepatan Hafalan" ${parsedMurCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -1052,58 +1059,58 @@
                                                 <option value="Hafalan Lama" ${parsedMurCatType === 'Hafalan Lama' ? 'selected' : ''}>Hafalan Lama</option>
                                                 <option value="Hafalan Juz" ${parsedMurCatType === 'Hafalan Juz' ? 'selected' : ''}>Hafalan Juz</option>
                                             </select>
-                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm font-extrabold">
+                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs font-extrabold">
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="flex-1 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Muroja'ah (${s.name})
                                         </button>
                                     </div>
                                 </div>
-                                <div class="pt-2 border-t">
-                                    <button type="button" id="card_history_btn_Murojaah_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Murojaah')" class="text-xs font-black text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1">
-                                        <i class="fa-solid ${isMurojaahHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
+                                <div class="pt-1.5 border-t">
+                                    <button type="button" id="card_history_btn_Murojaah_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Murojaah')" class="text-[11px] font-black text-purple-700 dark:text-purple-400 hover:underline">
+                                        ${isMurojaahHistoryOpen ? '▲ Tutup Riwayat' : '▼ Buka Riwayat'}
                                     </button>
-                                    <div id="card_history_content_Murojaah_${s.name}" class="mt-2 space-y-2 max-h-48 overflow-y-auto custom-scrollbar ${!isMurojaahHistoryOpen ? 'hidden' : ''}">
+                                    <div id="card_history_content_Murojaah_${s.name}" class="mt-1.5 space-y-2 max-h-40 overflow-y-auto custom-scrollbar ${!isMurojaahHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Murojaah')}
                                     </div>
                                 </div>
                             </div>
 
                             <!-- TUGAS TAMBAHAN -->
-                            <div class="p-3.5 sm:p-4 rounded-xl border-2 border-amber-800 space-y-3">
-                                <div class="flex items-center justify-between border-b border-amber-300 dark:border-amber-800 pb-2.5 flex-wrap gap-2">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="font-black text-xs sm:text-sm text-amber-900 dark:text-amber-200 uppercase flex items-center gap-1.5">
+                            <div class="p-3 rounded-xl border-2 border-amber-800 space-y-2.5">
+                                <div class="flex items-center justify-between border-b border-amber-300 dark:border-amber-800 pb-2 flex-wrap gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-black text-xs text-amber-900 dark:text-amber-200 uppercase flex items-center gap-1">
                                             <i class="fa-solid fa-list-check"></i> TUGAS TAMBAHAN — ${s.name}
                                         </span>
                                         ${badgeTug}
-                                        <span id="save_badge_tugas_${s.name}" class="text-[11px] font-black text-amber-700 hidden">Alhamdulillah sudah di input</span>
+                                        <span id="save_badge_tugas_${s.name}" class="text-[10px] font-black text-amber-700 hidden">Alhamdulillah sudah di input</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-2.5 py-1.5 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                                    <div class="flex items-center gap-1.5">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-2 py-1 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
                                             <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
-                                        <button type="button" id="card_section_btn_tugas_${s.name}" onclick="window.toggleCardSection('${s.name}', 'tugas')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-black shadow-xs transition flex items-center gap-1">
+                                        <button type="button" id="card_section_btn_tugas_${s.name}" onclick="window.toggleCardSection('${s.name}', 'tugas')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isTugasOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasOpen ? 'Tutup Form' : 'Buka Form'}
                                         </button>
                                     </div>
                                 </div>
-                                <div id="card_section_content_tugas_${s.name}" class="space-y-3 ${!isTugasOpen ? 'hidden' : ''}">
-                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs sm:text-sm">
-                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-2.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs sm:text-sm font-extrabold">
-                                    <div class="flex items-center gap-3">
-                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="flex-1 py-3 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 mt-0.5">
+                                <div id="card_section_content_tugas_${s.name}" class="space-y-2.5 ${!isTugasOpen ? 'hidden' : ''}">
+                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg font-extrabold text-xs">
+                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-2 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-lg text-xs font-extrabold">
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="flex-1 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-xs shadow-md transition flex items-center justify-center gap-1.5">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
                                         </button>
                                     </div>
                                 </div>
-                                <div class="pt-2 border-t">
-                                    <button type="button" id="card_history_btn_Tugas_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Tugas')" class="text-xs font-black text-amber-800 dark:text-amber-300 hover:underline flex items-center gap-1">
-                                        <i class="fa-solid ${isTugasHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasHistoryOpen ? 'Tutup Riwayat' : 'Buka Riwayat'}
+                                <div class="pt-1.5 border-t">
+                                    <button type="button" id="card_history_btn_Tugas_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Tugas')" class="text-[11px] font-black text-amber-800 dark:text-amber-300 hover:underline">
+                                        ${isTugasHistoryOpen ? '▲ Tutup Riwayat' : '▼ Buka Riwayat'}
                                     </button>
-                                    <div id="card_history_content_Tugas_${s.name}" class="mt-2 space-y-2 max-h-48 overflow-y-auto custom-scrollbar ${!isTugasHistoryOpen ? 'hidden' : ''}">
+                                    <div id="card_history_content_Tugas_${s.name}" class="mt-1.5 space-y-2 max-h-40 overflow-y-auto custom-scrollbar ${!isTugasHistoryOpen ? 'hidden' : ''}">
                                         ${window.renderCardCategoryHistoryList(s.name, 'Tugas')}
                                     </div>
                                 </div>
@@ -1173,7 +1180,8 @@
             if (!s) return;
 
             const tanggalVal = document.getElementById(`tgl_${name}`)?.value || new Date().toISOString().split('T')[0];
-            const formattedTimeStr = window.formatTimestampCustom(new Date());
+            const nowObj = new Date();
+            const formattedTimeStr = window.formatTimestampCustom(nowObj);
             const rekapanList = JSON.parse(localStorage.getItem('rq_history_rekapan') || '[]');
 
             if (sectionType === 'bacaan') {
@@ -1195,12 +1203,12 @@
                 s.cloudBacCat = bacaanCatCombined;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
                 localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
                 
                 window.syncToCloud({
                     type: 'bacaan',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1213,7 +1221,7 @@
                 });
 
                 if (bacaanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
                 }
 
                 window.cardSectionToggleState[`${name}_section_bacaan`] = false;
@@ -1241,12 +1249,12 @@
                 s.cloudHafCat = hafalanCatCombined;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
                 localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
                 
                 window.syncToCloud({
                     type: 'hafalan',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1259,7 +1267,7 @@
                 });
 
                 if (hafalanCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
                 }
 
                 window.cardSectionToggleState[`${name}_section_hafalan`] = false;
@@ -1287,12 +1295,12 @@
                 s.cloudMurCat = murojaahCatCombined;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
                 localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
                 
                 window.syncToCloud({
                     type: 'murojaah',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1305,7 +1313,7 @@
                 });
 
                 if (murojaahCatCombined) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
                 }
 
                 window.cardSectionToggleState[`${name}_section_murojaah`] = false;
@@ -1327,11 +1335,11 @@
                 s.cloudTugCat = tugasCat;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
                 localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
                 window.syncToCloud({
                     type: 'tugas',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1343,7 +1351,7 @@
                 });
 
                 if (tugasCat) {
-                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
                 }
 
                 window.cardSectionToggleState[`${name}_section_tugas`] = false;
@@ -2072,7 +2080,7 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
     
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-2">
                     <div id="logoContainer" class="shrink-0">
@@ -2087,8 +2095,8 @@
                             <span class="px-1 py-0.5 bg-amber-400 text-emerald-950 text-[7px] sm:text-[8px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
                         <div class="flex items-center gap-1 mt-0.5">
-                            <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
-                            <p id="storageInfoLabel" class="text-[8px] sm:text-[9px] text-emerald-200 font-extrabold">Sheets & Local Active</p>
+                            <span id="syncDotIndicator" class="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
+                            <p id="storageInfoLabel" class="text-[7px] sm:text-[8px] text-emerald-200 font-extrabold">Sheets & Local Active</p>
                         </div>
                     </div>
                 </div>
@@ -2096,33 +2104,33 @@
                     <button onclick="window.toggleDarkMode()" class="p-1.5 bg-emerald-700 dark:bg-emerald-900 rounded-lg text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
                         <i id="darkModeIcon" class="fa-solid fa-moon text-xs"></i>
                     </button>
-                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2 py-1 bg-amber-400 text-emerald-950 font-black rounded-lg text-[11px] flex items-center gap-1">
+                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2 py-1 bg-amber-400 text-emerald-950 font-black rounded-lg text-[10px] flex items-center gap-1">
                         <i class="fa-solid fa-rotate"></i> Sync
                     </button>
                 </div>
             </div>
 
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
-                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat</button>
-                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
+                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat</button>
+                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-5 relative">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 space-y-4 relative">
         <button id="floatingScrollTopBtn" onclick="window.scrollToTopGrid()" class="fixed bottom-6 right-6 z-50 px-3 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-2xl font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all opacity-0 pointer-events-none border-2 border-rose-300">
             <i class="fa-solid fa-arrow-up animate-bounce"></i> Kembali Ke Atas
         </button>
 
         <!-- SECTION: INPUT SETORAN -->
-        <section id="section-setoran" class="space-y-5">
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="w-full sm:w-auto flex items-center gap-2.5">
-                    <span class="text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Pilih Kelas:</span>
-                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-black rounded-xl px-3 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
+        <section id="section-setoran" class="space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="w-full sm:w-auto flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-300">Pilih Kelas:</span>
+                    <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-xs font-black rounded-xl px-3 py-2 outline-none cursor-pointer flex-1 sm:flex-none">
                         <option value="Abdurrahman" selected>Abdurrahman</option>
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
                         <option value="Zubair">Zubair</option>
@@ -2136,50 +2144,50 @@
                         <option value="ALL">Semua Kelas</option>
                     </select>
                 </div>
-                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-                    <button onclick="window.fetchAllDataFromCloud()" class="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-xs transition-all">
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button onclick="window.fetchAllDataFromCloud()" class="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-xs transition-all">
                         <i class="fa-solid fa-rotate"></i> Sinkron Cloud
                     </button>
                 </div>
             </div>
 
-            <div id="santriKotakContainerWrapper" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
-                <h4 class="text-xs sm:text-sm font-black text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">Daftar Nama Santri (Klik untuk Melompat ke Input):</h4>
-                <div id="santriKotakContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-52 overflow-y-auto custom-scrollbar p-1"></div>
+            <div id="santriKotakContainerWrapper" class="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-2.5">
+                <h4 class="text-xs font-black text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">Daftar Nama Santri (Klik untuk Melompat ke Input):</h4>
+                <div id="santriKotakContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1"></div>
             </div>
 
-            <div id="santriGridContainer" class="space-y-5"></div>
+            <div id="santriGridContainer" class="space-y-4"></div>
         </section>
 
         <!-- SECTION: MATERI -->
-        <section id="section-materi" class="hidden space-y-5">
-            <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-cloud-arrow-down text-emerald-600 text-xl sm:text-2xl"></i>
+        <section id="section-materi" class="hidden space-y-4">
+            <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-sm border">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-cloud-arrow-down text-emerald-600 text-lg sm:text-xl"></i>
                     <div>
-                        <h4 class="font-black text-xs sm:text-sm">Sinkronisasi Materi</h4>
-                        <p class="text-[11px] sm:text-xs text-slate-500 font-extrabold">Ambil data materi terbaru langsung dari Google Sheets</p>
+                        <h4 class="font-black text-xs">Sinkronisasi Materi</h4>
+                        <p class="text-[10px] text-slate-500 font-extrabold">Ambil data materi terbaru langsung dari Google Sheets</p>
                     </div>
                 </div>
-                <button onclick="window.fetchAllDataFromCloud(); window.showToast('Materi berhasil disinkronkan dari Google Sheet!', 'success');" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md flex items-center gap-1.5 transition">
+                <button onclick="window.fetchAllDataFromCloud(); window.showToast('Materi berhasil disinkronkan dari Google Sheet!', 'success');" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-rotate"></i> Sinkron Google Sheet
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border space-y-3.5">
-                    <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
-                        <h3 class="font-black text-sm sm:text-base text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                            <i class="fa-solid fa-book text-emerald-600 text-sm"></i> Materi Belajar Hari Ini
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border space-y-3">
+                    <div class="flex items-center justify-between border-b pb-2.5 flex-wrap gap-2">
+                        <h3 class="font-black text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-book text-emerald-600 text-xs"></i> Materi Belajar Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
                             <i class="fa-solid fa-table"></i> Buka Sheet Materi 📊
                         </a>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-2.5">
                         <div>
-                            <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
-                            <select id="materiKelasSelect" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
+                            <select id="materiKelasSelect" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                                 <option value="Abdurrahman">Abdurrahman</option>
                                 <option value="Abu Ubaidah">Abu Ubaidah</option>
                                 <option value="Zubair">Zubair</option>
@@ -2194,49 +2202,49 @@
                             </select>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Judul Mata Pelajaran:</label>
-                            <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Judul Mata Pelajaran:</label>
+                            <input type="text" id="materiJudulInput" placeholder="Contoh: Tahfizh / Fiqih / Bahasa Arab" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             <div>
-                                <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Bab / Tema:</label>
-                                <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Bab / Tema:</label>
+                                <input type="text" id="materiBabInput" placeholder="Contoh: Bab Thaharah" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                             </div>
                             <div>
-                                <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Tanggal:</label>
-                                <input type="date" id="materiTanggalInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Tanggal:</label>
+                                <input type="date" id="materiTanggalInput" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                             </div>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Keterangan:</label>
-                            <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs sm:text-sm font-semibold"></textarea>
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Keterangan:</label>
+                            <textarea id="materiKeteranganInput" rows="2" placeholder="Rincian materi pembelajaran..." class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs font-semibold"></textarea>
                         </div>
                         <div class="flex items-center gap-2 pt-0.5">
                             <input type="checkbox" id="materiTampilWaCheckbox" checked class="w-4 h-4 text-emerald-600 rounded">
-                            <label for="materiTampilWaCheckbox" class="text-[11px] sm:text-xs font-extrabold text-slate-700 dark:text-slate-300">Tampilkan di Laporan WA / Kelas</label>
+                            <label for="materiTampilWaCheckbox" class="text-[10px] font-extrabold text-slate-700 dark:text-slate-300">Tampilkan di Laporan WA / Kelas</label>
                         </div>
-                        <button onclick="window.saveMateri('utama')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">💾 Simpan & Sinkron Materi</button>
+                        <button onclick="window.saveMateri('utama')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">💾 Simpan & Sinkron Materi</button>
                     </div>
 
-                    <div class="pt-3.5 border-t space-y-2">
-                        <h4 class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-300">Daftar Materi Tersimpan:</h4>
-                        <div id="materiListContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                    <div class="pt-3 border-t space-y-2">
+                        <h4 class="font-black text-xs text-slate-700 dark:text-slate-300">Daftar Materi Tersimpan:</h4>
+                        <div id="materiListContainer" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border space-y-3.5">
-                    <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
-                        <h3 class="font-black text-sm sm:text-base text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
-                            <i class="fa-solid fa-star text-amber-500 text-sm"></i> Materi Tambahan Hari Ini
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border space-y-3">
+                    <div class="flex items-center justify-between border-b pb-2.5 flex-wrap gap-2">
+                        <h3 class="font-black text-xs sm:text-sm text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-star text-amber-500 text-xs"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
                             <i class="fa-solid fa-table"></i> Buka Sheet Tambahan 📊
                         </a>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-2.5">
                         <div>
-                            <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
-                            <select id="materiTambahanKelasSelect" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Pilih Kelas:</label>
+                            <select id="materiTambahanKelasSelect" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                                 <option value="Abdurrahman">Abdurrahman</option>
                                 <option value="Abu Ubaidah">Abu Ubaidah</option>
                                 <option value="Zubair">Zubair</option>
@@ -2251,60 +2259,60 @@
                             </select>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Judul Mata Pelajaran (Tambahan):</label>
-                            <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Judul Mata Pelajaran (Tambahan):</label>
+                            <input type="text" id="materiTambahanJudulInput" placeholder="Contoh: Doa Harian / Hadits Pilihan" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             <div>
-                                <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Bab / Tema:</label>
-                                <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Bab / Tema:</label>
+                                <input type="text" id="materiTambahanBabInput" placeholder="Contoh: Hadits Niat" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                             </div>
                             <div>
-                                <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Tanggal:</label>
-                                <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm">
+                                <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Tanggal:</label>
+                                <input type="date" id="materiTambahanTanggalInput" class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs">
                             </div>
                         </div>
                         <div>
-                            <label class="font-black text-[11px] sm:text-xs text-slate-700 dark:text-slate-200">Keterangan Tambahan:</label>
-                            <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs sm:text-sm font-semibold"></textarea>
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Keterangan Tambahan:</label>
+                            <textarea id="materiTambahanKeteranganInput" rows="2" placeholder="Rincian materi tambahan..." class="w-full mt-1 p-2 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl text-xs font-semibold"></textarea>
                         </div>
                         <div class="flex items-center gap-2 pt-0.5">
                             <input type="checkbox" id="materiTambahanTampilWaCheckbox" checked class="w-4 h-4 text-amber-600 rounded">
-                            <label for="materiTambahanTampilWaCheckbox" class="text-[11px] sm:text-xs font-extrabold text-slate-700 dark:text-slate-300">Tampilkan di Laporan WA / Kelas</label>
+                            <label for="materiTambahanTampilWaCheckbox" class="text-[10px] font-extrabold text-slate-700 dark:text-slate-300">Tampilkan di Laporan WA / Kelas</label>
                         </div>
-                        <button onclick="window.saveMateri('tambahan')" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
+                        <button onclick="window.saveMateri('tambahan')" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-black text-xs shadow-md transition">💾 Simpan & Sinkron Materi Tambahan</button>
                     </div>
 
-                    <div class="pt-3.5 border-t space-y-2">
-                        <h4 class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-300">Daftar Materi Tambahan Tersimpan:</h4>
-                        <div id="materiTambahanListContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                    <div class="pt-3 border-t space-y-2">
+                        <h4 class="font-black text-xs text-slate-700 dark:text-slate-300">Daftar Materi Tambahan Tersimpan:</h4>
+                        <div id="materiTambahanListContainer" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- SECTION: RIWAYAT -->
-        <section id="section-history" class="hidden space-y-5">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border space-y-4">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b pb-3.5">
+        <section id="section-history" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border space-y-3.5">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b pb-3">
                     <div>
-                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
-                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
+                        <h3 class="font-black text-sm sm:text-base text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
                     </div>
-                    <div class="flex items-center gap-2 flex-wrap justify-start w-full">
-                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
-                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
-                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
-                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
-                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
-                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
+                    <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
+                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
+                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
+                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
+                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
+                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
+                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between pt-1 flex-wrap gap-3">
-                    <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
-                        <span id="activeHistoryTitle" class="font-black text-sm sm:text-base text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
-                        <select id="historyClassSelect" onchange="window.filterHistoryByClass(this.value)" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs sm:text-sm font-bold">
+                <div class="flex items-center justify-between pt-1 flex-wrap gap-2.5">
+                    <div class="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
+                        <span id="activeHistoryTitle" class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Riwayat Keseluruhan</span>
+                        <select id="historyClassSelect" onchange="window.filterHistoryByClass(this.value)" class="p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-bold">
                             <option value="ALL">Semua Kelas</option>
                             <option value="Abdurrahman">Abdurrahman</option>
                             <option value="Abu Ubaidah">Abu Ubaidah</option>
@@ -2317,37 +2325,37 @@
                             <option value="Fatimah">Fatimah</option>
                             <option value="Umar">Umar</option>
                         </select>
-                        <div class="relative w-full sm:w-64">
+                        <div class="relative w-full sm:w-56">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                             </span>
-                            <input type="text" id="historySearchInput" oninput="window.renderHistoryTable()" placeholder="Cari nama santri..." class="w-full pl-9 pr-9 py-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs sm:text-sm font-bold outline-none">
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <input type="text" id="historySearchInput" oninput="window.renderHistoryTable()" placeholder="Cari nama santri..." class="w-full pl-8 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border rounded-xl text-xs font-bold outline-none">
+                            <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center">
                                 <button type="button" id="clearHistorySearchBtn" onclick="window.clearSearchInput('historySearchInput', 'clearHistorySearchBtn')" class="text-slate-400 hover:text-slate-600 hidden" title="Hapus Ketikan">
-                                    <i class="fa-solid fa-xmark text-sm"></i>
+                                    <i class="fa-solid fa-xmark text-xs"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-                        <button onclick="window.fetchHistoryFromCloud()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition">
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button onclick="window.fetchHistoryFromCloud()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1 shadow-xs transition">
                             <i class="fa-solid fa-rotate"></i> Sinkronisasi Riwayat
                         </button>
-                        <button onclick="window.downloadCurrentHistory()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition">
+                        <button onclick="window.downloadCurrentHistory()" class="px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-black text-xs flex items-center gap-1 shadow-xs transition">
                             <i class="fa-solid fa-download"></i> Download (.csv)
                         </button>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto max-h-[450px] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 custom-scrollbar">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <div class="overflow-x-auto max-h-[400px] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 custom-scrollbar">
+                    <table class="w-full text-left border-collapse text-xs">
                         <thead class="sticky top-0 bg-slate-100 dark:bg-slate-900 z-10">
-                            <tr id="historyTableHeader" class="border-b text-slate-600 dark:text-slate-300 font-black uppercase text-[11px] sm:text-xs">
-                                <th class="p-3">Nama Santri</th>
-                                <th class="p-3">Bacaan Terakhir</th>
-                                <th class="p-3">Hafalan Terakhir</th>
-                                <th class="p-3">Muroja'ah Terakhir</th>
-                                <th class="p-3 text-right">Waktu & Tanggal</th>
+                            <tr id="historyTableHeader" class="border-b text-slate-600 dark:text-slate-300 font-black uppercase text-[10px]">
+                                <th class="p-2.5">Nama Santri</th>
+                                <th class="p-2.5">Bacaan Terakhir</th>
+                                <th class="p-2.5">Hafalan Terakhir</th>
+                                <th class="p-2.5">Muroja'ah Terakhir</th>
+                                <th class="p-2.5 text-right">Waktu & Tanggal</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -2357,72 +2365,72 @@
         </section>
 
         <!-- SECTION: LAPORAN -->
-        <section id="section-laporan" class="hidden space-y-5">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between border-b pb-3.5 flex-wrap gap-3">
+        <section id="section-laporan" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border space-y-3.5">
+                <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2.5">
                     <div>
-                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Laporan Orang Tua & Akumulasi</h3>
-                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
+                        <h3 class="font-black text-sm sm:text-base text-emerald-800 dark:text-emerald-300">Pusat Laporan Orang Tua & Akumulasi</h3>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
                     </div>
-                    <div class="flex items-center gap-2 flex-wrap justify-start w-full">
-                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
-                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
-                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
+                    <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
+                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
+                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
+                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
                     </div>
                 </div>
 
-                <div id="laporanTabContent-wa" class="space-y-4">
-                    <div class="flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/40 p-3.5 rounded-xl border border-emerald-300">
-                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                <div id="laporanTabContent-wa" class="space-y-3.5">
+                    <div class="flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-300">
+                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-900 dark:text-emerald-200">
                             <i class="fa-solid fa-arrows-rotate"></i> Membuka di HP/Laptop lain? Klik Refresh untuk menarik data terbaru.
                         </div>
-                        <button id="waRefreshBtn" onclick="window.refreshWaReport()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-xs flex items-center gap-1.5 transition">
+                        <button id="waRefreshBtn" onclick="window.refreshWaReport()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-xs flex items-center gap-1 transition">
                             <i class="fa-solid fa-rotate"></i> Refresh Data
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div class="relative">
-                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
+                            <label class="font-black text-xs text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
                             <div class="relative mt-1">
-                                <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-9 pr-9 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm outline-none">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-8 pr-8 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs outline-none">
+                                <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                                 </span>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center">
                                     <button type="button" id="clearWaSearchBtn" onclick="window.clearSearchInput('waSantriSearchInput', 'clearWaSearchBtn')" class="text-slate-400 hover:text-slate-600 hidden" title="Hapus Ketikan">
-                                        <i class="fa-solid fa-xmark text-sm"></i>
+                                        <i class="fa-solid fa-xmark text-xs"></i>
                                     </button>
                                 </div>
                             </div>
-                            <div id="waAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-52 overflow-y-auto hidden custom-scrollbar"></div>
+                            <div id="waAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-48 overflow-y-auto hidden custom-scrollbar"></div>
                         </div>
                         <div>
-                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">No WA Wali:</label>
-                            <input type="text" id="waPhoneInput" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm" value="+6285774042121">
+                            <label class="font-black text-xs text-slate-700 dark:text-slate-200">No WA Wali:</label>
+                            <input type="text" id="waPhoneInput" class="w-full mt-1 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs" value="+6285774042121">
                         </div>
                     </div>
                     <div>
-                        <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Preview Pesan:</label>
-                        <textarea id="waMessagePreview" rows="9" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                        <label class="font-black text-xs text-slate-700 dark:text-slate-200">Preview Pesan:</label>
+                        <textarea id="waMessagePreview" rows="8" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[11px] leading-relaxed"></textarea>
                     </div>
-                    <div class="flex items-center gap-2.5">
-                        <button onclick="window.copyWaReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm">Salin Teks</button>
-                        <button onclick="window.sendWaReportDirect()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">Kirim WhatsApp</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.copyWaReportText()" class="px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs">Salin Teks</button>
+                        <button onclick="window.sendWaReportDirect()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">Kirim WhatsApp</button>
                     </div>
                 </div>
 
-                <div id="laporanTabContent-kelas" class="space-y-4 hidden">
-                    <div class="flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/40 p-3.5 rounded-xl border border-emerald-300">
-                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                <div id="laporanTabContent-kelas" class="space-y-3.5 hidden">
+                    <div class="flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-300">
+                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-900 dark:text-emerald-200">
                             <i class="fa-solid fa-arrows-rotate"></i> Membuka di HP/Laptop lain? Klik Refresh untuk menarik data terbaru.
                         </div>
-                        <button id="classRefreshBtn" onclick="window.refreshClassReport()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-xs flex items-center gap-1.5 transition">
+                        <button id="classRefreshBtn" onclick="window.refreshClassReport()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-xs flex items-center gap-1 transition">
                             <i class="fa-solid fa-rotate"></i> Refresh Data
                         </button>
                     </div>
-                    <div class="flex items-center justify-between flex-wrap gap-3">
-                        <h4 class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200">Rekapitulasi Per Kelas & Materi Belajar</h4>
-                        <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-3 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm">
+                    <div class="flex items-center justify-between flex-wrap gap-2.5">
+                        <h4 class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">Rekapitulasi Per Kelas & Materi Belajar</h4>
+                        <select id="reportClassSelect" onchange="window.generateClassReport()" class="p-2.5 bg-slate-100 dark:bg-slate-900 border rounded-xl font-bold text-xs">
                             <option value="Abdurrahman" selected>Abdurrahman</option>
                             <option value="Abu Ubaidah">Abu Ubaidah</option>
                             <option value="Zubair">Zubair</option>
@@ -2436,73 +2444,73 @@
                         </select>
                     </div>
                     <div>
-                        <textarea id="classReportMessagePreview" rows="9" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                        <textarea id="classReportMessagePreview" rows="8" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[11px] leading-relaxed"></textarea>
                     </div>
-                    <div class="flex items-center gap-2.5">
-                        <button onclick="window.copyClassReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm">Salin Teks Kelas</button>
-                        <button onclick="window.sendClassReportDirect()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">Kirim WA Kelas</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="window.copyClassReportText()" class="px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs">Salin Teks Kelas</button>
+                        <button onclick="window.sendClassReportDirect()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">Kirim WA Kelas</button>
                     </div>
                 </div>
 
-                <div id="laporanTabContent-ayat" class="space-y-4 hidden">
-                    <div class="flex flex-col sm:flex-row items-center justify-between border-b pb-3.5 gap-3">
+                <div id="laporanTabContent-ayat" class="space-y-3.5 hidden">
+                    <div class="flex flex-col sm:flex-row items-center justify-between border-b pb-3 gap-2.5">
                         <div>
-                            <h4 class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200">Laporan Akumulasi Jumlah Ayat</h4>
-                            <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Hitung total ayat bacaan dan hafalan baru dalam periode waktu tertentu.</p>
+                            <h4 class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">Laporan Akumulasi Jumlah Ayat</h4>
+                            <p class="text-[11px] text-slate-500 font-bold mt-0.5">Hitung total ayat bacaan dan hafalan baru dalam periode waktu tertentu.</p>
                         </div>
-                        <div class="flex items-center gap-2.5 flex-wrap">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500">Dari Tanggal:</label>
-                                <input type="date" id="filterStartDate" onchange="window.generateAkkAyatReport()" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm">
+                                <label class="block text-[10px] font-bold text-slate-500">Dari Tanggal:</label>
+                                <input type="date" id="filterStartDate" onchange="window.generateAkkAyatReport()" class="p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500">Sampai Tanggal:</label>
-                                <input type="date" id="filterEndDate" onchange="window.generateAkkAyatReport()" class="p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm">
+                                <label class="block text-[10px] font-bold text-slate-500">Sampai Tanggal:</label>
+                                <input type="date" id="filterEndDate" onchange="window.generateAkkAyatReport()" class="p-2 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs">
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div class="space-y-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+                        <div class="space-y-3.5">
                             <div class="relative">
-                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
+                                <label class="font-black text-xs text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
                                 <div class="relative mt-1">
-                                    <input type="text" id="ayatSantriSearchInput" oninput="window.filterAyatDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-9 pr-9 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm outline-none">
-                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                    <input type="text" id="ayatSantriSearchInput" oninput="window.filterAyatDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-8 pr-8 p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs outline-none">
+                                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                                     </span>
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center">
                                         <button type="button" id="clearAyatSearchBtn" onclick="window.clearSearchInput('ayatSantriSearchInput', 'clearAyatSearchBtn')" class="text-slate-400 hover:text-slate-600 hidden" title="Hapus Ketikan">
-                                            <i class="fa-solid fa-xmark text-sm"></i>
+                                            <i class="fa-solid fa-xmark text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
-                                <div id="ayatAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-52 overflow-y-auto hidden custom-scrollbar"></div>
+                                <div id="ayatAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-48 overflow-y-auto hidden custom-scrollbar"></div>
                             </div>
                             
-                            <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-300 space-y-3">
-                                <h4 class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">📊 Statistik Akumulasi Ayat</h4>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border">
-                                        <span class="text-[11px] sm:text-xs font-bold text-slate-500">Total Ayat Bacaan:</span>
-                                        <div id="statTotalBacaan" class="text-base sm:text-lg font-black text-emerald-700 mt-1">0 Ayat</div>
+                            <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-300 space-y-2.5">
+                                <h4 class="font-black text-xs text-emerald-900 dark:text-emerald-200">📊 Statistik Akumulasi Ayat</h4>
+                                <div class="grid grid-cols-2 gap-2.5">
+                                    <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border">
+                                        <span class="text-[10px] font-bold text-slate-500">Total Ayat Bacaan:</span>
+                                        <div id="statTotalBacaan" class="text-sm sm:text-base font-black text-emerald-700 mt-0.5">0 Ayat</div>
                                     </div>
-                                    <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border">
-                                        <span class="text-[11px] sm:text-xs font-bold text-slate-500">Total Ayat Hafalan:</span>
-                                        <div id="statTotalHafalan" class="text-base sm:text-lg font-black text-rose-600 mt-1">0 Ayat</div>
+                                    <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border">
+                                        <span class="text-[10px] font-bold text-slate-500">Total Ayat Hafalan:</span>
+                                        <div id="statTotalHafalan" class="text-sm sm:text-base font-black text-rose-600 mt-0.5">0 Ayat</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="space-y-4">
+                        <div class="space-y-3.5">
                             <div>
-                                <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Preview Pesan Laporan Akumulasi Jumlah Ayat:</label>
-                                <textarea id="ayatMessagePreview" rows="7" class="w-full mt-1 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                                <label class="font-black text-xs text-slate-700 dark:text-slate-200">Preview Pesan Laporan Akumulasi Jumlah Ayat:</label>
+                                <textarea id="ayatMessagePreview" rows="6" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[11px] leading-relaxed"></textarea>
                             </div>
-                            <div class="flex items-center gap-2.5">
-                                <button onclick="window.copyAyatReportText()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm">Salin Teks</button>
-                                <button onclick="window.sendAyatReportDirect()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">Kirim WA Wali</button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="window.copyAyatReportText()" class="px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs">Salin Teks</button>
+                                <button onclick="window.sendAyatReportDirect()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">Kirim WA Wali</button>
                             </div>
                         </div>
                     </div>
@@ -2511,61 +2519,61 @@
         </section>
 
         <!-- SECTION: CLOUD & EXPORT -->
-        <section id="section-export" class="hidden space-y-5">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border space-y-4">
-                <div class="flex items-center justify-between flex-wrap gap-3">
-                    <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Cloud & Web Terkait</h3>
-                    <button onclick="window.fetchAllDataFromCloud()" class="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-sm">
+        <section id="section-export" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border space-y-3.5">
+                <div class="flex items-center justify-between flex-wrap gap-2.5">
+                    <h3 class="font-black text-sm sm:text-base text-emerald-800 dark:text-emerald-300">Cloud & Web Terkait</h3>
+                    <button onclick="window.fetchAllDataFromCloud()" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center gap-1.5 shadow-sm">
                         <i class="fa-solid fa-rotate"></i> Sinkronisasi Data Cloud Sekarang
                     </button>
                 </div>
-                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-extrabold leading-relaxed">Akses cepat ke berbagai web sistem pembelajaran Rumah Qur'an Al-Khansa serta sinkronisasi database.</p>
+                <p class="text-xs text-slate-600 dark:text-slate-400 font-extrabold leading-relaxed">Akses cepat ke berbagai web sistem pembelajaran Rumah Qur'an Al-Khansa serta sinkronisasi database.</p>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
-                    <a href="https://akhshiddiq.github.io/presensi-rq/" target="_blank" class="p-4 bg-slate-50 dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-slate-800 border rounded-xl flex flex-col justify-between space-y-3 transition shadow-xs group">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <a href="https://akhshiddiq.github.io/presensi-rq/" target="_blank" class="p-3.5 bg-slate-50 dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-slate-800 border rounded-xl flex flex-col justify-between space-y-2.5 transition shadow-xs group">
                         <div>
-                            <span class="text-[10px] font-black text-emerald-600 uppercase tracking-wider">Presensi</span>
-                            <h4 class="font-black text-sm sm:text-base text-slate-800 dark:text-white mt-0.5 group-hover:text-emerald-700">Web Presensi</h4>
+                            <span class="text-[9px] font-black text-emerald-600 uppercase tracking-wider">Presensi</span>
+                            <h4 class="font-black text-xs sm:text-sm text-slate-800 dark:text-white mt-0.5 group-hover:text-emerald-700">Web Presensi</h4>
                         </div>
-                        <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">Buka Web <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></span>
+                        <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">Buka Web <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></span>
                     </a>
                     
-                    <a href="https://akhshiddiq.github.io/murojaahmanzili/" target="_blank" class="p-4 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 border rounded-xl flex flex-col justify-between space-y-3 transition shadow-xs group">
+                    <a href="https://akhshiddiq.github.io/murojaahmanzili/" target="_blank" class="p-3.5 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-800 border rounded-xl flex flex-col justify-between space-y-2.5 transition shadow-xs group">
                         <div>
-                            <span class="text-[10px] font-black text-amber-600 uppercase tracking-wider">Muroja'ah</span>
-                            <h4 class="font-black text-sm sm:text-base text-slate-800 dark:text-white mt-0.5 group-hover:text-amber-700">Web tugas muroja'ah manzili</h4>
+                            <span class="text-[9px] font-black text-amber-600 uppercase tracking-wider">Muroja'ah</span>
+                            <h4 class="font-black text-xs sm:text-sm text-slate-800 dark:text-white mt-0.5 group-hover:text-amber-700">Web tugas muroja'ah manzili</h4>
                         </div>
-                        <span class="text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1">Buka Web <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></span>
+                        <span class="text-[11px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1">Buka Web <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></span>
                     </a>
 
-                    <a href="https://akhshiddiq.github.io/monitoring-tahfizh/" target="_blank" class="p-4 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border rounded-xl flex flex-col justify-between space-y-3 transition shadow-xs group">
+                    <a href="https://akhshiddiq.github.io/monitoring-tahfizh/" target="_blank" class="p-3.5 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border rounded-xl flex flex-col justify-between space-y-2.5 transition shadow-xs group">
                         <div>
-                            <span class="text-[10px] font-black text-sky-600 uppercase tracking-wider">Tahfizh</span>
-                            <h4 class="font-black text-sm sm:text-base text-slate-800 dark:text-white mt-0.5 group-hover:text-sky-700">Web Monitoring bacaan hafalan</h4>
+                            <span class="text-[9px] font-black text-sky-600 uppercase tracking-wider">Tahfizh</span>
+                            <h4 class="font-black text-xs sm:text-sm text-slate-800 dark:text-white mt-0.5 group-hover:text-sky-700">Web Monitoring bacaan hafalan</h4>
                         </div>
-                        <span class="text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">Buka Web <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></span>
+                        <span class="text-[11px] font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">Buka Web <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></span>
                     </a>
                 </div>
 
-                <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border-2 border-emerald-500 space-y-3 mt-4">
-                    <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2.5">
-                        <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
+                <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border-2 border-emerald-500 space-y-2.5 mt-3">
+                    <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2">
+                        <span class="font-black text-xs text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
                             <i class="fa-solid fa-circle-info text-emerald-600"></i> Status Sinkronisasi
                         </span>
-                        <span class="px-3 py-1 bg-emerald-600 text-white text-[11px] font-black rounded-full">Aktif & Live</span>
+                        <span class="px-2.5 py-0.5 bg-emerald-600 text-white text-[10px] font-black rounded-full">Aktif & Live</span>
                     </div>
-                    <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1.5">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
-                        <input type="text" id="customGsUrlInput" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border rounded-xl font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:ring-2 focus:ring-emerald-500" value="https://script.google.com/macros/s/AKfycbwFuP-mw4QYAc1LRCjiP6dGn0WkT2kZRQ6KCNT7yT7G4m5MdQmQlzOVmVaZvaz1ss2C/exec">
-                        <button onclick="window.saveCustomGsUrl()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition mt-1">Simpan URL Endpoint GS Baru</button>
+                    <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
+                        <input type="text" id="customGsUrlInput" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:ring-2 focus:ring-emerald-500" value="https://script.google.com/macros/s/AKfycbwFuP-mw4QYAc1LRCjiP6dGn0WkT2kZRQ6KCNT7yT7G4m5MdQmQlzOVmVaZvaz1ss2C/exec">
+                        <button onclick="window.saveCustomGsUrl()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition mt-1">Simpan URL Endpoint GS Baru</button>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3 pt-1">
-                    <button onclick="window.exportDataToExcel()" class="px-5 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition">
-                        <i class="fa-solid fa-file-excel text-sm"></i> Download Excel (.csv)
+                <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                    <button onclick="window.exportDataToExcel()" class="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 shadow-md transition">
+                        <i class="fa-solid fa-file-excel text-xs"></i> Download Excel (.csv)
                     </button>
-                    <button onclick="window.resetDailyLogsOnly()" class="px-5 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition">⚠️ Reset Data Setoran Harian Saja</button>
+                    <button onclick="window.resetDailyLogsOnly()" class="px-4 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs shadow-md transition">⚠️ Reset Data Setoran Harian Saja</button>
                 </div>
             </div>
         </section>
