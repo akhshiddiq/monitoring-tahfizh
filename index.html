@@ -15,8 +15,7 @@
                         amber: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f', 950: '#451a03' },
                         sky: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e', 950: '#082f49' },
                         rose: { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' },
-                        purple: { 50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 300: '#d8b4fe', 400: '#c084fc', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce', 800: '#6b21a8', 900: '#581c87', 950: '#3b0764' },
-                        amberbrown: { 50: '#fdf8f6', 100: '#fbeee6', 200: '#f5dcd0', 300: '#eac2ae', 400: '#dc9c7f', 500: '#cb7a55', 600: '#bc623d', 700: '#9c4e30', 800: '#7e4028', 900: '#683624', 950: '#381c12' }
+                        purple: { 50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 300: '#d8b4fe', 400: '#c084fc', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce', 800: '#6b21a8', 900: '#581c87', 950: '#3b0764' }
                     }
                 }
             }
@@ -59,6 +58,7 @@
         window.selectedWaSantriName = null;
         window.selectedAyatSantriName = null;
         window.historyClassFilter = 'ALL';
+        window.localFormCache = {};
 
         window.surahList = [
             { no: 1, name: "Al-Fatihah", ayat: 7 }, { no: 2, name: "Al-Baqarah", ayat: 286 }, { no: 3, name: "Ali 'Imran", ayat: 200 },
@@ -134,7 +134,10 @@
             try {
                 const d = new Date(dateStr);
                 if (isNaN(d.getTime())) return dateStr;
-                return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: '2-digit' });
+                let formatted = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: '2-digit' });
+                // Replace Minggu with Ahad
+                formatted = formatted.replace(/Minggu/gi, 'Ahad');
+                return formatted;
             } catch (e) {
                 return dateStr;
             }
@@ -171,8 +174,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-4 py-2 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
+                        ? "px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
                 }
             });
 
@@ -190,7 +193,7 @@
             const c = document.getElementById('toastContainer');
             if (!c) return;
             const t = document.createElement('div');
-            t.className = `p-3 rounded-xl text-xs sm:text-sm font-black text-white shadow-xl pointer-events-auto ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
+            t.className = `p-4 rounded-2xl text-xs sm:text-sm font-black text-white shadow-2xl pointer-events-auto border-2 border-white/20 ${type === 'success' ? 'bg-emerald-600' : 'bg-amber-500'}`;
             t.innerText = msg;
             c.appendChild(t);
             setTimeout(() => t.remove(), 2500);
@@ -280,38 +283,64 @@
                         localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
                     }
 
+                    const parseCloudSlots = (row) => {
+                        const parseSlotStr = (cellStr) => {
+                            if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran' };
+                            const parts = cellStr.split('|');
+                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran' };
+                        };
+                        const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-';
+                        const s2 = parseSlotStr(row[9]); s2.start = row[10] || '-'; s2.end = row[11] || '-';
+                        const s3 = parseSlotStr(row[12]); s3.start = row[13] || '-'; s3.end = row[14] || '-';
+                        return [s1, s2, s3];
+                    };
+
+                    const formatDetailSlot = (sl) => {
+                        if (!sl.item || sl.item === '-') return '';
+                        const isIqro = (sl.mode === 'iqro' || sl.item.toLowerCase().includes('iqro'));
+                        const unitName = isIqro ? 'halaman' : 'ayat';
+                        let count = 0;
+                        if (sl.start && sl.end && sl.start !== '-' && sl.end !== '-') {
+                            const sNum = parseInt(sl.start);
+                            const eNum = parseInt(sl.end);
+                            if (!isNaN(sNum) && !isNaN(eNum) && eNum >= sNum) count = (eNum - sNum + 1);
+                        } else if (sl.start && sl.start !== '-') {
+                            count = 1;
+                        }
+                        const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
+                        const countStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
+                        return `${sl.item} ${rangeLabel}${countStr}`.trim();
+                    };
+
+                    const processInputRowsToHistory = (inputRows, typeName) => {
+                        return inputRows.map(row => {
+                            const slots = parseCloudSlots(row);
+                            const detailStr = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                            return {
+                                timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
+                                tanggal: row[1] || new Date().toISOString().split('T')[0],
+                                rawTime: new Date(row[0] || 0).getTime(),
+                                name: row[3],
+                                detail: detailStr,
+                                status: row[15] || '-',
+                                catatan: row[16] || '',
+                                type: typeName
+                            };
+                        });
+                    };
+
                     if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
-                        const bacHist = cloudData.input_bacaan.map(row => ({
-                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
-                            tanggal: row[1] || new Date().toISOString().split('T')[0],
-                            rawTime: new Date(row[0] || 0).getTime(),
-                            name: row[3],
-                            detail: [
-                                row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
-                                row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
-                                row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
-                            ].filter(Boolean).join(', ') || '-',
-                            status: row[15] || '-',
-                            catatan: row[16] || '',
-                            type: 'bacaan'
-                        }));
+                        const bacHist = processInputRowsToHistory(cloudData.input_bacaan, 'bacaan');
                         localStorage.setItem('rq_history_bacaan', JSON.stringify(bacHist));
 
                         cloudData.input_bacaan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastBacaan = [
-                                    row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
-                                    row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
-                                    row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
-                                ].filter(Boolean).join(', ') || '-';
-
-                                sObj.cloudBacSlots = [
-                                    { item: row[6], start: row[7], end: row[8], mode: row[6] && row[6].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
-                                    { item: row[9], start: row[10], end: row[11], mode: row[9] && row[9].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
-                                    { item: row[12], start: row[13], end: row[14], mode: row[12] && row[12].toLowerCase().includes('iqro') ? 'iqro' : 'quran' }
-                                ];
+                                const slots = parseCloudSlots(row);
+                                sObj.cloudBacSlots = slots;
+                                sObj.lastBacaan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                                sObj.lastBacaanDate = row[1] || '';
                                 if (row[15]) sObj.cloudBacStat = row[15];
                                 if (row[16]) sObj.cloudBacCat = row[16];
                             }
@@ -319,37 +348,17 @@
                     }
 
                     if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
-                        const hafHist = cloudData.input_hafalan.map(row => ({
-                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
-                            tanggal: row[1] || new Date().toISOString().split('T')[0],
-                            rawTime: new Date(row[0] || 0).getTime(),
-                            name: row[3],
-                            detail: [
-                                row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
-                                row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
-                                row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
-                            ].filter(Boolean).join(', ') || '-',
-                            status: row[15] || '-',
-                            catatan: row[16] || '',
-                            type: 'hafalan'
-                        }));
+                        const hafHist = processInputRowsToHistory(cloudData.input_hafalan, 'hafalan');
                         localStorage.setItem('rq_history_hafalan', JSON.stringify(hafHist));
 
                         cloudData.input_hafalan.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastHafalan = [
-                                    row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
-                                    row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
-                                    row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
-                                ].filter(Boolean).join(', ') || '-';
-
-                                sObj.cloudHafSlots = [
-                                    { item: row[6], start: row[7], end: row[8], mode: row[6] && row[6].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
-                                    { item: row[9], start: row[10], end: row[11], mode: row[9] && row[9].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
-                                    { item: row[12], start: row[13], end: row[14], mode: row[12] && row[12].toLowerCase().includes('iqro') ? 'iqro' : 'quran' }
-                                ];
+                                const slots = parseCloudSlots(row);
+                                sObj.cloudHafSlots = slots;
+                                sObj.lastHafalan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                                sObj.lastHafalanDate = row[1] || '';
                                 if (row[15]) sObj.cloudHafStat = row[15];
                                 if (row[16]) sObj.cloudHafCat = row[16];
                             }
@@ -357,37 +366,17 @@
                     }
 
                     if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
-                        const murHist = cloudData.input_murojaah_dikelas.map(row => ({
-                            timestamp: row[0] ? window.formatTimestampCustom(new Date(row[0])) : '-',
-                            tanggal: row[1] || new Date().toISOString().split('T')[0],
-                            rawTime: new Date(row[0] || 0).getTime(),
-                            name: row[3],
-                            detail: [
-                                row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
-                                row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
-                                row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
-                            ].filter(Boolean).join(', ') || '-',
-                            status: row[15] || '-',
-                            catatan: row[16] || '',
-                            type: 'murojaah'
-                        }));
+                        const murHist = processInputRowsToHistory(cloudData.input_murojaah_dikelas, 'murojaah');
                         localStorage.setItem('rq_history_murojaah', JSON.stringify(murHist));
 
                         cloudData.input_murojaah_dikelas.forEach(row => {
                             const nameSantri = row[3];
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
-                                sObj.lastMurojaah = [
-                                    row[6] && row[6] !== '-' ? `${row[6]} ${row[7] && row[8] && row[7]!=='-' && row[8]!=='-' ? row[7]+'-'+row[8] : (row[7] && row[7]!=='-'? row[7] : '')}` : '',
-                                    row[9] && row[9] !== '-' ? `${row[9]} ${row[10] && row[11] && row[10]!=='-' && row[11]!=='-' ? row[10]+'-'+row[11] : (row[10] && row[10]!=='-'? row[10] : '')}` : '',
-                                    row[12] && row[12] !== '-' ? `${row[12]} ${row[13] && row[14] && row[13]!=='-' && row[14]!=='-' ? row[13]+'-'+row[14] : (row[13] && row[13]!=='-'? row[13] : '')}` : ''
-                                ].filter(Boolean).join(', ') || '-';
-
-                                sObj.cloudMurSlots = [
-                                    { item: row[6], start: row[7], end: row[8], mode: row[6] && row[6].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
-                                    { item: row[9], start: row[10], end: row[11], mode: row[9] && row[9].toLowerCase().includes('iqro') ? 'iqro' : 'quran' },
-                                    { item: row[12], start: row[13], end: row[14], mode: row[12] && row[12].toLowerCase().includes('iqro') ? 'iqro' : 'quran' }
-                                ];
+                                const slots = parseCloudSlots(row);
+                                sObj.cloudMurSlots = slots;
+                                sObj.lastMurojaah = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                                sObj.lastMurojaahDate = row[1] || '';
                                 if (row[15]) sObj.cloudMurStat = row[15];
                                 if (row[16]) sObj.cloudMurCat = row[16];
                             }
@@ -412,6 +401,7 @@
                             const sObj = window.santriList.find(s => s.name === nameSantri);
                             if (sObj) {
                                 sObj.lastTugas = row[6] || '-';
+                                sObj.lastTugasDate = row[1] || '';
                                 if (row[8]) sObj.cloudTugCat = row[8];
                             }
                         });
@@ -432,11 +422,11 @@
                     }
                     
                     if (cloudData.materi) {
-                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
+                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' && row[5] !== 'FALSE' }));
                         localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
                     }
                     if (cloudData.materi_tambahan) {
-                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' }));
+                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' && row[5] !== 'FALSE' }));
                         localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
                     }
                     
@@ -523,21 +513,40 @@
                 localStorage.setItem(key, JSON.stringify(list));
                 window.renderMateriList(type);
                 window.showToast("Status tampil laporan diperbarui", "success");
+
+                window.syncToCloud({
+                    type: 'toggle_materi',
+                    subType: type,
+                    kelas: list[idx].kelas,
+                    judul: list[idx].judul,
+                    tampilWa: list[idx].tampilWa
+                });
             }
         };
 
         window.deleteMateri = function(type, idx) {
             const key = type === 'utama' ? 'rq_materi_utama' : 'rq_materi_tambahan';
             const list = JSON.parse(localStorage.getItem(key) || '[]');
+            const target = list[idx];
             list.splice(idx, 1);
             localStorage.setItem(key, JSON.stringify(list));
             window.renderMateriList(type);
             window.showToast("Materi dihapus", "success");
+
+            if (target) {
+                window.syncToCloud({
+                    type: 'delete_materi',
+                    subType: type,
+                    kelas: target.kelas,
+                    judul: target.judul
+                });
+            }
         };
 
         window.switchSourceMode = function(category, slot, santriName, mode) {
             const key = `${santriName}_${category}_${slot}`;
             window.itemSourceMode[key] = mode;
+            window.cacheFormInput({ value: mode }, `${santriName}_${category}_mode_${slot}`);
             
             const btnQ = document.getElementById(`btn_src_quran_${category}_${slot}_${santriName}`);
             const btnI = document.getElementById(`btn_src_iqro_${category}_${slot}_${santriName}`);
@@ -614,6 +623,15 @@
             }
         };
 
+        window.cacheFormInput = function(elem, key) {
+            window.localFormCache[key] = elem.value;
+        };
+
+        window.getFormCache = function(key, defaultVal = '') {
+            if (window.localFormCache[key] !== undefined) return window.localFormCache[key];
+            return defaultVal;
+        };
+
         window.renderTripleInputSlot = function(category, santriName, borderClass) {
             const slots = [1, 2, 3];
             const sObj = window.santriList.find(x => x.name === santriName);
@@ -629,13 +647,26 @@
                 const isCloudActive = slotData && slotData.item && slotData.item !== '-';
                 const isVisible = isFirst || !!window.activeSlotState[stateKey] || isCloudActive;
 
+                const cacheKeySurah = `${santriName}_${category}_surah_${slot}`;
+                const cacheKeyIqro = `${santriName}_${category}_iqro_${slot}`;
+                const cacheKeyStart = `${santriName}_${category}_start_${slot}`;
+                const cacheKeyEnd = `${santriName}_${category}_end_${slot}`;
+                const cacheKeyMode = `${santriName}_${category}_mode_${slot}`;
+
                 const slotItem = slotData ? (slotData.item || '') : '';
                 const slotStart = slotData ? (slotData.start || '') : '';
                 const slotEnd = slotData ? (slotData.end || '') : '';
                 
-                let currentMode = slotData && slotData.mode ? slotData.mode : 'quran';
-                if (!slotData && slotItem.toLowerCase().includes('iqro')) currentMode = 'iqro';
-                window.itemSourceMode[`${santriName}_${category}_${slot}`] = currentMode;
+                let cloudMode = slotData && slotData.mode ? slotData.mode : 'quran';
+                if (!slotData && slotItem.toLowerCase().includes('iqro')) cloudMode = 'iqro';
+                
+                const cachedMode = window.getFormCache(cacheKeyMode, cloudMode);
+                window.itemSourceMode[`${santriName}_${category}_${slot}`] = cachedMode;
+
+                const defaultSurahVal = window.getFormCache(cacheKeySurah, slotItem);
+                const defaultIqroVal = window.getFormCache(cacheKeyIqro, slotItem);
+                const defaultStartVal = window.getFormCache(cacheKeyStart, (slotStart && slotStart !== '-' ? slotStart : ''));
+                const defaultEndVal = window.getFormCache(cacheKeyEnd, (slotEnd && slotEnd !== '-' ? slotEnd : ''));
 
                 return `
                     ${!isFirst ? `
@@ -652,38 +683,38 @@
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs ${currentMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs ${currentMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-2 rounded-lg text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-2 rounded-lg text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
-                        <div id="field_quran_${category}_${slot}_${santriName}" class="${currentMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                        <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Surat Al-Qur'an (114 Surat) --</option>
-                                ${window.surahList.map(s => `<option value="${s.name}" ${slotItem === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
+                                ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
-                        <div id="field_iqro_${category}_${slot}_${santriName}" class="${currentMode === 'quran' ? 'hidden' : ''}">
-                            <select id="${category}_iqro_${slot}_${santriName}" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                        <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-extrabold text-sm sm:text-base">
                                 <option value="">-- Pilih Jilid Iqro --</option>
-                                <option value="Iqro 1" ${slotItem === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
-                                <option value="Iqro 2" ${slotItem === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
-                                <option value="Iqro 3" ${slotItem === 'Iqro 3' ? 'selected' : ''}>Iqro Jilid 3</option>
-                                <option value="Iqro 4" ${slotItem === 'Iqro 4' ? 'selected' : ''}>Iqro Jilid 4</option>
-                                <option value="Iqro 5" ${slotItem === 'Iqro 5' ? 'selected' : ''}>Iqro Jilid 5</option>
-                                <option value="Iqro 6" ${slotItem === 'Iqro 6' ? 'selected' : ''}>Iqro Jilid 6</option>
+                                <option value="Iqro 1" ${defaultIqroVal === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
+                                <option value="Iqro 2" ${defaultIqroVal === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
+                                <option value="Iqro 3" ${defaultIqroVal === 'Iqro 3' ? 'selected' : ''}>Iqro Jilid 3</option>
+                                <option value="Iqro 4" ${defaultIqroVal === 'Iqro 4' ? 'selected' : ''}>Iqro Jilid 4</option>
+                                <option value="Iqro 5" ${defaultIqroVal === 'Iqro 5' ? 'selected' : ''}>Iqro Jilid 5</option>
+                                <option value="Iqro 6" ${defaultIqroVal === 'Iqro 6' ? 'selected' : ''}>Iqro Jilid 6</option>
                             </select>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${currentMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" value="${slotStart && slotStart !== '-' ? slotStart : ''}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${currentMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" value="${slotEnd && slotEnd !== '-' ? slotEnd : ''}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-white dark:bg-slate-800 border-2 rounded-xl font-extrabold text-sm sm:text-base">
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-extrabold text-sm sm:text-base">
                             </div>
                         </div>
                     </div>
@@ -775,8 +806,15 @@
             const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
             grid.innerHTML = filtered.map(s => {
-                const hasInput = (s.lastBacaan && s.lastBacaan !== '-') || (s.lastHafalan && s.lastHafalan !== '-') || (s.lastMurojaah && s.lastMurojaah !== '-') || (s.lastTugas && s.lastTugas !== '-');
-                const badgeTag = hasInput ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[11px] font-black rounded-lg">Pernah Stor</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[11px] font-black rounded-lg">Belum Ada Stor</span>';
+                const isTodayBac = s.lastBacaanDate === todayStr;
+                const isTodayHaf = s.lastHafalanDate === todayStr;
+                const isTodayMur = s.lastMurojaahDate === todayStr;
+                const isTodayTug = s.lastTugasDate === todayStr;
+
+                const badgeBac = isTodayBac ? '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
+                const badgeHaf = isTodayHaf ? '<span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
+                const badgeMur = isTodayMur ? '<span class="px-2.5 py-1 bg-purple-100 text-purple-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
+                const badgeTug = isTodayTug ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black rounded-lg">Belum di input</span>';
 
                 const defaultBacStat = s.cloudBacStat || 'Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.';
                 const defaultHafStat = s.cloudHafStat || 'Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.';
@@ -835,8 +873,7 @@
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all">
                         <div class="flex items-start justify-between border-b pb-3 flex-wrap gap-2">
                             <div>
-                                <div class="flex items-center gap-2">${badgeTag}</div>
-                                <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-1.5">${s.name}</h3>
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">${s.name}</h3>
                                 <p class="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
                             <div class="flex items-center gap-2 flex-wrap">
@@ -858,15 +895,19 @@
                                 <span class="text-emerald-700 dark:text-emerald-400 font-black">Form Input Setoran</span>
                             </div>
 
-                            <!-- BACAAN (Buka/Tutup) -->
+                            <!-- BACAAN -->
                             <div class="p-4 sm:p-5 rounded-2xl border-2 border-emerald-500 space-y-4">
                                 <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2.5 flex-wrap gap-2">
-                                    <span class="font-black text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 uppercase flex items-center gap-1.5">
-                                        <i class="fa-solid fa-book-open"></i> BACAAN — ${s.name}
-                                    </span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-black text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 uppercase flex items-center gap-1.5">
+                                            <i class="fa-solid fa-book-open"></i> BACAAN — ${s.name}
+                                        </span>
+                                        ${badgeBac}
+                                    </div>
                                     <div class="flex items-center gap-2">
+                                        <span id="saved_badge_bacaan_${s.name}" class="text-[11px] font-black text-emerald-600 dark:text-emerald-400 hidden">Alhamdulillah sudah di input</span>
                                         <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet Input Bacaan 📊
+                                            <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
                                         <button type="button" id="card_section_btn_bacaan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'bacaan')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
                                             <i class="fa-solid ${isBacaanOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isBacaanOpen ? 'Tutup Form' : 'Buka Form'}
@@ -878,7 +919,7 @@
                                     <div class="pt-3 border-t border-emerald-200 dark:border-emerald-800 space-y-3">
                                         <div>
                                             <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Bacaan (${s.name}):</label>
-                                            <select id="bac_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-black text-sm sm:text-base">
+                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-black text-sm sm:text-base">
                                                 <option value="Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan lancar, makhraj dan tajwid tepat, hampir tidak ada kesalahan.</option>
                                                 <option value="Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki." ${defaultBacStat.includes('Baik Bacaan cukup') || !defaultBacStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik Bacaan cukup lancar, terdapat beberapa kesalahan ringan tetapi dapat diperbaiki.</option>
                                                 <option value="Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran." ${defaultBacStat.includes('kesalahan makhraj') ? 'selected' : ''}>Masih terdapat beberapa kesalahan makhraj, tajwid, panjang-pendek, atau kelancaran.</option>
@@ -887,7 +928,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Bacaan (${s.name}):</label>
-                                            <select id="bac_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
+                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Makharijul Huruf" ${parsedBacCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
                                                 <option value="Sifatul Huruf" ${parsedBacCatType === 'Sifatul Huruf' ? 'selected' : ''}>Sifatul Huruf</option>
@@ -899,12 +940,14 @@
                                                 <option value="Bacaan Gharib" ${parsedBacCatType === 'Bacaan Gharib' ? 'selected' : ''}>Bacaan Gharib</option>
                                                 <option value="Kesalahan Bacaan" ${parsedBacCatType === 'Kesalahan Bacaan' ? 'selected' : ''}>Kesalahan Bacaan</option>
                                             </select>
-                                            <input type="text" id="bac_cat_desc_${s.name}" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
+                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
                                         </div>
                                     </div>
-                                    <button type="button" onclick="window.saveSectionData('${s.name}', 'bacaan')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Bacaan (${s.name})
-                                    </button>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'bacaan')" class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                                            <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Bacaan (${s.name})
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Bacaan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Bacaan')" class="text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1.5">
@@ -916,15 +959,19 @@
                                 </div>
                             </div>
 
-                            <!-- HAFALAN BARU (Buka/Tutup) -->
+                            <!-- HAFALAN BARU -->
                             <div class="p-4 sm:p-5 rounded-2xl border-2 border-rose-500 space-y-4">
                                 <div class="flex items-center justify-between border-b border-rose-200 dark:border-rose-800 pb-2.5 flex-wrap gap-2">
-                                    <span class="font-black text-xs sm:text-sm text-rose-800 dark:text-rose-300 uppercase flex items-center gap-1.5">
-                                        <i class="fa-solid fa-award"></i> HAFALAN BARU — ${s.name}
-                                    </span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-black text-xs sm:text-sm text-rose-800 dark:text-rose-300 uppercase flex items-center gap-1.5">
+                                            <i class="fa-solid fa-award"></i> HAFALAN BARU — ${s.name}
+                                        </span>
+                                        ${badgeHaf}
+                                    </div>
                                     <div class="flex items-center gap-2">
+                                        <span id="saved_badge_hafalan_${s.name}" class="text-[11px] font-black text-rose-600 dark:text-rose-400 hidden">Alhamdulillah sudah di input</span>
                                         <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2.5 py-1 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet Input Hafalan 📊
+                                            <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
                                         <button type="button" id="card_section_btn_hafalan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'hafalan')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
                                             <i class="fa-solid ${isHafalanOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanOpen ? 'Tutup Form' : 'Buka Form'}
@@ -936,7 +983,7 @@
                                     <div class="pt-3 border-t border-rose-200 dark:border-rose-800 space-y-3">
                                         <div>
                                             <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
-                                            <select id="haf_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-black text-sm sm:text-base">
+                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-black text-sm sm:text-base">
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('Baik, Hafalan cukup') || !defaultHafStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('beberapa kali lupa') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -945,7 +992,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
-                                            <select id="haf_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
+                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran Hafalan" ${parsedHafCatType === 'Kelancaran Hafalan' ? 'selected' : ''}>Kelancaran Hafalan</option>
                                                 <option value="Ketepatan Hafalan" ${parsedHafCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -957,12 +1004,14 @@
                                                 <option value="Hafalan Belum Selesai" ${parsedHafCatType === 'Hafalan Belum Selesai' ? 'selected' : ''}>Hafalan Belum Selesai</option>
                                                 <option value="Hafalan Lulus" ${parsedHafCatType === 'Hafalan Lulus' ? 'selected' : ''}>Hafalan Lulus</option>
                                             </select>
-                                            <input type="text" id="haf_cat_desc_${s.name}" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
+                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
                                         </div>
                                     </div>
-                                    <button type="button" onclick="window.saveSectionData('${s.name}', 'hafalan')" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Hafalan Baru (${s.name})
-                                    </button>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'hafalan')" class="flex-1 py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                                            <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Hafalan Baru (${s.name})
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Hafalan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Hafalan')" class="text-xs font-black text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1.5">
@@ -974,15 +1023,19 @@
                                 </div>
                             </div>
 
-                            <!-- MUROJA'AH DI KELAS (Buka/Tutup) -->
+                            <!-- MUROJA'AH DI KELAS -->
                             <div class="p-4 sm:p-5 rounded-2xl border-2 border-purple-500 space-y-4">
                                 <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800 pb-2.5 flex-wrap gap-2">
-                                    <span class="font-black text-xs sm:text-sm text-purple-800 dark:text-purple-300 uppercase flex items-center gap-1.5">
-                                        <i class="fa-solid fa-rotate"></i> MUROJA'AH DI KELAS — ${s.name}
-                                    </span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-black text-xs sm:text-sm text-purple-800 dark:text-purple-300 uppercase flex items-center gap-1.5">
+                                            <i class="fa-solid fa-rotate"></i> MUROJA'AH DI KELAS — ${s.name}
+                                        </span>
+                                        ${badgeMur}
+                                    </div>
                                     <div class="flex items-center gap-2">
+                                        <span id="saved_badge_murojaah_${s.name}" class="text-[11px] font-black text-purple-600 dark:text-purple-400 hidden">Alhamdulillah sudah di input</span>
                                         <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2.5 py-1 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet Muroja'ah Dikelas 📊
+                                            <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
                                         <button type="button" id="card_section_btn_murojaah_${s.name}" onclick="window.toggleCardSection('${s.name}', 'murojaah')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
                                             <i class="fa-solid ${isMurojaahOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahOpen ? 'Tutup Form' : 'Buka Form'}
@@ -994,7 +1047,7 @@
                                     <div class="pt-3 border-t border-purple-200 dark:border-purple-800 space-y-3">
                                         <div>
                                             <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
-                                            <select id="mur_stat_${s.name}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-black text-sm sm:text-base">
+                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-black text-sm sm:text-base">
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('Baik, Hafalan cukup') || !defaultMurStat.includes('Alhamdulillah') ? 'selected' : ''}>Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('beberapa kali lupa') ? 'selected' : ''}>Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -1003,7 +1056,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
-                                            <select id="mur_cat_type_${s.name}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
+                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-bold text-xs sm:text-sm mb-2.5">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran" ${parsedMurCatType === 'Kelancaran' ? 'selected' : ''}>Kelancaran</option>
                                                 <option value="Ketepatan Hafalan" ${parsedMurCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -1014,12 +1067,14 @@
                                                 <option value="Hafalan Lama" ${parsedMurCatType === 'Hafalan Lama' ? 'selected' : ''}>Hafalan Lama</option>
                                                 <option value="Hafalan Juz" ${parsedMurCatType === 'Hafalan Juz' ? 'selected' : ''}>Hafalan Juz</option>
                                             </select>
-                                            <input type="text" id="mur_cat_desc_${s.name}" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
+                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
                                         </div>
                                     </div>
-                                    <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="w-full py-3.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Muroja'ah (${s.name})
-                                    </button>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="flex-1 py-3.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                                            <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Muroja'ah (${s.name})
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Murojaah_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Murojaah')" class="text-xs font-black text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1.5">
@@ -1031,15 +1086,19 @@
                                 </div>
                             </div>
 
-                            <!-- TUGAS TAMBAHAN (Buka/Tutup) -->
+                            <!-- TUGAS TAMBAHAN -->
                             <div class="p-4 sm:p-5 rounded-2xl border-2 border-amber-800 space-y-3">
                                 <div class="flex items-center justify-between border-b border-amber-300 dark:border-amber-800 pb-2.5 flex-wrap gap-2">
-                                    <span class="font-black text-xs sm:text-sm text-amber-900 dark:text-amber-200 uppercase flex items-center gap-1.5">
-                                        <i class="fa-solid fa-list-check"></i> TUGAS TAMBAHAN — ${s.name}
-                                    </span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-black text-xs sm:text-sm text-amber-900 dark:text-amber-200 uppercase flex items-center gap-1.5">
+                                            <i class="fa-solid fa-list-check"></i> TUGAS TAMBAHAN — ${s.name}
+                                        </span>
+                                        ${badgeTug}
+                                    </div>
                                     <div class="flex items-center gap-2">
+                                        <span id="saved_badge_tugas_${s.name}" class="text-[11px] font-black text-amber-800 dark:text-amber-300 hidden">Alhamdulillah sudah di input</span>
                                         <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-lg text-[11px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet Tugas 📊
+                                            <i class="fa-solid fa-table"></i> Sheet 📊
                                         </a>
                                         <button type="button" id="card_section_btn_tugas_${s.name}" onclick="window.toggleCardSection('${s.name}', 'tugas')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-black shadow-xs transition flex items-center gap-1.5">
                                             <i class="fa-solid ${isTugasOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasOpen ? 'Tutup Form' : 'Buka Form'}
@@ -1047,11 +1106,13 @@
                                     </div>
                                 </div>
                                 <div id="card_section_content_tugas_${s.name}" class="space-y-3 ${!isTugasOpen ? 'hidden' : ''}">
-                                    <input type="text" id="tug_detail_${s.name}" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-extrabold text-sm sm:text-base">
-                                    <input type="text" id="tug_cat_${s.name}" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
-                                    <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="w-full py-3.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 mt-1">
-                                        <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
-                                    </button>
+                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl font-extrabold text-sm sm:text-base">
+                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-3.5 sm:p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-xl text-sm sm:text-base font-bold">
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="flex-1 py-3.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 mt-1">
+                                            <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="pt-2 border-t">
                                     <button type="button" id="card_history_btn_Tugas_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Tugas')" class="text-xs font-black text-amber-800 dark:text-amber-300 hover:underline flex items-center gap-1.5">
@@ -1083,15 +1144,22 @@
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '';
 
                 if (itemVal) {
+                    const isIqro = (mode === 'iqro' || itemVal.toLowerCase().includes('iqro'));
+                    const unitName = isIqro ? 'halaman' : 'ayat';
+                    let count = 0;
                     if (start && end) {
-                        const rangeLabel = mode === 'iqro' ? `Hlm ${start}-${end}` : `${start}-${end}`;
-                        entries.push(`${itemVal} ${rangeLabel}`);
+                        const sNum = parseInt(start);
+                        const eNum = parseInt(end);
+                        if (!isNaN(sNum) && !isNaN(eNum) && eNum >= sNum) {
+                            count = (eNum - sNum + 1);
+                        }
                     } else if (start) {
-                        const rangeLabel = mode === 'iqro' ? `Hlm ${start}` : `Ayat ${start}`;
-                        entries.push(`${itemVal} ${rangeLabel}`);
-                    } else {
-                        entries.push(itemVal);
+                        count = 1;
                     }
+
+                    const rangeLabel = isIqro ? `Hlm ${start}${end && end !== start ? '-' + end : ''}` : `${start}${end && end !== start ? '-' + end : ''}`;
+                    const progressStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
+                    entries.push(`${itemVal} ${rangeLabel}${progressStr}`);
                 }
             });
             return entries.length > 0 ? entries.join(', ') : '-';
@@ -1136,6 +1204,7 @@
                 const structuredSlots = window.extractSlotsStructured('bac', name);
 
                 s.lastBacaan = bacaanFormatted;
+                s.lastBacaanDate = tanggalVal;
                 s.cloudBacSlots = structuredSlots;
                 s.cloudBacStat = bacaanStat;
                 s.cloudBacCat = bacaanCatCombined;
@@ -1161,6 +1230,10 @@
                 if (bacaanCatCombined) {
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
                 }
+
+                window.toggleCardSection(name, 'bacaan');
+                const badge = document.getElementById(`saved_badge_bacaan_${name}`);
+                if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Bacaan berhasil disimpan & disinkronkan!", "success");
             } 
             else if (sectionType === 'hafalan') {
@@ -1176,6 +1249,7 @@
                 const structuredSlotsHaf = window.extractSlotsStructured('haf', name);
 
                 s.lastHafalan = hafalanFormatted;
+                s.lastHafalanDate = tanggalVal;
                 s.cloudHafSlots = structuredSlotsHaf;
                 s.cloudHafStat = hafalanStat;
                 s.cloudHafCat = hafalanCatCombined;
@@ -1201,6 +1275,10 @@
                 if (hafalanCatCombined) {
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
                 }
+
+                window.toggleCardSection(name, 'hafalan');
+                const badge = document.getElementById(`saved_badge_hafalan_${name}`);
+                if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Hafalan Baru berhasil disimpan & disinkronkan!", "success");
             } 
             else if (sectionType === 'murojaah') {
@@ -1216,6 +1294,7 @@
                 const structuredSlotsMur = window.extractSlotsStructured('mur', name);
 
                 s.lastMurojaah = murojaahFormatted;
+                s.lastMurojaahDate = tanggalVal;
                 s.cloudMurSlots = structuredSlotsMur;
                 s.cloudMurStat = murojaahStat;
                 s.cloudMurCat = murojaahCatCombined;
@@ -1241,6 +1320,10 @@
                 if (murojaahCatCombined) {
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
                 }
+
+                window.toggleCardSection(name, 'murojaah');
+                const badge = document.getElementById(`saved_badge_murojaah_${name}`);
+                if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Muroja'ah berhasil disimpan & disinkronkan!", "success");
             } 
             else if (sectionType === 'tugas') {
@@ -1252,6 +1335,7 @@
                 const tugasCat = document.getElementById(`tug_cat_${name}`)?.value.trim() || '';
 
                 s.lastTugas = tugasVal;
+                s.lastTugasDate = tanggalVal;
                 s.cloudTugCat = tugasCat;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
@@ -1273,6 +1357,10 @@
                 if (tugasCat) {
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: new Date().getTime(), id: s.id, name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
                 }
+
+                window.toggleCardSection(name, 'tugas');
+                const badge = document.getElementById(`saved_badge_tugas_${name}`);
+                if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Tugas berhasil disimpan & disinkronkan!", "success");
             }
 
@@ -1312,14 +1400,6 @@
             }
         };
 
-        window.formatProgressLabel = function(detailStr) {
-            if (!detailStr || detailStr === '-') return '';
-            const count = window.calculateVersesFromDetail(detailStr);
-            const isIqro = detailStr.toLowerCase().includes('iqro');
-            const unitName = isIqro ? 'halaman' : 'ayat';
-            return ` (bertambah ${count} ${unitName})`;
-        };
-
         window.generateWaReport = function() {
             let name = window.selectedWaSantriName;
             if (!name && window.santriList.length > 0) {
@@ -1351,36 +1431,33 @@
             const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
             const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanProgress = window.formatProgressLabel(bacaanVal);
 
             const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
             const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanProgress = window.formatProgressLabel(hafalanVal);
 
             const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
             const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
-            const murojaahProgress = window.formatProgressLabel(murojaahVal);
 
             const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
             const tugasCat = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
 
             let bagianSetoran = "";
             if (bacaanVal && bacaanVal !== '-') {
-                bagianSetoran += `📖 *Bacaan:* ${bacaanVal}${bacaanProgress}`;
+                bagianSetoran += `📖 *Bacaan:* ${bacaanVal}`;
                 if (bacaanStat) bagianSetoran += `\n   - Nilai: ${bacaanStat}`;
                 if (bacaanCat) bagianSetoran += `\n   - Catatan: ${bacaanCat}`;
                 bagianSetoran += `\n`;
             }
             if (hafalanVal && hafalanVal !== '-') {
-                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}${hafalanProgress}`;
+                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}`;
                 if (hafalanStat) bagianSetoran += `\n   - Nilai: ${hafalanStat}`;
                 if (hafalanCat) bagianSetoran += `\n   - Catatan: ${hafalanCat}`;
                 bagianSetoran += `\n`;
             }
             if (murojaahVal && murojaahVal !== '-') {
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}${murojaahProgress}`;
+                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}`;
                 if (murojaahStat) bagianSetoran += `\n   - Nilai: ${murojaahStat}`;
                 if (murojaahCat) bagianSetoran += `\n   - Catatan: ${murojaahCat}`;
                 bagianSetoran += `\n`;
@@ -1428,8 +1505,18 @@
         };
 
         window.refreshWaReport = async function() {
+            const btn = document.getElementById('waRefreshBtn');
+            if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Loading berjalan...`;
+            
             await window.fetchAllDataFromCloud();
             window.generateWaReport();
+            
+            if (btn) {
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Alhamdulillah`;
+                setTimeout(() => {
+                    btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Refresh Data`;
+                }, 2000);
+            }
             window.showToast("Data laporan WA diperbarui dari Google Sheet!", "success");
         };
 
@@ -1485,14 +1572,8 @@
                 const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
 
                 const bacaanVal = sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
-                const bacaanProgress = window.formatProgressLabel(bacaanVal);
-
                 const hafalanVal = sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
-                const hafalanProgress = window.formatProgressLabel(hafalanVal);
-
                 const murojaahVal = sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
-                const murojaahProgress = window.formatProgressLabel(murojaahVal);
-
                 const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
@@ -1500,9 +1581,9 @@
                     activeSantriCount++;
                     const emojiNum = window.numberToEmoji(activeSantriCount);
                     let santriLine = `\n${emojiNum} *${s.name}*`;
-                    if (bacaanVal && bacaanVal !== '-') santriLine += `\n    - Bacaan: ${bacaanVal}${bacaanProgress}`;
-                    if (hafalanVal && hafalanVal !== '-') santriLine += `\n    - Hafalan: ${hafalanVal}${hafalanProgress}`;
-                    if (murojaahVal && murojaahVal !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${murojaahVal}${murojaahProgress}`;
+                    if (bacaanVal && bacaanVal !== '-') santriLine += `\n    - Bacaan: ${bacaanVal}`;
+                    if (hafalanVal && hafalanVal !== '-') santriLine += `\n    - Hafalan: ${hafalanVal}`;
+                    if (murojaahVal && murojaahVal !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${murojaahVal}`;
                     if (tugasVal && tugasVal !== '-') santriLine += `\n    - Tugas: ${tugasVal}`;
                     msg += santriLine + `\n`;
                 }
@@ -1516,8 +1597,18 @@
         };
 
         window.refreshClassReport = async function() {
+            const btn = document.getElementById('classRefreshBtn');
+            if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Loading berjalan...`;
+
             await window.fetchAllDataFromCloud();
             window.generateClassReport();
+
+            if (btn) {
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Alhamdulillah`;
+                setTimeout(() => {
+                    btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Refresh Data`;
+                }, 2000);
+            }
             window.showToast("Data laporan kelas diperbarui dari Google Sheet!", "success");
         };
 
@@ -1579,8 +1670,8 @@
                 const btn = document.getElementById(`btnSubHistory-${c}`);
                 if (btn) {
                     btn.className = (c === cat)
-                        ? "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all"
-                        : "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all";
+                        ? "px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all"
+                        : "px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all";
                 }
             });
 
@@ -2012,42 +2103,42 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
     
     <header class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-2">
                     <div id="logoContainer" class="shrink-0">
-                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-6 h-6 sm:w-7 sm:h-7 object-contain rounded-full bg-white p-0.5 border-2 border-amber-400 shadow-md" onerror="window.handleLogoError(this)">
-                        <div id="defaultLogoIcon" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-[7px] font-black shadow-md hidden">
+                        <img id="appLogo" src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" alt="Logo RQ Al-Khansa" class="w-5 h-5 sm:w-6 sm:h-6 object-contain rounded-full bg-white p-0.5 border border-amber-400 shadow-sm" onerror="window.handleLogoError(this)">
+                        <div id="defaultLogoIcon" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-[7px] font-black shadow-md hidden">
                             <i class="fa-solid fa-mosque"></i>
                         </div>
                     </div>
                     <div>
-                        <h1 class="text-[9px] sm:text-[10px] font-black tracking-tight flex items-center gap-1">
+                        <h1 class="text-[7px] sm:text-[9px] font-black tracking-tight flex items-center gap-1">
                             <span>Monitoring</span>
-                            <span class="px-1 py-0.5 bg-amber-400 text-emerald-950 text-[7px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
+                            <span class="px-1.5 py-0.5 bg-amber-400 text-emerald-950 text-[6px] font-black rounded shadow-xs">RQ AL-KHANSA</span>
                         </h1>
                         <div class="flex items-center gap-1.5 mt-0.5">
-                            <span id="syncDotIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
-                            <p id="storageInfoLabel" class="text-[9px] text-emerald-200 font-bold">Sheets & Local Active</p>
+                            <span id="syncDotIndicator" class="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse" title="Status Sinkronisasi Sheet"></span>
+                            <p id="storageInfoLabel" class="text-[7px] text-emerald-200 font-bold">Sheets & Local Active</p>
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <button onclick="window.toggleDarkMode()" class="p-1.5 bg-emerald-700 dark:bg-emerald-900 rounded-lg text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
-                        <i id="darkModeIcon" class="fa-solid fa-moon text-sm"></i>
+                        <i id="darkModeIcon" class="fa-solid fa-moon text-xs sm:text-sm"></i>
                     </button>
-                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2.5 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-lg text-xs flex items-center gap-1">
+                    <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2 py-1 bg-amber-400 text-emerald-950 font-black rounded-lg text-[10px] flex items-center gap-1">
                         <i class="fa-solid fa-rotate"></i> Sync
                     </button>
                 </div>
             </div>
 
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scrollbar">
-                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-4 py-2 rounded-xl text-base sm:text-lg font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
-                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
-                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat</button>
-                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
-                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-4 py-2 rounded-xl text-base sm:text-lg font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
+                <button onclick="window.switchTab('setoran')" id="btnTab-setoran" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0">Input</button>
+                <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
+                <button onclick="window.switchTab('history')" id="btnTab-history" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat</button>
+                <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
+                <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
     </header>
@@ -2057,6 +2148,7 @@
             <i class="fa-solid fa-arrow-up animate-bounce"></i> Kembali Ke Atas
         </button>
 
+        <!-- SECTION: INPUT SETORAN -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="w-full sm:w-auto flex items-center gap-2">
@@ -2090,6 +2182,7 @@
             <div id="santriGridContainer" class="space-y-6"></div>
         </section>
 
+        <!-- SECTION: MATERI -->
         <section id="section-materi" class="hidden space-y-4">
             <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border">
                 <div class="flex items-center gap-3">
@@ -2221,6 +2314,7 @@
             </div>
         </section>
 
+        <!-- SECTION: RIWAYAT -->
         <section id="section-history" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b pb-3">
@@ -2228,13 +2322,13 @@
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Riwayat & Rekapan Santri</h3>
                         <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
                     </div>
-                    <div class="flex items-center gap-2 flex-wrap justify-start w-full">
-                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
-                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
-                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
-                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
-                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
-                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
+                    <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
+                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
+                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
+                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
+                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
+                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
+                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
                     </div>
                 </div>
 
@@ -2293,6 +2387,7 @@
             </div>
         </section>
 
+        <!-- SECTION: LAPORAN -->
         <section id="section-laporan" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-3">
@@ -2300,7 +2395,7 @@
                         <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pusat Laporan Orang Tua & Akumulasi</h3>
                         <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
                     </div>
-                    <div class="flex items-center gap-2 flex-wrap justify-start w-full">
+                    <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
                         <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
                         <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
                         <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
@@ -2312,7 +2407,7 @@
                         <div class="flex items-center gap-2 text-xs font-bold text-emerald-900 dark:text-emerald-200">
                             <i class="fa-solid fa-arrows-rotate"></i> Membuka di HP/Laptop lain? Klik Refresh untuk menarik data terbaru.
                         </div>
-                        <button onclick="window.refreshWaReport()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1.5 transition">
+                        <button id="waRefreshBtn" onclick="window.refreshWaReport()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-rotate"></i> Refresh Data
                         </button>
                     </div>
@@ -2352,7 +2447,7 @@
                         <div class="flex items-center gap-2 text-xs font-bold text-emerald-900 dark:text-emerald-200">
                             <i class="fa-solid fa-arrows-rotate"></i> Membuka di HP/Laptop lain? Klik Refresh untuk menarik data terbaru.
                         </div>
-                        <button onclick="window.refreshClassReport()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1.5 transition">
+                        <button id="classRefreshBtn" onclick="window.refreshClassReport()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-rotate"></i> Refresh Data
                         </button>
                     </div>
@@ -2446,6 +2541,7 @@
             </div>
         </section>
 
+        <!-- SECTION: CLOUD & EXPORT -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between flex-wrap gap-3">
@@ -2506,7 +2602,7 @@
         </section>
     </main>
 
-    <div id="toastContainer" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-6 left-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
