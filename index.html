@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Tahfizh RQ Al-Khansa</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -141,8 +142,20 @@
             try {
                 const d = new Date(dateStr);
                 if (isNaN(d.getTime())) return dateStr;
-                let formatted = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: '2-digit' });
+                let formatted = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                 formatted = formatted.replace(/Minggu/gi, 'Ahad');
+                const parts = formatted.split(',');
+                if (parts.length === 2) {
+                    const weekday = parts[0].trim();
+                    const rest = parts[1].trim().replace(/\s+/g, ' ');
+                    const dateParts = rest.split(' ');
+                    if (dateParts.length >= 3) {
+                        const dayNum = dateParts[0];
+                        const monthName = dateParts[1];
+                        const yearNum = dateParts[2];
+                        return `${weekday}, ${dayNum} - ${monthName} - ${yearNum}`;
+                    }
+                }
                 return formatted;
             } catch (e) {
                 return dateStr;
@@ -217,6 +230,27 @@
                 card.classList.add('ring-4', 'ring-amber-400');
                 setTimeout(() => card.classList.remove('ring-4', 'ring-amber-400'), 2000);
             }
+        };
+
+        window.jumpToInputSantriFromReport = function() {
+            const name = window.selectedWaSantriName;
+            if (!name) {
+                window.showToast("Pilih santri terlebih dahulu!", "error");
+                return;
+            }
+            const s = window.santriList.find(x => x.name === name);
+            if (!s) return;
+            
+            window.switchTab('setoran');
+            const classFilterSelect = document.getElementById('classFilterSelect');
+            if (classFilterSelect) {
+                classFilterSelect.value = s.class;
+                window.selectedClass = s.class;
+                window.renderSantriCardsAndTable();
+            }
+            setTimeout(() => {
+                window.scrollToSantri(s.name);
+            }, 100);
         };
 
         window.scrollToTopGrid = function() {
@@ -898,8 +932,8 @@
                                         <span id="save_badge_bacaan_${s.name}" class="text-[10px] font-black text-emerald-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2 py-1 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet 📊
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition shadow-xs">
+                                            <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_bacaan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'bacaan')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isBacaanOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isBacaanOpen ? 'Tutup Form' : 'Buka Form'}
@@ -962,8 +996,8 @@
                                         <span id="save_badge_hafalan_${s.name}" class="text-[10px] font-black text-rose-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2 py-1 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet 📊
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-2.5 py-1 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition shadow-xs">
+                                            <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_hafalan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'hafalan')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isHafalanOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanOpen ? 'Tutup Form' : 'Buka Form'}
@@ -1026,8 +1060,8 @@
                                         <span id="save_badge_murojaah_${s.name}" class="text-[10px] font-black text-purple-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2 py-1 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet 📊
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-2.5 py-1 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition shadow-xs">
+                                            <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_murojaah_${s.name}" onclick="window.toggleCardSection('${s.name}', 'murojaah')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isMurojaahOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahOpen ? 'Tutup Form' : 'Buka Form'}
@@ -1089,8 +1123,8 @@
                                         <span id="save_badge_tugas_${s.name}" class="text-[10px] font-black text-amber-700 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-2 py-1 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
-                                            <i class="fa-solid fa-table"></i> Sheet 📊
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-2.5 py-1 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-lg text-[10px] font-black flex items-center gap-1 transition shadow-xs">
+                                            <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_tugas_${s.name}" onclick="window.toggleCardSection('${s.name}', 'tugas')" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-lg text-[11px] font-black shadow-xs transition flex items-center gap-1">
                                             <i class="fa-solid ${isTugasOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasOpen ? 'Tutup Form' : 'Buka Form'}
@@ -1512,6 +1546,158 @@
         window.sendWaReportDirect = function() {
             const phone = document.getElementById('waPhoneInput')?.value || '+6285774042121';
             window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('waMessagePreview')?.value)}`, '_blank');
+        };
+
+        window.downloadPdfWaReport = function() {
+            let name = window.selectedWaSantriName;
+            if (!name && window.santriList.length > 0) name = window.santriList[0].name;
+            const s = window.santriList.find(x => x.name === name);
+            if (!s) {
+                window.showToast("Pilih santri terlebih dahulu!", "error");
+                return;
+            }
+
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
+            const liveBac = window.extractSlotEntries('bac', s.name);
+            const liveHaf = window.extractSlotEntries('haf', s.name);
+            const liveMur = window.extractSlotEntries('mur', s.name);
+
+            const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
+            const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
+            const bacaanCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
+
+            const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
+            const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
+            const hafalanCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
+
+            const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
+            const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
+            const murojaahCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
+
+            const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+            const tugasCat = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
+
+            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
+
+            const element = document.createElement('div');
+            element.style.padding = '36px 40px';
+            element.style.fontFamily = "'Comic Sans MS', sans-serif";
+            element.style.color = '#000000';
+            element.style.background = '#ffffff';
+            element.style.borderRadius = '16px';
+            element.style.border = '2px solid #047857';
+            element.style.maxWidth = '750px';
+            element.style.margin = '0 auto';
+
+            let sectionsHtml = '';
+
+            if (bacaanVal && bacaanVal !== '-') {
+                sectionsHtml += `
+                    <div style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Bacaan</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${bacaanVal}</div>
+                        ${bacaanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${bacaanStat}</div>` : ''}
+                        ${bacaanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${bacaanCat}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            if (hafalanVal && hafalanVal !== '-') {
+                sectionsHtml += `
+                    <div style="background-color: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Hafalan</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${hafalanVal}</div>
+                        ${hafalanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${hafalanStat}</div>` : ''}
+                        ${hafalanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${hafalanCat}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            if (murojaahVal && murojaahVal !== '-') {
+                sectionsHtml += `
+                    <div style="background-color: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Muroja'ah</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${murojaahVal}</div>
+                        ${murojaahStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${murojaahStat}</div>` : ''}
+                        ${murojaahCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${murojaahCat}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            if (tugasVal && tugasVal !== '-') {
+                sectionsHtml += `
+                    <div style="background-color: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Tugas</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${tugasVal}</div>
+                        ${tugasCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${tugasCat}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            if (!sectionsHtml) {
+                sectionsHtml = `<div style="font-size: 14.5px; font-weight: normal; color: #000000; text-align: center; padding: 24px;">Belum ada data setoran tercatat.</div>`;
+            }
+
+            element.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #047857; padding-bottom: 20px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <img src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" style="width: 55px; height: 55px; object-fit: contain; border-radius: 50%; border: 2px solid #fbbf24; padding: 3px; background: #fff;" crossorigin="anonymous" />
+                        <div>
+                            <h2 style="font-size: 18px; font-weight: bold; color: #000000; margin: 0; letter-spacing: -0.3px;">RUMAH QUR'AN AL-KHANSA</h2>
+                            <p style="font-size: 13.5px; font-weight: normal; color: #047857; margin: 4px 0 0 0;">Laporan Perkembangan Santri</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #f8fafc; padding: 18px 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid #cbd5e1;">
+                    <table style="width: 100%; font-size: 14px; font-weight: normal; color: #000000; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 7px 0; width: 140px;">Nama Santri</td>
+                            <td style="padding: 7px 0;">: <strong style="font-size: 15px; color: #000000;">${s.name}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 7px 0;">Kelas / Pengajar</td>
+                            <td style="padding: 7px 0;">: ${s.class} • ${s.teacher}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 7px 0;">Tanggal Laporan</td>
+                            <td style="padding: 7px 0;">: ${currentDateStr}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    ${sectionsHtml}
+                </div>
+
+                <div style="background: #f1f5f9; padding: 18px 24px; border-radius: 12px; font-size: 13.5px; font-weight: normal; color: #000000; text-align: center; line-height: 1.8;">
+                    Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.
+                </div>
+            `;
+
+            const opt = {
+                margin:       14,
+                filename:     `Laporan_Perkembangan_Santri_${s.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(opt).save().then(() => {
+                window.showToast("PDF Laporan Perkembangan Santri berhasil didownload!", "success");
+            }).catch(err => {
+                console.error("PDF generation error:", err);
+                window.showToast("Gagal menghasilkan PDF.", "error");
+            });
         };
 
         window.generateClassReport = function() {
@@ -2180,8 +2366,8 @@
                         <h3 class="font-black text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
                             <i class="fa-solid fa-book text-emerald-600 text-xs"></i> Materi Belajar Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
-                            <i class="fa-solid fa-table"></i> Buka Sheet Materi 📊
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-lg text-[10px] font-black flex items-center gap-1 transition shadow-xs">
+                            <i class="fa-solid fa-table"></i> Sheet
                         </a>
                     </div>
                     <div class="space-y-2.5">
@@ -2237,8 +2423,8 @@
                         <h3 class="font-black text-xs sm:text-sm text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
                             <i class="fa-solid fa-star text-amber-500 text-xs"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-lg text-[10px] font-black flex items-center gap-1 transition">
-                            <i class="fa-solid fa-table"></i> Buka Sheet Tambahan 📊
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-lg text-[10px] font-black flex items-center gap-1 transition shadow-xs">
+                            <i class="fa-solid fa-table"></i> Sheet
                         </a>
                     </div>
                     <div class="space-y-2.5">
@@ -2300,12 +2486,12 @@
                         <p class="text-[11px] sm:text-xs text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
                     </div>
                     <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
-                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
-                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
-                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
-                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
-                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
-                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
+                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
+                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
+                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
+                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
+                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
+                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
                     </div>
                 </div>
 
@@ -2373,9 +2559,9 @@
                         <p class="text-[11px] sm:text-xs text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
                     </div>
                     <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
-                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
-                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
-                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
+                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
+                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
+                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
                     </div>
                 </div>
 
@@ -2413,9 +2599,15 @@
                         <label class="font-black text-xs text-slate-700 dark:text-slate-200">Preview Pesan:</label>
                         <textarea id="waMessagePreview" rows="8" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[11px] leading-relaxed"></textarea>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <button onclick="window.copyWaReportText()" class="px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs">Salin Teks</button>
                         <button onclick="window.sendWaReportDirect()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs shadow-md transition">Kirim WhatsApp</button>
+                        <button onclick="window.downloadPdfWaReport()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-pdf"></i> Download PDF
+                        </button>
+                        <button onclick="window.jumpToInputSantriFromReport()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs shadow-md transition flex items-center gap-1.5" title="Buka form input untuk santri yang sedang dipilih">
+                            <i class="fa-solid fa-pen-to-square"></i> Input / Cek Santri Ini
+                        </button>
                     </div>
                 </div>
 
