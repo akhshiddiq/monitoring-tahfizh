@@ -142,26 +142,21 @@
             try {
                 const d = new Date(dateStr);
                 if (isNaN(d.getTime())) return dateStr;
-                let formatted = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: '2-digit' });
+                let formatted = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                 formatted = formatted.replace(/Minggu/gi, 'Ahad');
+                const parts = formatted.split(',');
+                if (parts.length === 2) {
+                    const weekday = parts[0].trim();
+                    const rest = parts[1].trim().replace(/\s+/g, ' ');
+                    const dateParts = rest.split(' ');
+                    if (dateParts.length >= 3) {
+                        const dayNum = dateParts[0];
+                        const monthName = dateParts[1];
+                        const yearNum = dateParts[2];
+                        return `${weekday}, ${dayNum} - ${monthName} - ${yearNum}`;
+                    }
+                }
                 return formatted;
-            } catch (e) {
-                return dateStr;
-            }
-        };
-
-        window.formatPdfDate = function(dateStr) {
-            if (!dateStr) return '-';
-            try {
-                const d = new Date(dateStr);
-                if (isNaN(d.getTime())) return dateStr;
-                const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-                const weekday = days[d.getDay()];
-                const dayNum = d.getDate();
-                const monthName = months[d.getMonth()];
-                const yearNum = d.getFullYear();
-                return `${weekday}, ${dayNum} - ${monthName} - ${yearNum}`;
             } catch (e) {
                 return dateStr;
             }
@@ -1591,109 +1586,109 @@
             const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
             const tugasCat = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
 
-            const currentDateStr = window.formatPdfDate(new Date().toISOString().split('T')[0]);
+            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
             const element = document.createElement('div');
-            element.style.width = '100%';
-            element.style.maxWidth = '680px';
-            element.style.margin = '0 auto';
-            element.style.padding = '24px 28px';
-            element.style.fontFamily = "'Comic Sans MS', 'Comic Sans', cursive, sans-serif";
+            element.style.padding = '36px 40px';
+            element.style.fontFamily = "'Comic Sans MS', sans-serif";
             element.style.color = '#000000';
             element.style.background = '#ffffff';
-            element.style.boxSizing = 'border-box';
+            element.style.borderRadius = '16px';
+            element.style.border = '2px solid #047857';
+            element.style.maxWidth = '750px';
+            element.style.margin = '0 auto';
 
             let sectionsHtml = '';
 
             if (bacaanVal && bacaanVal !== '-') {
                 sectionsHtml += `
-                    <div style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 12px; padding: 18px 22px; margin-bottom: 20px;">
-                        <div style="font-size: 20px; font-weight: bold; color: #000000; margin-bottom: 10px;">Bacaan</div>
-                        <div style="font-size: 14.5px; font-weight: bold; color: #000000; margin-bottom: 8px; line-height: 1.6;">• ${bacaanVal}</div>
-                        ${bacaanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 5px; line-height: 1.5;">- Nilai: ${bacaanStat}</div>` : ''}
-                        ${bacaanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.5;">- Catatan: ${bacaanCat}</div>` : ''}
+                    <div style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Bacaan</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${bacaanVal}</div>
+                        ${bacaanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${bacaanStat}</div>` : ''}
+                        ${bacaanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${bacaanCat}</div>` : ''}
                     </div>
                 `;
             }
 
             if (hafalanVal && hafalanVal !== '-') {
                 sectionsHtml += `
-                    <div style="background-color: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 12px; padding: 18px 22px; margin-bottom: 20px;">
-                        <div style="font-size: 20px; font-weight: bold; color: #000000; margin-bottom: 10px;">Hafalan</div>
-                        <div style="font-size: 14.5px; font-weight: bold; color: #000000; margin-bottom: 8px; line-height: 1.6;">• ${hafalanVal}</div>
-                        ${hafalanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 5px; line-height: 1.5;">- Nilai: ${hafalanStat}</div>` : ''}
-                        ${hafalanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.5;">- Catatan: ${hafalanCat}</div>` : ''}
+                    <div style="background-color: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Hafalan</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${hafalanVal}</div>
+                        ${hafalanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${hafalanStat}</div>` : ''}
+                        ${hafalanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${hafalanCat}</div>` : ''}
                     </div>
                 `;
             }
 
             if (murojaahVal && murojaahVal !== '-') {
                 sectionsHtml += `
-                    <div style="background-color: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 12px; padding: 18px 22px; margin-bottom: 20px;">
-                        <div style="font-size: 20px; font-weight: bold; color: #000000; margin-bottom: 10px;">Muroja'ah</div>
-                        <div style="font-size: 14.5px; font-weight: bold; color: #000000; margin-bottom: 8px; line-height: 1.6;">• ${murojaahVal}</div>
-                        ${murojaahStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 5px; line-height: 1.5;">- Nilai: ${murojaahStat}</div>` : ''}
-                        ${murojaahCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.5;">- Catatan: ${murojaahCat}</div>` : ''}
+                    <div style="background-color: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Muroja'ah</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${murojaahVal}</div>
+                        ${murojaahStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${murojaahStat}</div>` : ''}
+                        ${murojaahCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${murojaahCat}</div>` : ''}
                     </div>
                 `;
             }
 
             if (tugasVal && tugasVal !== '-') {
                 sectionsHtml += `
-                    <div style="background-color: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 18px 22px; margin-bottom: 15px;">
-                        <div style="font-size: 20px; font-weight: bold; color: #000000; margin-bottom: 10px;">Tugas</div>
-                        <div style="font-size: 14.5px; font-weight: bold; color: #000000; margin-bottom: 8px; line-height: 1.6;">• ${tugasVal}</div>
-                        ${tugasCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.5;">- Catatan: ${tugasCat}</div>` : ''}
+                    <div style="background-color: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px;">
+                        <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Tugas</div>
+                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${tugasVal}</div>
+                        ${tugasCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${tugasCat}</div>` : ''}
                     </div>
                 `;
             }
 
             if (!sectionsHtml) {
-                sectionsHtml = `<div style="font-size: 14px; font-weight: normal; color: #000000; text-align: center; padding: 20px;">Belum ada data setoran tercatat.</div>`;
+                sectionsHtml = `<div style="font-size: 14.5px; font-weight: normal; color: #000000; text-align: center; padding: 24px;">Belum ada data setoran tercatat.</div>`;
             }
 
             element.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #047857; padding-bottom: 16px; margin-bottom: 20px;">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <img src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" style="width: 50px; height: 50px; object-fit: contain; border-radius: 50%; border: 2px solid #fbbf24; padding: 2px; background: #fff;" crossorigin="anonymous" />
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #047857; padding-bottom: 20px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <img src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" style="width: 55px; height: 55px; object-fit: contain; border-radius: 50%; border: 2px solid #fbbf24; padding: 3px; background: #fff;" crossorigin="anonymous" />
                         <div>
-                            <h2 style="font-size: 17px; font-weight: bold; color: #000000; margin: 0; letter-spacing: -0.2px;">RUMAH QUR'AN AL-KHANSA</h2>
-                            <p style="font-size: 13px; font-weight: normal; color: #047857; margin: 3px 0 0 0;">Laporan Perkembangan Santri</p>
+                            <h2 style="font-size: 18px; font-weight: bold; color: #000000; margin: 0; letter-spacing: -0.3px;">RUMAH QUR'AN AL-KHANSA</h2>
+                            <p style="font-size: 13.5px; font-weight: normal; color: #047857; margin: 4px 0 0 0;">Laporan Perkembangan Santri</p>
                         </div>
                     </div>
                 </div>
 
-                <div style="background: #f8fafc; padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #cbd5e1;">
-                    <table style="width: 100%; font-size: 13.5px; font-weight: normal; color: #000000; border-collapse: collapse;">
+                <div style="background: #f8fafc; padding: 18px 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid #cbd5e1;">
+                    <table style="width: 100%; font-size: 14px; font-weight: normal; color: #000000; border-collapse: collapse;">
                         <tr>
-                            <td style="padding: 6px 0; width: 130px;">Nama Santri</td>
-                            <td style="padding: 6px 0;">: <strong style="font-size: 14.5px; color: #000000;">${s.name}</strong></td>
+                            <td style="padding: 7px 0; width: 140px;">Nama Santri</td>
+                            <td style="padding: 7px 0;">: <strong style="font-size: 15px; color: #000000;">${s.name}</strong></td>
                         </tr>
                         <tr>
-                            <td style="padding: 6px 0;">Kelas / Pengajar</td>
-                            <td style="padding: 6px 0;">: ${s.class} • ${s.teacher}</td>
+                            <td style="padding: 7px 0;">Kelas / Pengajar</td>
+                            <td style="padding: 7px 0;">: ${s.class} • ${s.teacher}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 6px 0;">Tanggal Laporan</td>
-                            <td style="padding: 6px 0;">: ${currentDateStr}</td>
+                            <td style="padding: 7px 0;">Tanggal Laporan</td>
+                            <td style="padding: 7px 0;">: ${currentDateStr}</td>
                         </tr>
                     </table>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 24px;">
                     ${sectionsHtml}
                 </div>
 
-                <div style="background: #f1f5f9; padding: 16px 20px; border-radius: 12px; font-size: 13px; font-weight: normal; color: #000000; text-align: center; line-height: 1.7;">
+                <div style="background: #f1f5f9; padding: 18px 24px; border-radius: 12px; font-size: 13.5px; font-weight: normal; color: #000000; text-align: center; line-height: 1.8;">
                     Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.
                 </div>
             `;
 
             const opt = {
-                margin:       [10, 10, 10, 10],
+                margin:       14,
                 filename:     `Laporan_Perkembangan_Santri_${s.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false, windowWidth: 700 },
+                html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
@@ -2491,12 +2486,12 @@
                         <p class="text-[11px] sm:text-xs text-slate-500 font-bold mt-0.5">Data terbaru otomatis berada di paling atas.</p>
                     </div>
                     <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
-                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
-                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
-                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
-                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
-                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
-                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
+                        <button onclick="window.switchHistorySubTab('keseluruhan')" id="btnSubHistory-keseluruhan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">Riwayat Keseluruhan</button>
+                        <button onclick="window.switchHistorySubTab('bacaan')" id="btnSubHistory-bacaan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Bacaan</button>
+                        <button onclick="window.switchHistorySubTab('hafalan')" id="btnSubHistory-hafalan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Riwayat Hafalan</button>
+                        <button onclick="window.switchHistorySubTab('murojaah')" id="btnSubHistory-murojaah" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Muroja'ah di Kelas</button>
+                        <button onclick="window.switchHistorySubTab('tugas')" id="btnSubHistory-tugas" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Tugas</button>
+                        <button onclick="window.switchHistorySubTab('rekapan')" id="btnSubHistory-rekapan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Rekap Catatan</button>
                     </div>
                 </div>
 
@@ -2564,9 +2559,9 @@
                         <p class="text-[11px] sm:text-xs text-slate-500 font-bold mt-0.5">Pilih jenis laporan yang ingin dikirimkan atau direkap.</p>
                     </div>
                     <div class="flex items-center gap-1.5 flex-wrap justify-start w-full">
-                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
-                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
-                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
+                        <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
+                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
+                        <button onclick="window.switchLaporanSubTab('ayat')" id="btnLaporanSub-ayat" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Akumulasi Ayat</button>
                     </div>
                 </div>
 
