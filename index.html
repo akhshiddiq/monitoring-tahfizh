@@ -192,8 +192,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
+                        ? "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
                 }
             });
 
@@ -333,16 +333,7 @@
 
                     const formatDetailSlot = (sl) => {
                         if (!sl.item || sl.item === '-') return '';
-                        const isIqro = (sl.mode === 'iqro' || sl.item.toLowerCase().includes('iqro'));
-                        let count = 0;
-                        if (sl.start && sl.end && sl.start !== '-' && sl.end !== '-') {
-                            const sNum = parseInt(sl.start);
-                            const eNum = parseInt(sl.end);
-                            if (!isNaN(sNum) && !isNaN(eNum) && eNum >= sNum) count = (eNum - sNum + 1);
-                        } else if (sl.start && sl.start !== '-') {
-                            count = 1;
-                        }
-                        const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
+                        const rangeLabel = sl.item.toLowerCase().includes('iqro') ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
                         return `${sl.item} ${rangeLabel}`.trim();
                     };
 
@@ -470,25 +461,6 @@
             await window.fetchAllDataFromCloud();
             window.renderHistoryTable();
             window.showToast("Data riwayat berhasil diperbarui dari Cloud!", "success");
-        };
-
-        window.cleanReportDetail = function(text) {
-            if (!text || text === '-') return '';
-            return text.replace(/\s*\(\s*bertambah\s+\d+\s+(?:ayat|halaman)\s*\)/gi, '').trim();
-        };
-
-        window.formatMateriForReport = function(m, icon, label) {
-            if (!m) return '';
-            let text = `${icon} *${label}:*\n- *${m.judul}*`;
-            const bab = (m.bab || '').trim();
-            if (bab && bab !== '-') {
-                text += `\n  Bab: ${bab}`;
-            }
-            const ket = (m.ket || '').trim();
-            if (ket && ket !== '-') {
-                text += `\n  ${ket}`;
-            }
-            return text + '\n\n';
         };
 
         window.saveMateri = function(type) {
@@ -709,7 +681,7 @@
 
                 return `
                     ${!isFirst ? `
-                        <div class="my-1">
+                        <div class="my-1.5">
                             <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-lg text-xs flex items-center gap-1 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
@@ -909,26 +881,27 @@
                 const isTugasHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Tugas`];
 
                 return `
-                    <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all">
-                        <div class="flex items-start justify-between border-b pb-3 flex-wrap gap-2.5">
+                    <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all relative">
+                        <!-- STICKY HEADER SAAT SCROLL -->
+                        <div class="sticky top-16 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm py-2.5 border-b border-slate-200 dark:border-slate-700 flex items-start justify-between flex-wrap gap-2.5 shadow-xs">
                             <div>
                                 <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">${s.name}</h3>
                                 <p class="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
                             <div class="flex items-center gap-2 flex-wrap">
-                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Input & Sinkron Semua">
+                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Input & Sinkron Semua">
                                     <i class="fa-solid fa-floppy-disk"></i> Input Semua
                                 </button>
-                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Kirim WA Personal">
+                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Kirim WA Personal">
                                     <i class="fa-brands fa-whatsapp text-sm"></i> WA
                                 </button>
-                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Laporan Grup">
+                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Laporan Grup">
                                     <i class="fa-solid fa-users text-sm"></i> Grup
                                 </button>
                             </div>
                         </div>
 
-                        <div class="space-y-3.5">
+                        <div class="space-y-3.5 pt-1">
                             <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 p-3 rounded-xl">
                                 <span>Tanggal: <input type="date" id="tgl_${s.name}" value="${todayStr}" class="p-2 bg-white dark:bg-slate-800 border rounded-xl font-bold text-xs sm:text-sm"></span>
                                 <span class="text-emerald-700 dark:text-emerald-400 font-black">Form Input Setoran</span>
@@ -945,7 +918,7 @@
                                         <span id="save_badge_bacaan_${s.name}" class="text-xs font-black text-emerald-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-3 py-2 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=1313172495#gid=1313172495" target="_blank" class="px-3.5 py-2 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
                                             <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_bacaan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'bacaan')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-black shadow-xs transition flex items-center gap-1.5 active:scale-95">
@@ -1009,7 +982,7 @@
                                         <span id="save_badge_hafalan_${s.name}" class="text-xs font-black text-rose-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-3 py-2 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=690030139#gid=690030139" target="_blank" class="px-3.5 py-2 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
                                             <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_hafalan_${s.name}" onclick="window.toggleCardSection('${s.name}', 'hafalan')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-black shadow-xs transition flex items-center gap-1.5 active:scale-95">
@@ -1073,7 +1046,7 @@
                                         <span id="save_badge_murojaah_${s.name}" class="text-xs font-black text-purple-600 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-3 py-2 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=578931786#gid=578931786" target="_blank" class="px-3.5 py-2 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
                                             <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_murojaah_${s.name}" onclick="window.toggleCardSection('${s.name}', 'murojaah')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-black shadow-xs transition flex items-center gap-1.5 active:scale-95">
@@ -1136,7 +1109,7 @@
                                         <span id="save_badge_tugas_${s.name}" class="text-xs font-black text-amber-700 hidden">Alhamdulillah sudah di input</span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-3 py-2 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
+                                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=558689147#gid=558689147" target="_blank" class="px-3.5 py-2 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs active:scale-95">
                                             <i class="fa-solid fa-table"></i> Sheet
                                         </a>
                                         <button type="button" id="card_section_btn_tugas_${s.name}" onclick="window.toggleCardSection('${s.name}', 'tugas')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-black shadow-xs transition flex items-center gap-1.5 active:scale-95">
@@ -1459,15 +1432,15 @@
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
+            const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
             const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
 
-            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
+            const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
             const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
 
-            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
+            const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
             const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
 
@@ -1571,15 +1544,15 @@
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
+            const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
             const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
 
-            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
+            const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
             const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
 
-            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
+            const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
             const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
 
@@ -1700,20 +1673,6 @@
             });
         };
 
-        window.formatMateriForReportPlain = function(m, icon, label) {
-            if (!m) return '';
-            let text = `${icon} *${label}:*\n- *${m.judul}*`;
-            const bab = (m.bab || '').trim();
-            if (bab && bab !== '-') {
-                text += `\n  Bab: ${bab}`;
-            }
-            const ket = (m.ket || '').trim();
-            if (ket && ket !== '-') {
-                text += `\n  ${ket}`;
-            }
-            return text + '\n\n';
-        };
-
         window.generateClassReport = function() {
             const className = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
             const list = window.santriList.filter(s => s.class === className);
@@ -1733,11 +1692,21 @@
             let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
             
             if (latestMateri) {
-                msg += window.formatMateriForReportPlain(latestMateri, '📚', 'Materi Belajar Hari Ini');
+                msg += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*`;
+                const bab = (latestMateri.bab || '').trim();
+                if (bab && bab !== '-') msg += `\n  Bab: ${bab}`;
+                const ket = (latestMateri.ket || '').trim();
+                if (ket && ket !== '-') msg += `\n  ${ket}`;
+                msg += `\n\n`;
             }
 
             if (latestTambahan) {
-                msg += window.formatMateriForReportPlain(latestTambahan, '⭐', 'Materi Tambahan Hari Ini');
+                msg += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*`;
+                const babT = (latestTambahan.bab || '').trim();
+                if (babT && babT !== '-') msg += `\n  Bab: ${babT}`;
+                const ketT = (latestTambahan.ket || '').trim();
+                if (ketT && ketT !== '-') msg += `\n  ${ketT}`;
+                msg += `\n\n`;
             }
 
             msg += `👥 *Daftar Santri & Prestasi:*`;
@@ -1748,9 +1717,9 @@
                 const sMur = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
                 const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
 
-                const bacaanVal = window.cleanReportDetail(sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
-                const hafalanVal = window.cleanReportDetail(sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
-                const murojaahVal = window.cleanReportDetail(sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
+                const bacaanVal = sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
+                const hafalanVal = sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
+                const murojaahVal = sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
                 const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
@@ -2414,7 +2383,7 @@
                         <h3 class="font-black text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
                             <i class="fa-solid fa-book text-emerald-600 text-sm"></i> Materi Belajar Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-xl text-xs font-black flex items-center gap-1.5 transition shadow-xs">
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=211291951#gid=211291951" target="_blank" class="px-3.5 py-2 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-800 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs">
                             <i class="fa-solid fa-table"></i> Sheet
                         </a>
                     </div>
@@ -2471,7 +2440,7 @@
                         <h3 class="font-black text-xs sm:text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-star text-amber-500 text-sm"></i> Materi Tambahan Hari Ini
                         </h3>
-                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-xl text-xs font-black flex items-center gap-1.5 transition shadow-xs">
+                        <a href="https://docs.google.com/spreadsheets/d/12kXnS_WddPm9b7rZYcLo0PMOq9UTiJDRM58ykpuo8vo/edit?gid=353939765#gid=353939765" target="_blank" class="px-3.5 py-2 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-800 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs">
                             <i class="fa-solid fa-table"></i> Sheet
                         </a>
                     </div>
@@ -2909,7 +2878,7 @@
             if (localStorage.getItem('rq_dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
                 const icon = document.getElementById('darkModeIcon');
-                if (icon) icon.className = 'fa-solid fa-sun text-sm';
+                if (icon) icon.className = 'fa-solid fa-sun text-xs';
             }
             const classFilter = document.getElementById('classFilterSelect');
             if (classFilter) classFilter.value = 'Abdurrahman';
