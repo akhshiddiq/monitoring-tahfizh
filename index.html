@@ -1477,32 +1477,32 @@
             }
 
             const includeMateriWa = document.getElementById('includeMateriWaCheckbox')?.checked ?? true;
-            if (includeMateriWa) {
-                const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-                const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-                const latestMateri = materiUtama.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-                const latestTambahan = materiTambahan.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            const includeTambahanWa = document.getElementById('includeTambahanWaCheckbox')?.checked ?? true;
 
-                if (latestMateri || latestTambahan) {
-                    bagianSetoran += `📚 *Materi Belajar & Tambahan Hari Ini:*\n`;
-                    if (latestMateri) {
-                        bagianSetoran += `- *${latestMateri.judul}*`;
-                        const bab = (latestMateri.bab || '').trim();
-                        if (bab && bab !== '-') bagianSetoran += ` (Bab: ${bab})`;
-                        const ket = (latestMateri.ket || '').trim();
-                        if (isValidText(ket) && ket !== '-') bagianSetoran += `\n  ${ket}`;
-                        bagianSetoran += `\n`;
-                    }
-                    if (latestTambahan) {
-                        bagianSetoran += `- *${latestTambahan.judul}*`;
-                        const babT = (latestTambahan.bab || '').trim();
-                        if (babT && babT !== '-') bagianSetoran += ` (Bab: ${babT})`;
-                        const ketT = (latestTambahan.ket || '').trim();
-                        if (isValidText(ketT) && ketT !== '-') bagianSetoran += `\n  ${ketT}`;
-                        bagianSetoran += `\n`;
-                    }
-                    bagianSetoran += `_______________\n\n`;
+            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+            const latestMateri = materiUtama.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            const latestTambahan = materiTambahan.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+
+            if ((includeMateriWa && latestMateri) || (includeTambahanWa && latestTambahan)) {
+                bagianSetoran += `📚 *Materi Pembelajaran Hari Ini:*\n`;
+                if (includeMateriWa && latestMateri) {
+                    bagianSetoran += `- *${latestMateri.judul}*`;
+                    const bab = (latestMateri.bab || '').trim();
+                    if (bab && bab !== '-') bagianSetoran += ` (Bab: ${bab})`;
+                    const ket = (latestMateri.ket || '').trim();
+                    if (isValidText(ket) && ket !== '-') bagianSetoran += `\n  ${ket}`;
+                    bagianSetoran += `\n`;
                 }
+                if (includeTambahanWa && latestTambahan) {
+                    bagianSetoran += `- *${latestTambahan.judul}*`;
+                    const babT = (latestTambahan.bab || '').trim();
+                    if (babT && babT !== '-') bagianSetoran += ` (Bab: ${babT})`;
+                    const ketT = (latestTambahan.ket || '').trim();
+                    if (isValidText(ketT) && ketT !== '-') bagianSetoran += `\n  ${ketT}`;
+                    bagianSetoran += `\n`;
+                }
+                bagianSetoran += `_______________\n\n`;
             }
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
@@ -1742,13 +1742,18 @@
             const list = window.santriList.filter(s => s.class === className);
             
             const includeMateriClass = document.getElementById('includeMateriClassCheckbox')?.checked ?? true;
+            const includeTambahanClass = document.getElementById('includeTambahanClassCheckbox')?.checked ?? true;
+
             let latestMateri = null;
             let latestTambahan = null;
 
+            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+            
             if (includeMateriClass) {
-                const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-                const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
                 latestMateri = materiUtama.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            }
+            if (includeTambahanClass) {
                 latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
             }
 
@@ -1761,22 +1766,25 @@
 
             let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
             
-            if (latestMateri) {
-                msg += `📚 *Materi Belajar Hari Ini:*\n- *${latestMateri.judul}*`;
-                const bab = (latestMateri.bab || '').trim();
-                if (bab && bab !== '-') msg += ` (Bab: ${bab})`;
-                const ket = (latestMateri.ket || '').trim();
-                if (window.isValidText && window.isValidText(ket) && ket !== '-') msg += `\n  ${ket}`;
-                msg += `\n\n`;
-            }
-
-            if (latestTambahan) {
-                msg += `⭐ *Materi Tambahan Hari Ini:*\n- *${latestTambahan.judul}*`;
-                const babT = (latestTambahan.bab || '').trim();
-                if (babT && babT !== '-') msg += ` (Bab: ${babT})`;
-                const ketT = (latestTambahan.ket || '').trim();
-                if (window.isValidText && window.isValidText(ketT) && ketT !== '-') msg += `\n  ${ketT}`;
-                msg += `\n\n`;
+            if (latestMateri || latestTambahan) {
+                msg += `📚 *Materi Pembelajaran Hari Ini:*\n`;
+                if (latestMateri) {
+                    msg += `- *${latestMateri.judul}*`;
+                    const bab = (latestMateri.bab || '').trim();
+                    if (bab && bab !== '-') msg += ` (Bab: ${bab})`;
+                    const ket = (latestMateri.ket || '').trim();
+                    if (ket && ket !== '-') msg += `\n  ${ket}`;
+                    msg += `\n`;
+                }
+                if (latestTambahan) {
+                    msg += `- *${latestTambahan.judul}*`;
+                    const babT = (latestTambahan.bab || '').trim();
+                    if (babT && babT !== '-') msg += ` (Bab: ${babT})`;
+                    const ketT = (latestTambahan.ket || '').trim();
+                    if (ketT && ketT !== '-') msg += `\n  ${ketT}`;
+                    msg += `\n`;
+                }
+                msg += `_______________\n\n`;
             }
 
             msg += `👥 *Daftar Santri & Prestasi:*`;
@@ -2688,13 +2696,21 @@
                             <input type="text" id="waPhoneInput" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm" value="+6285774042121">
                         </div>
                     </div>
-                    <div class="flex items-center gap-2.5 pt-1">
-                        <input type="checkbox" id="includeMateriWaCheckbox" checked onchange="window.generateWaReport()" class="w-4 h-4 text-emerald-600 rounded">
-                        <label for="includeMateriWaCheckbox" class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300">Cantumkan Materi & Materi Tambahan di Laporan WA</label>
+                    
+                    <div class="space-y-2 pt-1">
+                        <div class="flex items-center gap-2.5">
+                            <input type="checkbox" id="includeMateriWaCheckbox" checked onchange="window.generateWaReport()" class="w-4 h-4 text-emerald-600 rounded">
+                            <label for="includeMateriWaCheckbox" class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300">Cantumkan Materi Belajar di Laporan WA</label>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <input type="checkbox" id="includeTambahanWaCheckbox" checked onchange="window.generateWaReport()" class="w-4 h-4 text-emerald-600 rounded">
+                            <label for="includeTambahanWaCheckbox" class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300">Cantumkan Materi Tambahan di Laporan WA</label>
+                        </div>
                     </div>
+
                     <div>
                         <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Preview Pesan:</label>
-                        <textarea id="waMessagePreview" rows="8" class="w-full mt-1.5 p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                        <textarea id="waMessagePreview" rows="14" class="w-full mt-1.5 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed custom-scrollbar"></textarea>
                     </div>
                     <div class="flex items-center gap-2.5 flex-wrap">
                         <button onclick="window.copyWaReportText()" class="px-4 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm active:scale-95 transition">Salin Teks</button>
@@ -2732,12 +2748,20 @@
                             <option value="Umar">Umar</option>
                         </select>
                     </div>
-                    <div class="flex items-center gap-2.5 pt-1">
-                        <input type="checkbox" id="includeMateriClassCheckbox" checked onchange="window.generateClassReport()" class="w-4 h-4 text-emerald-600 rounded">
-                        <label for="includeMateriClassCheckbox" class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300">Cantumkan Materi & Materi Tambahan di Laporan Kelas</label>
+
+                    <div class="space-y-2 pt-1">
+                        <div class="flex items-center gap-2.5">
+                            <input type="checkbox" id="includeMateriClassCheckbox" checked onchange="window.generateClassReport()" class="w-4 h-4 text-emerald-600 rounded">
+                            <label for="includeMateriClassCheckbox" class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300">Cantumkan Materi Belajar di Laporan Kelas</label>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <input type="checkbox" id="includeTambahanClassCheckbox" checked onchange="window.generateClassReport()" class="w-4 h-4 text-emerald-600 rounded">
+                            <label for="includeTambahanClassCheckbox" class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300">Cantumkan Materi Tambahan di Laporan Kelas</label>
+                        </div>
                     </div>
+
                     <div>
-                        <textarea id="classReportMessagePreview" rows="8" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
+                        <textarea id="classReportMessagePreview" rows="14" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed custom-scrollbar"></textarea>
                     </div>
                     <div class="flex items-center gap-2.5">
                         <button onclick="window.copyClassReportText()" class="px-4 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm active:scale-95 transition">Salin Teks Kelas</button>
@@ -2941,7 +2965,7 @@
                         <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-300">Pilih Nama-nama Santri:</label>
                         <div class="flex items-center gap-2">
                             <button type="button" onclick="window.massalSelectAllSantri('tugas')" class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-black">Pilih Semua</button>
-                            <button type="button" onclick="window.massalDesaectAllSantri?.() || window.massalDeselectAllSantri('tugas')" class="px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg text-xs font-black">Batalkan Semua</button>
+                            <button type="button" onclick="window.massalDeselectAllSantri('tugas')" class="px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg text-xs font-black">Batalkan Semua</button>
                         </div>
                     </div>
                     <div id="massalTugasSantriGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1"></div>
