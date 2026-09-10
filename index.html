@@ -627,11 +627,11 @@
             const btnUlangi = document.getElementById(`btn_status_ulangi_${category}_${slot}_${santriName}`);
 
             if (statusVal === 'Ulangi') {
-                if (btnLanjut) btnLanjut.className = "flex-1 py-2 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
-                if (btnUlangi) btnUlangi.className = "flex-1 py-2 rounded-xl text-xs font-black bg-rose-600 text-white shadow-sm transition";
+                if (btnLanjut) btnLanjut.className = "flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-2.5 rounded-xl text-xs font-black bg-rose-600 text-white shadow-sm transition";
             } else {
-                if (btnLanjut) btnLanjut.className = "flex-1 py-2 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-sm transition";
-                if (btnUlangi) btnUlangi.className = "flex-1 py-2 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
+                if (btnLanjut) btnLanjut.className = "flex-1 py-2.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-sm transition";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
             }
         };
 
@@ -738,32 +738,32 @@
                 return `
                     ${!isFirst ? `
                         <div class="my-2">
-                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
+                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-3.5 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-4 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3.5 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-black text-slate-800 dark:text-slate-200">
+                            <span class="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-200">
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
-                            <div class="flex items-center bg-slate-200/90 dark:bg-slate-800 p-1 rounded-lg">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                            <div class="flex items-center bg-slate-200/90 dark:bg-slate-800 p-1.5 rounded-xl">
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-1.5 rounded-lg text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-1.5 rounded-lg text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
-                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${defaultIqroVal === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${defaultIqroVal === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -776,20 +776,20 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Lanjut / Ulangi:</label>
+                            <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Lanjut / Ulangi:</label>
                             <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border">
-                                <button type="button" id="btn_status_lanjut_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Lanjut')" class="flex-1 py-2 rounded-xl text-xs ${cachedStatus === 'Lanjut' ? 'font-black bg-emerald-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Lanjut</button>
-                                <button type="button" id="btn_status_ulangi_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Ulangi')" class="flex-1 py-2 rounded-xl text-xs ${cachedStatus === 'Ulangi' ? 'font-black bg-rose-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Ulangi</button>
+                                <button type="button" id="btn_status_lanjut_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Lanjut')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm ${cachedStatus === 'Lanjut' ? 'font-black bg-emerald-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Lanjut</button>
+                                <button type="button" id="btn_status_ulangi_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Ulangi')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm ${cachedStatus === 'Ulangi' ? 'font-black bg-rose-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Ulangi</button>
                             </div>
                         </div>
                     </div>
@@ -2974,10 +2974,10 @@
                     <div>
                         <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Muroja'ah:</label>
                         <select id="massalMurojaahStat" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
-                            <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." selected>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                            <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                            <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
+                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." selected>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                            <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                            <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                            <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                         </select>
                     </div>
                 </div>
