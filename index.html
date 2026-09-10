@@ -520,7 +520,7 @@
                 <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
                     <div class="flex-1">
                         <div class="font-black text-emerald-800 dark:text-emerald-300">${m.judul} (${m.kelas}) - ${window.formatIndonesianDate(m.tanggal)} ${m.tampilWa !== false ? '<span class="text-emerald-600 font-extrabold">[Tampil Laporan]</span>' : '<span class="text-slate-400">[Disembunyikan]</span>'}</div>
-                        <div class="font-bold text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">Bab: ${m.bab || '-'} | Ket: ${m.ket || '-'}</div>
+                        <div class="font-bold text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">Bab: ${m.bab || '-'} ${m.ket && m.ket !== '-' ? '| ' + m.ket : ''}</div>
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                         <button onclick="window.toggleMateriTampil('${type}', ${idx})" class="px-2 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-lg font-extrabold text-[10px] text-slate-700 dark:text-slate-200 transition">
@@ -767,7 +767,7 @@
                 <div class="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
                     <div class="flex-1 space-y-0.5">
                         <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">${h.detail || '-'}</div>
-                        <div class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'} | Catatan: ${h.catatan || '-'}</div>
+                        <div class="text-[11px] font-bold text-slate-600 dark:text-slate-400">${h.status && h.status!=='-' ? 'Status: ' + h.status : ''} ${h.catatan ? '| Catatan: ' + h.catatan : ''}</div>
                         <div class="text-[10px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
                     </div>
                     <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-lg font-black text-[10px] hover:bg-rose-200 transition shrink-0">Hapus</button>
@@ -898,7 +898,7 @@
 
                 return `
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3.5 transition-all">
-                        <div class="sticky top-14 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs py-2 -mx-3.5 px-3.5 sm:-mx-4 sm:px-4 border-b flex items-start justify-between flex-wrap gap-2 shadow-xs">
+                        <div class="sticky top-14 z-20 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs py-2 -mx-3.5 px-3.5 sm:-mx-4 sm:px-4 border-b flex items-start justify-between flex-wrap gap-2 shadow-xs">
                             <div>
                                 <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">${s.name}</h3>
                                 <p class="text-[11px] text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
@@ -1462,22 +1462,22 @@
 
             const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
             const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
-            const rawBacCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanCat = (rawBacCat && rawBacCat !== '-' && rawBacCat !== 'undefined' && rawBacCat !== 'null') ? window.cleanReportDetail(rawBacCat) : '';
+            const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
+            const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
 
             const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
-            const rawHafCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanCat = (rawHafCat && rawHafCat !== '-' && rawHafCat !== 'undefined' && rawHafCat !== 'null') ? window.cleanReportDetail(rawHafCat) : '';
+            const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
+            const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
 
             const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
-            const rawMurCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
-            const murojaahCat = (rawMurCat && rawMurCat !== '-' && rawMurCat !== 'undefined' && rawMurCat !== 'null') ? window.cleanReportDetail(rawMurCat) : '';
+            const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
+            const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
 
             const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
-            const rawTugCat = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
-            const tugasCat = (rawTugCat && rawTugCat !== '-' && rawTugCat !== 'undefined' && rawTugCat !== 'null') ? window.cleanReportDetail(rawTugCat) : '';
+            const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
+            const tugasCat = (rawTugC && rawTugC !== '-' && rawTugC !== 'undefined' && rawTugC !== 'null') ? window.cleanReportDetail(rawTugC) : '';
 
             const isValidText = (txt) => {
                 if (!txt) return false;
@@ -2394,7 +2394,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="window.toggleDarkMode()" class="p-2 bg-emerald-700 dark:bg-emerald-900 rounded-xl text-amber-300 hover:bg-emerald-600 transition shadow-xs" title="Fitur Malam (Dark Mode)">
-                        <i id="darkModeIcon" class="fa-solid fa-moon text-sm"></i>
+                        <i id="darkModeIcon" class="fa-solid fa-moon text-xs"></i>
                     </button>
                     <button onclick="window.fetchAllDataFromCloud()" class="sm:hidden px-2.5 py-1.5 bg-amber-400 text-emerald-950 font-black rounded-xl text-xs flex items-center gap-1.5">
                         <i class="fa-solid fa-rotate"></i> Sync
@@ -2436,7 +2436,7 @@
                         <option value="ALL">Semua Kelas</option>
                     </select>
                 </div>
-                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end flex-wrap">
+                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-center sm:justify-end flex-wrap">
                     <button onclick="window.openMurojaahMassalModal()" class="flex items-center gap-1.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95">
                         <i class="fa-solid fa-rotate"></i> Muroja'ah di Kelas (Sama)
                     </button>
