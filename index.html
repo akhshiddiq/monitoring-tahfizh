@@ -63,6 +63,7 @@
         ];
         window.selectedClass = 'Abdurrahman';
         window.itemSourceMode = {};
+        window.itemStatusMode = {};
         window.activeSlotState = {};
         window.cardSectionToggleState = {};
         window.cardHistoryToggleState = {};
@@ -338,9 +339,9 @@
 
                     const parseCloudSlots = (row) => {
                         const parseSlotStr = (cellStr) => {
-                            if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran' };
+                            if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran', status: 'Lanjut' };
                             const parts = cellStr.split('|');
-                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran' };
+                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran', status: parts[2] || 'Lanjut' };
                         };
                         const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-';
                         const s2 = parseSlotStr(row[9]); s2.start = row[10] || '-'; s2.end = row[11] || '-';
@@ -362,7 +363,8 @@
                         }
                         const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
                         const countStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                        return `${sl.item} ${rangeLabel}${countStr}`.trim();
+                        const statusLabel = sl.status && sl.status !== 'Lanjut' ? ` [${sl.status}]` : '';
+                        return `${sl.item} ${rangeLabel}${statusLabel}${countStr}`.trim();
                     };
 
                     const processInputRowsToHistory = (inputRows, typeName) => {
@@ -616,6 +618,23 @@
             }
         };
 
+        window.switchStatusMode = function(category, slot, santriName, statusVal) {
+            const statusKey = `${santriName}_${category}_status_${slot}`;
+            window.itemStatusMode[statusKey] = statusVal;
+            window.cacheFormInput({ value: statusVal }, `${santriName}_${category}_status_val_${slot}`);
+
+            const btnLanjut = document.getElementById(`btn_status_lanjut_${category}_${slot}_${santriName}`);
+            const btnUlangi = document.getElementById(`btn_status_ulangi_${category}_${slot}_${santriName}`);
+
+            if (statusVal === 'Ulangi') {
+                if (btnLanjut) btnLanjut.className = "flex-1 py-2 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-2 rounded-xl text-xs font-black bg-rose-600 text-white shadow-sm transition";
+            } else {
+                if (btnLanjut) btnLanjut.className = "flex-1 py-2 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-sm transition";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-2 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
+            }
+        };
+
         window.toggleSlotVisibility = function(category, slot, santriName) {
             const stateKey = `${santriName}_${category}_slot_${slot}`;
             window.activeSlotState[stateKey] = !window.activeSlotState[stateKey];
@@ -682,7 +701,6 @@
             let cloudSlots = null;
             if (category === 'bac' && sObj?.cloudBacSlots) cloudSlots = sObj.cloudBacSlots;
             if (category === 'haf' && sObj?.cloudHafSlots) cloudSlots = sObj.cloudHafSlots;
-            if (category === 'mur' && sObj?.cloudMurSlots) cloudSlots = sObj.cloudMurSlots;
 
             return slots.map(slot => {
                 const isFirst = slot === 1;
@@ -696,6 +714,7 @@
                 const cacheKeyStart = `${santriName}_${category}_start_${slot}`;
                 const cacheKeyEnd = `${santriName}_${category}_end_${slot}`;
                 const cacheKeyMode = `${santriName}_${category}_mode_${slot}`;
+                const cacheKeyStatusVal = `${santriName}_${category}_status_val_${slot}`;
 
                 const slotItem = slotData ? (slotData.item || '') : '';
                 const slotStart = slotData ? (slotData.start || '') : '';
@@ -706,6 +725,10 @@
                 
                 const cachedMode = window.getFormCache(cacheKeyMode, cloudMode);
                 window.itemSourceMode[`${santriName}_${category}_${slot}`] = cachedMode;
+
+                let cloudStatus = slotData && slotData.status ? slotData.status : 'Lanjut';
+                const cachedStatus = window.getFormCache(cacheKeyStatusVal, cloudStatus);
+                window.itemStatusMode[`${santriName}_${category}_status_${slot}`] = cachedStatus;
 
                 const defaultSurahVal = window.getFormCache(cacheKeySurah, slotItem);
                 const defaultIqroVal = window.getFormCache(cacheKeyIqro, slotItem);
@@ -721,26 +744,26 @@
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-4 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3.5 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-3.5 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-black text-slate-800 dark:text-slate-200">
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/90 dark:bg-slate-800 p-1 rounded-lg">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-1.5 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-1.5 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
-                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${defaultIqroVal === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${defaultIqroVal === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -751,14 +774,22 @@
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Lanjut / Ulangi:</label>
+                            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border">
+                                <button type="button" id="btn_status_lanjut_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Lanjut')" class="flex-1 py-2 rounded-xl text-xs ${cachedStatus === 'Lanjut' ? 'font-black bg-emerald-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Lanjut</button>
+                                <button type="button" id="btn_status_ulangi_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Ulangi')" class="flex-1 py-2 rounded-xl text-xs ${cachedStatus === 'Ulangi' ? 'font-black bg-rose-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Ulangi</button>
                             </div>
                         </div>
                     </div>
@@ -913,7 +944,6 @@
                 const isMurojaahHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Murojaah`];
                 const isTugasHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Tugas`];
 
-                // Alternating sticky header colors: index 0, 2, 4... is green (emerald-800), index 1, 3, 5... is blue (sky-700)
                 const stickyBgColor = (index % 2 === 0) ? 'bg-emerald-800' : 'bg-sky-700';
 
                 return `
@@ -952,7 +982,7 @@
                                     <div class="pt-3.5 border-t border-emerald-200 dark:border-emerald-800 space-y-3">
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Bacaan (${s.name}):</label>
-                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultBacStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultBacStat.includes('75 -') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -961,7 +991,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Bacaan (${s.name}):</label>
-                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
+                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Makharijul Huruf" ${parsedBacCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
                                                 <option value="Sifatul Huruf" ${parsedBacCatType === 'Sifatul Huruf' ? 'selected' : ''}>Sifatul Huruf</option>
@@ -973,7 +1003,7 @@
                                                 <option value="Bacaan Gharib" ${parsedBacCatType === 'Bacaan Gharib' ? 'selected' : ''}>Bacaan Gharib</option>
                                                 <option value="Kesalahan Bacaan" ${parsedBacCatType === 'Kesalahan Bacaan' ? 'selected' : ''}>Kesalahan Bacaan</option>
                                             </select>
-                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
+                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -1016,7 +1046,7 @@
                                     <div class="pt-3.5 border-t border-rose-200 dark:border-rose-800 space-y-3">
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
-                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('75 -') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -1025,7 +1055,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
-                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
+                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran Hafalan" ${parsedHafCatType === 'Kelancaran Hafalan' ? 'selected' : ''}>Kelancaran Hafalan</option>
                                                 <option value="Ketepatan Hafalan" ${parsedHafCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -1037,7 +1067,7 @@
                                                 <option value="Hafalan Belum Selesai" ${parsedHafCatType === 'Hafalan Belum Selesai' ? 'selected' : ''}>Hafalan Belum Selesai</option>
                                                 <option value="Hafalan Lulus" ${parsedHafCatType === 'Hafalan Lulus' ? 'selected' : ''}>Hafalan Lulus</option>
                                             </select>
-                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
+                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -1080,7 +1110,7 @@
                                     <div class="pt-3.5 border-t border-purple-200 dark:border-purple-800 space-y-3">
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
-                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('75 -') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -1089,7 +1119,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
-                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
+                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran" ${parsedMurCatType === 'Kelancaran' ? 'selected' : ''}>Kelancaran</option>
                                                 <option value="Ketepatan Hafalan" ${parsedMurCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -1100,7 +1130,7 @@
                                                 <option value="Hafalan Lama" ${parsedMurCatType === 'Hafalan Lama' ? 'selected' : ''}>Hafalan Lama</option>
                                                 <option value="Hafalan Juz" ${parsedMurCatType === 'Hafalan Juz' ? 'selected' : ''}>Hafalan Juz</option>
                                             </select>
-                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
+                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -1139,8 +1169,8 @@
                                     </div>
                                 </div>
                                 <div id="card_section_content_tugas_${s.name}" class="space-y-3.5 ${!isTugasOpen ? 'hidden' : ''}">
-                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
-                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-4.5 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="flex-1 py-4 bg-amber-700 hover:bg-amber-800 text-white rounded-2xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
@@ -1167,6 +1197,7 @@
             const entries = [];
             slots.forEach(slot => {
                 const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
+                const status = window.itemStatusMode[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
                 let itemVal = '';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '';
@@ -1191,8 +1222,9 @@
                     }
 
                     const rangeLabel = isIqro ? `Hlm ${start}${end && end !== start ? '-' + end : ''}` : `${start}${end && end !== start ? '-' + end : ''}`;
+                    const statusLabel = status && status !== 'Lanjut' ? ` [${status}]` : '';
                     const progressStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                    entries.push(`${itemVal} ${rangeLabel}${progressStr}`);
+                    entries.push(`${itemVal} ${rangeLabel}${statusLabel}${progressStr}`);
                 }
             });
             return entries.length > 0 ? entries.join(', ') : '-';
@@ -1203,6 +1235,7 @@
             const slotData = [];
             slots.forEach(slot => {
                 const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
+                const status = window.itemStatusMode[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
                 let itemVal = '';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '-';
@@ -1211,7 +1244,7 @@
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '-';
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '-';
-                slotData.push({ item: itemVal, start: start, end: end, mode: mode });
+                slotData.push({ item: itemVal, start: start, end: end, mode: mode, status: status });
             });
             return slotData;
         };
