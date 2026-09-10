@@ -1438,6 +1438,11 @@
             const modal = document.getElementById('modalMurojaahMassal');
             if (!modal) return;
             
+            const surahSelect = document.getElementById('massalSurahSelect');
+            if (surahSelect && surahSelect.options.length <= 1) {
+                surahSelect.innerHTML = '<option value="">-- Pilih Surat Al-Qur\'an --</option>' + window.surahList.map(s => `<option value="${s.name}">${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('');
+            }
+
             const classFilter = window.selectedClass && window.selectedClass !== 'ALL' ? window.selectedClass : 'Abdurrahman';
             const classSelect = document.getElementById('massalClassFilter');
             if (classSelect) classSelect.value = classFilter;
@@ -3197,6 +3202,7 @@
             </div>
         </section>
     </main>
+
     <!-- Modal Muroja'ah Massal -->
     <div id="modalMurojaahMassal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl border border-purple-300 dark:border-purple-800 overflow-hidden flex flex-col max-h-[92vh]">
@@ -3213,6 +3219,132 @@
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
+
+            <!-- Modal Content Scrollable -->
+            <div class="p-4 overflow-y-auto custom-scrollbar space-y-4 text-xs">
+                <!-- Form Pilihan Surat / Iqro -->
+                <div class="p-3 bg-purple-50 dark:bg-purple-950/40 rounded-xl border border-purple-200 dark:border-purple-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-black text-purple-900 dark:text-purple-200">Pilihan Materi Muroja'ah:</span>
+                        <div class="flex items-center bg-purple-200/70 dark:bg-purple-900 p-0.5 rounded-lg">
+                            <button type="button" id="btnMassalSrcQuran" onclick="window.switchMassalMode('quran')" class="px-3 py-1 rounded-lg text-xs font-black bg-white dark:bg-slate-900 shadow-xs text-purple-700">Al-Qur'an</button>
+                            <button type="button" id="btnMassalSrcIqro" onclick="window.switchMassalMode('iqro')" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400">Iqro</button>
+                        </div>
+                    </div>
+
+                    <div id="fieldMassalQuran">
+                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Pilih Surat:</label>
+                        <select id="massalSurahSelect" class="w-full p-2 bg-white dark:bg-slate-900 border-2 border-purple-300 dark:border-purple-700 rounded-xl font-extrabold text-xs">
+                            <option value="">-- Pilih Surat Al-Qur'an --</option>
+                        </select>
+                    </div>
+
+                    <div id="fieldMassalIqro" class="hidden">
+                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Pilih Jilid Iqro:</label>
+                        <select id="massalIqroSelect" class="w-full p-2 bg-white dark:bg-slate-900 border-2 border-purple-300 dark:border-purple-700 rounded-xl font-extrabold text-xs">
+                            <option value="">-- Pilih Jilid Iqro --</option>
+                            <option value="Iqro 1">Iqro Jilid 1</option>
+                            <option value="Iqro 2">Iqro Jilid 2</option>
+                            <option value="Iqro 3">Iqro Jilid 3</option>
+                            <option value="Iqro 4">Iqro Jilid 4</option>
+                            <option value="Iqro 5">Iqro Jilid 5</option>
+                            <option value="Iqro 6">Iqro Jilid 6</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label id="lblMassalStart" class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Ayat Mulai:</label>
+                            <input type="number" id="massalStartInput" placeholder="Mulai" class="w-full p-2 bg-white dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                        </div>
+                        <div>
+                            <label id="lblMassalEnd" class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Ayat Sampai:</label>
+                            <input type="number" id="massalEndInput" placeholder="Sampai" class="w-full p-2 bg-white dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Tanggal Muroja'ah:</label>
+                        <input type="date" id="massalTglInput" class="w-full p-2 bg-white dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Muroja'ah di Kelas:</label>
+                        <select id="massalStatSelect" class="w-full p-2 bg-white dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                            <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                            <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                            <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Kategori Catatan:</label>
+                            <select id="massalCatTypeSelect" class="w-full p-2 bg-white dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                                <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
+                                <option value="Kelancaran">Kelancaran</option>
+                                <option value="Ketepatan Hafalan">Ketepatan Hafalan</option>
+                                <option value="Sambung Ayat">Sambung Ayat</option>
+                                <option value="Lupa Ayat">Lupa Ayat</option>
+                                <option value="Pengulangan">Pengulangan</option>
+                                <option value="Kekuatan Hafalan">Kekuatan Hafalan</option>
+                                <option value="Hafalan Lama">Hafalan Lama</option>
+                                <option value="Hafalan Juz">Hafalan Juz</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-700 dark:text-slate-300 mb-1">Catatan Tambahan (Opsional):</label>
+                            <input type="text" id="massalCatDescInput" placeholder="Keterangan tambahan..." class="w-full p-2 bg-white dark:bg-slate-900 border rounded-xl text-xs font-semibold">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bagian Pilih Siswa & Tombol Batalkan -->
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-black text-purple-900 dark:text-purple-300">Filter Kelas:</span>
+                            <select id="massalClassFilter" onchange="window.onMassalClassChange(this.value)" class="p-1.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs">
+                                <option value="Abdurrahman">Abdurrahman</option>
+                                <option value="Abu Ubaidah">Abu Ubaidah</option>
+                                <option value="Zubair">Zubair</option>
+                                <option value="Ali">Ali</option>
+                                <option value="Utsman">Utsman</option>
+                                <option value="Abu Bakar">Abu Bakar</option>
+                                <option value="Bilal">Bilal</option>
+                                <option value="Hamzah">Hamzah</option>
+                                <option value="Fatimah">Fatimah</option>
+                                <option value="Umar">Umar</option>
+                                <option value="ALL">Semua Kelas</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="massalSelectedCountLabel" class="text-[10px] font-black text-purple-800 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/80 px-2 py-0.5 rounded-md">0 santri dipilih</span>
+                            <button type="button" onclick="window.selectAllMassalSantri()" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 rounded-lg text-[10px] font-black hover:bg-emerald-200 transition">
+                                <i class="fa-solid fa-check-double"></i> Pilih Semua
+                            </button>
+                            <button type="button" onclick="window.deselectAllMassalSantri()" class="px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 rounded-lg text-[10px] font-black hover:bg-rose-200 transition">
+                                <i class="fa-solid fa-ban"></i> Batalkan Semua
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="massalSantriListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1 border rounded-xl"></div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 border-t flex items-center justify-between gap-2.5 shrink-0">
+                <button type="button" onclick="window.closeMurojaahMassalModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-200 rounded-xl font-black text-xs transition">
+                    Tutup / Batalkan
+                </button>
+                <button type="button" id="btnSubmitMassalMurojaah" onclick="window.saveMurojaahMassal()" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black text-xs shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkronkan Muroja'ah Bersama
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Tugas Bersama / Massal -->
     <div id="modalTugasMassal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
