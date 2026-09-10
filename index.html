@@ -63,7 +63,7 @@
         ];
         window.selectedClass = 'Abdurrahman';
         window.itemSourceMode = {};
-        window.itemStatusMode = {};
+        window.itemSlotStatus = {};
         window.activeSlotState = {};
         window.cardSectionToggleState = {};
         window.cardHistoryToggleState = {};
@@ -209,8 +209,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
+                        ? "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
                 }
             });
 
@@ -314,10 +314,6 @@
                     body: JSON.stringify(payload)
                 });
                 window.setSyncIndicator('success');
-                const nowTimeStr = window.formatTimestampCustom(new Date());
-                localStorage.setItem('rq_last_sync_time', nowTimeStr);
-                const timeLbl = document.getElementById('lastUpdateTimestampLabel');
-                if (timeLbl) timeLbl.innerText = nowTimeStr;
             } catch (err) {
                 console.error("Cloud sync error:", err);
                 window.setSyncIndicator('error');
@@ -339,13 +335,13 @@
 
                     const parseCloudSlots = (row) => {
                         const parseSlotStr = (cellStr) => {
-                            if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran', status: 'Lanjut' };
+                            if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran' };
                             const parts = cellStr.split('|');
-                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran', status: parts[2] || 'Lanjut' };
+                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran' };
                         };
-                        const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-';
-                        const s2 = parseSlotStr(row[9]); s2.start = row[10] || '-'; s2.end = row[11] || '-';
-                        const s3 = parseSlotStr(row[12]); s3.start = row[13] || '-'; s3.end = row[14] || '-';
+                        const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-'; s1.status = row[9] || 'Lanjut';
+                        const s2 = parseSlotStr(row[10]); s2.start = row[11] || '-'; s2.end = row[12] || '-'; s2.status = row[13] || 'Lanjut';
+                        const s3 = parseSlotStr(row[14]); s3.start = row[15] || '-'; s3.end = row[16] || '-'; s3.status = row[17] || 'Lanjut';
                         return [s1, s2, s3];
                     };
 
@@ -363,8 +359,8 @@
                         }
                         const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
                         const countStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                        const statusLabel = sl.status && sl.status !== 'Lanjut' ? ` [${sl.status}]` : '';
-                        return `${sl.item} ${rangeLabel}${statusLabel}${countStr}`.trim();
+                        const statusStr = sl.status && sl.status !== 'Lanjut' ? ` [${sl.status}]` : '';
+                        return `${sl.item} ${rangeLabel}${countStr}${statusStr}`.trim();
                     };
 
                     const processInputRowsToHistory = (inputRows, typeName) => {
@@ -377,8 +373,8 @@
                                 rawTime: new Date(row[0] || 0).getTime(),
                                 name: row[3],
                                 detail: detailStr,
-                                status: row[15] || '-',
-                                catatan: row[16] || '',
+                                status: row[18] || '-',
+                                catatan: row[19] || '',
                                 type: typeName
                             };
                         });
@@ -396,8 +392,8 @@
                                 sObj.cloudBacSlots = slots;
                                 sObj.lastBacaan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastBacaanDate = row[1] || '';
-                                if (row[15]) sObj.cloudBacStat = row[15];
-                                if (row[16]) sObj.cloudBacCat = row[16];
+                                if (row[18]) sObj.cloudBacStat = row[18];
+                                if (row[19]) sObj.cloudBacCat = row[19];
                             }
                         });
                     }
@@ -414,8 +410,8 @@
                                 sObj.cloudHafSlots = slots;
                                 sObj.lastHafalan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastHafalanDate = row[1] || '';
-                                if (row[15]) sObj.cloudHafStat = row[15];
-                                if (row[16]) sObj.cloudHafCat = row[16];
+                                if (row[18]) sObj.cloudHafStat = row[18];
+                                if (row[19]) sObj.cloudHafCat = row[19];
                             }
                         });
                     }
@@ -432,8 +428,8 @@
                                 sObj.cloudMurSlots = slots;
                                 sObj.lastMurojaah = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastMurojaahDate = row[1] || '';
-                                if (row[15]) sObj.cloudMurStat = row[15];
-                                if (row[16]) sObj.cloudMurCat = row[16];
+                                if (row[18]) sObj.cloudMurStat = row[18];
+                                if (row[19]) sObj.cloudMurCat = row[19];
                             }
                         });
                     }
@@ -476,11 +472,6 @@
                     window.renderMateriList('utama');
                     window.renderMateriList('tambahan');
                     window.setSyncIndicator('success');
-                    
-                    const nowTimeStr = window.formatTimestampCustom(new Date());
-                    localStorage.setItem('rq_last_sync_time', nowTimeStr);
-                    const timeLbl = document.getElementById('lastUpdateTimestampLabel');
-                    if (timeLbl) timeLbl.innerText = nowTimeStr;
                 }
             } catch (err) {
                 window.setSyncIndicator('error');
@@ -618,20 +609,20 @@
             }
         };
 
-        window.switchStatusMode = function(category, slot, santriName, statusVal) {
+        window.setSlotStatus = function(category, slot, santriName, statusVal) {
             const statusKey = `${santriName}_${category}_status_${slot}`;
-            window.itemStatusMode[statusKey] = statusVal;
-            window.cacheFormInput({ value: statusVal }, `${santriName}_${category}_status_val_${slot}`);
+            window.itemSlotStatus[statusKey] = statusVal;
+            window.cacheFormInput({ value: statusVal }, statusKey);
 
             const btnLanjut = document.getElementById(`btn_status_lanjut_${category}_${slot}_${santriName}`);
             const btnUlangi = document.getElementById(`btn_status_ulangi_${category}_${slot}_${santriName}`);
 
             if (statusVal === 'Ulangi') {
-                if (btnLanjut) btnLanjut.className = "flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
-                if (btnUlangi) btnUlangi.className = "flex-1 py-2.5 rounded-xl text-xs font-black bg-rose-600 text-white shadow-sm transition";
+                if (btnLanjut) btnLanjut.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-2 px-3 rounded-xl text-xs font-black bg-rose-600 text-white shadow-md transition";
             } else {
-                if (btnLanjut) btnLanjut.className = "flex-1 py-2.5 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-sm transition";
-                if (btnUlangi) btnUlangi.className = "flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition";
+                if (btnLanjut) btnLanjut.className = "flex-1 py-2 px-3 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md transition";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
             }
         };
 
@@ -701,6 +692,7 @@
             let cloudSlots = null;
             if (category === 'bac' && sObj?.cloudBacSlots) cloudSlots = sObj.cloudBacSlots;
             if (category === 'haf' && sObj?.cloudHafSlots) cloudSlots = sObj.cloudHafSlots;
+            if (category === 'mur' && sObj?.cloudMurSlots) cloudSlots = sObj.cloudMurSlots;
 
             return slots.map(slot => {
                 const isFirst = slot === 1;
@@ -714,11 +706,12 @@
                 const cacheKeyStart = `${santriName}_${category}_start_${slot}`;
                 const cacheKeyEnd = `${santriName}_${category}_end_${slot}`;
                 const cacheKeyMode = `${santriName}_${category}_mode_${slot}`;
-                const cacheKeyStatusVal = `${santriName}_${category}_status_val_${slot}`;
+                const statusKey = `${santriName}_${category}_status_${slot}`;
 
                 const slotItem = slotData ? (slotData.item || '') : '';
                 const slotStart = slotData ? (slotData.start || '') : '';
                 const slotEnd = slotData ? (slotData.end || '') : '';
+                const slotStatus = slotData ? (slotData.status || 'Lanjut') : 'Lanjut';
                 
                 let cloudMode = slotData && slotData.mode ? slotData.mode : 'quran';
                 if (!slotData && slotItem.toLowerCase().includes('iqro')) cloudMode = 'iqro';
@@ -726,9 +719,8 @@
                 const cachedMode = window.getFormCache(cacheKeyMode, cloudMode);
                 window.itemSourceMode[`${santriName}_${category}_${slot}`] = cachedMode;
 
-                let cloudStatus = slotData && slotData.status ? slotData.status : 'Lanjut';
-                const cachedStatus = window.getFormCache(cacheKeyStatusVal, cloudStatus);
-                window.itemStatusMode[`${santriName}_${category}_status_${slot}`] = cachedStatus;
+                const cachedStatus = window.getFormCache(statusKey, slotStatus);
+                window.itemSlotStatus[statusKey] = cachedStatus;
 
                 const defaultSurahVal = window.getFormCache(cacheKeySurah, slotItem);
                 const defaultIqroVal = window.getFormCache(cacheKeyIqro, slotItem);
@@ -738,32 +730,32 @@
                 return `
                     ${!isFirst ? `
                         <div class="my-2">
-                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
+                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-4 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3.5 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-3.5 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-200">
+                            <span class="text-xs font-black text-slate-800 dark:text-slate-200">
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
-                            <div class="flex items-center bg-slate-200/90 dark:bg-slate-800 p-1.5 rounded-xl">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-1.5 rounded-lg text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-1.5 rounded-lg text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                            <div class="flex items-center bg-slate-200/90 dark:bg-slate-800 p-1 rounded-lg">
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
-                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${defaultIqroVal === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${defaultIqroVal === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -776,20 +768,20 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                             </div>
                             <div>
-                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Lanjut / Ulangi:</label>
-                            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border">
-                                <button type="button" id="btn_status_lanjut_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Lanjut')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm ${cachedStatus === 'Lanjut' ? 'font-black bg-emerald-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Lanjut</button>
-                                <button type="button" id="btn_status_ulangi_${category}_${slot}_${santriName}" onclick="window.switchStatusMode('${category}', ${slot}, '${santriName}', 'Ulangi')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm ${cachedStatus === 'Ulangi' ? 'font-black bg-rose-600 text-white shadow-sm' : 'font-bold text-slate-500'}">Ulangi</button>
+                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Status Pilihan ${slot}:</label>
+                            <div class="flex items-center gap-2">
+                                <button type="button" id="btn_status_lanjut_${category}_${slot}_${santriName}" onclick="window.setSlotStatus('${category}', ${slot}, '${santriName}', 'Lanjut')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold ${cachedStatus === 'Lanjut' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition">Lanjut</button>
+                                <button type="button" id="btn_status_ulangi_${category}_${slot}_${santriName}" onclick="window.setSlotStatus('${category}', ${slot}, '${santriName}', 'Ulangi')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold ${cachedStatus === 'Ulangi' ? 'bg-rose-600 text-white font-black shadow-md' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition">Ulangi</button>
                             </div>
                         </div>
                     </div>
@@ -944,11 +936,11 @@
                 const isMurojaahHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Murojaah`];
                 const isTugasHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Tugas`];
 
-                const stickyBgColor = (index % 2 === 0) ? 'bg-emerald-800' : 'bg-sky-700';
+                const stickyBannerColor = (index % 2 === 0) ? 'bg-emerald-800 text-white' : 'bg-sky-700 text-white';
 
                 return `
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all relative">
-                        <div class="santri-name-sticky ${stickyBgColor} text-white p-3.5 sm:p-4 rounded-2xl shadow-xl flex items-center justify-between">
+                        <div class="santri-name-sticky ${stickyBannerColor} p-3.5 sm:p-4 rounded-2xl shadow-xl flex items-center justify-between">
                             <h3 class="text-base sm:text-lg font-black tracking-tight">${s.name}</h3>
                         </div>
 
@@ -985,8 +977,8 @@
                                             <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultBacStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                                <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultBacStat.includes('75 -') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                                                <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultBacStat.includes('70 -') ? 'selected' : ''}>70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
+                                                <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultBacStat.includes('75 - Masih') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                                <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultBacStat.includes('70 - Semangat') ? 'selected' : ''}>70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                             </select>
                                         </div>
                                         <div>
@@ -1049,8 +1041,8 @@
                                             <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                                <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('75 -') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                                                <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultHafStat.includes('70 -') ? 'selected' : ''}>70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
+                                                <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('75 - Masih') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                                <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultHafStat.includes('70 - Semangat') ? 'selected' : ''}>70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                             </select>
                                         </div>
                                         <div>
@@ -1113,8 +1105,8 @@
                                             <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                                                <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('75 -') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                                                <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultMurStat.includes('70 -') ? 'selected' : ''}>70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
+                                                <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('75 - Masih') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                                                <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum" ${defaultMurStat.includes('70 - Semangat') ? 'selected' : ''}>70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                                             </select>
                                         </div>
                                         <div>
@@ -1197,7 +1189,6 @@
             const entries = [];
             slots.forEach(slot => {
                 const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
-                const status = window.itemStatusMode[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
                 let itemVal = '';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '';
@@ -1206,6 +1197,7 @@
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '';
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '';
+                const statusVal = window.itemSlotStatus[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
 
                 if (itemVal) {
                     const isIqro = (mode === 'iqro' || itemVal.toLowerCase().includes('iqro'));
@@ -1222,9 +1214,9 @@
                     }
 
                     const rangeLabel = isIqro ? `Hlm ${start}${end && end !== start ? '-' + end : ''}` : `${start}${end && end !== start ? '-' + end : ''}`;
-                    const statusLabel = status && status !== 'Lanjut' ? ` [${status}]` : '';
                     const progressStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                    entries.push(`${itemVal} ${rangeLabel}${statusLabel}${progressStr}`);
+                    const statusStr = statusVal && statusVal !== 'Lanjut' ? ` [${statusVal}]` : '';
+                    entries.push(`${itemVal} ${rangeLabel}${progressStr}${statusStr}`);
                 }
             });
             return entries.length > 0 ? entries.join(', ') : '-';
@@ -1235,7 +1227,6 @@
             const slotData = [];
             slots.forEach(slot => {
                 const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
-                const status = window.itemStatusMode[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
                 let itemVal = '';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '-';
@@ -1244,7 +1235,8 @@
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '-';
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '-';
-                slotData.push({ item: itemVal, start: start, end: end, mode: mode, status: status });
+                const statusVal = window.itemSlotStatus[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
+                slotData.push({ item: itemVal, start: start, end: end, mode: mode, status: statusVal });
             });
             return slotData;
         };
@@ -2332,7 +2324,7 @@
                     detail: detailStr,
                     status: stat,
                     catatan: '',
-                    slots: [{ item: surah, start: start || '-', end: end || '-', mode: 'quran' }]
+                    slots: [{ item: surah, start: start || '-', end: end || '-', mode: 'quran', status: 'Lanjut' }]
                 });
             }
 
@@ -2859,16 +2851,6 @@
                 </div>
                 <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-extrabold leading-relaxed">Akses cepat ke berbagai web sistem pembelajaran Rumah Qur'an Al-Khansa serta sinkronisasi database.</p>
                 
-                <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border-2 border-emerald-500 space-y-3 mt-2">
-                    <div class="flex items-center justify-between border-b border-emerald-200 dark:border-emerald-800 pb-2.5 flex-wrap gap-2">
-                        <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
-                            <i class="fa-solid fa-clock text-emerald-600"></i> Waktu & Tanggal Terakhir Update Data Cloud:
-                        </span>
-                        <span id="lastUpdateTimestampLabel" class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-lg font-mono">-</span>
-                    </div>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Waktu di atas menunjukkan kapan terakhir kali data berhasil disinkronkan atau ditarik dari Google Sheets.</p>
-                </div>
-
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
                     <a href="https://akhshiddiq.github.io/presensi-rq/" target="_blank" class="p-4 bg-slate-50 dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-slate-800 border-2 rounded-2xl flex flex-col justify-between space-y-3 transition shadow-xs group">
                         <div>
@@ -2974,10 +2956,10 @@
                     <div>
                         <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Muroja'ah:</label>
                         <select id="massalMurojaahStat" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
-                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." selected>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                            <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                            <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                            <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
+                            <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." selected>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                            <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                            <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                         </select>
                     </div>
                 </div>
