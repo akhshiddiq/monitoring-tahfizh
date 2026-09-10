@@ -57,6 +57,7 @@
         window.cardHistoryToggleState = {};
         window.activeHistoryCategory = 'keseluruhan';
         window.selectedWaSantriName = null;
+        window.reportWaClassFilter = 'Abdurrahman';
         window.historyClassFilter = 'ALL';
         window.localFormCache = {};
 
@@ -276,10 +277,7 @@
             const btn = document.getElementById(btnId);
             if (input) {
                 input.value = '';
-                if (inputId === 'waSantriSearchInput') {
-                    window.filterWaDropdown('');
-                    document.getElementById('waAutocompleteDropdown')?.classList.add('hidden');
-                } else if (inputId === 'historySearchInput') {
+                if (inputId === 'historySearchInput') {
                     window.renderHistoryTable();
                 }
             }
@@ -898,19 +896,19 @@
 
                 return `
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3.5 transition-all">
-                        <div class="sticky top-14 z-20 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs py-2 -mx-3.5 px-3.5 sm:-mx-4 sm:px-4 border-b flex items-start justify-between flex-wrap gap-2 shadow-xs">
+                        <div class="sticky top-12 z-20 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs py-2 -mx-3.5 px-3.5 sm:-mx-4 sm:px-4 border-b flex items-start justify-between flex-wrap gap-2 shadow-xs">
                             <div>
                                 <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">${s.name}</h3>
                                 <p class="text-[11px] text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm active:scale-95 transition" title="Input & Sinkron Semua">
+                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm active:scale-95 transition" title="Input & Sinkron Semua">
                                     <i class="fa-solid fa-floppy-disk text-xs"></i> Input Semua
                                 </button>
-                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm active:scale-95 transition" title="Kirim WA Personal">
+                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm active:scale-95 transition" title="Kirim WA Personal">
                                     <i class="fa-brands fa-whatsapp text-sm"></i> WA
                                 </button>
-                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm active:scale-95 transition" title="Laporan Grup">
+                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm active:scale-95 transition" title="Laporan Grup">
                                     <i class="fa-solid fa-users text-sm"></i> Grup
                                 </button>
                             </div>
@@ -1414,12 +1412,11 @@
             if (!s) return;
             window.switchTab('laporan');
             window.switchLaporanSubTab('wa');
-            const waSearchInput = document.getElementById('waSantriSearchInput');
-            if (waSearchInput) {
-                waSearchInput.value = s.name;
-                window.toggleClearBtn('waSantriSearchInput', 'clearWaSearchBtn');
-                window.filterWaDropdown(s.name);
-            }
+            window.reportWaClassFilter = s.class;
+            const classSel = document.getElementById('reportWaClassFilter');
+            if (classSel) classSel.value = s.class;
+            window.renderWaCardGrid(s.class);
+            window.selectWaSantri(s.name);
         };
 
         window.sendCardWaClass = function(className) {
@@ -1772,10 +1769,16 @@
             const className = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
             const list = window.santriList.filter(s => s.class === className);
             
-            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const latestMateri = materiUtama.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-            const latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            const includeMateriClass = document.getElementById('includeMateriClassCheckbox')?.checked ?? true;
+            let latestMateri = null;
+            let latestTambahan = null;
+
+            if (includeMateriClass) {
+                const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
+                const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
+                latestMateri = materiUtama.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+                latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
+            }
 
             const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
             const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
@@ -2097,59 +2100,61 @@
                 }
             });
 
-            if (sub === 'wa') window.initWaDropdown();
+            if (sub === 'wa') window.initWaReportTab();
             if (sub === 'kelas') window.generateClassReport();
         };
 
-        window.initWaDropdown = function() {
-            const searchInput = document.getElementById('waSantriSearchInput');
-            if (searchInput) {
-                const currentVal = searchInput.value.trim();
-                if (!currentVal && window.santriList.length > 0) {
-                    searchInput.value = window.santriList[0].name;
-                    window.selectedWaSantriName = window.santriList[0].name;
-                } else if (currentVal) {
-                    const found = window.santriList.find(s => s.name.toLowerCase() === currentVal.toLowerCase());
-                    if (found) window.selectedWaSantriName = found.name;
-                }
-                window.toggleClearBtn('waSantriSearchInput', 'clearWaSearchBtn');
-                window.filterWaDropdown(searchInput.value);
-            }
+        window.initWaReportTab = function() {
+            const classSel = document.getElementById('reportWaClassFilter');
+            if (classSel) classSel.value = window.reportWaClassFilter || 'Abdurrahman';
+            window.renderWaCardGrid(window.reportWaClassFilter || 'Abdurrahman');
         };
 
-        window.filterWaDropdown = function(query) {
-            const q = (query || '').toLowerCase().trim();
-            window.toggleClearBtn('waSantriSearchInput', 'clearWaSearchBtn');
-            const dropdown = document.getElementById('waAutocompleteDropdown');
-            if (!dropdown) return;
+        window.filterWaClassReport = function(cls) {
+            window.reportWaClassFilter = cls;
+            window.renderWaCardGrid(cls);
+        };
 
-            const filtered = window.santriList.filter(s => s.name.toLowerCase().includes(q) || s.class.toLowerCase().includes(q));
+        window.renderWaCardGrid = function(cls) {
+            const grid = document.getElementById('reportWaSantriGrid');
+            if (!grid) return;
 
-            if (filtered.length > 0) {
-                dropdown.classList.remove('hidden');
-                dropdown.innerHTML = filtered.map(s => `
-                    <div onclick="window.selectWaSantri('${s.name}')" class="p-3 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0 flex items-center justify-between">
-                        <span class="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200">${s.name}</span>
-                        <span class="text-[11px] font-black text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-lg">${s.class}</span>
-                    </div>
-                `).join('');
-            } else {
-                dropdown.classList.add('hidden');
+            const filtered = window.santriList.filter(s => s.class === cls);
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="text-xs text-slate-400 font-bold col-span-full">Tidak ada santri pada kelas ini.</p>`;
+                return;
             }
 
-            if (filtered.length > 0) {
-                if (!window.selectedWaSantriName) window.selectedWaSantriName = filtered[0].name;
-                window.generateWaReport();
+            if (!window.selectedWaSantriName || !filtered.some(s => s.name === window.selectedWaSantriName)) {
+                window.selectedWaSantriName = filtered[0].name;
             }
+
+            grid.innerHTML = filtered.map(s => {
+                const isSelected = window.selectedWaSantriName === s.name;
+                const isFemale = s.gender === 'P' || /(putri|aishah|fatimah|zahrah|khansa|nabilah|marsha|haura|riska|zarina|alesha|yumna|almira|calista|ufaira|alya|quinsha|anggun|jovita|rayya|reyna|yasmin|afiqa|dilara|lujayn|syahda|anindya|novia|rianti|sakura|elmira|hevanika|iffa|nurhalimah|salsabila|yura)/i.test(s.name);
+                const activeColor = isSelected 
+                    ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-2 ring-amber-400' 
+                    : (isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800');
+
+                return `
+                    <button type="button" onclick="window.selectWaSantri('${s.name}')" class="p-3 rounded-xl border-2 font-black text-xs sm:text-sm flex flex-col items-center justify-center text-center transition ${activeColor}">
+                        <span>${s.name}</span>
+                    </button>
+                `;
+            }).join('');
+
+            window.generateWaReport();
         };
 
         window.selectWaSantri = function(name) {
             window.selectedWaSantriName = name;
-            const input = document.getElementById('waSantriSearchInput');
-            if (input) input.value = name;
-            window.toggleClearBtn('waSantriSearchInput', 'clearWaSearchBtn');
-            document.getElementById('waAutocompleteDropdown').classList.add('hidden');
-            window.generateWaReport();
+            const s = window.santriList.find(x => x.name === name);
+            if (s && s.class !== window.reportWaClassFilter) {
+                window.reportWaClassFilter = s.class;
+                const classSel = document.getElementById('reportWaClassFilter');
+                if (classSel) classSel.value = s.class;
+            }
+            window.renderWaCardGrid(window.reportWaClassFilter || 'Abdurrahman');
         };
 
         // --- MASSAL / BERSAMAAN (MUROJA'AH & TUGAS) ---
@@ -2685,22 +2690,27 @@
                             <i class="fa-solid fa-rotate"></i> Refresh Data
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="relative">
-                            <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">Cari & Pilih Nama Santri:</label>
-                            <div class="relative mt-1.5">
-                                <input type="text" id="waSantriSearchInput" oninput="window.filterWaDropdown(this.value)" placeholder="Ketik nama santri..." class="w-full pl-9 pr-9 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm outline-none">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                                </span>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                    <button type="button" id="clearWaSearchBtn" onclick="window.clearSearchInput('waSantriSearchInput', 'clearWaSearchBtn')" class="text-slate-400 hover:text-slate-600 hidden" title="Hapus Ketikan">
-                                        <i class="fa-solid fa-xmark text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="waAutocompleteDropdown" class="absolute z-30 left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 border rounded-xl shadow-xl max-h-52 overflow-y-auto hidden custom-scrollbar"></div>
+
+                    <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border">
+                        <div class="flex items-center justify-between flex-wrap gap-3">
+                            <span class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-300">Pilih Kelas Santri:</span>
+                            <select id="reportWaClassFilter" onchange="window.filterWaClassReport(this.value)" class="p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-black text-xs sm:text-sm">
+                                <option value="Abdurrahman" selected>Abdurrahman</option>
+                                <option value="Abu Ubaidah">Abu Ubaidah</option>
+                                <option value="Zubair">Zubair</option>
+                                <option value="Ali">Ali</option>
+                                <option value="Utsman">Utsman</option>
+                                <option value="Abu Bakar">Abu Bakar</option>
+                                <option value="Bilal">Bilal</option>
+                                <option value="Hamzah">Hamzah</option>
+                                <option value="Fatimah">Fatimah</option>
+                                <option value="Umar">Umar</option>
+                            </select>
                         </div>
+                        <div id="reportWaSantriGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-52 overflow-y-auto custom-scrollbar p-1"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="font-black text-xs sm:text-sm text-slate-700 dark:text-slate-200">No WA Wali:</label>
                             <input type="text" id="waPhoneInput" class="w-full mt-1.5 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs sm:text-sm" value="+6285774042121">
@@ -2749,6 +2759,10 @@
                             <option value="Fatimah">Fatimah</option>
                             <option value="Umar">Umar</option>
                         </select>
+                    </div>
+                    <div class="flex items-center gap-2.5 pt-1">
+                        <input type="checkbox" id="includeMateriClassCheckbox" checked onchange="window.generateClassReport()" class="w-4 h-4 text-emerald-600 rounded">
+                        <label for="includeMateriClassCheckbox" class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300">Cantumkan Materi & Materi Tambahan di Laporan Kelas</label>
                     </div>
                     <div>
                         <textarea id="classReportMessagePreview" rows="8" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-xs leading-relaxed"></textarea>
