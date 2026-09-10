@@ -114,6 +114,11 @@
             }
         };
 
+        window.cleanReportDetail = function(detailStr) {
+            if (!detailStr) return '-';
+            return detailStr.replace(/\s*\(bertambah\s+\d+\s+(ayat|halaman)\)/gi, '').trim();
+        };
+
         window.formatTimestampCustom = function(inputDate) {
             try {
                 let dateObj = inputDate;
@@ -333,8 +338,19 @@
 
                     const formatDetailSlot = (sl) => {
                         if (!sl.item || sl.item === '-') return '';
-                        const rangeLabel = sl.item.toLowerCase().includes('iqro') ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
-                        return `${sl.item} ${rangeLabel}`.trim();
+                        const isIqro = (sl.mode === 'iqro' || sl.item.toLowerCase().includes('iqro'));
+                        const unitName = isIqro ? 'halaman' : 'ayat';
+                        let count = 0;
+                        if (sl.start && sl.end && sl.start !== '-' && sl.end !== '-') {
+                            const sNum = parseInt(sl.start);
+                            const eNum = parseInt(sl.end);
+                            if (!isNaN(sNum) && !isNaN(eNum) && eNum >= sNum) count = (eNum - sNum + 1);
+                        } else if (sl.start && sl.start !== '-') {
+                            count = 1;
+                        }
+                        const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
+                        const countStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
+                        return `${sl.item} ${rangeLabel}${countStr}`.trim();
                     };
 
                     const processInputRowsToHistory = (inputRows, typeName) => {
@@ -883,19 +899,19 @@
                 return `
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-4 transition-all relative">
                         <!-- STICKY HEADER SAAT SCROLL -->
-                        <div class="sticky top-16 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm py-2.5 border-b border-slate-200 dark:border-slate-700 flex items-start justify-between flex-wrap gap-2.5 shadow-xs">
+                        <div class="sticky top-16 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-start justify-between flex-wrap gap-2.5 shadow-xs">
                             <div>
                                 <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">${s.name}</h3>
                                 <p class="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-extrabold mt-0.5">${s.class} • ${s.teacher}</p>
                             </div>
                             <div class="flex items-center gap-2 flex-wrap">
-                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Input & Sinkron Semua">
+                                <button type="button" onclick="window.saveAllSantriSections('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Input & Sinkron Semua">
                                     <i class="fa-solid fa-floppy-disk"></i> Input Semua
                                 </button>
-                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Kirim WA Personal">
+                                <button type="button" onclick="window.sendCardWaPersonal('${s.name}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Kirim WA Personal">
                                     <i class="fa-brands fa-whatsapp text-sm"></i> WA
                                 </button>
-                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Laporan Grup">
+                                <button type="button" onclick="window.sendCardWaClass('${s.class}')" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Laporan Grup">
                                     <i class="fa-solid fa-users text-sm"></i> Grup
                                 </button>
                             </div>
@@ -1432,19 +1448,19 @@
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
+            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
             const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
 
-            const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
+            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
 
-            const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
+            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
 
-            const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+            const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
             const tugasCat = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
 
             let bagianSetoran = "";
@@ -1544,19 +1560,19 @@
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = (liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
+            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
             const bacaanStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanCat = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
 
-            const hafalanVal = (liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
+            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const hafalanStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanCat = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
 
-            const murojaahVal = (liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
+            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const murojaahStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahCat = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
 
-            const tugasVal = lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+            const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
             const tugasCat = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
@@ -1573,45 +1589,69 @@
 
             let sectionsHtml = '';
 
-            if (bacaanVal && bacaanVal !== '-') {
+            const isValidText = (txt) => {
+                if (!txt) return false;
+                const trimmed = String(txt).trim();
+                return trimmed !== '' && trimmed !== '-' && trimmed !== 'undefined' && trimmed !== 'null';
+            };
+
+            if (isValidText(bacaanVal)) {
+                let bacContent = `<div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 8px; line-height: 1.7;">• ${bacaanVal}</div>`;
+                if (isValidText(bacaanStat)) {
+                    bacContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${bacaanStat}</div>`;
+                }
+                if (isValidText(bacaanCat)) {
+                    bacContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${bacaanCat}</div>`;
+                }
                 sectionsHtml += `
                     <div style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Bacaan</div>
-                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${bacaanVal}</div>
-                        ${bacaanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${bacaanStat}</div>` : ''}
-                        ${bacaanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${bacaanCat}</div>` : ''}
+                        ${bacContent}
                     </div>
                 `;
             }
 
-            if (hafalanVal && hafalanVal !== '-') {
+            if (isValidText(hafalanVal)) {
+                let hafContent = `<div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 8px; line-height: 1.7;">• ${hafalanVal}</div>`;
+                if (isValidText(hafalanStat)) {
+                    hafContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${hafalanStat}</div>`;
+                }
+                if (isValidText(hafalanCat)) {
+                    hafContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${hafalanCat}</div>`;
+                }
                 sectionsHtml += `
                     <div style="background-color: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Hafalan</div>
-                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${hafalanVal}</div>
-                        ${hafalanStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${hafalanStat}</div>` : ''}
-                        ${hafalanCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${hafalanCat}</div>` : ''}
+                        ${hafContent}
                     </div>
                 `;
             }
 
-            if (murojaahVal && murojaahVal !== '-') {
+            if (isValidText(murojaahVal)) {
+                let murContent = `<div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 8px; line-height: 1.7;">• ${murojaahVal}</div>`;
+                if (isValidText(murojaahStat)) {
+                    murContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${murojaahStat}</div>`;
+                }
+                if (isValidText(murojaahCat)) {
+                    murContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${murojaahCat}</div>`;
+                }
                 sectionsHtml += `
                     <div style="background-color: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Muroja'ah</div>
-                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${murojaahVal}</div>
-                        ${murojaahStat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; margin-bottom: 6px; line-height: 1.6;">- Nilai: ${murojaahStat}</div>` : ''}
-                        ${murojaahCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${murojaahCat}</div>` : ''}
+                        ${murContent}
                     </div>
                 `;
             }
 
-            if (tugasVal && tugasVal !== '-') {
+            if (isValidText(tugasVal)) {
+                let tugContent = `<div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 8px; line-height: 1.7;">• ${tugasVal}</div>`;
+                if (isValidText(tugasCat)) {
+                    tugContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${tugasCat}</div>`;
+                }
                 sectionsHtml += `
                     <div style="background-color: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Tugas</div>
-                        <div style="font-size: 14.5px; font-weight: normal; color: #000000; margin-bottom: 10px; line-height: 1.7;">• ${tugasVal}</div>
-                        ${tugasCat ? `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${tugasCat}</div>` : ''}
+                        ${tugContent}
                     </div>
                 `;
             }
@@ -1717,10 +1757,10 @@
                 const sMur = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
                 const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
 
-                const bacaanVal = sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '');
-                const hafalanVal = sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '');
-                const murojaahVal = sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '');
-                const tugasVal = sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : '');
+                const bacaanVal = window.cleanReportDetail(sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
+                const hafalanVal = window.cleanReportDetail(sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
+                const murojaahVal = window.cleanReportDetail(sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
+                const tugasVal = window.cleanReportDetail(sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
                 if (hasAnySetoran) {
