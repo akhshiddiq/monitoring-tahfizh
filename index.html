@@ -378,6 +378,7 @@
             else dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-sm";
         };
 
+        // Sinkronisasi cloud: setelah Save, perangkat lain akan mengambil versi terakhir dari Google Sheet.
         window.syncToCloud = async function(payload) {
             window.setSyncIndicator('pending');
             const url = window.getGsUrl();
@@ -385,24 +386,77 @@
                 await fetch(url, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
                 window.setSyncIndicator('success');
+                // Ambil kembali data setelah server selesai menerima Save agar perangkat ini
+                // juga memakai data yang benar-benar tersimpan di Google Sheet.
+                setTimeout(() => window.fetchAllDataFromCloud(true), 250);
             } catch (err) {
                 console.error("Cloud sync error:", err);
                 window.setSyncIndicator('error');
             }
         };
 
-        window.fetchAllDataFromCloud = async function() {
+        window._cloudFingerprint = '';
+        window._cloudPollingBusy = false;
+
+        // Terapkan satu baris Cloud sebagai nilai TERAKHIR untuk form santri.
+        // Ini sengaja menghapus cache lokal untuk field yang sudah disimpan, sehingga
+        // hasil Save dari laptop lain benar-benar menggantikan nilai yang tampil.
+        window.applyLatestCloudRowToFormCache = function(row, category) {
+            const name = row[3];
+            if (!name) return;
+            const prefix = category === 'bacaan' ? 'bac' : category === 'hafalan' ? 'haf' : category === 'murojaah' ? 'mur' : null;
+            if (prefix) {
+                for (let slot = 1; slot <= 3; slot++) {
+                    const base = (slot === 1 ? 6 : slot === 2 ? 9 : 12);
+                    const cell = row[base] || '-';
+                    const parts = String(cell).split('|');
+                    const item = parts[0] && parts[0] !== '-' ? parts[0] : '';
+                    const mode = parts[1] || (item.toLowerCase().includes('iqro') ? 'iqro' : 'quran');
+                    const start = row[base + 1] && row[base + 1] !== '-' ? row[base + 1] : '';
+                    const end = row[base + 2] && row[base + 2] !== '-' ? row[base + 2] : '';
+                    window.localFormCache[`${name}_${prefix}_surah_${slot}`] = mode === 'quran' ? item : '';
+                    window.localFormCache[`${name}_${prefix}_iqro_${slot}`] = mode === 'iqro' ? item : '';
+                    window.localFormCache[`${name}_${prefix}_start_${slot}`] = start;
+                    window.localFormCache[`${name}_${prefix}_end_${slot}`] = end;
+                    window.localFormCache[`${name}_${prefix}_mode_${slot}`] = mode;
+                    window.localFormCache[`${name}_${prefix}_status_${slot}`] = row[15] || '';
+                }
+                window.localFormCache[`${name}_${prefix}_status_1`] = row[15] || '';
+            } else if (category === 'tugas') {
+                window.localFormCache[`${name}_tug_detail`] = row[6] || '';
+                window.localFormCache[`${name}_tug_cat`] = row[8] || '';
+            }
+        };
+
+        window.fetchAllDataFromCloud = async function(forceRender = false) {
+            if (window._cloudPollingBusy) return;
+            window._cloudPollingBusy = true;
             window.setSyncIndicator('pending');
             const url = window.getGsUrl();
             try {
                 const res = await fetch(url);
                 const cloudData = await res.json();
-                
+
                 if (cloudData) {
+                    // Urutkan berdasarkan waktu server/Sheet. Baris paling akhir adalah Save terbaru.
+                    const sortByTimestamp = (a, b) => new Date(a?.[0] || 0).getTime() - new Date(b?.[0] || 0).getTime();
+                    ['input_bacaan', 'input_hafalan', 'input_murojaah_dikelas', 'input_tugas'].forEach(key => {
+                        if (Array.isArray(cloudData[key])) cloudData[key].sort(sortByTimestamp);
+                    });
+                    const fingerprint = JSON.stringify({
+                        b: cloudData.input_bacaan || [],
+                        h: cloudData.input_hafalan || [],
+                        m: cloudData.input_murojaah_dikelas || [],
+                        t: cloudData.input_tugas || [],
+                        mu: cloudData.materi || [],
+                        mt: cloudData.materi_tambahan || []
+                    });
+                    const cloudChanged = forceRender || fingerprint !== window._cloudFingerprint;
+                    window._cloudFingerprint = fingerprint;
                     if (cloudData.santri && cloudData.santri.length > 0) {
                         window.santriList = cloudData.santri;
                         localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
@@ -470,6 +524,12 @@
                                 if (row[16]) sObj.cloudBacCat = row[16];
                             }
                         });
+                        const latestByName = {};
+                        (cloudData.input_bacaan || []).forEach(r => {
+                            const n = r?.[3];
+                            if (n) latestByName[n] = r;
+                        });
+                        Object.values(latestByName).forEach(r => window.applyLatestCloudRowToFormCache(r, 'bacaan'));
                     }
 
                     if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
@@ -488,6 +548,12 @@
                                 if (row[16]) sObj.cloudHafCat = row[16];
                             }
                         });
+                        const latestByName = {};
+                        (cloudData.input_hafalan || []).forEach(r => {
+                            const n = r?.[3];
+                            if (n) latestByName[n] = r;
+                        });
+                        Object.values(latestByName).forEach(r => window.applyLatestCloudRowToFormCache(r, 'hafalan'));
                     }
 
                     if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
@@ -506,6 +572,12 @@
                                 if (row[16]) sObj.cloudMurCat = row[16];
                             }
                         });
+                        const latestByName = {};
+                        (cloudData.input_murojaah_dikelas || []).forEach(r => {
+                            const n = r?.[3];
+                            if (n) latestByName[n] = r;
+                        });
+                        Object.values(latestByName).forEach(r => window.applyLatestCloudRowToFormCache(r, 'murojaah'));
                     }
 
                     if (cloudData.input_tugas && cloudData.input_tugas.length > 0) {
@@ -530,6 +602,12 @@
                                 if (row[8]) sObj.cloudTugCat = row[8];
                             }
                         });
+                        const latestByName = {};
+                        (cloudData.input_tugas || []).forEach(r => {
+                            const n = r?.[3];
+                            if (n) latestByName[n] = r;
+                        });
+                        Object.values(latestByName).forEach(r => window.applyLatestCloudRowToFormCache(r, 'tugas'));
                     }
                     
                     if (cloudData.materi) {
@@ -541,9 +619,11 @@
                         localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
                     }
                     
-                    window.renderSantriCardsAndTable();
-                    window.renderMateriList('utama');
-                    window.renderMateriList('tambahan');
+                    if (cloudChanged) {
+                        window.renderSantriCardsAndTable();
+                        window.renderMateriList('utama');
+                        window.renderMateriList('tambahan');
+                    }
                     window.setSyncIndicator('success');
                 }
             } catch (err) {
@@ -553,6 +633,8 @@
                     window.santriList = JSON.parse(cached);
                     window.renderSantriCardsAndTable();
                 }
+            } finally {
+                window._cloudPollingBusy = false;
             }
         };
 
@@ -2555,6 +2637,16 @@
         // Inisialisasi Sticky Active Santri setelah seluruh struktur halaman tersedia.
         document.addEventListener('DOMContentLoaded', () => {
             window.initSantriStickyHeader();
+
+            // Load awal + sinkron otomatis lintas laptop setiap 5 detik.
+            window.fetchAllDataFromCloud(true);
+            window._cloudSyncInterval = setInterval(() => {
+                if (document.visibilityState === 'visible') window.fetchAllDataFromCloud(false);
+            }, 5000);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') window.fetchAllDataFromCloud(false);
+            });
         });
 
         window.addEventListener('scroll', () => {
