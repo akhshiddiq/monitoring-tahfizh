@@ -1034,7 +1034,9 @@
                 const isMurojaahHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Murojaah`];
                 const isTugasHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Tugas`];
 
-                const stickyBannerColor = (index % 2 === 0) ? 'bg-emerald-800 text-white' : 'bg-sky-700 text-white';
+                const stickyBannerColor = (index % 2 === 0)
+                    ? 'bg-emerald-800 text-white'
+                    : 'bg-sky-700 text-white';
 
                 return `
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 block transition-all relative">
@@ -2549,6 +2551,11 @@
             window.addEventListener('resize', window.updateSantriStickyOffset, { passive: true });
             window.addEventListener('orientationchange', window.updateSantriStickyOffset, { passive: true });
         };
+
+        // Inisialisasi Sticky Active Santri setelah seluruh struktur halaman tersedia.
+        document.addEventListener('DOMContentLoaded', () => {
+            window.initSantriStickyHeader();
+        });
 
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('floatingScrollTopBtn');
