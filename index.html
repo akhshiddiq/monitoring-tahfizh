@@ -309,6 +309,20 @@
         window.autoRecognition = null;
         window.autoListening = false;
 
+        // Fallback event listener: tombol tetap bekerja walaupun browser membatasi inline handler.
+        document.addEventListener('DOMContentLoaded', function() {
+            const geminiBtn = document.getElementById('autoGeminiBtn');
+            if (geminiBtn && !geminiBtn.dataset.boundAutoGemini) {
+                geminiBtn.dataset.boundAutoGemini = '1';
+                geminiBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!geminiBtn.disabled && typeof window.parseAutoVoice === 'function') {
+                        window.parseAutoVoice();
+                    }
+                });
+            }
+        });
+
         window.normalizeAutoText = function(text) {
             return String(text || '')
                 .replace(/\bke\b/gi, ' sampai ')
@@ -319,25 +333,52 @@
         };
 
         window.findAutoSantri = function(text) {
-            const source = String(text || '').toLowerCase();
-            let best = null;
-            let bestScore = 0;
+            const sourceRaw = String(text || '').toLowerCase().trim();
+            if (!sourceRaw) return null;
+
+            const sourceWords = sourceRaw.replace(/[^\p{L}\p{N}\s'-]/gu, ' ').split(/\s+/).filter(Boolean);
+            const source = ' ' + sourceWords.join(' ') + ' ';
+            const candidates = [];
+
             (window.santriList || []).forEach(s => {
-                const name = String(s.name || '').toLowerCase();
+                const name = String(s.name || '').trim();
                 if (!name) return;
-                if (source.includes(name)) {
-                    best = s; bestScore = 1000;
-                    return;
-                }
-                const words = name.split(/\s+/).filter(Boolean);
-                const score = words.reduce((n, w) => n + (source.includes(w) ? 1 : 0), 0);
-                if (score > bestScore && score >= Math.min(2, words.length)) {
-                    best = s; bestScore = score;
+
+                const nameWords = name.toLowerCase().replace(/[^\p{L}\p{N}\s'-]/gu, ' ').split(/\s+/).filter(Boolean);
+                if (!nameWords.length) return;
+
+                let score = 0;
+                let matched = 0;
+
+                // Nama lengkap persis disebut.
+                if (sourceRaw.includes(name.toLowerCase())) score += 1000;
+
+                nameWords.forEach(w => {
+                    if (source.includes(' ' + w + ' ')) {
+                        matched++;
+                        score += 30;
+                    }
+                });
+
+                // Kata terakhir/nama panggilan yang cukup panjang.
+                const last = nameWords[nameWords.length - 1];
+                if (last.length >= 4 && sourceWords.includes(last)) score += 70;
+
+                // Kecocokan prefix untuk ucapan sebagian, misalnya "yudanta" vs nama lengkap.
+                sourceWords.forEach(sw => {
+                    if (sw.length >= 4 && (sw === last || last.startsWith(sw) || sw.startsWith(last))) {
+                        score += 80;
+                    }
+                });
+
+                if (matched > 0 || score >= 70) {
+                    candidates.push({s, score, matched, nameWords});
                 }
             });
-            return best;
-        };
 
+            candidates.sort((a,b) => b.score - a.score || b.matched - a.matched);
+            return candidates.length ? candidates[0].s : null;
+        };
         window.findAutoSurah = function(text) {
             const source = String(text || '').toLowerCase();
             const list = (window.surahList || []).slice().sort((a,b) => String(b.name).length - String(a.name).length);
@@ -391,7 +432,96 @@
             return text.slice(start, end).trim();
         };
 
-        window.parseAutoVoice = function() {
+        window.parseAutoVoice = async function() {
+            const raw = document.getElementById('autoVoiceText')?.value.trim();
+            if (!raw) {
+                window.showToast('Silakan isi atau rekam perintah suara terlebih dahulu.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('autoGeminiBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gemini sedang menganalisis...';
+            }
+            const preview = document.getElementById('autoPreview');
+            preview.innerHTML = '<div class="text-sm font-black text-emerald-700">🤖 Gemini sedang membaca perintah dan mencocokkan nama santri, surat, ayat, nilai, catatan, serta tugas...</div>';
+
+            const jobId = 'AI-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+            const knownSantri = (window.santriList || []).map(s => s.name).filter(Boolean);
+            const knownSurah = (window.surahList || []).map(s => s.name).filter(Boolean);
+            const url = window.getGsUrl();
+
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                    body: JSON.stringify({type:'ai_parse', jobId, transcript:raw, knownSantri, knownSurah})
+                });
+
+                let done = false;
+                for (let attempt = 0; attempt < 45; attempt++) {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    const res = await fetch(url + '?action=ai_job&jobId=' + encodeURIComponent(jobId), {cache:'no-store'});
+                    const job = await res.json();
+                    if (job.jobStatus === 'done' && job.result) {
+                        window.setAutoGeminiResult(job.result, raw);
+                        done = true;
+                        break;
+                    }
+                    if (job.jobStatus === 'error') throw new Error(job.error || 'Gemini gagal memproses perintah.');
+                }
+                if (!done) throw new Error('Waktu tunggu Gemini habis. Silakan coba lagi.');
+            } catch (err) {
+                console.error('Gemini AI error:', err);
+                preview.innerHTML = `<div class="space-y-2"><div class="font-black text-rose-700">❌ Gemini belum berhasil memproses.</div><div class="text-xs font-bold text-slate-600">${String(err.message || err).replace(/[&<>]/g,'')}</div><div class="text-xs font-bold text-slate-500">Periksa Script Properties GEMINI_API_KEY dan deployment Apps Script. Anda masih bisa memakai parser lokal dengan tombol di bawah.</div></div>`;
+                window.showToast('Gemini gagal. Periksa konfigurasi API.', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-robot"></i> Analisis dengan Gemini';
+                }
+            }
+        };
+
+        window.setAutoGeminiResult = function(result, rawText) {
+            const santri = window.findAutoSantri(result.santri_name || '');
+            if (!santri) throw new Error('Gemini mengembalikan nama santri yang tidak ada di daftar website: ' + (result.santri_name || '-'));
+
+            const cleanCat = (cat) => {
+                if (!cat) return null;
+                const slots = Array.isArray(cat.slots) ? cat.slots.filter(x => x && x.item) : [];
+                if (!slots.length && !cat.status && !cat.catatan && !cat.catatan_type) return null;
+                return {slots: slots.slice(0,3), status: cat.status || '', catatan_type: cat.catatan_type || '', catatan: cat.catatan || ''};
+            };
+            const data = {
+                santri,
+                tanggal: /^\d{4}-\d{2}-\d{2}$/.test(result.tanggal || '') ? result.tanggal : new Date().toISOString().split('T')[0],
+                bacaan: cleanCat(result.bacaan),
+                hafalan: cleanCat(result.hafalan),
+                murojaah: cleanCat(result.murojaah),
+                tugas: result.tugas && (result.tugas.detail || result.tugas.catatan) ? {detail:result.tugas.detail || '', catatan:result.tugas.catatan || ''} : null,
+                sourceTranscript: rawText || ''
+            };
+            window.autoParsedData = data;
+
+            const esc = v => String(v || '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+            let preview = `<div class="space-y-3"><div class="font-black text-emerald-800 dark:text-emerald-300">🤖 Hasil analisis Gemini</div><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Santri</b><br>${esc(santri.name)}</div><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Kelas</b><br>${esc(santri.class)}</div></div>`;
+            ['bacaan','hafalan','murojaah'].forEach(cat => {
+                const d = data[cat]; if (!d) return;
+                const label = cat === 'murojaah' ? "Muroja'ah di Kelas" : cat[0].toUpperCase()+cat.slice(1);
+                const slots = d.slots.map(x => `${esc(x.item)}${x.start ? ` ayat ${esc(x.start)}–${esc(x.end)}` : ''}`).join('<br>');
+                preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>${label}</b><br>📖 ${slots || '-'}<br>⭐ ${esc(d.status || 'Tidak disebutkan')}<br>📝 ${esc(d.catatan_type || '')}${d.catatan ? ` — ${esc(d.catatan)}` : ''}</div>`;
+            });
+            if (data.tugas) preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>Tugas</b><br>📝 ${esc(data.tugas.detail || '-')} ${data.tugas.catatan ? `<br>Catatan: ${esc(data.tugas.catatan)}` : ''}</div>`;
+            preview += `<div class="text-[11px] text-slate-500 font-bold">Periksa hasil Gemini. Belum ada data yang disimpan. Tekan OKE hanya jika hasil sudah benar.</div></div>`;
+            document.getElementById('autoPreview').innerHTML = preview;
+            document.getElementById('autoActionArea').classList.remove('hidden');
+            window.showToast('Gemini selesai menganalisis. Silakan periksa lalu tekan OKE.', 'success');
+        };
+
+        window.parseAutoVoiceLocal = function() {
             const raw = document.getElementById('autoVoiceText')?.value.trim();
             if (!raw) {
                 window.showToast('Silakan isi atau rekam perintah suara terlebih dahulu.', 'error');
@@ -461,6 +591,64 @@
             window.showToast('AI sudah mencatat ulang. Silakan periksa lalu tekan OKE.', 'success');
         };
 
+        // Membersihkan pengulangan yang sering muncul dari SpeechRecognition Chrome.
+        window.cleanAutoTranscriptChunk = function(value) {
+            let s = String(value || '').replace(/\s+/g, ' ').trim();
+            if (!s) return '';
+
+            // Hilangkan pengulangan kata langsung: "yudanta yudanta" -> "yudanta"
+            let prev = '';
+            while (s !== prev) {
+                prev = s;
+                s = s.replace(/\b(\S+)(?:\s+\1\b)+/gi, '$1').trim();
+            }
+
+            // Hilangkan pengulangan frasa 2-6 kata: "yudanta bacaan yudanta bacaan" -> satu frasa.
+            const words = s.split(/\s+/);
+            for (let n = Math.min(6, Math.floor(words.length / 2)); n >= 2; n--) {
+                let changed = true;
+                while (changed && words.length >= n * 2) {
+                    changed = false;
+                    const a = words.slice(-n).map(x => x.toLowerCase()).join(' ');
+                    const b = words.slice(-2 * n, -n).map(x => x.toLowerCase()).join(' ');
+                    if (a && a === b) {
+                        words.splice(-n, n);
+                        changed = true;
+                    }
+                }
+            }
+            return words.join(' ').trim();
+        };
+
+        window.appendAutoTranscript = function(current, chunk) {
+            const cleanChunk = window.cleanAutoTranscriptChunk(chunk);
+            if (!cleanChunk) return String(current || '').trim();
+
+            let base = window.cleanAutoTranscriptChunk(current);
+            if (!base) return cleanChunk;
+
+            const a = base.toLowerCase();
+            const b = cleanChunk.toLowerCase();
+
+            // Jangan menambahkan hasil final yang sama berulang-ulang.
+            if (a === b || a.endsWith(' ' + b) || a.includes(b)) return base;
+
+            // Tangani overlap antar hasil final, misalnya:
+            // "... nama yudanta" lalu hasil berikutnya "yudanta bacaan..."
+            const aw = base.split(/\s+/);
+            const bw = cleanChunk.split(/\s+/);
+            const maxOverlap = Math.min(12, aw.length, bw.length);
+            for (let n = maxOverlap; n >= 1; n--) {
+                const tail = aw.slice(-n).map(x => x.toLowerCase()).join(' ');
+                const head = bw.slice(0, n).map(x => x.toLowerCase()).join(' ');
+                if (tail === head) {
+                    return window.cleanAutoTranscriptChunk(aw.concat(bw.slice(n)).join(' '));
+                }
+            }
+
+            return window.cleanAutoTranscriptChunk(base + ' ' + cleanChunk);
+        };
+
         window.toggleAutoVoice = function() {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             const btn = document.getElementById('autoRecordBtn');
@@ -468,12 +656,12 @@
             const area = document.getElementById('autoVoiceText');
 
             if (!SR) {
-                window.showToast('Browser ini belum mendukung Voice Note. Gunakan Chrome/Edge versi terbaru.', 'error');
+                window.showToast('Browser ini belum mendukung Voice Note. Gunakan Chrome atau Edge terbaru.', 'error');
                 return;
             }
 
             if (window.autoListening && window.autoRecognition) {
-                window.autoRecognition.stop();
+                try { window.autoRecognition.stop(); } catch (e) {}
                 return;
             }
 
@@ -481,39 +669,63 @@
             recognition.lang = 'id-ID';
             recognition.continuous = true;
             recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
 
             window.autoRecognition = recognition;
             window.autoListening = true;
             status.textContent = '🎙️ Sedang mendengarkan...';
+            btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-stop"></i> Berhenti Rekam';
 
-            let finalText = area.value ? area.value.trim() + ' ' : '';
+            let finalText = window.cleanAutoTranscriptChunk(area.value || '');
+            let lastInterim = '';
+
             recognition.onresult = event => {
                 let interim = '';
+
                 for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) finalText += transcript + ' ';
-                    else interim += transcript;
+                    const result = event.results[i];
+                    const transcript = result && result[0] ? result[0].transcript : '';
+
+                    if (result.isFinal) {
+                        finalText = window.appendAutoTranscript(finalText, transcript);
+                        lastInterim = '';
+                    } else {
+                        interim += ' ' + transcript;
+                    }
                 }
-                area.value = (finalText + interim).trim();
+
+                lastInterim = window.cleanAutoTranscriptChunk(interim);
+                area.value = window.cleanAutoTranscriptChunk(
+                    finalText + (lastInterim ? ' ' + lastInterim : '')
+                );
             };
 
             recognition.onerror = event => {
                 window.autoListening = false;
-                status.textContent = 'Error: ' + (event.error || 'gagal');
+                window.autoRecognition = null;
+                status.textContent = 'Error Voice Note: ' + (event.error || 'gagal');
                 btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
             };
 
             recognition.onend = () => {
                 window.autoListening = false;
                 window.autoRecognition = null;
-                status.textContent = 'Selesai merekam — tekan AI Catat Ulang';
+                area.value = window.cleanAutoTranscriptChunk(finalText || area.value || '');
+                status.textContent = 'Selesai merekam — hasil sudah dibersihkan dari pengulangan.';
                 btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
             };
 
-            recognition.start();
+            try {
+                recognition.start();
+            } catch (e) {
+                window.autoListening = false;
+                window.autoRecognition = null;
+                status.textContent = 'Gagal memulai Voice Note.';
+                btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
+                window.showToast('Voice Note tidak dapat dimulai. Coba tekan Rekam lagi.', 'error');
+            }
         };
-
         window.applyAutoFill = function() {
             const d = window.autoParsedData;
             if (!d || !d.santri) {
@@ -529,15 +741,35 @@
             const fillCat = (cat, dcat) => {
                 if (!dcat) return;
                 const prefix = cat === 'bacaan' ? 'bac' : cat === 'hafalan' ? 'haf' : 'mur';
-                const slot = 1;
-                set(`${name}_${prefix}_mode_${slot}`, 'quran');
-                set(`${name}_${prefix}_surah_${slot}`, dcat.surah || '');
-                set(`${name}_${prefix}_start_${slot}`, dcat.start || '');
-                set(`${name}_${prefix}_end_${slot}`, dcat.end || '');
-                if (dcat.score) set(`${name}_${prefix}_status_${slot}`, dcat.score);
-                if (cat === 'bacaan' && dcat.score) set(`${name}_bac_stat`, dcat.score);
-                if (cat === 'hafalan' && dcat.score) set(`${name}_haf_stat`, dcat.score);
-                if (cat === 'murojaah' && dcat.score) set(`${name}_mur_stat`, dcat.score);
+                const slots = Array.isArray(dcat.slots) ? dcat.slots.slice(0,3) : [];
+                slots.forEach((slotData, idx) => {
+                    const slot = idx + 1;
+                    const mode = slotData.mode === 'iqro' ? 'iqro' : 'quran';
+                    set(`${name}_${prefix}_mode_${slot}`, mode);
+                    set(`${name}_${prefix}_surah_${slot}`, mode === 'quran' ? (slotData.item || '') : '');
+                    set(`${name}_${prefix}_iqro_${slot}`, mode === 'iqro' ? (slotData.item || '') : '');
+                    set(`${name}_${prefix}_start_${slot}`, slotData.start || '');
+                    set(`${name}_${prefix}_end_${slot}`, slotData.end || '');
+                    window.activeSlotState[`${name}_${prefix}_slot_${slot}`] = true;
+                });
+                if (dcat.status) {
+                    set(`${name}_${prefix}_status_1`, dcat.status);
+                    if (cat === 'bacaan') set(`${name}_bac_stat`, dcat.status);
+                    if (cat === 'hafalan') set(`${name}_haf_stat`, dcat.status);
+                    if (cat === 'murojaah') set(`${name}_mur_stat`, dcat.status);
+                }
+                if (cat === 'bacaan') {
+                    set(`${name}_bac_cat_type`, dcat.catatan_type || '');
+                    set(`${name}_bac_cat_desc`, dcat.catatan || '');
+                }
+                if (cat === 'hafalan') {
+                    set(`${name}_haf_cat_type`, dcat.catatan_type || '');
+                    set(`${name}_haf_cat_desc`, dcat.catatan || '');
+                }
+                if (cat === 'murojaah') {
+                    set(`${name}_mur_cat_type`, dcat.catatan_type || '');
+                    set(`${name}_mur_cat_desc`, dcat.catatan || '');
+                }
             };
 
             fillCat('bacaan', d.bacaan);
@@ -545,12 +777,11 @@
             fillCat('murojaah', d.murojaah);
 
             if (d.tugas) {
-                set(`${name}_tug_detail`, d.tugas.detail);
+                set(`${name}_tug_detail`, d.tugas.detail || '');
                 set(`${name}_tug_cat`, d.tugas.catatan || '');
             }
 
             set(`${name}_tanggal`, d.tanggal);
-
             window.activeSlotState[`${name}_bac_slot_1`] = true;
             window.activeSlotState[`${name}_haf_slot_1`] = true;
             window.activeSlotState[`${name}_mur_slot_1`] = true;
@@ -558,13 +789,16 @@
             window.selectedClass = d.santri.class;
             window.switchTab('setoran');
             window.renderSantriCardsAndTable();
-            setTimeout(() => window.scrollToSantri(name), 250);
+            setTimeout(() => {
+                const dateInput = document.getElementById(`tgl_${name}`);
+                if (dateInput && d.tanggal) dateInput.value = d.tanggal;
+                window.scrollToSantri(name);
+            }, 250);
 
             const result = document.getElementById('autoResult');
             result.classList.remove('hidden');
-            result.innerHTML = `✅ <b>AI sudah mengisi form untuk ${name}.</b><br><span class="font-bold">Data belum disimpan ke Google Sheet.</span> Silakan periksa form, lalu klik tombol Simpan pada bagian yang diperlukan.`;
-            window.showToast('AI sudah mengisi form sesuai hasil catatan.', 'success');
-
+            result.innerHTML = `✅ <b>AI/Gemini sudah mengisi form untuk ${name}.</b><br><span class="font-bold">Data belum disimpan ke Google Sheet.</span> Silakan periksa semua field, lalu klik tombol Simpan pada bagian yang diperlukan.`;
+            window.showToast('AI sudah mengisi form sesuai hasil Gemini.', 'success');
             document.getElementById('autoActionArea').classList.add('hidden');
         };
 
@@ -3040,9 +3274,13 @@
                             class="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-microphone"></i> Rekam Voice Note
                         </button>
-                        <button type="button" onclick="window.parseAutoVoice()"
+                        <button type="button" id="autoGeminiBtn" onclick="window.parseAutoVoice()"
+                            class="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-robot"></i> Analisis dengan Gemini
+                        </button>
+                        <button type="button" onclick="window.parseAutoVoiceLocal()"
                             class="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Catat Ulang
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Parser Lokal
                         </button>
                         <button type="button" onclick="document.getElementById('autoVoiceText').value=''; document.getElementById('autoPreview').innerHTML=''; window.autoParsedData=null; window.showToast('Perintah dikosongkan','success');"
                             class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-black text-xs sm:text-sm">
@@ -3050,7 +3288,7 @@
                         </button>
                     </div>
                     <p class="text-[11px] text-slate-500 font-bold">
-                        Catatan: fitur suara memakai pengenalan suara browser. Setelah AI mencatat ulang, Anda wajib menekan <b>OKE</b> sebelum form diisi.
+                        Catatan: suara diubah menjadi teks oleh browser, lalu <b>Gemini API</b> memahami dan menyusun datanya. API key tetap di Google Apps Script, bukan di HTML. Setelah hasil tampil, Anda wajib menekan <b>OKE</b> sebelum form diisi.
                     </p>
                 </div>
 
