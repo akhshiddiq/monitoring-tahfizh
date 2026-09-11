@@ -463,10 +463,25 @@
                     }
 
                     const parseCloudSlots = (row) => {
-                        const parseSlotStr = (cellStr) => {
+                        const parseSlotStr = (cellStr, rowStatus) => {
                             if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran' };
                             const parts = cellStr.split('|');
-                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran' };
+                            let item = parts[0] || '-';
+
+                            // Data lama mungkin pernah menyimpan nilai di dalam detail.
+                            // Jika ada, hapus hanya bagian [nilai] yang sama dengan Status row.
+                            const status = String(rowStatus || '').trim();
+                            if (status) {
+                                const escapedStatus = status.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                item = item.replace(new RegExp('\\\\s*\\\\[' + escapedStatus + '\\\\]\\\\s*$', 'i'), '').trim() || '-';
+                            }
+
+                            return {
+                                item: item,
+                                start: '-',
+                                end: '-',
+                                mode: parts[1] || 'quran'
+                            };
                         };
                         const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-';
                         const s2 = parseSlotStr(row[9]); s2.start = row[10] || '-'; s2.end = row[11] || '-';
@@ -1409,8 +1424,9 @@
 
                     const rangeLabel = isIqro ? `Hlm ${start}${end && end !== start ? '-' + end : ''}` : `${start}${end && end !== start ? '-' + end : ''}`;
                     const progressStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                    const statusStr = statusVal ? ` [${statusVal}]` : '';
-                    entries.push(`${itemVal} ${rangeLabel}${progressStr}${statusStr}`);
+                    // Nilai/status ditampilkan terpisah pada kartu/laporan.
+                    // Jangan memasukkannya lagi ke detail agar tidak tampil 2x.
+                    entries.push(`${itemVal} ${rangeLabel}${progressStr}`);
                 }
             });
             return entries.length > 0 ? entries.join(', ') : '-';
