@@ -486,6 +486,22 @@
             }
         };
 
+        // AUTO SYNC ANTAR LAPTOP/HP
+        // Google Apps Script tetap menjadi sumber data. Browser lain akan mengambil
+        // data terbaru secara berkala tanpa perlu refresh halaman.
+        window.startAutoCloudSync = function() {
+            if (window._autoCloudSyncTimer) clearInterval(window._autoCloudSyncTimer);
+
+            // Cek data terbaru setiap 5 detik.
+            window._autoCloudSyncTimer = setInterval(async () => {
+                try {
+                    await window.fetchAllDataFromCloud();
+                } catch (err) {
+                    console.error('Auto sync error:', err);
+                }
+            }, 5000);
+        };
+
         window.fetchHistoryFromCloud = async function() {
             await window.fetchAllDataFromCloud();
             window.renderHistoryTable();
@@ -3041,6 +3057,9 @@
             window.renderSantriCardsAndTable();
             // Pastikan tinggi header sudah terukur setelah seluruh elemen selesai dirender.
             requestAnimationFrame(window.updateSantriStickyOffset);
+
+            // Aktifkan sinkronisasi otomatis antar laptop/HP.
+            window.startAutoCloudSync();
         });
     </script>
 </body>
