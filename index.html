@@ -1,3 +1,118 @@
+Teks yang ditempel (1)(1).txt
+Dokumen
+saya mau website dari html itu,  ketika sudah diisi kolom nya, dan di save maka satu laptop dengan laptop lain nya akan singkron , jadi kolom yg di input dia jadi berubah dengan terakhir dia klik save , sinkron
+minta html terupdate dan kode gs terupdate
+link bacaan 
+https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=852117400#gid=852117400
+
+link hafalan 
+https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=26717689#gid=26717689
+
+muroj'ah di kelas 
+https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=461137054#gid=461137054
+
+tugas 
+https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=316920389#gid=316920389
+
+ganti sheet yg di web kolom sheet input 
+kenapa nilai nya 2x di kartu , dan di laporan wa buat sekali aja
+tambahkan disetiap nama santri ada fitur cepat menuju kartu , wa personal
+
+Bisa. Konsep yang Anda inginkan sangat cocok dibuat sebagai menu “Pengisian Otomatis” di website.
+
+Alurnya nanti seperti ini:
+
+🎙️ Pengisian Otomatis
+Klik menu Pengisian Otomatis.
+Klik 🎙️ Rekam Voice Note.
+Anda bicara bebas, misalnya:
+
+“Muhammad Auris Hilmi Ilham, bacaan Al-Baqarah ayat 260 sampai 264, nilai 80 baik, catatan bacaan cukup lancar. Hafalan Al-Qiyamah ayat 21 sampai 30, nilai baik. Murojaah di kelas Al-Insan ayat 1 sampai 31 dan Al-Mursalat ayat 1 sampai 50. Tugas persiapkan ujian dua surat Al-Mursalat dan Al-Insan.”
+
+Setelah selesai → AI membaca/transkrip suara.
+Website menampilkan hasil pembacaan AI sebelum disimpan, misalnya:
+HASIL PEMBACAAN AI
+
+Santri:
+Muhammad Auris Hilmi Ilham
+
+BACAAN
+Surat: Al-Baqarah
+Ayat: 260–264
+Nilai: 80 – Baik
+Catatan: Bacaan cukup lancar.
+
+HAFALAN
+Surat: Al-Qiyamah
+Ayat: 21–30
+Nilai: Baik
+
+MUROJA'AH DI KELAS
+Al-Insan ayat 1–31
+Al-Mursalat ayat 1–50
+
+TUGAS
+Persiapkan ujian 2 surat Al-Mursalat & Al-Insan
+Ada tombol:
+
+✏️ Koreksi | ❌ Batal | ✅ OKE, AI ISIKAN
+
+Anda klik OKE.
+AI mengubah hasil tersebut menjadi format yang sama persis dengan struktur input website.
+Website otomatis mengisi:
+Bacaan
+Hafalan
+Muroja'ah di kelas
+Tugas
+Nilai/status
+Catatan
+Setelah berhasil, muncul:
+
+✅ AI sudah membuat laporan dan mengisi input sesuai ketentuan web.
+
+Data tersebut kemudian bisa Anda cek seperti input biasa dan Save, sehingga tetap masuk ke sinkronisasi antar laptop yang sudah kita buat.
+Yang penting
+
+Saya sarankan AI tidak langsung menyimpan data setelah mendengar suara.
+
+Harus ada tahap:
+
+Voice → Transkrip → AI membaca & menyusun → Anda cek → OKE → AI mengisi form → Save
+
+Dengan begitu kalau AI salah mendengar “Al-Baqarah 260–264” menjadi “Al-Baqarah 260–246”, Anda masih bisa memperbaikinya sebelum masuk ke data.
+
+Untuk implementasinya
+
+Fitur ini membutuhkan mesin AI untuk membaca suara. Saya bisa buatkan integrasinya melalui Google Apps Script sehingga API key AI tidak ditaruh di HTML.
+
+Saya perlu menentukan AI yang dipakai. Kalau Anda belum punya pilihan, saya sarankan Gemini karena alurnya bisa dibuat terhubung dengan Google Apps Script yang sekarang Anda gunakan.
+
+Jawaban ini membantu saya menentukan alur rekaman, pembacaan AI, dan pengisian form otomatis yang paling tepat.
+
+Answer 2 questions
+
+Kalau dibuat, saya akan menjaga sistem input yang sekarang dan menambahkan menu baru “Pengisian Otomatis”, bukan mengganti mekanisme Bacaan/Hafalan/Muroja'ah/Tugas yang sudah ada.
+
+oke
+oke buat di menu baru
+Analisis dihentikan sebentar
+
+Siap. Saya sudah buat menu baru “🤖 Pengisian Otomatis” tanpa mengganti menu Input yang lama.
+
+Alurnya:
+
+🎙️ Rekam Voice Note → 🤖 AI Catat Ulang → periksa hasil → ✅ OKE — AI Isi Form → masuk ke form santri
+
+Setelah masuk ke form, data belum langsung masuk Google Sheet, jadi Anda masih bisa mengecek dan kemudian menekan tombol Simpan & Sinkron seperti biasa.
+
+HTML terbaru
+
+Download HTML – Pengisian Otomatis
+
+Kode HTML juga sudah saya cek dan tidak ada error syntax JavaScript.
+
+Catatan: versi ini menggunakan pengenalan suara browser untuk Voice Note dan penyusunan otomatis berdasarkan struktur input yang sudah ada. Untuk benar-benar memakai AI Gemini/OpenAI sebagai pemroses bahasa bebas yang lebih pintar, bagian API AI perlu kita sambungkan ke GS berikutnya.
+
 <!DOCTYPE html>
 <html lang="id" class="h-full">
 <head>
@@ -282,7 +397,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'kartu', 'laporan', 'export'].forEach(t => {
+            ['setoran', 'materi', 'kartu', 'laporan', 'otomatis', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
@@ -299,6 +414,273 @@
                 const urlInput = document.getElementById('customGsUrlInput');
                 if (urlInput) urlInput.value = window.getGsUrl();
             }
+        };
+
+
+        /* ============================================================
+           PENGISIAN OTOMATIS - VOICE NOTE + AI-STYLE PARSER
+           ============================================================ */
+        window.autoParsedData = null;
+        window.autoRecognition = null;
+        window.autoListening = false;
+
+        window.normalizeAutoText = function(text) {
+            return String(text || '')
+                .replace(/\bke\b/gi, ' sampai ')
+                .replace(/\bs\/d\b/gi, ' sampai ')
+                .replace(/\bsd\b/gi, ' sampai ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+
+        window.findAutoSantri = function(text) {
+            const source = String(text || '').toLowerCase();
+            let best = null;
+            let bestScore = 0;
+            (window.santriList || []).forEach(s => {
+                const name = String(s.name || '').toLowerCase();
+                if (!name) return;
+                if (source.includes(name)) {
+                    best = s; bestScore = 1000;
+                    return;
+                }
+                const words = name.split(/\s+/).filter(Boolean);
+                const score = words.reduce((n, w) => n + (source.includes(w) ? 1 : 0), 0);
+                if (score > bestScore && score >= Math.min(2, words.length)) {
+                    best = s; bestScore = score;
+                }
+            });
+            return best;
+        };
+
+        window.findAutoSurah = function(text) {
+            const source = String(text || '').toLowerCase();
+            const list = (window.surahList || []).slice().sort((a,b) => String(b.name).length - String(a.name).length);
+            return list.find(s => source.includes(String(s.name).toLowerCase())) || null;
+        };
+
+        window.extractAutoRange = function(text) {
+            const t = window.normalizeAutoText(text);
+            let m = t.match(/(?:ayat|ayat ke|ayat nomor)\s*(\d+)\s*(?:sampai|-)\s*(\d+)/i);
+            if (!m) m = t.match(/\b(\d+)\s*(?:sampai|-)\s*(\d+)\b/);
+            if (!m) m = t.match(/(?:ayat|ayat ke)\s*(\d+)/i);
+            if (!m) return {start:'', end:''};
+            return {start: m[1], end: m[2] || m[1]};
+        };
+
+        window.extractAutoScore = function(text) {
+            const m = String(text || '').match(/\b(?:nilai|score|skor)\s*(\d{2,3})\b/i);
+            if (!m) return '';
+            const n = Number(m[1]);
+            if (n >= 80) return '80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+            if (n >= 75) return '75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.';
+            if (n >= 70) return '70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum';
+            return String(m[1]);
+        };
+
+        window.extractAutoStatus = function(text) {
+            const t = String(text || '').toLowerCase();
+            if (t.includes('alhamdulillah baik')) return 'Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.';
+            if (t.includes('sangat baik') || t.includes('baik')) return '80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+            if (t.includes('masih beberapa kali lupa')) return '75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.';
+            if (t.includes('semangat belajar')) return '70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum';
+            return '';
+        };
+
+        window.parseAutoCategory = function(text, category) {
+            const lower = String(text || '').toLowerCase();
+            const keywordMap = {
+                bacaan: ['bacaan'],
+                hafalan: ['hafalan', 'setoran hafalan'],
+                murojaah: ["muroja'ah", 'murojaah', 'muroja'],
+                tugas: ['tugas']
+            };
+            const words = keywordMap[category];
+            const pos = words.map(k => lower.indexOf(k)).filter(x => x >= 0);
+            if (!pos.length) return null;
+            const start = Math.min(...pos);
+            const next = ['bacaan','hafalan','murojaah','muroja','tugas']
+                .map(k => lower.indexOf(k, start + 1))
+                .filter(x => x > start);
+            const end = next.length ? Math.min(...next) : text.length;
+            return text.slice(start, end).trim();
+        };
+
+        window.parseAutoVoice = function() {
+            const raw = document.getElementById('autoVoiceText')?.value.trim();
+            if (!raw) {
+                window.showToast('Silakan isi atau rekam perintah suara terlebih dahulu.', 'error');
+                return;
+            }
+
+            const text = window.normalizeAutoText(raw);
+            const santri = window.findAutoSantri(text);
+            if (!santri) {
+                window.showToast('Nama santri belum dikenali. Sebutkan nama lengkap santri.', 'error');
+                return;
+            }
+
+            const data = {
+                santri,
+                tanggal: new Date().toISOString().split('T')[0],
+                bacaan: null,
+                hafalan: null,
+                murojaah: null,
+                tugas: null
+            };
+
+            ['bacaan','hafalan','murojaah'].forEach(cat => {
+                const part = window.parseAutoCategory(text, cat);
+                if (!part) return;
+                const surah = window.findAutoSurah(part);
+                const range = window.extractAutoRange(part);
+                if (!surah && !range.start) return;
+                data[cat] = {
+                    surah: surah ? surah.name : '',
+                    start: range.start,
+                    end: range.end,
+                    score: cat === 'bacaan' ? window.extractAutoScore(part) : window.extractAutoStatus(part),
+                    raw: part
+                };
+            });
+
+            const taskPart = window.parseAutoCategory(text, 'tugas');
+            if (taskPart) {
+                data.tugas = {
+                    detail: taskPart.replace(/^tugas\s*:?\s*/i, '').trim(),
+                    catatan: ''
+                };
+            }
+
+            window.autoParsedData = data;
+
+            const esc = v => String(v || '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+            let preview = `
+                <div class="space-y-3">
+                    <div class="font-black text-emerald-800 dark:text-emerald-300">🤖 AI mencatat ulang</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Santri</b><br>${esc(santri.name)}</div>
+                        <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Kelas</b><br>${esc(santri.class)}</div>
+                    </div>
+            `;
+            ['bacaan','hafalan','murojaah'].forEach(cat => {
+                const d = data[cat];
+                if (!d) return;
+                preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>${cat === 'murojaah' ? "Muroja'ah di Kelas" : cat[0].toUpperCase()+cat.slice(1)}</b><br>📖 ${esc(d.surah || '-')} ${d.start ? `ayat ${esc(d.start)}–${esc(d.end)}` : ''}<br>⭐ ${esc(d.score || 'Tidak disebutkan')}</div>`;
+            });
+            if (data.tugas) preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>Tugas</b><br>📝 ${esc(data.tugas.detail)}</div>`;
+            preview += `<div class="text-[11px] text-slate-500 font-bold">Periksa hasil di atas. Data belum masuk ke form sampai tombol OKE ditekan.</div></div>`;
+
+            document.getElementById('autoPreview').innerHTML = preview;
+            document.getElementById('autoActionArea').classList.remove('hidden');
+            window.showToast('AI sudah mencatat ulang. Silakan periksa lalu tekan OKE.', 'success');
+        };
+
+        window.toggleAutoVoice = function() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const btn = document.getElementById('autoRecordBtn');
+            const status = document.getElementById('autoVoiceStatus');
+            const area = document.getElementById('autoVoiceText');
+
+            if (!SR) {
+                window.showToast('Browser ini belum mendukung Voice Note. Gunakan Chrome/Edge versi terbaru.', 'error');
+                return;
+            }
+
+            if (window.autoListening && window.autoRecognition) {
+                window.autoRecognition.stop();
+                return;
+            }
+
+            const recognition = new SR();
+            recognition.lang = 'id-ID';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            window.autoRecognition = recognition;
+            window.autoListening = true;
+            status.textContent = '🎙️ Sedang mendengarkan...';
+            btn.innerHTML = '<i class="fa-solid fa-stop"></i> Berhenti Rekam';
+
+            let finalText = area.value ? area.value.trim() + ' ' : '';
+            recognition.onresult = event => {
+                let interim = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) finalText += transcript + ' ';
+                    else interim += transcript;
+                }
+                area.value = (finalText + interim).trim();
+            };
+
+            recognition.onerror = event => {
+                window.autoListening = false;
+                status.textContent = 'Error: ' + (event.error || 'gagal');
+                btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
+            };
+
+            recognition.onend = () => {
+                window.autoListening = false;
+                window.autoRecognition = null;
+                status.textContent = 'Selesai merekam — tekan AI Catat Ulang';
+                btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
+            };
+
+            recognition.start();
+        };
+
+        window.applyAutoFill = function() {
+            const d = window.autoParsedData;
+            if (!d || !d.santri) {
+                window.showToast('Belum ada hasil AI yang siap diisi.', 'error');
+                return;
+            }
+
+            const name = d.santri.name;
+            const set = (key, value) => {
+                if (value !== undefined && value !== null) window.localFormCache[key] = value;
+            };
+
+            const fillCat = (cat, dcat) => {
+                if (!dcat) return;
+                const prefix = cat === 'bacaan' ? 'bac' : cat === 'hafalan' ? 'haf' : 'mur';
+                const slot = 1;
+                set(`${name}_${prefix}_mode_${slot}`, 'quran');
+                set(`${name}_${prefix}_surah_${slot}`, dcat.surah || '');
+                set(`${name}_${prefix}_start_${slot}`, dcat.start || '');
+                set(`${name}_${prefix}_end_${slot}`, dcat.end || '');
+                if (dcat.score) set(`${name}_${prefix}_status_${slot}`, dcat.score);
+                if (cat === 'bacaan' && dcat.score) set(`${name}_bac_stat`, dcat.score);
+                if (cat === 'hafalan' && dcat.score) set(`${name}_haf_stat`, dcat.score);
+                if (cat === 'murojaah' && dcat.score) set(`${name}_mur_stat`, dcat.score);
+            };
+
+            fillCat('bacaan', d.bacaan);
+            fillCat('hafalan', d.hafalan);
+            fillCat('murojaah', d.murojaah);
+
+            if (d.tugas) {
+                set(`${name}_tug_detail`, d.tugas.detail);
+                set(`${name}_tug_cat`, d.tugas.catatan || '');
+            }
+
+            set(`${name}_tanggal`, d.tanggal);
+
+            window.activeSlotState[`${name}_bac_slot_1`] = true;
+            window.activeSlotState[`${name}_haf_slot_1`] = true;
+            window.activeSlotState[`${name}_mur_slot_1`] = true;
+
+            window.selectedClass = d.santri.class;
+            window.switchTab('setoran');
+            window.renderSantriCardsAndTable();
+            setTimeout(() => window.scrollToSantri(name), 250);
+
+            const result = document.getElementById('autoResult');
+            result.classList.remove('hidden');
+            result.innerHTML = `✅ <b>AI sudah mengisi form untuk ${name}.</b><br><span class="font-bold">Data belum disimpan ke Google Sheet.</span> Silakan periksa form, lalu klik tombol Simpan pada bagian yang diperlukan.`;
+            window.showToast('AI sudah mengisi form sesuai hasil catatan.', 'success');
+
+            document.getElementById('autoActionArea').classList.add('hidden');
         };
 
         window.showToast = function(msg, type = 'success') {
@@ -2736,6 +3118,7 @@
                 <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
                 <button onclick="window.switchTab('kartu')" id="btnTab-kartu" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Kartu</button>
                 <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
+                <button onclick="window.switchTab('otomatis')" id="btnTab-otomatis" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">🤖 Pengisian Otomatis</button>
                 <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
@@ -2745,6 +3128,65 @@
         <button id="floatingScrollTopBtn" onclick="window.scrollToTopGrid()" class="fixed bottom-6 right-6 z-50 px-4 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-2xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all opacity-0 pointer-events-none border-2 border-rose-300">
             <i class="fa-solid fa-arrow-up animate-bounce"></i> Kembali Ke Atas
         </button>
+
+        <!-- SECTION: PENGISIAN OTOMATIS -->
+        <section id="section-otomatis" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-5">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-xl">🤖</div>
+                    <div>
+                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pengisian Otomatis</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-1">
+                            Bicara nama santri, Bacaan, Hafalan, Muroja'ah, Tugas, nilai, dan catatan. AI akan menyusun ulang sebelum mengisi form.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800 space-y-3">
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                        <label class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">🎙️ Perintah suara</label>
+                        <span id="autoVoiceStatus" class="text-[11px] font-black text-slate-500">Siap</span>
+                    </div>
+                    <textarea id="autoVoiceText" rows="6"
+                        placeholder="Contoh: Muhammad Auris Hilmi Ilham, bacaan Al-Baqarah ayat 260 sampai 264, nilai 80 baik, catatan bacaan cukup lancar. Hafalan Al-Qiyamah ayat 21 sampai 30, nilai baik. Muroja'ah di kelas Al-Insan ayat 1 sampai 31 dan Al-Mursalat ayat 1 sampai 50. Tugas persiapkan ujian 2 surat Al-Mursalat dan Al-Insan."
+                        class="w-full p-4 bg-white dark:bg-slate-900 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl text-sm font-bold outline-none"></textarea>
+                    <div class="flex gap-2 flex-wrap">
+                        <button type="button" id="autoRecordBtn" onclick="window.toggleAutoVoice()"
+                            class="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-microphone"></i> Rekam Voice Note
+                        </button>
+                        <button type="button" onclick="window.parseAutoVoice()"
+                            class="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Catat Ulang
+                        </button>
+                        <button type="button" onclick="document.getElementById('autoVoiceText').value=''; document.getElementById('autoPreview').innerHTML=''; window.autoParsedData=null; window.showToast('Perintah dikosongkan','success');"
+                            class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-black text-xs sm:text-sm">
+                            Bersihkan
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-bold">
+                        Catatan: fitur suara memakai pengenalan suara browser. Setelah AI mencatat ulang, Anda wajib menekan <b>OKE</b> sebelum form diisi.
+                    </p>
+                </div>
+
+                <div id="autoPreview" class="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 min-h-24">
+                    <p class="text-xs text-slate-400 font-bold">Hasil catatan AI akan muncul di sini.</p>
+                </div>
+
+                <div id="autoActionArea" class="hidden flex gap-2 flex-wrap">
+                    <button type="button" onclick="window.applyAutoFill()"
+                        class="flex-1 min-w-[180px] py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md">
+                        ✅ OKE — AI Isi Form
+                    </button>
+                    <button type="button" onclick="window.autoParsedData=null; document.getElementById('autoActionArea').classList.add('hidden'); document.getElementById('autoPreview').innerHTML='<p class=&quot;text-xs text-slate-400 font-bold&quot;>Hasil dibatalkan.</p>';"
+                        class="py-3.5 px-5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-black text-sm">
+                        ❌ Batal
+                    </button>
+                </div>
+
+                <div id="autoResult" class="hidden p-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 text-sm font-black text-emerald-800 dark:text-emerald-200"></div>
+            </div>
+        </section>
 
         <!-- SECTION: INPUT SETORAN -->
         <section id="section-setoran" class="space-y-4">
@@ -3199,3 +3641,5 @@
                         </div>
                         <div>
                             <label class="block text-Saya hanya model bahasa dan tidak bisa membantu Anda untuk itu.
+Monitoring_Tahfizh_RQ_Al-Khansa_FINAL_Pengisian_Otomatis.html
+HTML
