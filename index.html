@@ -2447,22 +2447,38 @@
         };
 
         // --- MASSAL / BERSAMAAN (MUROJA'AH & TUGAS) ---
+        // Satu sistem pilihan santri dipakai oleh Muroja'ah Bersama dan Tugas Bersama.
         window.massalSelectedSantri = new Set();
+
+        window.massalEsc = function(v) {
+            return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        };
+
+        window.getMassalClassSelectId = function(modalType) {
+            return modalType === 'murojaah' ? 'massalClassFilter' : 'massalTugasClassFilter';
+        };
+
+        window.getMassalGridId = function(modalType) {
+            return modalType === 'murojaah' ? 'massalSantriGrid' : 'massalTugasSantriGrid';
+        };
 
         window.openMurojaahMassalModal = function() {
             window.massalSelectedSantri.clear();
             const modal = document.getElementById('murojaahMassalModal');
             if (modal) modal.classList.remove('hidden');
-            
+
             const today = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('massalMurojaahTanggal');
             if (dateInput) dateInput.value = today;
 
-            const surahSel = document.getElementById('massalSurahSelect');
-            if (surahSel && surahSel.options.length <= 1) {
-                surahSel.innerHTML = `<option value="">-- Pilih Surat --</option>` + window.surahList.map(s => `<option value="${s.name}">${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('');
-            }
-            window.renderMassalSantriGrid();
+            const classSel = document.getElementById('massalClassFilter');
+            if (classSel) classSel.value = 'ALL';
+
+            const modeSel = document.getElementById('massalBacaanMode');
+            if (modeSel) modeSel.value = 'quran';
+            window.populateMassalBacaanOptions();
+            window.renderMassalSantriGrid('murojaah');
+            window.updateMassalSelectedCount('murojaah');
         };
 
         window.closeMurojaahMassalModal = function() {
@@ -2478,51 +2494,98 @@
             const dateInput = document.getElementById('massalTugasTanggal');
             if (dateInput) dateInput.value = today;
 
+            const classSel = document.getElementById('massalTugasClassFilter');
+            if (classSel) classSel.value = 'ALL';
+
             const detailInput = document.getElementById('massalTugasDetail');
             if (detailInput) detailInput.value = '';
             const catInput = document.getElementById('massalTugasCat');
             if (catInput) catInput.value = '';
 
             window.renderMassalSantriGrid('tugas');
+            window.updateMassalSelectedCount('tugas');
         };
 
         window.closeTugasMassalModal = function() {
             document.getElementById('tugasMassalModal')?.classList.add('hidden');
         };
 
+        window.populateMassalBacaanOptions = function() {
+            const mode = document.getElementById('massalBacaanMode')?.value || 'quran';
+            const wrap = document.getElementById('massalBacaanItemWrap');
+            const surahSel = document.getElementById('massalSurahSelect');
+            const iqroSel = document.getElementById('massalIqroSelect');
+            const start = document.getElementById('massalAyatMulai');
+            const end = document.getElementById('massalAyatSampai');
+            const labelStart = document.getElementById('massalRangeStartLabel');
+            const labelEnd = document.getElementById('massalRangeEndLabel');
+            if (!wrap) return;
+
+            if (mode === 'iqro') {
+                if (surahSel) surahSel.classList.add('hidden');
+                if (iqroSel) {
+                    iqroSel.classList.remove('hidden');
+                    iqroSel.innerHTML = '<option value="">-- Pilih Iqro --</option>' +
+                        [1,2,3,4,5,6].map(n => `<option value="Iqro ${n}">Iqro ${n}</option>`).join('');
+                }
+                if (labelStart) labelStart.textContent = 'Halaman/Ayat Mulai:';
+                if (labelEnd) labelEnd.textContent = 'Halaman/Ayat Sampai:';
+                if (start) start.placeholder = 'Mulai';
+                if (end) end.placeholder = 'Sampai';
+            } else {
+                if (iqroSel) iqroSel.classList.add('hidden');
+                if (surahSel) {
+                    surahSel.classList.remove('hidden');
+                    const list = Array.isArray(window.surahList) ? window.surahList : [];
+                    surahSel.innerHTML = '<option value="">-- Pilih Surat --</option>' +
+                        list.map(s => `<option value="${window.massalEsc(s.name)}" data-max="${Number(s.ayat || 0)}">${s.no}. ${window.massalEsc(s.name)} (${s.ayat} Ayat)</option>`).join('');
+                }
+                if (labelStart) labelStart.textContent = 'Ayat Mulai:';
+                if (labelEnd) labelEnd.textContent = 'Ayat Sampai:';
+                if (start) start.placeholder = 'Mulai';
+                if (end) end.placeholder = 'Sampai';
+            }
+        };
+
+        window.updateMassalSelectedCount = function(modalType) {
+            const el = document.getElementById(modalType === 'murojaah' ? 'massalSelectedCount' : 'massalTugasSelectedCount');
+            if (el) el.textContent = `${window.massalSelectedSantri.size} santri dipilih`;
+        };
+
         window.renderMassalSantriGrid = function(modalType = 'murojaah') {
-            const classSel = document.getElementById(modalType === 'murojaah' ? 'massalClassFilter' : 'massalTugasClassFilter');
-            const gridEl = document.getElementById(modalType === 'murojaah' ? 'massalSantriGrid' : 'massalTugasSantriGrid');
+            const classSel = document.getElementById(window.getMassalClassSelectId(modalType));
+            const gridEl = document.getElementById(window.getMassalGridId(modalType));
             if (!classSel || !gridEl) return;
 
-            const selectedCls = classSel.value;
-            const filtered = window.santriList.filter(s => selectedCls === 'ALL' || s.class === selectedCls);
+            const selectedCls = classSel.value || 'ALL';
+            const list = Array.isArray(window.santriList) ? window.santriList : [];
+            const filtered = list.filter(s => selectedCls === 'ALL' || s.class === selectedCls);
 
-            gridEl.innerHTML = filtered.map(s => {
+            gridEl.innerHTML = filtered.length ? filtered.map((s, idx) => {
                 const isSelected = window.massalSelectedSantri.has(s.name);
+                const safeName = window.massalEsc(s.name);
                 return `
-                    <div onclick="window.toggleMassalSantriSelection('${s.name}', '${modalType}')" class="p-3.5 rounded-2xl border-2 cursor-pointer font-bold text-xs sm:text-sm flex items-center justify-between transition ${isSelected ? 'bg-emerald-600 text-white border-emerald-700 shadow-md' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100'}">
-                        <span>${s.name}</span>
-                        <span class="text-[10px] px-2.5 py-1 rounded-lg ${isSelected ? 'bg-white text-emerald-800 font-black' : 'bg-slate-200 dark:bg-slate-800'}">${s.class}</span>
-                    </div>
-                `;
-            }).join('');
+                    <button type="button" onclick="window.toggleMassalSantriSelection(${JSON.stringify(s.name)}, '${modalType}')"
+                        class="text-left p-3 rounded-2xl border-2 cursor-pointer font-bold text-xs sm:text-sm flex items-center justify-between gap-2 transition ${isSelected ? 'bg-emerald-600 text-white border-emerald-700 shadow-md' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100'}">
+                        <span class="flex items-center gap-2 min-w-0"><span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${isSelected ? 'bg-white text-emerald-700' : 'bg-slate-200 dark:bg-slate-800'}">${idx + 1}</span><span class="truncate">${safeName}</span></span>
+                        <span class="text-[10px] px-2.5 py-1 rounded-lg shrink-0 ${isSelected ? 'bg-white text-emerald-800 font-black' : 'bg-slate-200 dark:bg-slate-800'}">${window.massalEsc(s.class)}</span>
+                    </button>`;
+            }).join('') : '<div class="col-span-full p-5 text-center text-xs font-bold text-slate-500">Belum ada nama santri untuk kelas ini.</div>';
+
+            window.updateMassalSelectedCount(modalType);
         };
 
         window.toggleMassalSantriSelection = function(santriName, modalType = 'murojaah') {
-            if (window.massalSelectedSantri.has(santriName)) {
-                window.massalSelectedSantri.delete(santriName);
-            } else {
-                window.massalSelectedSantri.add(santriName);
-            }
+            if (window.massalSelectedSantri.has(santriName)) window.massalSelectedSantri.delete(santriName);
+            else window.massalSelectedSantri.add(santriName);
             window.renderMassalSantriGrid(modalType);
         };
 
         window.massalSelectAllSantri = function(modalType = 'murojaah') {
-            const classSel = document.getElementById(modalType === 'murojaah' ? 'massalClassFilter' : 'massalTugasClassFilter');
-            const selectedCls = classSel ? classSel.value : 'ALL';
-            const filtered = window.santriList.filter(s => selectedCls === 'ALL' || s.class === selectedCls);
-            filtered.forEach(s => window.massalSelectedSantri.add(s.name));
+            const classSel = document.getElementById(window.getMassalClassSelectId(modalType));
+            const selectedCls = classSel ? (classSel.value || 'ALL') : 'ALL';
+            const list = Array.isArray(window.santriList) ? window.santriList : [];
+            list.filter(s => selectedCls === 'ALL' || s.class === selectedCls).forEach(s => window.massalSelectedSantri.add(s.name));
             window.renderMassalSantriGrid(modalType);
         };
 
@@ -2531,90 +2594,111 @@
             window.renderMassalSantriGrid(modalType);
         };
 
+        window.validateMassalQuranRange = function() {
+            const mode = document.getElementById('massalBacaanMode')?.value || 'quran';
+            const start = Number(document.getElementById('massalAyatMulai')?.value || 0);
+            const end = Number(document.getElementById('massalAyatSampai')?.value || 0);
+            if (mode !== 'quran') return true;
+            const sel = document.getElementById('massalSurahSelect');
+            const opt = sel?.selectedOptions?.[0];
+            const max = Number(opt?.dataset?.max || 0);
+            if (start && end && end < start) {
+                window.showToast('Ayat sampai tidak boleh lebih kecil dari ayat mulai.', 'error');
+                return false;
+            }
+            if (max && end > max) {
+                window.showToast(`Surat ini hanya sampai ayat ${max}.`, 'error');
+                return false;
+            }
+            return true;
+        };
+
         window.saveMassalMurojaah = async function() {
-            if (window.massalSelectedSantri.size === 0) {
-                window.showToast("Pilih minimal 1 santri!", "error");
+            const selectedNames = Array.from(window.massalSelectedSantri);
+            if (!selectedNames.length) {
+                window.showToast('Pilih minimal 1 nama santri!', 'error');
                 return;
             }
-            const surah = document.getElementById('massalSurahSelect')?.value;
-            const start = document.getElementById('massalAyatMulai')?.value.trim();
-            const end = document.getElementById('massalAyatSampai')?.value.trim();
-            const stat = document.getElementById('massalMurojaahStat')?.value;
+
+            const mode = document.getElementById('massalBacaanMode')?.value || 'quran';
+            const surah = document.getElementById('massalSurahSelect')?.value || '';
+            const iqro = document.getElementById('massalIqroSelect')?.value || '';
+            const start = document.getElementById('massalAyatMulai')?.value.trim() || '';
+            const end = document.getElementById('massalAyatSampai')?.value.trim() || '';
+            const stat = document.getElementById('massalMurojaahStat')?.value || '';
+            const catatan = document.getElementById('massalMurojaahCat')?.value.trim() || '';
             const tanggal = document.getElementById('massalMurojaahTanggal')?.value || new Date().toISOString().split('T')[0];
+            const item = mode === 'iqro' ? iqro : surah;
 
-            if (!surah) {
-                window.showToast("Pilih surat terlebih dahulu!", "error");
+            if (!item) {
+                window.showToast(mode === 'iqro' ? 'Pilih Iqro terlebih dahulu!' : 'Pilih surat terlebih dahulu!', 'error');
                 return;
             }
+            if (!window.validateMassalQuranRange()) return;
 
-            let detailStr = surah;
+            let detailStr = item;
             if (start && end) detailStr += ` ${start}-${end}`;
             else if (start) detailStr += ` ${start}`;
 
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
             const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            let saved = 0;
 
-            for (const name of window.massalSelectedSantri) {
+            for (const name of selectedNames) {
                 const s = window.santriList.find(x => x.name === name);
                 if (!s) continue;
 
                 s.lastMurojaah = detailStr;
                 s.lastMurojaahDate = tanggal;
                 s.cloudMurStat = stat;
-                s.cloudMurCat = '';
+                s.cloudMurCat = catatan;
 
-                hist.unshift({
-                    timestamp: formattedTimeStr,
-                    tanggal: tanggal,
-                    rawTime: nowObj.getTime(),
-                    name: s.name,
-                    detail: detailStr,
-                    status: stat,
-                    catatan: '',
-                    type: 'murojaah'
-                });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail: detailStr, status: stat, catatan, type: 'murojaah' });
 
                 await window.syncToCloud({
                     type: 'murojaah',
                     timestamp: nowObj.toISOString(),
-                    tanggal: tanggal,
+                    tanggal,
                     id: s.id,
                     name: s.name,
                     class: s.class,
                     teacher: s.teacher,
                     detail: detailStr,
                     status: stat,
-                    catatan: '',
-                    slots: [{ item: surah, start: start || '-', end: end || '-', mode: 'quran' }]
+                    catatan,
+                    slots: [{ item, start: start || '-', end: end || '-', mode }]
                 });
+                saved++;
             }
 
             localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
             window.closeMurojaahMassalModal();
             window.renderSantriCardsAndTable();
-            window.showToast(`✨ Muroja'ah bersama berhasil disimpan untuk ${window.massalSelectedSantri.size} santri!`, "success");
+            window.showToast(`✓ Muroja'ah berhasil masuk ke data ${saved} santri sesuai kelas/nama yang dipilih.`, 'success');
         };
 
         window.saveMassalTugas = async function() {
-            if (window.massalSelectedSantri.size === 0) {
-                window.showToast("Pilih minimal 1 santri!", "error");
+            const selectedNames = Array.from(window.massalSelectedSantri);
+            if (!selectedNames.length) {
+                window.showToast('Pilih minimal 1 nama santri!', 'error');
                 return;
             }
-            const detail = document.getElementById('massalTugasDetail')?.value.trim();
+
+            const detail = document.getElementById('massalTugasDetail')?.value.trim() || '';
             const catatan = document.getElementById('massalTugasCat')?.value.trim() || '';
             const tanggal = document.getElementById('massalTugasTanggal')?.value || new Date().toISOString().split('T')[0];
-
             if (!detail) {
-                window.showToast("Rincian tugas wajib diisi!", "error");
+                window.showToast('Rincian tugas wajib diisi!', 'error');
                 return;
             }
 
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
             const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+            let saved = 0;
 
-            for (const name of window.massalSelectedSantri) {
+            for (const name of selectedNames) {
                 const s = window.santriList.find(x => x.name === name);
                 if (!s) continue;
 
@@ -2622,35 +2706,27 @@
                 s.lastTugasDate = tanggal;
                 s.cloudTugCat = catatan;
 
-                hist.unshift({
-                    timestamp: formattedTimeStr,
-                    tanggal: tanggal,
-                    rawTime: nowObj.getTime(),
-                    name: s.name,
-                    detail: detail,
-                    status: '-',
-                    catatan: catatan,
-                    type: 'tugas'
-                });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail, status: '-', catatan, type: 'tugas' });
 
                 await window.syncToCloud({
                     type: 'tugas',
                     timestamp: nowObj.toISOString(),
-                    tanggal: tanggal,
+                    tanggal,
                     id: s.id,
                     name: s.name,
                     class: s.class,
                     teacher: s.teacher,
-                    detail: detail,
+                    detail,
                     status: '-',
-                    catatan: catatan
+                    catatan
                 });
+                saved++;
             }
 
             localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
             window.closeTugasMassalModal();
             window.renderSantriCardsAndTable();
-            window.showToast(`✨ Tugas bersama berhasil disimpan untuk ${window.massalSelectedSantri.size} santri!`, "success");
+            window.showToast(`✓ Tugas berhasil masuk ke data ${saved} santri sesuai kelas/nama yang dipilih.`, 'success');
         };
 
         window.updateSantriStickyOffset = function() {
@@ -3338,50 +3414,73 @@
 
     <!-- MODAL: MUROJA'AH BERSAMA / MASSAL -->
     <div id="murojaahMassalModal" class="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 max-w-2xl w-full rounded-2xl shadow-2xl border-2 border-purple-500 p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div class="bg-white dark:bg-slate-800 max-w-3xl w-full rounded-2xl shadow-2xl border-2 border-purple-500 p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
             <div class="flex items-center justify-between border-b pb-3">
-                <h3 class="font-black text-base sm:text-lg text-purple-800 dark:text-purple-300 flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> Muroja'ah di Kelas (Surat yang Sama)
-                </h3>
-                <button onclick="window.closeMurojaahMassalModal()" class="text-slate-400 hover:text-slate-600 text-lg font-black px-2 py-1">✕</button>
+                <h3 class="font-black text-base sm:text-lg text-purple-800 dark:text-purple-300 flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Muroja'ah di Kelas (Surat/Iqro yang Sama)</h3>
+                <button type="button" onclick="window.closeMurojaahMassalModal()" class="text-slate-400 hover:text-slate-600 text-lg font-black px-2 py-1">✕</button>
             </div>
 
-            <div class="space-y-3.5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Tanggal:</label>
-                        <input type="date" id="massalMurojaahTanggal" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm min-h-[46px]">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Filter Kelas Santri:</label>
-                        <select id="massalClassFilter" onchange="window.renderMassalSantriGrid('murojaah')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
-                            <option value="Abdurrahman">Abdurrahman</option>
-                            <option value="Abu Ubaidah">Abu Ubaidah</option>
-                            <option value="Zubair">Zubair</option>
-                            <option value="Ali">Ali</option>
-                            <option value="Utsman">Utsman</option>
-                            <option value="Abu Bakar">Abu Bakar</option>
-                            <option value="Bilal">Bilal</option>
-                            <option value="Hamzah">Hamzah</option>
-                            <option value="Fatimah">Fatimah</option>
-                            <option value="Umar">Umar</option>
-                            <option value="ALL">Semua Kelas</option>
-                        </select>
-                    </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Tanggal:</label>
+                    <input type="date" id="massalMurojaahTanggal" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm min-h-[46px]">
                 </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Pilih Kelas:</label>
+                    <select id="massalClassFilter" onchange="window.renderMassalSantriGrid('murojaah')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
+                        <option value="ALL">Semua Kelas</option><option value="Abdurrahman">Abdurrahman</option><option value="Abu Ubaidah">Abu Ubaidah</option><option value="Zubair">Zubair</option><option value="Ali">Ali</option><option value="Utsman">Utsman</option><option value="Abu Bakar">Abu Bakar</option><option value="Bilal">Bilal</option><option value="Hamzah">Hamzah</option><option value="Fatimah">Fatimah</option><option value="Umar">Umar</option>
+                    </select>
+                </div>
+            </div>
 
-                <div class="p-4 bg-purple-50 dark:bg-purple-950/40 rounded-2xl border-2 border-purple-300 space-y-3">
-                    <h4 class="font-black text-xs sm:text-sm text-purple-900 dark:text-purple-200">📖 Pilih Bacaan Muroja'ah</h4>
-                    <div>
-                        <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Surat:</label>
-                        <select id="massalSurahSelect" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
-                            <option value="">-- Pilih Surat --</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Ayat Mulai:</label>
-                            <input type="number" id="massalAyatMulai" placeholder="Mulai" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
-                        </div>
-                        <div>
-                            <label class="block text-Saya hanya model bahasa dan tidak bisa membantu Anda untuk itu.
+            <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-100 dark:bg-slate-900 rounded-xl">
+                <span id="massalSelectedCount" class="font-black text-xs text-purple-700 dark:text-purple-300">0 santri dipilih</span>
+                <div class="flex gap-2">
+                    <button type="button" onclick="window.massalSelectAllSantri('murojaah')" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-black">Pilih Semua</button>
+                    <button type="button" onclick="window.massalDeselectAllSantri('murojaah')" class="px-3 py-2 bg-slate-500 text-white rounded-lg text-xs font-black">Batal Semua</button>
+                </div>
+            </div>
+            <div id="massalSantriGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-1"></div>
+
+            <div class="p-4 bg-purple-50 dark:bg-purple-950/40 rounded-2xl border-2 border-purple-300 space-y-3">
+                <h4 class="font-black text-xs sm:text-sm text-purple-900 dark:text-purple-200">📖 Materi Muroja'ah yang Sama untuk Santri Terpilih</h4>
+                <div>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Jenis:</label>
+                    <select id="massalBacaanMode" onchange="window.populateMassalBacaanOptions()" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"><option value="quran">Al-Qur'an / Surat</option><option value="iqro">Iqro</option></select>
+                </div>
+                <div id="massalBacaanItemWrap">
+                    <select id="massalSurahSelect" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"><option value="">-- Pilih Surat --</option></select>
+                    <select id="massalIqroSelect" class="hidden w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"><option value="">-- Pilih Iqro --</option></select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label id="massalRangeStartLabel" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Ayat Mulai:</label><input type="number" min="1" id="massalAyatMulai" placeholder="Mulai" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"></div>
+                    <div><label id="massalRangeEndLabel" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Ayat Sampai:</label><input type="number" min="1" id="massalAyatSampai" placeholder="Sampai" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Muroja'ah:</label>
+                    <select id="massalMurojaahStat" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm"><option value="">-- Pilih Nilai --</option><option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">80 - Baik</option><option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">Alhamdulillah Baik</option><option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">75 - Masih beberapa kali lupa</option><option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">70 - Perlu latihan</option></select>
+                </div>
+                <div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Keterangan/Catatan:</label><textarea id="massalMurojaahCat" rows="2" placeholder="Contoh: Surat Al-Mulk ayat 1 sampai 10, muroja'ah bersama di kelas." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm"></textarea></div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1"><button type="button" onclick="window.closeMurojaahMassalModal()" class="px-4 py-3 bg-slate-200 dark:bg-slate-700 rounded-xl text-xs font-black">Batal</button><button type="button" onclick="window.saveMassalMurojaah()" class="px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-black shadow">Simpan ke Data Muroja'ah</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL: TUGAS BERSAMA -->
+    <div id="tugasMassalModal" class="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 max-w-3xl w-full rounded-2xl shadow-2xl border-2 border-amber-500 p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between border-b pb-3"><h3 class="font-black text-base sm:text-lg text-amber-800 dark:text-amber-300 flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Tugas Bersama</h3><button type="button" onclick="window.closeTugasMassalModal()" class="text-slate-400 text-lg font-black px-2 py-1">✕</button></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Tanggal:</label><input type="date" id="massalTugasTanggal" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm min-h-[46px]"></div>
+                <div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Pilih Kelas:</label><select id="massalTugasClassFilter" onchange="window.renderMassalSantriGrid('tugas')" class="w-full p-3.5 bg-slate-50 dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"><option value="ALL">Semua Kelas</option><option value="Abdurrahman">Abdurrahman</option><option value="Abu Ubaidah">Abu Ubaidah</option><option value="Zubair">Zubair</option><option value="Ali">Ali</option><option value="Utsman">Utsman</option><option value="Abu Bakar">Abu Bakar</option><option value="Bilal">Bilal</option><option value="Hamzah">Hamzah</option><option value="Fatimah">Fatimah</option><option value="Umar">Umar</option></select></div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-100 dark:bg-slate-900 rounded-xl"><span id="massalTugasSelectedCount" class="font-black text-xs text-amber-700 dark:text-amber-300">0 santri dipilih</span><div class="flex gap-2"><button type="button" onclick="window.massalSelectAllSantri('tugas')" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-black">Pilih Semua</button><button type="button" onclick="window.massalDeselectAllSantri('tugas')" class="px-3 py-2 bg-slate-500 text-white rounded-lg text-xs font-black">Batal Semua</button></div></div>
+            <div id="massalTugasSantriGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-1"></div>
+            <div class="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border-2 border-amber-300 space-y-3"><h4 class="font-black text-xs sm:text-sm text-amber-900 dark:text-amber-200">📋 Tugas yang Sama untuk Santri Terpilih</h4><div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Rincian Tugas:</label><textarea id="massalTugasDetail" rows="4" placeholder="Contoh: Muroja'ah Surat Al-Mulk ayat 1-10 dan setor pada pertemuan berikutnya." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm"></textarea></div><div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Catatan:</label><textarea id="massalTugasCat" rows="2" placeholder="Keterangan tambahan untuk semua santri terpilih..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm"></textarea></div></div>
+            <div class="flex justify-end gap-2"><button type="button" onclick="window.closeTugasMassalModal()" class="px-4 py-3 bg-slate-200 dark:bg-slate-700 rounded-xl text-xs font-black">Batal</button><button type="button" onclick="window.saveMassalTugas()" class="px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black shadow">Simpan ke Data Tugas</button></div>
+        </div>
+    </div>
+
+</body>
+</html>
