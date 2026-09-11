@@ -209,8 +209,8 @@
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
-                        ? "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
-                        : "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
+                        ? "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-white text-emerald-950 shadow-md transition-all shrink-0"
+                        : "px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0";
                 }
             });
 
@@ -221,6 +221,8 @@
             if (tabId === 'export') {
                 const urlInput = document.getElementById('customGsUrlInput');
                 if (urlInput) urlInput.value = window.getGsUrl();
+                const updateLbl = document.getElementById('lastCloudUpdateLabel');
+                if (updateLbl) updateLbl.innerText = localStorage.getItem('rq_last_cloud_sync') || 'Belum pernah disinkronkan';
             }
         };
 
@@ -339,9 +341,9 @@
                             const parts = cellStr.split('|');
                             return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran' };
                         };
-                        const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-'; s1.status = row[9] || 'Lanjut';
-                        const s2 = parseSlotStr(row[10]); s2.start = row[11] || '-'; s2.end = row[12] || '-'; s2.status = row[13] || 'Lanjut';
-                        const s3 = parseSlotStr(row[14]); s3.start = row[15] || '-'; s3.end = row[16] || '-'; s3.status = row[17] || 'Lanjut';
+                        const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-'; s1.status = row[9] || '-';
+                        const s2 = parseSlotStr(row[10]); s2.start = row[11] || '-'; s2.end = row[12] || '-'; s2.status = row[13] || '-';
+                        const s3 = parseSlotStr(row[14]); s3.start = row[15] || '-'; s3.end = row[16] || '-'; s3.status = row[17] || '-';
                         return [s1, s2, s3];
                     };
 
@@ -359,7 +361,7 @@
                         }
                         const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
                         const countStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                        const statusStr = sl.status && sl.status !== 'Lanjut' ? ` [${sl.status}]` : '';
+                        const statusStr = sl.status && sl.status !== '-' ? ` [${sl.status}]` : '';
                         return `${sl.item} ${rangeLabel}${countStr}${statusStr}`.trim();
                     };
 
@@ -467,6 +469,11 @@
                         localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
                     }
                     
+                    const nowSyncStr = window.formatTimestampCustom(new Date());
+                    localStorage.setItem('rq_last_cloud_sync', nowSyncStr);
+                    const updateLbl = document.getElementById('lastCloudUpdateLabel');
+                    if (updateLbl) updateLbl.innerText = nowSyncStr;
+
                     window.renderSantriCardsAndTable();
                     window.renderHistoryTable();
                     window.renderMateriList('utama');
@@ -582,6 +589,31 @@
 
         window.switchSourceMode = function(category, slot, santriName, mode) {
             const key = `${santriName}_${category}_${slot}`;
+            const currentMode = window.itemSourceMode[key];
+            
+            if (currentMode === mode) {
+                delete window.itemSourceMode[key];
+                window.cacheFormInput({ value: '' }, `${santriName}_${category}_mode_${slot}`);
+                
+                const btnQ = document.getElementById(`btn_src_quran_${category}_${slot}_${santriName}`);
+                const btnI = document.getElementById(`btn_src_iqro_${category}_${slot}_${santriName}`);
+                const fieldQ = document.getElementById(`field_quran_${category}_${slot}_${santriName}`);
+                const fieldI = document.getElementById(`field_iqro_${category}_${slot}_${santriName}`);
+
+                if (btnQ) btnQ.className = "px-2.5 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400";
+                if (btnI) btnI.className = "px-2.5 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400";
+                if (fieldQ) fieldQ.classList.add('hidden');
+                if (fieldI) fieldI.classList.add('hidden');
+
+                const surahSel = document.getElementById(`${category}_surah_${slot}_${santriName}`);
+                if (surahSel) surahSel.value = "";
+                const iqroSel = document.getElementById(`${category}_iqro_${slot}_${santriName}`);
+                if (iqroSel) iqroSel.value = "";
+                window.cacheFormInput({ value: "" }, `${santriName}_${category}_surah_${slot}`);
+                window.cacheFormInput({ value: "" }, `${santriName}_${category}_iqro_${slot}`);
+                return;
+            }
+
             window.itemSourceMode[key] = mode;
             window.cacheFormInput({ value: mode }, `${santriName}_${category}_mode_${slot}`);
             
@@ -611,11 +643,21 @@
 
         window.setSlotStatus = function(category, slot, santriName, statusVal) {
             const statusKey = `${santriName}_${category}_status_${slot}`;
-            window.itemSlotStatus[statusKey] = statusVal;
-            window.cacheFormInput({ value: statusVal }, statusKey);
+            const currentVal = window.itemSlotStatus[statusKey];
 
             const btnLanjut = document.getElementById(`btn_status_lanjut_${category}_${slot}_${santriName}`);
             const btnUlangi = document.getElementById(`btn_status_ulangi_${category}_${slot}_${santriName}`);
+
+            if (currentVal === statusVal) {
+                delete window.itemSlotStatus[statusKey];
+                window.cacheFormInput({ value: '' }, statusKey);
+                if (btnLanjut) btnLanjut.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
+                return;
+            }
+
+            window.itemSlotStatus[statusKey] = statusVal;
+            window.cacheFormInput({ value: statusVal }, statusKey);
 
             if (statusVal === 'Ulangi') {
                 if (btnLanjut) btnLanjut.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
@@ -711,10 +753,11 @@
                 const slotItem = slotData ? (slotData.item || '') : '';
                 const slotStart = slotData ? (slotData.start || '') : '';
                 const slotEnd = slotData ? (slotData.end || '') : '';
-                const slotStatus = slotData ? (slotData.status || 'Lanjut') : 'Lanjut';
+                const slotStatus = slotData ? (slotData.status || '') : '';
                 
-                let cloudMode = slotData && slotData.mode ? slotData.mode : 'quran';
+                let cloudMode = slotData && slotData.mode ? slotData.mode : '';
                 if (!slotData && slotItem.toLowerCase().includes('iqro')) cloudMode = 'iqro';
+                if (!slotData && slotItem && slotItem !== '-') cloudMode = 'quran';
                 
                 const cachedMode = window.getFormCache(cacheKeyMode, cloudMode);
                 window.itemSourceMode[`${santriName}_${category}_${slot}`] = cachedMode;
@@ -807,7 +850,7 @@
                 <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
                     <div class="flex-1 space-y-1">
                         <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">${h.detail || '-'}</div>
-                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'} | Catatan: ${h.catatan || '-'}</div>
+                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">${h.status && h.status!=='-' ? `Nilai: ${h.status} | ` : ''}Catatan: ${h.catatan || '-'}</div>
                         <div class="text-[11px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
                     </div>
                     <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-3.5 py-1.5 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-xl font-black text-xs hover:bg-rose-200 transition shrink-0">Hapus</button>
@@ -883,9 +926,9 @@
                 const badgeMur = isTodayMur ? '<span class="px-2.5 py-1 bg-purple-100 text-purple-800 text-[11px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-black rounded-lg">Belum di input</span>';
                 const badgeTug = isTodayTug ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[11px] font-black rounded-lg">Alhamdulillah hari ini sudah di input</span>' : '<span class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-black rounded-lg">Belum di input</span>';
 
-                const defaultBacStat = s.cloudBacStat || '80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
-                const defaultHafStat = s.cloudHafStat || '80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
-                const defaultMurStat = s.cloudMurStat || '80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const defaultBacStat = s.cloudBacStat || '';
+                const defaultHafStat = s.cloudHafStat || '';
+                const defaultMurStat = s.cloudMurStat || '';
                 
                 let parsedBacCatType = '';
                 let parsedBacCatDesc = s.cloudBacCat || '';
@@ -973,8 +1016,12 @@
                                     ${window.renderTripleInputSlot('bac', s.name, 'border-emerald-500')}
                                     <div class="pt-3.5 border-t border-emerald-200 dark:border-emerald-800 space-y-3">
                                         <div>
-                                            <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Bacaan (${s.name}):</label>
+                                            <div class="flex items-center justify-between mb-1.5">
+                                                <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Bacaan (${s.name}):</label>
+                                                <button type="button" onclick="document.getElementById('bac_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_bac_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Pilihan Nilai</button>
+                                            </div>
                                             <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                                <option value="" ${!defaultBacStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultBacStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultBacStat.includes('75 - Masih') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -1037,8 +1084,12 @@
                                     ${window.renderTripleInputSlot('haf', s.name, 'border-rose-500')}
                                     <div class="pt-3.5 border-t border-rose-200 dark:border-rose-800 space-y-3">
                                         <div>
-                                            <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
+                                            <div class="flex items-center justify-between mb-1.5">
+                                                <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
+                                                <button type="button" onclick="document.getElementById('haf_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_haf_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Pilihan Nilai</button>
+                                            </div>
                                             <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                                <option value="" ${!defaultHafStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultHafStat.includes('75 - Masih') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -1101,8 +1152,12 @@
                                     ${window.renderTripleInputSlot('mur', s.name, 'border-purple-500')}
                                     <div class="pt-3.5 border-t border-purple-200 dark:border-purple-800 space-y-3">
                                         <div>
-                                            <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
+                                            <div class="flex items-center justify-between mb-1.5">
+                                                <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
+                                                <button type="button" onclick="document.getElementById('mur_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_mur_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Pilihan Nilai</button>
+                                            </div>
                                             <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                                <option value="" ${!defaultMurStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                                                 <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat." ${defaultMurStat.includes('75 - Masih') ? 'selected' : ''}>75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
@@ -1188,16 +1243,16 @@
             const slots = [1, 2, 3];
             const entries = [];
             slots.forEach(slot => {
-                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
+                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || '';
                 let itemVal = '';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '';
-                } else {
+                } else if (mode === 'quran') {
                     itemVal = document.getElementById(`${category}_surah_${slot}_${santriName}`)?.value || '';
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '';
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '';
-                const statusVal = window.itemSlotStatus[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
+                const statusVal = window.itemSlotStatus[`${santriName}_${category}_status_${slot}`] || '';
 
                 if (itemVal) {
                     const isIqro = (mode === 'iqro' || itemVal.toLowerCase().includes('iqro'));
@@ -1215,7 +1270,7 @@
 
                     const rangeLabel = isIqro ? `Hlm ${start}${end && end !== start ? '-' + end : ''}` : `${start}${end && end !== start ? '-' + end : ''}`;
                     const progressStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                    const statusStr = statusVal && statusVal !== 'Lanjut' ? ` [${statusVal}]` : '';
+                    const statusStr = statusVal ? ` [${statusVal}]` : '';
                     entries.push(`${itemVal} ${rangeLabel}${progressStr}${statusStr}`);
                 }
             });
@@ -1226,16 +1281,16 @@
             const slots = [1, 2, 3];
             const slotData = [];
             slots.forEach(slot => {
-                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
-                let itemVal = '';
+                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || '';
+                let itemVal = '-';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '-';
-                } else {
+                } else if (mode === 'quran') {
                     itemVal = document.getElementById(`${category}_surah_${slot}_${santriName}`)?.value || '-';
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '-';
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '-';
-                const statusVal = window.itemSlotStatus[`${santriName}_${category}_status_${slot}`] || 'Lanjut';
+                const statusVal = window.itemSlotStatus[`${santriName}_${category}_status_${slot}`] || '-';
                 slotData.push({ item: itemVal, start: start, end: end, mode: mode, status: statusVal });
             });
             return slotData;
@@ -1256,7 +1311,7 @@
                     window.showToast("Pilih minimal 1 surat/iqro bacaan!", "error");
                     return;
                 }
-                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || '80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const bacaanStat = document.getElementById(`bac_stat_${name}`)?.value || '';
                 const bacType = document.getElementById(`bac_cat_type_${name}`)?.value || '';
                 const bacDesc = document.getElementById(`bac_cat_desc_${name}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
@@ -1302,7 +1357,7 @@
                     window.showToast("Pilih minimal 1 surat hafalan baru!", "error");
                     return;
                 }
-                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || '80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const hafalanStat = document.getElementById(`haf_stat_${name}`)?.value || '';
                 const hafType = document.getElementById(`haf_cat_type_${name}`)?.value || '';
                 const hafDesc = document.getElementById(`haf_cat_desc_${name}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
@@ -1348,7 +1403,7 @@
                     window.showToast("Pilih minimal 1 surat muroja'ah!", "error");
                     return;
                 }
-                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || '80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
+                const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || '';
                 const murType = document.getElementById(`mur_cat_type_${name}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
@@ -2324,7 +2379,7 @@
                     detail: detailStr,
                     status: stat,
                     catatan: '',
-                    slots: [{ item: surah, start: start || '-', end: end || '-', mode: 'quran', status: 'Lanjut' }]
+                    slots: [{ item: surah, start: start || '-', end: end || '-', mode: 'quran' }]
                 });
             }
 
@@ -2882,7 +2937,10 @@
                         <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
                             <i class="fa-solid fa-circle-info text-emerald-600"></i> Status Sinkronisasi
                         </span>
-                        <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-full">Aktif & Live</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-extrabold text-slate-600 dark:text-slate-300">Update Terakhir: <span id="lastCloudUpdateLabel" class="font-black text-emerald-700 dark:text-emerald-400">Belum disinkronkan</span></span>
+                            <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-full">Aktif & Live</span>
+                        </div>
                     </div>
                     <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1.5">
                         <span class="text-xs font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
@@ -2956,7 +3014,8 @@
                     <div>
                         <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Muroja'ah:</label>
                         <select id="massalMurojaahStat" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
-                            <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." selected>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                            <option value="" selected>-- Pilih Nilai --</option>
+                            <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                             <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
                             <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
                             <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
