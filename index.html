@@ -2448,7 +2448,19 @@
 
         // --- MASSAL / BERSAMAAN (MUROJA'AH & TUGAS) ---
         // Satu sistem pilihan santri dipakai oleh Muroja'ah Bersama dan Tugas Bersama.
-        window.massalSelectedSantri = new Set();
+        // Pilihan santri dipisahkan untuk masing-masing modal agar pilihan
+        // Muroja'ah Bersama dan Tugas Bersama tidak saling mengganggu.
+        window.massalSelectedByModal = {
+            murojaah: new Set(),
+            tugas: new Set()
+        };
+
+        window.getMassalSelectedSet = function(modalType = 'murojaah') {
+            if (!window.massalSelectedByModal[modalType]) {
+                window.massalSelectedByModal[modalType] = new Set();
+            }
+            return window.massalSelectedByModal[modalType];
+        };
 
         window.massalEsc = function(v) {
             return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -2463,7 +2475,7 @@
         };
 
         window.openMurojaahMassalModal = function() {
-            window.massalSelectedSantri.clear();
+            window.getMassalSelectedSet('murojaah').clear();
             const modal = document.getElementById('murojaahMassalModal');
             if (modal) modal.classList.remove('hidden');
 
@@ -2486,7 +2498,7 @@
         };
 
         window.openTugasMassalModal = function() {
-            window.massalSelectedSantri.clear();
+            window.getMassalSelectedSet('tugas').clear();
             const modal = document.getElementById('tugasMassalModal');
             if (modal) modal.classList.remove('hidden');
 
@@ -2548,49 +2560,106 @@
         };
 
         window.updateMassalSelectedCount = function(modalType) {
-            const el = document.getElementById(modalType === 'murojaah' ? 'massalSelectedCount' : 'massalTugasSelectedCount');
-            if (el) el.textContent = `${window.massalSelectedSantri.size} santri dipilih`;
+            const set = window.getMassalSelectedSet(modalType);
+            const el = document.getElementById(
+                modalType === 'murojaah'
+                    ? 'massalSelectedCount'
+                    : 'massalTugasSelectedCount'
+            );
+            if (el) el.textContent = `${set.size} santri dipilih`;
         };
 
         window.renderMassalSantriGrid = function(modalType = 'murojaah') {
-            const classSel = document.getElementById(window.getMassalClassSelectId(modalType));
-            const gridEl = document.getElementById(window.getMassalGridId(modalType));
+            const classSel = document.getElementById(
+                window.getMassalClassSelectId(modalType)
+            );
+            const gridEl = document.getElementById(
+                window.getMassalGridId(modalType)
+            );
             if (!classSel || !gridEl) return;
 
             const selectedCls = classSel.value || 'ALL';
-            const list = Array.isArray(window.santriList) ? window.santriList : [];
-            const filtered = list.filter(s => selectedCls === 'ALL' || s.class === selectedCls);
+            const list = Array.isArray(window.santriList)
+                ? window.santriList
+                : [];
+            const selectedSet = window.getMassalSelectedSet(modalType);
+            const filtered = list.filter(
+                s => selectedCls === 'ALL' || s.class === selectedCls
+            );
 
-            gridEl.innerHTML = filtered.length ? filtered.map((s, idx) => {
-                const isSelected = window.massalSelectedSantri.has(s.name);
-                const safeName = window.massalEsc(s.name);
-                return `
-                    <button type="button" onclick="window.toggleMassalSantriSelection(${JSON.stringify(s.name)}, '${modalType}')"
-                        class="text-left p-3 rounded-2xl border-2 cursor-pointer font-bold text-xs sm:text-sm flex items-center justify-between gap-2 transition ${isSelected ? 'bg-emerald-600 text-white border-emerald-700 shadow-md' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100'}">
-                        <span class="flex items-center gap-2 min-w-0"><span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${isSelected ? 'bg-white text-emerald-700' : 'bg-slate-200 dark:bg-slate-800'}">${idx + 1}</span><span class="truncate">${safeName}</span></span>
-                        <span class="text-[10px] px-2.5 py-1 rounded-lg shrink-0 ${isSelected ? 'bg-white text-emerald-800 font-black' : 'bg-slate-200 dark:bg-slate-800'}">${window.massalEsc(s.class)}</span>
-                    </button>`;
-            }).join('') : '<div class="col-span-full p-5 text-center text-xs font-bold text-slate-500">Belum ada nama santri untuk kelas ini.</div>';
+            gridEl.innerHTML = filtered.length
+                ? filtered.map((s, idx) => {
+                    const isSelected = selectedSet.has(s.name);
+                    const safeName = window.massalEsc(s.name);
+                    const safeClass = window.massalEsc(s.class);
+                    const safeNameJs = JSON.stringify(s.name);
+
+                    return `
+                        <label class="relative flex items-center gap-3 text-left p-3 rounded-2xl border-2 cursor-pointer select-none font-bold text-xs sm:text-sm transition ${
+                            isSelected
+                                ? 'bg-emerald-600 text-white border-emerald-700 shadow-md'
+                                : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }">
+                            <input
+                                type="checkbox"
+                                class="massal-santri-checkbox w-5 h-5 shrink-0 accent-emerald-600 cursor-pointer"
+                                ${isSelected ? 'checked' : ''}
+                                onchange="window.toggleMassalSantriSelection(${safeNameJs}, '${modalType}')"
+                            >
+                            <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
+                                isSelected
+                                    ? 'bg-white text-emerald-700'
+                                    : 'bg-slate-200 dark:bg-slate-800'
+                            }">${idx + 1}</span>
+                            <span class="truncate flex-1">${safeName}</span>
+                            <span class="text-[10px] px-2.5 py-1 rounded-lg shrink-0 ${
+                                isSelected
+                                    ? 'bg-white text-emerald-800 font-black'
+                                    : 'bg-slate-200 dark:bg-slate-800'
+                            }">${safeClass}</span>
+                        </label>`;
+                }).join('')
+                : '<div class="col-span-full p-5 text-center text-xs font-bold text-slate-500">Belum ada nama santri untuk kelas ini.</div>';
 
             window.updateMassalSelectedCount(modalType);
         };
 
         window.toggleMassalSantriSelection = function(santriName, modalType = 'murojaah') {
-            if (window.massalSelectedSantri.has(santriName)) window.massalSelectedSantri.delete(santriName);
-            else window.massalSelectedSantri.add(santriName);
+            const selectedSet = window.getMassalSelectedSet(modalType);
+            const name = String(santriName || '').trim();
+            if (!name) return;
+
+            if (selectedSet.has(name)) {
+                selectedSet.delete(name);
+            } else {
+                selectedSet.add(name);
+            }
+
             window.renderMassalSantriGrid(modalType);
         };
 
         window.massalSelectAllSantri = function(modalType = 'murojaah') {
-            const classSel = document.getElementById(window.getMassalClassSelectId(modalType));
-            const selectedCls = classSel ? (classSel.value || 'ALL') : 'ALL';
-            const list = Array.isArray(window.santriList) ? window.santriList : [];
-            list.filter(s => selectedCls === 'ALL' || s.class === selectedCls).forEach(s => window.massalSelectedSantri.add(s.name));
+            const classSel = document.getElementById(
+                window.getMassalClassSelectId(modalType)
+            );
+            const selectedCls = classSel
+                ? (classSel.value || 'ALL')
+                : 'ALL';
+            const list = Array.isArray(window.santriList)
+                ? window.santriList
+                : [];
+            const selectedSet = window.getMassalSelectedSet(modalType);
+
+            list
+                .filter(s => selectedCls === 'ALL' || s.class === selectedCls)
+                .forEach(s => selectedSet.add(s.name));
+
             window.renderMassalSantriGrid(modalType);
         };
 
         window.massalDeselectAllSantri = function(modalType = 'murojaah') {
-            window.massalSelectedSantri.clear();
+            const selectedSet = window.getMassalSelectedSet(modalType);
+            selectedSet.clear();
             window.renderMassalSantriGrid(modalType);
         };
 
@@ -2614,7 +2683,7 @@
         };
 
         window.saveMassalMurojaah = async function() {
-            const selectedNames = Array.from(window.massalSelectedSantri);
+            const selectedNames = Array.from(window.getMassalSelectedSet('murojaah'));
             if (!selectedNames.length) {
                 window.showToast('Pilih minimal 1 nama santri!', 'error');
                 return;
@@ -2673,13 +2742,14 @@
             }
 
             localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
+            window.getMassalSelectedSet('murojaah').clear();
             window.closeMurojaahMassalModal();
             window.renderSantriCardsAndTable();
             window.showToast(`✓ Muroja'ah berhasil masuk ke data ${saved} santri sesuai kelas/nama yang dipilih.`, 'success');
         };
 
         window.saveMassalTugas = async function() {
-            const selectedNames = Array.from(window.massalSelectedSantri);
+            const selectedNames = Array.from(window.getMassalSelectedSet('tugas'));
             if (!selectedNames.length) {
                 window.showToast('Pilih minimal 1 nama santri!', 'error');
                 return;
