@@ -66,10 +66,10 @@
         window.itemSlotStatus = {};
         window.activeSlotState = {};
         window.cardSectionToggleState = {};
-        window.cardHistoryToggleState = {};
         window.selectedWaSantriName = null;
         window.selectedKartuSantriName = null;
         window.kartuClassFilter = 'Abdurrahman';
+        window.reportWaClassFilter = 'Abdurrahman';
         window.localFormCache = {};
 
         window.surahList = [
@@ -318,11 +318,11 @@
                         const parseSlotStr = (cellStr) => {
                             if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran' };
                             const parts = cellStr.split('|');
-                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran' };
+                            return { item: parts[0] === '-' ? '' : (parts[0] || ''), start: '-', end: '-', mode: parts[1] || 'quran' };
                         };
-                        const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-'; s1.status = row[9] || '-';
-                        const s2 = parseSlotStr(row[10]); s2.start = row[11] || '-'; s2.end = row[12] || '-'; s2.status = row[13] || '-';
-                        const s3 = parseSlotStr(row[14]); s3.start = row[15] || '-'; s3.end = row[16] || '-'; s3.status = row[17] || '-';
+                        const s1 = parseSlotStr(row[6]); s1.start = row[7] === '-' ? '' : (row[7] || ''); s1.end = row[8] === '-' ? '' : (row[8] || ''); s1.status = row[9] === '-' ? '' : (row[9] || '');
+                        const s2 = parseSlotStr(row[10]); s2.start = row[11] === '-' ? '' : (row[11] || ''); s2.end = row[12] === '-' ? '' : (row[12] || ''); s2.status = row[13] === '-' ? '' : (row[13] || '');
+                        const s3 = parseSlotStr(row[14]); s3.start = row[15] === '-' ? '' : (row[15] || ''); s3.end = row[16] === '-' ? '' : (row[16] || ''); s3.status = row[17] === '-' ? '' : (row[17] || '');
                         return [s1, s2, s3];
                     };
 
@@ -353,8 +353,8 @@
                                 sObj.cloudBacSlots = slots;
                                 sObj.lastBacaan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastBacaanDate = row[1] || '';
-                                if (row[18] && row[18] !== 'undefined') sObj.cloudBacStat = row[18];
-                                if (row[19] && row[19] !== 'undefined') sObj.cloudBacCat = row[19];
+                                if (row[18] && row[18] !== 'undefined' && row[18] !== '-') sObj.cloudBacStat = row[18];
+                                if (row[19] && row[19] !== 'undefined' && row[19] !== '-') sObj.cloudBacCat = row[19];
                             }
                         });
                     }
@@ -368,8 +368,8 @@
                                 sObj.cloudHafSlots = slots;
                                 sObj.lastHafalan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastHafalanDate = row[1] || '';
-                                if (row[18] && row[18] !== 'undefined') sObj.cloudHafStat = row[18];
-                                if (row[19] && row[19] !== 'undefined') sObj.cloudHafCat = row[19];
+                                if (row[18] && row[18] !== 'undefined' && row[18] !== '-') sObj.cloudHafStat = row[18];
+                                if (row[19] && row[19] !== 'undefined' && row[19] !== '-') sObj.cloudHafCat = row[19];
                             }
                         });
                     }
@@ -383,8 +383,8 @@
                                 sObj.cloudMurSlots = slots;
                                 sObj.lastMurojaah = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastMurojaahDate = row[1] || '';
-                                if (row[18] && row[18] !== 'undefined') sObj.cloudMurStat = row[18];
-                                if (row[19] && row[19] !== 'undefined') sObj.cloudMurCat = row[19];
+                                if (row[18] && row[18] !== 'undefined' && row[18] !== '-') sObj.cloudMurStat = row[18];
+                                if (row[19] && row[19] !== 'undefined' && row[19] !== '-') sObj.cloudMurCat = row[19];
                             }
                         });
                     }
@@ -396,7 +396,7 @@
                             if (sObj) {
                                 sObj.lastTugas = row[6] || '-';
                                 sObj.lastTugasDate = row[1] || '';
-                                if (row[8] && row[8] !== 'undefined') sObj.cloudTugCat = row[8];
+                                if (row[8] && row[8] !== 'undefined' && row[8] !== '-') sObj.cloudTugCat = row[8];
                             }
                         });
                     }
@@ -636,22 +636,6 @@
                 } else {
                     contentEl.classList.add('hidden');
                     btnEl.innerHTML = `<i class="fa-solid fa-chevron-down"></i> Buka Form`;
-                }
-            }
-        };
-
-        window.toggleCardHistory = function(santriName, categoryKey) {
-            const key = `${santriName}_history_${categoryKey}`;
-            window.cardHistoryToggleState[key] = !window.cardHistoryToggleState[key];
-            const contentEl = document.getElementById(`card_history_content_${categoryKey}_${santriName}`);
-            const btnEl = document.getElementById(`card_history_btn_${categoryKey}_${santriName}`);
-            if (contentEl && btnEl) {
-                if (window.cardHistoryToggleState[key]) {
-                    contentEl.classList.remove('hidden');
-                    btnEl.innerHTML = `▲ Tutup Riwayat`;
-                } else {
-                    contentEl.classList.add('hidden');
-                    btnEl.innerHTML = `▼ Buka Riwayat`;
                 }
             }
         };
@@ -1140,7 +1124,6 @@
 
             const tanggalVal = document.getElementById(`tgl_${name}`)?.value || new Date().toISOString().split('T')[0];
             const nowObj = new Date();
-            const formattedTimeStr = window.formatTimestampCustom(nowObj);
 
             if (sectionType === 'bacaan') {
                 const bacaanFormatted = window.extractSlotEntries('bac', name);
@@ -2664,7 +2647,7 @@
                             <i class="fa-solid fa-circle-info text-emerald-600"></i> Status Sinkronisasi
                         </span>
                         <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-extrabold text-slate-600 dark:text-slate-300">Update Terakhir: <span id="lastCloudUpdateLabel" class="font-black text-emerald-700 dark:text-emerald-400">Belum disinkronkan</span></span>
+                            <span class="text-[11px] font-extrabold text-slate-600 dark:text-slate-300">Waktu & Tanggal Terakhir Update: <span id="lastCloudUpdateLabel" class="font-black text-emerald-700 dark:text-emerald-400">Belum disinkronkan</span></span>
                             <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-full">Aktif & Live</span>
                         </div>
                     </div>
