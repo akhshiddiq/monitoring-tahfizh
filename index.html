@@ -325,6 +325,23 @@
             }
         };
 
+        // Tombol cepat di setiap kartu santri: menuju Kartu Prestasi atau WA Personal.
+        window.quickOpenKartuSantri = function(santriName) {
+            const s = window.santriList.find(x => x.name === santriName);
+            if (!s) return;
+            window.selectedKartuSantriName = s.name;
+            window.kartuClassFilter = s.class;
+            window.switchTab('kartu');
+        };
+
+        window.quickOpenWaSantri = function(santriName) {
+            const s = window.santriList.find(x => x.name === santriName);
+            if (!s) return;
+            window.selectedWaSantriName = s.name;
+            window.reportWaClassFilter = s.class;
+            window.switchTab('laporan');
+        };
+
         window.jumpToInputSantriFromReport = function() {
             const name = window.selectedWaSantriName;
             if (!name) {
@@ -1137,8 +1154,16 @@
 
                 return `
                     <div id="santri_card_${CSS.escape(s.name)}" class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 block transition-all relative">
-                        <div class="santri-name-sticky ${stickyBannerColor} p-4 rounded-t-[22px] shadow-md flex items-center justify-between">
-                            <h3 class="text-base sm:text-lg font-black tracking-tight">${s.name}</h3>
+                        <div class="santri-name-sticky ${stickyBannerColor} p-3.5 sm:p-4 rounded-t-[22px] shadow-md flex items-center justify-between gap-2 flex-wrap">
+                            <h3 class="text-base sm:text-lg font-black tracking-tight leading-tight">${s.name}</h3>
+                            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                                <button type="button" onclick="event.stopPropagation(); window.quickOpenKartuSantri('${s.name.replace(/'/g, "\\'")}')" class="px-2.5 sm:px-3 py-1.5 bg-white/95 text-emerald-900 hover:bg-emerald-50 rounded-lg text-[10px] sm:text-xs font-black shadow-sm transition active:scale-95 flex items-center gap-1" title="Buka Kartu Prestasi">
+                                    <i class="fa-solid fa-id-card"></i><span>Kartu</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.quickOpenWaSantri('${s.name.replace(/'/g, "\\'")}')" class="px-2.5 sm:px-3 py-1.5 bg-white/95 text-emerald-900 hover:bg-emerald-50 rounded-lg text-[10px] sm:text-xs font-black shadow-sm transition active:scale-95 flex items-center gap-1" title="Buka WA Personal">
+                                    <i class="fa-brands fa-whatsapp"></i><span>WA</span>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="p-4 sm:p-5 space-y-4">
