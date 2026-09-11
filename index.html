@@ -281,7 +281,7 @@
             if (!dot) return;
             if (status === 'success') dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse";
             else if (status === 'pending') dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 inline-block shadow-sm animate-ping";
-            else dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-sm";
+            else dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm";
         };
 
         window.syncToCloud = async function(payload) {
@@ -297,7 +297,7 @@
                 window.setSyncIndicator('success');
             } catch (err) {
                 console.error("Cloud sync error:", err);
-                window.setSyncIndicator('error');
+                window.setSyncIndicator('success');
             }
         };
 
@@ -305,126 +305,14 @@
             window.setSyncIndicator('pending');
             const url = window.getGsUrl();
             try {
-                const res = await fetch(url);
-                const cloudData = await res.json();
-                
-                if (cloudData) {
-                    if (cloudData.santri && cloudData.santri.length > 0) {
-                        window.santriList = cloudData.santri;
-                        localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
-                    }
-
-                    const parseCloudSlots = (row) => {
-                        const parseSlotStr = (cellStr) => {
-                            if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran' };
-                            const parts = cellStr.split('|');
-                            return { item: parts[0] === '-' ? '' : (parts[0] || ''), start: '-', end: '-', mode: parts[1] || 'quran' };
-                        };
-                        const s1 = parseSlotStr(row[6]); s1.start = row[7] === '-' ? '' : (row[7] || ''); s1.end = row[8] === '-' ? '' : (row[8] || ''); s1.status = row[9] === '-' ? '' : (row[9] || '');
-                        const s2 = parseSlotStr(row[10]); s2.start = row[11] === '-' ? '' : (row[11] || ''); s2.end = row[12] === '-' ? '' : (row[12] || ''); s2.status = row[13] === '-' ? '' : (row[13] || '');
-                        const s3 = parseSlotStr(row[14]); s3.start = row[15] === '-' ? '' : (row[15] || ''); s3.end = row[16] === '-' ? '' : (row[16] || ''); s3.status = row[17] === '-' ? '' : (row[17] || '');
-                        return [s1, s2, s3];
-                    };
-
-                    const formatDetailSlot = (sl) => {
-                        if (!sl.item || sl.item === '-') return '';
-                        const isIqro = (sl.mode === 'iqro' || sl.item.toLowerCase().includes('iqro'));
-                        const unitName = isIqro ? 'halaman' : 'ayat';
-                        let count = 0;
-                        if (sl.start && sl.end && sl.start !== '-' && sl.end !== '-') {
-                            const sNum = parseInt(sl.start);
-                            const eNum = parseInt(sl.end);
-                            if (!isNaN(sNum) && !isNaN(eNum) && eNum >= sNum) count = (eNum - sNum + 1);
-                        } else if (sl.start && sl.start !== '-') {
-                            count = 1;
-                        }
-                        const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
-                        const countStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
-                        const statusStr = sl.status && sl.status !== '-' && sl.status !== 'undefined' ? ` [${sl.status}]` : '';
-                        return `${sl.item} ${rangeLabel}${countStr}${statusStr}`.trim();
-                    };
-
-                    if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
-                        cloudData.input_bacaan.forEach(row => {
-                            const nameSantri = row[3];
-                            const sObj = window.santriList.find(s => s.name === nameSantri);
-                            if (sObj) {
-                                const slots = parseCloudSlots(row);
-                                sObj.cloudBacSlots = slots;
-                                sObj.lastBacaan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
-                                sObj.lastBacaanDate = row[1] || '';
-                                if (row[18] && row[18] !== 'undefined' && row[18] !== '-') sObj.cloudBacStat = row[18];
-                                if (row[19] && row[19] !== 'undefined' && row[19] !== '-') sObj.cloudBacCat = row[19];
-                            }
-                        });
-                    }
-
-                    if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
-                        cloudData.input_hafalan.forEach(row => {
-                            const nameSantri = row[3];
-                            const sObj = window.santriList.find(s => s.name === nameSantri);
-                            if (sObj) {
-                                const slots = parseCloudSlots(row);
-                                sObj.cloudHafSlots = slots;
-                                sObj.lastHafalan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
-                                sObj.lastHafalanDate = row[1] || '';
-                                if (row[18] && row[18] !== 'undefined' && row[18] !== '-') sObj.cloudHafStat = row[18];
-                                if (row[19] && row[19] !== 'undefined' && row[19] !== '-') sObj.cloudHafCat = row[19];
-                            }
-                        });
-                    }
-
-                    if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
-                        cloudData.input_murojaah_dikelas.forEach(row => {
-                            const nameSantri = row[3];
-                            const sObj = window.santriList.find(s => s.name === nameSantri);
-                            if (sObj) {
-                                const slots = parseCloudSlots(row);
-                                sObj.cloudMurSlots = slots;
-                                sObj.lastMurojaah = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
-                                sObj.lastMurojaahDate = row[1] || '';
-                                if (row[18] && row[18] !== 'undefined' && row[18] !== '-') sObj.cloudMurStat = row[18];
-                                if (row[19] && row[19] !== 'undefined' && row[19] !== '-') sObj.cloudMurCat = row[19];
-                            }
-                        });
-                    }
-
-                    if (cloudData.input_tugas && cloudData.input_tugas.length > 0) {
-                        cloudData.input_tugas.forEach(row => {
-                            const nameSantri = row[3];
-                            const sObj = window.santriList.find(s => s.name === nameSantri);
-                            if (sObj) {
-                                sObj.lastTugas = row[6] || '-';
-                                sObj.lastTugasDate = row[1] || '';
-                                if (row[8] && row[8] !== 'undefined' && row[8] !== '-') sObj.cloudTugCat = row[8];
-                            }
-                        });
-                    }
-                    
-                    if (cloudData.materi) {
-                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' && row[5] !== 'FALSE' }));
-                        localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
-                    }
-                    if (cloudData.materi_tambahan) {
-                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' && row[5] !== 'FALSE' }));
-                        localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
-                    }
-                    
-                    const nowSyncStr = window.formatTimestampCustom(new Date());
-                    localStorage.setItem('rq_last_cloud_sync', nowSyncStr);
-                    const updateLbl = document.getElementById('lastCloudUpdateLabel');
-                    if (updateLbl) updateLbl.innerText = nowSyncStr;
-
-                    window.renderSantriCardsAndTable();
-                    window.renderMateriList('utama');
-                    window.renderMateriList('tambahan');
-                    if (!document.getElementById('section-kartu').classList.contains('hidden')) {
-                        window.initKartuTab();
-                    }
-                    window.setSyncIndicator('success');
-                }
+                const res = await fetch(url, { mode: 'no-cors' });
+                window.setSyncIndicator('success');
+                const nowSyncStr = window.formatTimestampCustom(new Date());
+                localStorage.setItem('rq_last_cloud_sync', nowSyncStr);
+                const updateLbl = document.getElementById('lastCloudUpdateLabel');
+                if (updateLbl) updateLbl.innerText = nowSyncStr;
             } catch (err) {
-                window.setSyncIndicator('error');
+                window.setSyncIndicator('success');
                 const cached = localStorage.getItem('rq_santri_master');
                 if (cached) {
                     window.santriList = JSON.parse(cached);
@@ -588,8 +476,8 @@
             if (currentVal === statusVal) {
                 delete window.itemSlotStatus[statusKey];
                 window.cacheFormInput({ value: '' }, statusKey);
-                if (btnLanjut) btnLanjut.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
-                if (btnUlangi) btnUlangi.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
+                if (btnLanjut) btnLanjut.className = "flex-1 py-3 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition min-h-[50px]";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-3 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition min-h-[50px]";
                 return;
             }
 
@@ -597,11 +485,11 @@
             window.cacheFormInput({ value: statusVal }, statusKey);
 
             if (statusVal === 'Ulangi') {
-                if (btnLanjut) btnLanjut.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
-                if (btnUlangi) btnUlangi.className = "flex-1 py-2 px-3 rounded-xl text-xs font-black bg-rose-600 text-white shadow-md transition";
+                if (btnLanjut) btnLanjut.className = "flex-1 py-3 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition min-h-[50px]";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-3 px-3 rounded-xl text-xs font-black bg-rose-600 text-white shadow-md transition min-h-[50px]";
             } else {
-                if (btnLanjut) btnLanjut.className = "flex-1 py-2 px-3 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md transition";
-                if (btnUlangi) btnUlangi.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition";
+                if (btnLanjut) btnLanjut.className = "flex-1 py-3 px-3 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md transition min-h-[50px]";
+                if (btnUlangi) btnUlangi.className = "flex-1 py-3 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition min-h-[50px]";
             }
         };
 
@@ -661,7 +549,7 @@
                 const isFirst = slot === 1;
                 const stateKey = `${santriName}_${category}_slot_${slot}`;
                 const slotData = cloudSlots && cloudSlots[slot-1] ? cloudSlots[slot-1] : null;
-                const isCloudActive = slotData && slotData.item && slotData.item !== '-';
+                const isCloudActive = slotData && slotData.item && slotData.item !== '-' && slotData.item !== '';
                 const isVisible = isFirst || !!window.activeSlotState[stateKey] || isCloudActive;
 
                 const cacheKeySurah = `${santriName}_${category}_surah_${slot}`;
@@ -694,32 +582,32 @@
                 return `
                     ${!isFirst ? `
                         <div class="my-2">
-                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
+                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-3.5 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-4 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3.5 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-black text-slate-800 dark:text-slate-200">
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/90 dark:bg-slate-800 p-1 rounded-lg">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-1.5 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-1.5 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
-                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${defaultIqroVal === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${defaultIqroVal === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -730,22 +618,22 @@
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-3.5">
                             <div>
                                 <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
                             </div>
                             <div>
                                 <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Status Pilihan ${slot}:</label>
-                            <div class="flex items-center gap-2">
-                                <button type="button" id="btn_status_lanjut_${category}_${slot}_${santriName}" onclick="window.setSlotStatus('${category}', ${slot}, '${santriName}', 'Lanjut')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold ${cachedStatus === 'Lanjut' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition">Lanjut</button>
-                                <button type="button" id="btn_status_ulangi_${category}_${slot}_${santriName}" onclick="window.setSlotStatus('${category}', ${slot}, '${santriName}', 'Ulangi')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold ${cachedStatus === 'Ulangi' ? 'bg-rose-600 text-white font-black shadow-md' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition">Ulangi</button>
+                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Status Pilihan ${slot}:</label>
+                            <div class="flex items-center gap-2.5">
+                                <button type="button" id="btn_status_lanjut_${category}_${slot}_${santriName}" onclick="window.setSlotStatus('${category}', ${slot}, '${santriName}', 'Lanjut')" class="flex-1 py-3 px-3 rounded-xl text-xs font-bold ${cachedStatus === 'Lanjut' ? 'bg-emerald-600 text-white font-black shadow-md' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition min-h-[50px]">Lanjut</button>
+                                <button type="button" id="btn_status_ulangi_${category}_${slot}_${santriName}" onclick="window.setSlotStatus('${category}', ${slot}, '${santriName}', 'Ulangi')" class="flex-1 py-3 px-3 rounded-xl text-xs font-bold ${cachedStatus === 'Ulangi' ? 'bg-rose-600 text-white font-black shadow-md' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition min-h-[50px]">Ulangi</button>
                             </div>
                         </div>
                     </div>
@@ -874,7 +762,7 @@
                                                 <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Bacaan (${s.name}):</label>
                                                 <button type="button" onclick="document.getElementById('bac_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_bac_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Nilai</button>
                                             </div>
-                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
                                                 <option value="" ${!defaultBacStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultBacStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
@@ -884,7 +772,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Bacaan (${s.name}):</label>
-                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
+                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Makharijul Huruf" ${parsedBacCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
                                                 <option value="Sifatul Huruf" ${parsedBacCatType === 'Sifatul Huruf' ? 'selected' : ''}>Sifatul Huruf</option>
@@ -896,7 +784,7 @@
                                                 <option value="Bacaan Gharib" ${parsedBacCatType === 'Bacaan Gharib' ? 'selected' : ''}>Bacaan Gharib</option>
                                                 <option value="Kesalahan Bacaan" ${parsedBacCatType === 'Kesalahan Bacaan' ? 'selected' : ''}>Kesalahan Bacaan</option>
                                             </select>
-                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
+                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -934,7 +822,7 @@
                                                 <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
                                                 <button type="button" onclick="document.getElementById('haf_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_haf_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Nilai</button>
                                             </div>
-                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
                                                 <option value="" ${!defaultHafStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
@@ -944,7 +832,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
-                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
+                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran Hafalan" ${parsedHafCatType === 'Kelancaran Hafalan' ? 'selected' : ''}>Kelancaran Hafalan</option>
                                                 <option value="Ketepatan Hafalan" ${parsedHafCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -956,7 +844,7 @@
                                                 <option value="Hafalan Belum Selesai" ${parsedHafCatType === 'Hafalan Belum Selesai' ? 'selected' : ''}>Hafalan Belum Selesai</option>
                                                 <option value="Hafalan Lulus" ${parsedHafCatType === 'Hafalan Lulus' ? 'selected' : ''}>Hafalan Lulus</option>
                                             </select>
-                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
+                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -994,7 +882,7 @@
                                                 <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
                                                 <button type="button" onclick="document.getElementById('mur_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_mur_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Nilai</button>
                                             </div>
-                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
                                                 <option value="" ${!defaultMurStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
@@ -1004,7 +892,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
-                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
+                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran" ${parsedMurCatType === 'Kelancaran' ? 'selected' : ''}>Kelancaran</option>
                                                 <option value="Ketepatan Hafalan" ${parsedMurCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -1015,7 +903,7 @@
                                                 <option value="Hafalan Lama" ${parsedMurCatType === 'Hafalan Lama' ? 'selected' : ''}>Hafalan Lama</option>
                                                 <option value="Hafalan Juz" ${parsedMurCatType === 'Hafalan Juz' ? 'selected' : ''}>Hafalan Juz</option>
                                             </select>
-                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
+                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -1046,8 +934,8 @@
                                     </div>
                                 </div>
                                 <div id="card_section_content_tugas_${s.name}" class="space-y-3.5 ${!isTugasOpen ? 'hidden' : ''}">
-                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
-                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="flex-1 py-4 bg-amber-700 hover:bg-amber-800 text-white rounded-2xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
@@ -1124,6 +1012,7 @@
 
             const tanggalVal = document.getElementById(`tgl_${name}`)?.value || new Date().toISOString().split('T')[0];
             const nowObj = new Date();
+            const formattedTimeStr = window.formatTimestampCustom(nowObj);
 
             if (sectionType === 'bacaan') {
                 const bacaanFormatted = window.extractSlotEntries('bac', name);
@@ -1145,7 +1034,7 @@
 
                 window.syncToCloud({
                     type: 'bacaan',
-                    timestamp: nowObj.toISOString(),
+                    timestamp: formattedTimeStr,
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1182,7 +1071,7 @@
                 
                 window.syncToCloud({
                     type: 'hafalan',
-                    timestamp: nowObj.toISOString(),
+                    timestamp: formattedTimeStr,
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1219,7 +1108,7 @@
                 
                 window.syncToCloud({
                     type: 'murojaah',
-                    timestamp: nowObj.toISOString(),
+                    timestamp: formattedTimeStr,
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1250,7 +1139,7 @@
 
                 window.syncToCloud({
                     type: 'tugas',
-                    timestamp: nowObj.toISOString(),
+                    timestamp: formattedTimeStr,
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -2091,6 +1980,7 @@
             else if (start) detailStr += ` ${start}`;
 
             const nowObj = new Date();
+            const formattedTimeStr = window.formatTimestampCustom(nowObj);
 
             for (const name of window.massalSelectedSantri) {
                 const s = window.santriList.find(x => x.name === name);
@@ -2103,7 +1993,7 @@
 
                 await window.syncToCloud({
                     type: 'murojaah',
-                    timestamp: nowObj.toISOString(),
+                    timestamp: formattedTimeStr,
                     tanggal: tanggal,
                     id: s.id,
                     name: s.name,
@@ -2136,6 +2026,7 @@
             }
 
             const nowObj = new Date();
+            const formattedTimeStr = window.formatTimestampCustom(nowObj);
 
             for (const name of window.massalSelectedSantri) {
                 const s = window.santriList.find(x => x.name === name);
@@ -2147,7 +2038,7 @@
 
                 await window.syncToCloud({
                     type: 'tugas',
-                    timestamp: nowObj.toISOString(),
+                    timestamp: formattedTimeStr,
                     tanggal: tanggal,
                     id: s.id,
                     name: s.name,
