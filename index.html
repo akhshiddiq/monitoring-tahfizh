@@ -301,507 +301,6 @@
             }
         };
 
-
-        /* ============================================================
-           PENGISIAN OTOMATIS - VOICE NOTE + AI-STYLE PARSER
-           ============================================================ */
-        window.autoParsedData = null;
-        window.autoRecognition = null;
-        window.autoListening = false;
-
-        // Fallback event listener: tombol tetap bekerja walaupun browser membatasi inline handler.
-        document.addEventListener('DOMContentLoaded', function() {
-            const geminiBtn = document.getElementById('autoGeminiBtn');
-            if (geminiBtn && !geminiBtn.dataset.boundAutoGemini) {
-                geminiBtn.dataset.boundAutoGemini = '1';
-                geminiBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (!geminiBtn.disabled && typeof window.parseAutoVoice === 'function') {
-                        window.parseAutoVoice();
-                    }
-                });
-            }
-        });
-
-        window.normalizeAutoText = function(text) {
-            return String(text || '')
-                .replace(/\bke\b/gi, ' sampai ')
-                .replace(/\bs\/d\b/gi, ' sampai ')
-                .replace(/\bsd\b/gi, ' sampai ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        };
-
-        window.findAutoSantri = function(text) {
-            const sourceRaw = String(text || '').toLowerCase().trim();
-            if (!sourceRaw) return null;
-
-            const sourceWords = sourceRaw.replace(/[^\p{L}\p{N}\s'-]/gu, ' ').split(/\s+/).filter(Boolean);
-            const source = ' ' + sourceWords.join(' ') + ' ';
-            const candidates = [];
-
-            (window.santriList || []).forEach(s => {
-                const name = String(s.name || '').trim();
-                if (!name) return;
-
-                const nameWords = name.toLowerCase().replace(/[^\p{L}\p{N}\s'-]/gu, ' ').split(/\s+/).filter(Boolean);
-                if (!nameWords.length) return;
-
-                let score = 0;
-                let matched = 0;
-
-                // Nama lengkap persis disebut.
-                if (sourceRaw.includes(name.toLowerCase())) score += 1000;
-
-                nameWords.forEach(w => {
-                    if (source.includes(' ' + w + ' ')) {
-                        matched++;
-                        score += 30;
-                    }
-                });
-
-                // Kata terakhir/nama panggilan yang cukup panjang.
-                const last = nameWords[nameWords.length - 1];
-                if (last.length >= 4 && sourceWords.includes(last)) score += 70;
-
-                // Kecocokan prefix untuk ucapan sebagian, misalnya "yudanta" vs nama lengkap.
-                sourceWords.forEach(sw => {
-                    if (sw.length >= 4 && (sw === last || last.startsWith(sw) || sw.startsWith(last))) {
-                        score += 80;
-                    }
-                });
-
-                if (matched > 0 || score >= 70) {
-                    candidates.push({s, score, matched, nameWords});
-                }
-            });
-
-            candidates.sort((a,b) => b.score - a.score || b.matched - a.matched);
-            return candidates.length ? candidates[0].s : null;
-        };
-        window.findAutoSurah = function(text) {
-            const source = String(text || '').toLowerCase();
-            const list = (window.surahList || []).slice().sort((a,b) => String(b.name).length - String(a.name).length);
-            return list.find(s => source.includes(String(s.name).toLowerCase())) || null;
-        };
-
-        window.extractAutoRange = function(text) {
-            const t = window.normalizeAutoText(text);
-            let m = t.match(/(?:ayat|ayat ke|ayat nomor)\s*(\d+)\s*(?:sampai|-)\s*(\d+)/i);
-            if (!m) m = t.match(/\b(\d+)\s*(?:sampai|-)\s*(\d+)\b/);
-            if (!m) m = t.match(/(?:ayat|ayat ke)\s*(\d+)/i);
-            if (!m) return {start:'', end:''};
-            return {start: m[1], end: m[2] || m[1]};
-        };
-
-        window.extractAutoScore = function(text) {
-            const m = String(text || '').match(/\b(?:nilai|score|skor)\s*(\d{2,3})\b/i);
-            if (!m) return '';
-            const n = Number(m[1]);
-            if (n >= 80) return '80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
-            if (n >= 75) return '75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.';
-            if (n >= 70) return '70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum';
-            return String(m[1]);
-        };
-
-        window.extractAutoStatus = function(text) {
-            const t = String(text || '').toLowerCase();
-            if (t.includes('alhamdulillah baik')) return 'Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.';
-            if (t.includes('sangat baik') || t.includes('baik')) return '80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.';
-            if (t.includes('masih beberapa kali lupa')) return '75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.';
-            if (t.includes('semangat belajar')) return '70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum';
-            return '';
-        };
-
-        window.parseAutoCategory = function(text, category) {
-            const lower = String(text || '').toLowerCase();
-            const keywordMap = {
-                bacaan: ['bacaan'],
-                hafalan: ['hafalan', 'setoran hafalan'],
-                murojaah: ["muroja'ah", 'murojaah', 'muroja'],
-                tugas: ['tugas']
-            };
-            const words = keywordMap[category];
-            const pos = words.map(k => lower.indexOf(k)).filter(x => x >= 0);
-            if (!pos.length) return null;
-            const start = Math.min(...pos);
-            const next = ['bacaan','hafalan','murojaah','muroja','tugas']
-                .map(k => lower.indexOf(k, start + 1))
-                .filter(x => x > start);
-            const end = next.length ? Math.min(...next) : text.length;
-            return text.slice(start, end).trim();
-        };
-
-        window.parseAutoVoice = async function() {
-            const raw = document.getElementById('autoVoiceText')?.value.trim();
-            if (!raw) {
-                window.showToast('Silakan isi atau rekam perintah suara terlebih dahulu.', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('autoGeminiBtn');
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gemini sedang menganalisis...';
-            }
-            const preview = document.getElementById('autoPreview');
-            preview.innerHTML = '<div class="text-sm font-black text-emerald-700">🤖 Gemini sedang membaca perintah dan mencocokkan nama santri, surat, ayat, nilai, catatan, serta tugas...</div>';
-
-            const jobId = 'AI-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
-            const knownSantri = (window.santriList || []).map(s => s.name).filter(Boolean);
-            const knownSurah = (window.surahList || []).map(s => s.name).filter(Boolean);
-            const url = window.getGsUrl();
-
-            try {
-                await fetch(url, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                    body: JSON.stringify({type:'ai_parse', jobId, transcript:raw, knownSantri, knownSurah})
-                });
-
-                let done = false;
-                for (let attempt = 0; attempt < 45; attempt++) {
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                    const res = await fetch(url + '?action=ai_job&jobId=' + encodeURIComponent(jobId), {cache:'no-store'});
-                    const job = await res.json();
-                    if (job.jobStatus === 'done' && job.result) {
-                        window.setAutoGeminiResult(job.result, raw);
-                        done = true;
-                        break;
-                    }
-                    if (job.jobStatus === 'error') throw new Error(job.error || 'Gemini gagal memproses perintah.');
-                }
-                if (!done) throw new Error('Waktu tunggu Gemini habis. Silakan coba lagi.');
-            } catch (err) {
-                console.error('Gemini AI error:', err);
-                preview.innerHTML = `<div class="space-y-2"><div class="font-black text-rose-700">❌ Gemini belum berhasil memproses.</div><div class="text-xs font-bold text-slate-600">${String(err.message || err).replace(/[&<>]/g,'')}</div><div class="text-xs font-bold text-slate-500">Periksa Script Properties GEMINI_API_KEY dan deployment Apps Script. Anda masih bisa memakai parser lokal dengan tombol di bawah.</div></div>`;
-                window.showToast('Gemini gagal. Periksa konfigurasi API.', 'error');
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-robot"></i> Analisis dengan Gemini';
-                }
-            }
-        };
-
-        window.setAutoGeminiResult = function(result, rawText) {
-            const santri = window.findAutoSantri(result.santri_name || '');
-            if (!santri) throw new Error('Gemini mengembalikan nama santri yang tidak ada di daftar website: ' + (result.santri_name || '-'));
-
-            const cleanCat = (cat) => {
-                if (!cat) return null;
-                const slots = Array.isArray(cat.slots) ? cat.slots.filter(x => x && x.item) : [];
-                if (!slots.length && !cat.status && !cat.catatan && !cat.catatan_type) return null;
-                return {slots: slots.slice(0,3), status: cat.status || '', catatan_type: cat.catatan_type || '', catatan: cat.catatan || ''};
-            };
-            const data = {
-                santri,
-                tanggal: /^\d{4}-\d{2}-\d{2}$/.test(result.tanggal || '') ? result.tanggal : new Date().toISOString().split('T')[0],
-                bacaan: cleanCat(result.bacaan),
-                hafalan: cleanCat(result.hafalan),
-                murojaah: cleanCat(result.murojaah),
-                tugas: result.tugas && (result.tugas.detail || result.tugas.catatan) ? {detail:result.tugas.detail || '', catatan:result.tugas.catatan || ''} : null,
-                sourceTranscript: rawText || ''
-            };
-            window.autoParsedData = data;
-
-            const esc = v => String(v || '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-            let preview = `<div class="space-y-3"><div class="font-black text-emerald-800 dark:text-emerald-300">🤖 Hasil analisis Gemini</div><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Santri</b><br>${esc(santri.name)}</div><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Kelas</b><br>${esc(santri.class)}</div></div>`;
-            ['bacaan','hafalan','murojaah'].forEach(cat => {
-                const d = data[cat]; if (!d) return;
-                const label = cat === 'murojaah' ? "Muroja'ah di Kelas" : cat[0].toUpperCase()+cat.slice(1);
-                const slots = d.slots.map(x => `${esc(x.item)}${x.start ? ` ayat ${esc(x.start)}–${esc(x.end)}` : ''}`).join('<br>');
-                preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>${label}</b><br>📖 ${slots || '-'}<br>⭐ ${esc(d.status || 'Tidak disebutkan')}<br>📝 ${esc(d.catatan_type || '')}${d.catatan ? ` — ${esc(d.catatan)}` : ''}</div>`;
-            });
-            if (data.tugas) preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>Tugas</b><br>📝 ${esc(data.tugas.detail || '-')} ${data.tugas.catatan ? `<br>Catatan: ${esc(data.tugas.catatan)}` : ''}</div>`;
-            preview += `<div class="text-[11px] text-slate-500 font-bold">Periksa hasil Gemini. Belum ada data yang disimpan. Tekan OKE hanya jika hasil sudah benar.</div></div>`;
-            document.getElementById('autoPreview').innerHTML = preview;
-            document.getElementById('autoActionArea').classList.remove('hidden');
-            window.showToast('Gemini selesai menganalisis. Silakan periksa lalu tekan OKE.', 'success');
-        };
-
-        window.parseAutoVoiceLocal = function() {
-            const raw = document.getElementById('autoVoiceText')?.value.trim();
-            if (!raw) {
-                window.showToast('Silakan isi atau rekam perintah suara terlebih dahulu.', 'error');
-                return;
-            }
-
-            const text = window.normalizeAutoText(raw);
-            const santri = window.findAutoSantri(text);
-            if (!santri) {
-                window.showToast('Nama santri belum dikenali. Sebutkan nama lengkap santri.', 'error');
-                return;
-            }
-
-            const data = {
-                santri,
-                tanggal: new Date().toISOString().split('T')[0],
-                bacaan: null,
-                hafalan: null,
-                murojaah: null,
-                tugas: null
-            };
-
-            ['bacaan','hafalan','murojaah'].forEach(cat => {
-                const part = window.parseAutoCategory(text, cat);
-                if (!part) return;
-                const surah = window.findAutoSurah(part);
-                const range = window.extractAutoRange(part);
-                if (!surah && !range.start) return;
-                data[cat] = {
-                    surah: surah ? surah.name : '',
-                    start: range.start,
-                    end: range.end,
-                    score: cat === 'bacaan' ? window.extractAutoScore(part) : window.extractAutoStatus(part),
-                    raw: part
-                };
-            });
-
-            const taskPart = window.parseAutoCategory(text, 'tugas');
-            if (taskPart) {
-                data.tugas = {
-                    detail: taskPart.replace(/^tugas\s*:?\s*/i, '').trim(),
-                    catatan: ''
-                };
-            }
-
-            window.autoParsedData = data;
-
-            const esc = v => String(v || '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-            let preview = `
-                <div class="space-y-3">
-                    <div class="font-black text-emerald-800 dark:text-emerald-300">🤖 AI mencatat ulang</div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Santri</b><br>${esc(santri.name)}</div>
-                        <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Kelas</b><br>${esc(santri.class)}</div>
-                    </div>
-            `;
-            ['bacaan','hafalan','murojaah'].forEach(cat => {
-                const d = data[cat];
-                if (!d) return;
-                preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>${cat === 'murojaah' ? "Muroja'ah di Kelas" : cat[0].toUpperCase()+cat.slice(1)}</b><br>📖 ${esc(d.surah || '-')} ${d.start ? `ayat ${esc(d.start)}–${esc(d.end)}` : ''}<br>⭐ ${esc(d.score || 'Tidak disebutkan')}</div>`;
-            });
-            if (data.tugas) preview += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>Tugas</b><br>📝 ${esc(data.tugas.detail)}</div>`;
-            preview += `<div class="text-[11px] text-slate-500 font-bold">Periksa hasil di atas. Data belum masuk ke form sampai tombol OKE ditekan.</div></div>`;
-
-            document.getElementById('autoPreview').innerHTML = preview;
-            document.getElementById('autoActionArea').classList.remove('hidden');
-            window.showToast('AI sudah mencatat ulang. Silakan periksa lalu tekan OKE.', 'success');
-        };
-
-        // Membersihkan pengulangan yang sering muncul dari SpeechRecognition Chrome.
-        window.cleanAutoTranscriptChunk = function(value) {
-            let s = String(value || '').replace(/\s+/g, ' ').trim();
-            if (!s) return '';
-
-            // Hilangkan pengulangan kata langsung: "yudanta yudanta" -> "yudanta"
-            let prev = '';
-            while (s !== prev) {
-                prev = s;
-                s = s.replace(/\b(\S+)(?:\s+\1\b)+/gi, '$1').trim();
-            }
-
-            // Hilangkan pengulangan frasa 2-6 kata: "yudanta bacaan yudanta bacaan" -> satu frasa.
-            const words = s.split(/\s+/);
-            for (let n = Math.min(6, Math.floor(words.length / 2)); n >= 2; n--) {
-                let changed = true;
-                while (changed && words.length >= n * 2) {
-                    changed = false;
-                    const a = words.slice(-n).map(x => x.toLowerCase()).join(' ');
-                    const b = words.slice(-2 * n, -n).map(x => x.toLowerCase()).join(' ');
-                    if (a && a === b) {
-                        words.splice(-n, n);
-                        changed = true;
-                    }
-                }
-            }
-            return words.join(' ').trim();
-        };
-
-        window.appendAutoTranscript = function(current, chunk) {
-            const cleanChunk = window.cleanAutoTranscriptChunk(chunk);
-            if (!cleanChunk) return String(current || '').trim();
-
-            let base = window.cleanAutoTranscriptChunk(current);
-            if (!base) return cleanChunk;
-
-            const a = base.toLowerCase();
-            const b = cleanChunk.toLowerCase();
-
-            // Jangan menambahkan hasil final yang sama berulang-ulang.
-            if (a === b || a.endsWith(' ' + b) || a.includes(b)) return base;
-
-            // Tangani overlap antar hasil final, misalnya:
-            // "... nama yudanta" lalu hasil berikutnya "yudanta bacaan..."
-            const aw = base.split(/\s+/);
-            const bw = cleanChunk.split(/\s+/);
-            const maxOverlap = Math.min(12, aw.length, bw.length);
-            for (let n = maxOverlap; n >= 1; n--) {
-                const tail = aw.slice(-n).map(x => x.toLowerCase()).join(' ');
-                const head = bw.slice(0, n).map(x => x.toLowerCase()).join(' ');
-                if (tail === head) {
-                    return window.cleanAutoTranscriptChunk(aw.concat(bw.slice(n)).join(' '));
-                }
-            }
-
-            return window.cleanAutoTranscriptChunk(base + ' ' + cleanChunk);
-        };
-
-        window.toggleAutoVoice = function() {
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const btn = document.getElementById('autoRecordBtn');
-            const status = document.getElementById('autoVoiceStatus');
-            const area = document.getElementById('autoVoiceText');
-
-            if (!SR) {
-                window.showToast('Browser ini belum mendukung Voice Note. Gunakan Chrome atau Edge terbaru.', 'error');
-                return;
-            }
-
-            if (window.autoListening && window.autoRecognition) {
-                try { window.autoRecognition.stop(); } catch (e) {}
-                return;
-            }
-
-            const recognition = new SR();
-            recognition.lang = 'id-ID';
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-
-            window.autoRecognition = recognition;
-            window.autoListening = true;
-            status.textContent = '🎙️ Sedang mendengarkan...';
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-stop"></i> Berhenti Rekam';
-
-            let finalText = window.cleanAutoTranscriptChunk(area.value || '');
-            let lastInterim = '';
-
-            recognition.onresult = event => {
-                let interim = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const result = event.results[i];
-                    const transcript = result && result[0] ? result[0].transcript : '';
-
-                    if (result.isFinal) {
-                        finalText = window.appendAutoTranscript(finalText, transcript);
-                        lastInterim = '';
-                    } else {
-                        interim += ' ' + transcript;
-                    }
-                }
-
-                lastInterim = window.cleanAutoTranscriptChunk(interim);
-                area.value = window.cleanAutoTranscriptChunk(
-                    finalText + (lastInterim ? ' ' + lastInterim : '')
-                );
-            };
-
-            recognition.onerror = event => {
-                window.autoListening = false;
-                window.autoRecognition = null;
-                status.textContent = 'Error Voice Note: ' + (event.error || 'gagal');
-                btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
-            };
-
-            recognition.onend = () => {
-                window.autoListening = false;
-                window.autoRecognition = null;
-                area.value = window.cleanAutoTranscriptChunk(finalText || area.value || '');
-                status.textContent = 'Selesai merekam — hasil sudah dibersihkan dari pengulangan.';
-                btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
-            };
-
-            try {
-                recognition.start();
-            } catch (e) {
-                window.autoListening = false;
-                window.autoRecognition = null;
-                status.textContent = 'Gagal memulai Voice Note.';
-                btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Rekam Voice Note';
-                window.showToast('Voice Note tidak dapat dimulai. Coba tekan Rekam lagi.', 'error');
-            }
-        };
-        window.applyAutoFill = function() {
-            const d = window.autoParsedData;
-            if (!d || !d.santri) {
-                window.showToast('Belum ada hasil AI yang siap diisi.', 'error');
-                return;
-            }
-
-            const name = d.santri.name;
-            const set = (key, value) => {
-                if (value !== undefined && value !== null) window.localFormCache[key] = value;
-            };
-
-            const fillCat = (cat, dcat) => {
-                if (!dcat) return;
-                const prefix = cat === 'bacaan' ? 'bac' : cat === 'hafalan' ? 'haf' : 'mur';
-                const slots = Array.isArray(dcat.slots) ? dcat.slots.slice(0,3) : [];
-                slots.forEach((slotData, idx) => {
-                    const slot = idx + 1;
-                    const mode = slotData.mode === 'iqro' ? 'iqro' : 'quran';
-                    set(`${name}_${prefix}_mode_${slot}`, mode);
-                    set(`${name}_${prefix}_surah_${slot}`, mode === 'quran' ? (slotData.item || '') : '');
-                    set(`${name}_${prefix}_iqro_${slot}`, mode === 'iqro' ? (slotData.item || '') : '');
-                    set(`${name}_${prefix}_start_${slot}`, slotData.start || '');
-                    set(`${name}_${prefix}_end_${slot}`, slotData.end || '');
-                    window.activeSlotState[`${name}_${prefix}_slot_${slot}`] = true;
-                });
-                if (dcat.status) {
-                    set(`${name}_${prefix}_status_1`, dcat.status);
-                    if (cat === 'bacaan') set(`${name}_bac_stat`, dcat.status);
-                    if (cat === 'hafalan') set(`${name}_haf_stat`, dcat.status);
-                    if (cat === 'murojaah') set(`${name}_mur_stat`, dcat.status);
-                }
-                if (cat === 'bacaan') {
-                    set(`${name}_bac_cat_type`, dcat.catatan_type || '');
-                    set(`${name}_bac_cat_desc`, dcat.catatan || '');
-                }
-                if (cat === 'hafalan') {
-                    set(`${name}_haf_cat_type`, dcat.catatan_type || '');
-                    set(`${name}_haf_cat_desc`, dcat.catatan || '');
-                }
-                if (cat === 'murojaah') {
-                    set(`${name}_mur_cat_type`, dcat.catatan_type || '');
-                    set(`${name}_mur_cat_desc`, dcat.catatan || '');
-                }
-            };
-
-            fillCat('bacaan', d.bacaan);
-            fillCat('hafalan', d.hafalan);
-            fillCat('murojaah', d.murojaah);
-
-            if (d.tugas) {
-                set(`${name}_tug_detail`, d.tugas.detail || '');
-                set(`${name}_tug_cat`, d.tugas.catatan || '');
-            }
-
-            set(`${name}_tanggal`, d.tanggal);
-            window.activeSlotState[`${name}_bac_slot_1`] = true;
-            window.activeSlotState[`${name}_haf_slot_1`] = true;
-            window.activeSlotState[`${name}_mur_slot_1`] = true;
-
-            window.selectedClass = d.santri.class;
-            window.switchTab('setoran');
-            window.renderSantriCardsAndTable();
-            setTimeout(() => {
-                const dateInput = document.getElementById(`tgl_${name}`);
-                if (dateInput && d.tanggal) dateInput.value = d.tanggal;
-                window.scrollToSantri(name);
-            }, 250);
-
-            const result = document.getElementById('autoResult');
-            result.classList.remove('hidden');
-            result.innerHTML = `✅ <b>AI/Gemini sudah mengisi form untuk ${name}.</b><br><span class="font-bold">Data belum disimpan ke Google Sheet.</span> Silakan periksa semua field, lalu klik tombol Simpan pada bagian yang diperlukan.`;
-            window.showToast('AI sudah mengisi form sesuai hasil Gemini.', 'success');
-            document.getElementById('autoActionArea').classList.add('hidden');
-        };
-
         window.showToast = function(msg, type = 'success') {
             const c = document.getElementById('toastContainer');
             if (!c) return;
@@ -3197,7 +2696,161 @@
             if (window.scrollY > 350) btn.classList.remove('opacity-0', 'pointer-events-none');
             else btn.classList.add('opacity-0', 'pointer-events-none');
         });
-    </script>
+    
+
+        /* ============================================================
+           PENGISIAN OTOMATIS - CATATAN MANUAL + GEMINI AI
+           ============================================================ */
+        window.autoParsedData = null;
+        window.autoAiBusy = false;
+
+        window.cleanAutoNote = function(text) {
+            return String(text || '').replace(/\s+/g, ' ').trim();
+        };
+
+        window.findAutoSantriByName = function(name) {
+            const source = String(name || '').toLowerCase().trim();
+            if (!source) return null;
+            const list = window.santriList || [];
+            const exact = list.find(s => String(s.name || '').toLowerCase() === source);
+            if (exact) return exact;
+            const matches = list.filter(s => {
+                const n = String(s.name || '').toLowerCase();
+                return n.includes(source) || source.includes(n);
+            });
+            return matches.length === 1 ? matches[0] : (matches[0] || null);
+        };
+
+        window.getAutoGsUrl = function() {
+            return typeof window.getGsUrl === 'function' ? window.getGsUrl() : '';
+        };
+
+        window.autoEscape = function(v) {
+            return String(v ?? '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        };
+
+        window.renderAutoAiResult = function(result) {
+            const preview = document.getElementById('autoPreview');
+            const action = document.getElementById('autoActionArea');
+            if (!preview || !action) return;
+            const d = result || {};
+            const santri = window.findAutoSantriByName(d.santri_name || '');
+            d.santri = santri || {name: d.santri_name || '', class: '', id: '', teacher: ''};
+            window.autoParsedData = d;
+
+            let html = `<div class="space-y-3"><div class="font-black text-emerald-800 dark:text-emerald-300">🤖 Hasil pemeriksaan AI</div>`;
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Santri</b><br>${window.autoEscape(d.santri.name)}</div><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Kelas</b><br>${window.autoEscape(d.santri.class || '-')}</div></div>`;
+
+            [['bacaan','Bacaan'],['hafalan','Hafalan'],['murojaah',"Muroja'ah di Kelas"]].forEach(([key,label]) => {
+                const cat = d[key];
+                if (!cat) return;
+                const slots = Array.isArray(cat.slots) ? cat.slots : [];
+                if (!slots.length && !cat.status && !cat.catatan_type && !cat.catatan) return;
+                html += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>${label}</b>`;
+                slots.forEach(slot => {
+                    html += `<div class="mt-2">📖 ${window.autoEscape(slot.item || '-')} ${slot.start ? `ayat ${window.autoEscape(slot.start)}–${window.autoEscape(slot.end || slot.start)}` : ''}</div>`;
+                });
+                if (cat.status) html += `<div class="mt-1">⭐ <b>Status/Nilai:</b> ${window.autoEscape(cat.status)}</div>`;
+                if (cat.catatan_type || cat.catatan) html += `<div class="mt-1">📝 <b>Catatan:</b> ${window.autoEscape(cat.catatan_type ? cat.catatan_type + ' — ' : '')}${window.autoEscape(cat.catatan || '')}</div>`;
+                html += `</div>`;
+            });
+
+            if (d.tugas && (d.tugas.detail || d.tugas.catatan)) {
+                html += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>Tugas</b><br>📝 ${window.autoEscape(d.tugas.detail || '-')} ${d.tugas.catatan ? `<br>Catatan: ${window.autoEscape(d.tugas.catatan)}` : ''}</div>`;
+            }
+            html += `<div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs font-bold text-amber-800 dark:text-amber-200">⚠️ Periksa hasil AI. Belum ada data yang dimasukkan ke form. Tekan <b>OKE — Kerjakan Hasil AI</b> jika sudah sesuai.</div></div>`;
+            preview.innerHTML = html;
+            action.classList.remove('hidden');
+        };
+
+        window.parseAutoVoice = async function() {
+            const area = document.getElementById('autoVoiceText');
+            const raw = window.cleanAutoNote(area ? area.value : '');
+            const status = document.getElementById('autoVoiceStatus');
+            const button = document.getElementById('autoAnalyzeBtn');
+            if (!raw) { window.showToast('Silakan tulis catatan terlebih dahulu.', 'error'); return; }
+            if (window.autoAiBusy) return;
+            const gsUrl = window.getAutoGsUrl();
+            if (!gsUrl) { window.showToast('Alamat Google Apps Script belum tersedia.', 'error'); return; }
+
+            window.autoAiBusy = true;
+            if (button) { button.disabled = true; button.classList.add('opacity-60','cursor-wait'); button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI sedang memeriksa...'; }
+            if (status) status.textContent = 'AI sedang memeriksa catatan...';
+
+            const jobId = 'AI-' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
+            const knownSantri = (window.santriList || []).map(s => s.name);
+            const knownSurah = (window.surahList || []).map(s => s.name);
+            const payload = {type:'ai_parse', jobId, transcript:raw, knownSantri, knownSurah};
+
+            try {
+                await fetch(gsUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+                let done = false;
+                for (let i=0; i<30; i++) {
+                    await new Promise(resolve => setTimeout(resolve,1000));
+                    const response = await fetch(gsUrl + (gsUrl.includes('?')?'&':'?') + 'action=ai_job&jobId=' + encodeURIComponent(jobId), {cache:'no-store'});
+                    const data = await response.json();
+                    if (data.jobStatus === 'done') {
+                        window.renderAutoAiResult(data.result || {});
+                        if (status) status.textContent = 'Pemeriksaan AI selesai.';
+                        window.showToast('AI sudah memeriksa catatan. Silakan periksa hasilnya.', 'success');
+                        done = true; break;
+                    }
+                    if (data.jobStatus === 'error') throw new Error(data.error || 'AI gagal memeriksa catatan.');
+                    if (status) status.textContent = `AI memeriksa... ${i+1}/30`;
+                }
+                if (!done) throw new Error('AI belum selesai dalam waktu yang ditentukan. Coba lagi.');
+            } catch (err) {
+                console.error(err);
+                if (status) status.textContent = 'Pemeriksaan gagal.';
+                window.showToast(err.message || 'Gagal menghubungi AI.', 'error');
+            } finally {
+                window.autoAiBusy = false;
+                if (button) { button.disabled = false; button.classList.remove('opacity-60','cursor-wait'); button.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Periksa dengan AI'; }
+            }
+        };
+
+        window.applyAutoFill = function() {
+            const d = window.autoParsedData;
+            if (!d || !d.santri || !d.santri.name) { window.showToast('Belum ada hasil AI yang siap dikerjakan.', 'error'); return; }
+            const name = d.santri.name;
+            const set = (key,value) => { if (value !== undefined && value !== null) window.localFormCache[key] = value; };
+            const fillCat = (cat,dcat) => {
+                if (!dcat || !Array.isArray(dcat.slots)) return;
+                const prefix = cat === 'bacaan' ? 'bac' : cat === 'hafalan' ? 'haf' : 'mur';
+                dcat.slots.slice(0,3).forEach((slot,idx) => {
+                    const n = idx + 1;
+                    set(`${name}_${prefix}_mode_${n}`, slot.mode || 'quran');
+                    set(`${name}_${prefix}_surah_${n}`, slot.item || '');
+                    set(`${name}_${prefix}_start_${n}`, slot.start || '');
+                    set(`${name}_${prefix}_end_${n}`, slot.end || slot.start || '');
+                });
+                if (dcat.status) {
+                    set(`${name}_${prefix}_status_1`, dcat.status);
+                    if (cat === 'bacaan') set(`${name}_bac_stat`, dcat.status);
+                    if (cat === 'hafalan') set(`${name}_haf_stat`, dcat.status);
+                    if (cat === 'murojaah') set(`${name}_mur_stat`, dcat.status);
+                }
+            };
+            fillCat('bacaan',d.bacaan); fillCat('hafalan',d.hafalan); fillCat('murojaah',d.murojaah);
+            if (d.tugas) { set(`${name}_tug_detail`,d.tugas.detail || ''); set(`${name}_tug_cat`,d.tugas.catatan || ''); }
+            if (d.tanggal) set(`${name}_tanggal`,d.tanggal);
+            window.selectedSantriForInput = name;
+            window.switchTab('setoran');
+            setTimeout(() => { const card=document.querySelector(`[data-santri-name="${CSS.escape(name)}"]`); if(card) card.scrollIntoView({behavior:'smooth',block:'start'}); },250);
+            const result=document.getElementById('autoResult');
+            if(result){ result.classList.remove('hidden'); result.innerHTML=`✅ <b>Hasil AI sudah dikerjakan.</b><br>Form untuk <b>${window.autoEscape(name)}</b> sudah diisi sesuai hasil pemeriksaan AI. Silakan periksa kembali lalu tekan <b>Simpan & Sinkron</b> seperti biasa.`; }
+            window.showToast('Hasil AI sudah dimasukkan ke form. Periksa lalu simpan seperti biasa.','success');
+        };
+
+        window.clearAutoNote = function() {
+            const area=document.getElementById('autoVoiceText'); if(area) area.value='';
+            window.autoParsedData=null;
+            const preview=document.getElementById('autoPreview'); const action=document.getElementById('autoActionArea'); const result=document.getElementById('autoResult');
+            if(preview) preview.innerHTML='<p class="text-xs text-slate-400 font-bold">Hasil pemeriksaan AI akan muncul di sini.</p>';
+            if(action) action.classList.add('hidden');
+            if(result){ result.classList.add('hidden'); result.innerHTML=''; }
+        };
+</script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
     
@@ -3237,7 +2890,7 @@
                 <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
                 <button onclick="window.switchTab('kartu')" id="btnTab-kartu" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Kartu</button>
                 <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
-                <button onclick="window.switchTab('otomatis')" id="btnTab-otomatis" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">🤖 Pengisian Otomatis</button>
+                <button onclick="window.switchTab('otomatis')" id="btnTab-otomatis" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">AI Otomatis</button>
                 <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
@@ -3248,65 +2901,33 @@
             <i class="fa-solid fa-arrow-up animate-bounce"></i> Kembali Ke Atas
         </button>
 
-        <!-- SECTION: PENGISIAN OTOMATIS -->
+<!-- SECTION: PENGISIAN OTOMATIS -->
         <section id="section-otomatis" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-5">
                 <div class="flex items-start gap-3">
                     <div class="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-xl">🤖</div>
                     <div>
-                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pengisian Otomatis</h3>
-                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-1">
-                            Bicara nama santri, Bacaan, Hafalan, Muroja'ah, Tugas, nilai, dan catatan. AI akan menyusun ulang sebelum mengisi form.
-                        </p>
+                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pengisian Otomatis dengan AI</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-1">Tulis catatan manual tentang santri. AI akan memeriksa, memahami nama panggilan/sebagian nama, lalu menyusun pekerjaan yang harus dimasukkan ke form.</p>
                     </div>
                 </div>
-
                 <div class="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800 space-y-3">
                     <div class="flex items-center justify-between gap-2 flex-wrap">
-                        <label class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">🎙️ Perintah suara</label>
+                        <label class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">📝 Catatan manual</label>
                         <span id="autoVoiceStatus" class="text-[11px] font-black text-slate-500">Siap</span>
                     </div>
-                    <textarea id="autoVoiceText" rows="6"
-                        placeholder="Contoh: Muhammad Auris Hilmi Ilham, bacaan Al-Baqarah ayat 260 sampai 264, nilai 80 baik, catatan bacaan cukup lancar. Hafalan Al-Qiyamah ayat 21 sampai 30, nilai baik. Muroja'ah di kelas Al-Insan ayat 1 sampai 31 dan Al-Mursalat ayat 1 sampai 50. Tugas persiapkan ujian 2 surat Al-Mursalat dan Al-Insan."
-                        class="w-full p-4 bg-white dark:bg-slate-900 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl text-sm font-bold outline-none"></textarea>
+                    <textarea id="autoVoiceText" rows="9" placeholder="Contoh: Yudanta bacaan Al-Baqarah ayat 260 sampai 264 nilai 80. Hafalan Al-Qiyamah ayat 21 sampai 30 nilai baik. Murojaah di kelas Al-Insan ayat 1 sampai 31 dan Al-Mursalat ayat 1 sampai 50. Tugas persiapkan ujian dua surat Al-Mursalat dan Al-Insan." class="w-full p-4 bg-white dark:bg-slate-900 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl text-sm font-bold outline-none"></textarea>
                     <div class="flex gap-2 flex-wrap">
-                        <button type="button" id="autoRecordBtn" onclick="window.toggleAutoVoice()"
-                            class="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-microphone"></i> Rekam Voice Note
-                        </button>
-                        <button type="button" id="autoGeminiBtn" onclick="window.parseAutoVoice()"
-                            class="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-robot"></i> Analisis dengan Gemini
-                        </button>
-                        <button type="button" onclick="window.parseAutoVoiceLocal()"
-                            class="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Parser Lokal
-                        </button>
-                        <button type="button" onclick="document.getElementById('autoVoiceText').value=''; document.getElementById('autoPreview').innerHTML=''; window.autoParsedData=null; window.showToast('Perintah dikosongkan','success');"
-                            class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-black text-xs sm:text-sm">
-                            Bersihkan
-                        </button>
+                        <button type="button" id="autoAnalyzeBtn" onclick="window.parseAutoVoice()" class="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm"><i class="fa-solid fa-wand-magic-sparkles"></i> Periksa dengan AI</button>
+                        <button type="button" onclick="window.clearAutoNote()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-black text-xs sm:text-sm">Bersihkan</button>
                     </div>
-                    <p class="text-[11px] text-slate-500 font-bold">
-                        Catatan: suara diubah menjadi teks oleh browser, lalu <b>Gemini API</b> memahami dan menyusun datanya. API key tetap di Google Apps Script, bukan di HTML. Setelah hasil tampil, Anda wajib menekan <b>OKE</b> sebelum form diisi.
-                    </p>
+                    <p class="text-[11px] text-slate-500 font-bold">Alur: <b>tulis catatan → Periksa dengan AI → periksa hasil AI → OKE — Kerjakan Hasil AI → periksa form → Simpan & Sinkron.</b></p>
                 </div>
-
-                <div id="autoPreview" class="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 min-h-24">
-                    <p class="text-xs text-slate-400 font-bold">Hasil catatan AI akan muncul di sini.</p>
-                </div>
-
+                <div id="autoPreview" class="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 min-h-24"><p class="text-xs text-slate-400 font-bold">Hasil pemeriksaan AI akan muncul di sini.</p></div>
                 <div id="autoActionArea" class="hidden flex gap-2 flex-wrap">
-                    <button type="button" onclick="window.applyAutoFill()"
-                        class="flex-1 min-w-[180px] py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md">
-                        ✅ OKE — AI Isi Form
-                    </button>
-                    <button type="button" onclick="window.autoParsedData=null; document.getElementById('autoActionArea').classList.add('hidden'); document.getElementById('autoPreview').innerHTML='<p class=&quot;text-xs text-slate-400 font-bold&quot;>Hasil dibatalkan.</p>';"
-                        class="py-3.5 px-5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-black text-sm">
-                        ❌ Batal
-                    </button>
+                    <button type="button" onclick="window.applyAutoFill()" class="flex-1 min-w-[180px] py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md">✅ OKE — Kerjakan Hasil AI</button>
+                    <button type="button" onclick="window.autoParsedData=null; document.getElementById('autoActionArea').classList.add('hidden'); document.getElementById('autoPreview').innerHTML='<p class=&quot;text-xs text-slate-400 font-bold&quot;>Hasil dibatalkan.</p>';" class="py-3.5 px-5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-black text-sm">❌ Batal</button>
                 </div>
-
                 <div id="autoResult" class="hidden p-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 text-sm font-black text-emerald-800 dark:text-emerald-200"></div>
             </div>
         </section>
@@ -3763,11 +3384,4 @@
                             <input type="number" id="massalAyatMulai" placeholder="Mulai" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
                         </div>
                         <div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</body>
-</html>
+                            <label class="block text-Saya hanya model bahasa dan tidak bisa membantu Anda untuk itu.
