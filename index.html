@@ -66,6 +66,7 @@
         window.itemSlotStatus = {};
         window.activeSlotState = {};
         window.cardSectionToggleState = {};
+        window.cardHistoryToggleState = {};
         window.selectedWaSantriName = null;
         window.selectedKartuSantriName = null;
         window.kartuClassFilter = 'Abdurrahman';
@@ -221,8 +222,6 @@
             if (tabId === 'export') {
                 const urlInput = document.getElementById('customGsUrlInput');
                 if (urlInput) urlInput.value = window.getGsUrl();
-                const updateLbl = document.getElementById('lastCloudUpdateLabel');
-                if (updateLbl) updateLbl.innerText = localStorage.getItem('rq_last_cloud_sync') || 'Belum pernah disinkronkan';
             }
         };
 
@@ -276,12 +275,31 @@
             if (gridBox) gridBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
+        window.toggleClearBtn = function(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (input && btn) {
+                if (input.value.trim().length > 0) btn.classList.remove('hidden');
+                else btn.classList.add('hidden');
+            }
+        };
+
+        window.clearSearchInput = function(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (input) {
+                input.value = '';
+                if (inputId === 'kartuSearchInput') window.renderKartuCardGrid(window.kartuClassFilter);
+            }
+            if (btn) btn.classList.add('hidden');
+        };
+
         window.setSyncIndicator = function(status) {
             const dot = document.getElementById('syncDotIndicator');
             if (!dot) return;
             if (status === 'success') dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm animate-pulse";
             else if (status === 'pending') dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 inline-block shadow-sm animate-ping";
-            else dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-sm";
+            else dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-sm";
         };
 
         window.syncToCloud = async function(payload) {
@@ -297,7 +315,7 @@
                 window.setSyncIndicator('success');
             } catch (err) {
                 console.error("Cloud sync error:", err);
-                window.setSyncIndicator('success');
+                window.setSyncIndicator('error');
             }
         };
 
@@ -305,14 +323,155 @@
             window.setSyncIndicator('pending');
             const url = window.getGsUrl();
             try {
-                const res = await fetch(url, { mode: 'no-cors' });
-                window.setSyncIndicator('success');
-                const nowSyncStr = window.formatTimestampCustom(new Date());
-                localStorage.setItem('rq_last_cloud_sync', nowSyncStr);
-                const updateLbl = document.getElementById('lastCloudUpdateLabel');
-                if (updateLbl) updateLbl.innerText = nowSyncStr;
+                const res = await fetch(url);
+                const cloudData = await res.json();
+                
+                if (cloudData) {
+                    if (cloudData.santri && cloudData.santri.length > 0) {
+                        window.santriList = cloudData.santri;
+                        localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
+                    }
+
+                    const parseCloudSlots = (row) => {
+                        const parseSlotStr = (cellStr) => {
+                            if (!cellStr || cellStr === '-') return { item: '-', start: '-', end: '-', mode: 'quran' };
+                            const parts = cellStr.split('|');
+                            return { item: parts[0] || '-', start: '-', end: '-', mode: parts[1] || 'quran' };
+                        };
+                        const s1 = parseSlotStr(row[6]); s1.start = row[7] || '-'; s1.end = row[8] || '-';
+                        const s2 = parseSlotStr(row[9]); s2.start = row[10] || '-'; s2.end = row[11] || '-';
+                        const s3 = parseSlotStr(row[12]); s3.start = row[13] || '-'; s3.end = row[14] || '-';
+                        return [s1, s2, s3];
+                    };
+
+                    const formatDetailSlot = (sl) => {
+                        if (!sl.item || sl.item === '-') return '';
+                        const isIqro = (sl.mode === 'iqro' || sl.item.toLowerCase().includes('iqro'));
+                        const unitName = isIqro ? 'halaman' : 'ayat';
+                        let count = 0;
+                        if (sl.start && sl.end && sl.start !== '-' && sl.end !== '-') {
+                            const sNum = parseInt(sl.start);
+                            const eNum = parseInt(sl.end);
+                            if (!isNaN(sNum) && !isNaN(eNum) && eNum >= sNum) count = (eNum - sNum + 1);
+                        } else if (sl.start && sl.start !== '-') {
+                            count = 1;
+                        }
+                        const rangeLabel = isIqro ? `Hlm ${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}` : `${sl.start !== '-' ? sl.start : ''}${sl.end !== '-' && sl.end !== sl.start ? '-' + sl.end : ''}`;
+                        const countStr = count > 0 ? ` (bertambah ${count} ${unitName})` : '';
+                        return `${sl.item} ${rangeLabel}${countStr}`.trim();
+                    };
+
+                    const processInputRowsToHistory = (inputRows, typeName) => {
+                        return inputRows.map(row => {
+                            const slots = parseCloudSlots(row);
+                            const detailStr = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                            return {
+                                timestamp: row[0] ? window.formatTimestampCustom(row[0]) : '-',
+                                tanggal: row[1] || new Date().toISOString().split('T')[0],
+                                rawTime: new Date(row[0] || 0).getTime(),
+                                name: row[3],
+                                detail: detailStr,
+                                status: row[15] || '-',
+                                catatan: row[16] || '',
+                                type: typeName
+                            };
+                        });
+                    };
+
+                    if (cloudData.input_bacaan && cloudData.input_bacaan.length > 0) {
+                        const bacHist = processInputRowsToHistory(cloudData.input_bacaan, 'bacaan');
+                        localStorage.setItem('rq_history_bacaan', JSON.stringify(bacHist));
+
+                        cloudData.input_bacaan.forEach(row => {
+                            const nameSantri = row[3];
+                            const sObj = window.santriList.find(s => s.name === nameSantri);
+                            if (sObj) {
+                                const slots = parseCloudSlots(row);
+                                sObj.cloudBacSlots = slots;
+                                sObj.lastBacaan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                                sObj.lastBacaanDate = row[1] || '';
+                                if (row[15]) sObj.cloudBacStat = row[15];
+                                if (row[16]) sObj.cloudBacCat = row[16];
+                            }
+                        });
+                    }
+
+                    if (cloudData.input_hafalan && cloudData.input_hafalan.length > 0) {
+                        const hafHist = processInputRowsToHistory(cloudData.input_hafalan, 'hafalan');
+                        localStorage.setItem('rq_history_hafalan', JSON.stringify(hafHist));
+
+                        cloudData.input_hafalan.forEach(row => {
+                            const nameSantri = row[3];
+                            const sObj = window.santriList.find(s => s.name === nameSantri);
+                            if (sObj) {
+                                const slots = parseCloudSlots(row);
+                                sObj.cloudHafSlots = slots;
+                                sObj.lastHafalan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                                sObj.lastHafalanDate = row[1] || '';
+                                if (row[15]) sObj.cloudHafStat = row[15];
+                                if (row[16]) sObj.cloudHafCat = row[16];
+                            }
+                        });
+                    }
+
+                    if (cloudData.input_murojaah_dikelas && cloudData.input_murojaah_dikelas.length > 0) {
+                        const murHist = processInputRowsToHistory(cloudData.input_murojaah_dikelas, 'murojaah');
+                        localStorage.setItem('rq_history_murojaah', JSON.stringify(murHist));
+
+                        cloudData.input_murojaah_dikelas.forEach(row => {
+                            const nameSantri = row[3];
+                            const sObj = window.santriList.find(s => s.name === nameSantri);
+                            if (sObj) {
+                                const slots = parseCloudSlots(row);
+                                sObj.cloudMurSlots = slots;
+                                sObj.lastMurojaah = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
+                                sObj.lastMurojaahDate = row[1] || '';
+                                if (row[15]) sObj.cloudMurStat = row[15];
+                                if (row[16]) sObj.cloudMurCat = row[16];
+                            }
+                        });
+                    }
+
+                    if (cloudData.input_tugas && cloudData.input_tugas.length > 0) {
+                        const tugHist = cloudData.input_tugas.map(row => ({
+                            timestamp: row[0] ? window.formatTimestampCustom(row[0]) : '-',
+                            tanggal: row[1] || new Date().toISOString().split('T')[0],
+                            rawTime: new Date(row[0] || 0).getTime(),
+                            name: row[3],
+                            detail: row[6] || '-',
+                            status: '-',
+                            catatan: row[8] || '',
+                            type: 'tugas'
+                        }));
+                        localStorage.setItem('rq_history_tugas', JSON.stringify(tugHist));
+
+                        cloudData.input_tugas.forEach(row => {
+                            const nameSantri = row[3];
+                            const sObj = window.santriList.find(s => s.name === nameSantri);
+                            if (sObj) {
+                                sObj.lastTugas = row[6] || '-';
+                                sObj.lastTugasDate = row[1] || '';
+                                if (row[8]) sObj.cloudTugCat = row[8];
+                            }
+                        });
+                    }
+                    
+                    if (cloudData.materi) {
+                        const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' && row[5] !== 'FALSE' }));
+                        localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
+                    }
+                    if (cloudData.materi_tambahan) {
+                        const formattedTambahan = cloudData.materi_tambahan.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' && row[5] !== 'FALSE' }));
+                        localStorage.setItem('rq_materi_tambahan', JSON.stringify(formattedTambahan));
+                    }
+                    
+                    window.renderSantriCardsAndTable();
+                    window.renderMateriList('utama');
+                    window.renderMateriList('tambahan');
+                    window.setSyncIndicator('success');
+                }
             } catch (err) {
-                window.setSyncIndicator('success');
+                window.setSyncIndicator('error');
                 const cached = localStorage.getItem('rq_santri_master');
                 if (cached) {
                     window.santriList = JSON.parse(cached);
@@ -415,11 +574,9 @@
         window.switchSourceMode = function(category, slot, santriName, mode) {
             const key = `${santriName}_${category}_${slot}`;
             const currentMode = window.itemSourceMode[key];
-            
+
             if (currentMode === mode) {
                 delete window.itemSourceMode[key];
-                window.cacheFormInput({ value: '' }, `${santriName}_${category}_mode_${slot}`);
-                
                 const btnQ = document.getElementById(`btn_src_quran_${category}_${slot}_${santriName}`);
                 const btnI = document.getElementById(`btn_src_iqro_${category}_${slot}_${santriName}`);
                 const fieldQ = document.getElementById(`field_quran_${category}_${slot}_${santriName}`);
@@ -434,8 +591,6 @@
                 if (surahSel) surahSel.value = "";
                 const iqroSel = document.getElementById(`${category}_iqro_${slot}_${santriName}`);
                 if (iqroSel) iqroSel.value = "";
-                window.cacheFormInput({ value: "" }, `${santriName}_${category}_surah_${slot}`);
-                window.cacheFormInput({ value: "" }, `${santriName}_${category}_iqro_${slot}`);
                 return;
             }
 
@@ -528,6 +683,22 @@
             }
         };
 
+        window.toggleCardHistory = function(santriName, categoryKey) {
+            const key = `${santriName}_history_${categoryKey}`;
+            window.cardHistoryToggleState[key] = !window.cardHistoryToggleState[key];
+            const contentEl = document.getElementById(`card_history_content_${categoryKey}_${santriName}`);
+            const btnEl = document.getElementById(`card_history_btn_${categoryKey}_${santriName}`);
+            if (contentEl && btnEl) {
+                if (window.cardHistoryToggleState[key]) {
+                    contentEl.classList.remove('hidden');
+                    btnEl.innerHTML = `<i class="fa-solid fa-chevron-up"></i> Tutup Riwayat ${categoryKey}`;
+                } else {
+                    contentEl.classList.add('hidden');
+                    btnEl.innerHTML = `<i class="fa-solid fa-chevron-down"></i> Lihat Riwayat ${categoryKey}`;
+                }
+            }
+        };
+
         window.cacheFormInput = function(elem, key) {
             window.localFormCache[key] = elem.value;
         };
@@ -549,7 +720,7 @@
                 const isFirst = slot === 1;
                 const stateKey = `${santriName}_${category}_slot_${slot}`;
                 const slotData = cloudSlots && cloudSlots[slot-1] ? cloudSlots[slot-1] : null;
-                const isCloudActive = slotData && slotData.item && slotData.item !== '-' && slotData.item !== '';
+                const isCloudActive = slotData && slotData.item && slotData.item !== '-';
                 const isVisible = isFirst || !!window.activeSlotState[stateKey] || isCloudActive;
 
                 const cacheKeySurah = `${santriName}_${category}_surah_${slot}`;
@@ -564,9 +735,8 @@
                 const slotEnd = slotData ? (slotData.end || '') : '';
                 const slotStatus = slotData ? (slotData.status || '') : '';
                 
-                let cloudMode = slotData && slotData.mode ? slotData.mode : '';
+                let cloudMode = slotData && slotData.mode ? slotData.mode : 'quran';
                 if (!slotData && slotItem.toLowerCase().includes('iqro')) cloudMode = 'iqro';
-                if (!slotData && slotItem && slotItem !== '-') cloudMode = 'quran';
                 
                 const cachedMode = window.getFormCache(cacheKeyMode, cloudMode);
                 window.itemSourceMode[`${santriName}_${category}_${slot}`] = cachedMode;
@@ -582,32 +752,32 @@
                 return `
                     ${!isFirst ? `
                         <div class="my-2">
-                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3.5 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
+                            <button type="button" id="toggle_btn_${category}_${slot}_${santriName}" onclick="window.toggleSlotVisibility('${category}', ${slot}, '${santriName}')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black rounded-xl text-xs flex items-center gap-1.5 transition">
                                 <i class="fa-solid ${isVisible ? 'fa-minus' : 'fa-plus'}"></i> ${isVisible ? `Sembunyikan Pilihan ${slot}` : `Tambah Pilihan ${slot}`}
                             </button>
                         </div>
                     ` : ''}
 
-                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-4 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3.5 ${!isVisible ? 'hidden' : ''}">
+                    <div id="slot_container_${category}_${slot}_${santriName}" class="p-3.5 bg-transparent rounded-2xl border-2 ${borderClass} space-y-3 ${!isVisible ? 'hidden' : ''}">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-black text-slate-800 dark:text-slate-200">
                                 Pilihan ${slot} ${isFirst ? '<span class="text-[11px] text-slate-400 font-normal">(Utama)</span>' : ''}
                             </span>
                             <div class="flex items-center bg-slate-200/90 dark:bg-slate-800 p-1 rounded-lg">
-                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-3 py-1.5 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
-                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-3 py-1.5 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
+                                <button type="button" id="btn_src_quran_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'quran')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'quran' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-emerald-700' : 'font-bold text-slate-500'}">Al-Qur'an</button>
+                                <button type="button" id="btn_src_iqro_${category}_${slot}_${santriName}" onclick="window.switchSourceMode('${category}', ${slot}, '${santriName}', 'iqro')" class="px-2.5 py-1 rounded text-xs ${cachedMode === 'iqro' ? 'font-black bg-white dark:bg-slate-900 shadow-xs text-amber-700' : 'font-bold text-slate-500'}">Iqro</button>
                             </div>
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
+                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
-                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
+                            <select id="${category}_iqro_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeyIqro}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <option value="">-- Pilih Jilid Iqro --</option>
                                 <option value="Iqro 1" ${defaultIqroVal === 'Iqro 1' ? 'selected' : ''}>Iqro Jilid 1</option>
                                 <option value="Iqro 2" ${defaultIqroVal === 'Iqro 2' ? 'selected' : ''}>Iqro Jilid 2</option>
@@ -618,14 +788,14 @@
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label id="lbl_start_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Mulai:' : 'Ayat Mulai:'}</label>
-                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
+                                <input type="number" id="${category}_start_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyStart}')" value="${defaultStartVal}" placeholder="Mulai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                             </div>
                             <div>
                                 <label id="lbl_end_${category}_${slot}_${santriName}" class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">${cachedMode === 'iqro' ? 'Halaman Sampai:' : 'Ayat Sampai:'}</label>
-                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[64px]">
+                                <input type="number" id="${category}_end_${slot}_${santriName}" oninput="window.cacheFormInput(this, '${cacheKeyEnd}')" value="${defaultEndVal}" placeholder="Sampai" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                             </div>
                         </div>
 
@@ -639,6 +809,68 @@
                     </div>
                 `;
             }).join('');
+        };
+
+        window.renderCardCategoryHistoryList = function(santriName, categoryKey) {
+            const storageKeyMap = {
+                'Bacaan': 'rq_history_bacaan',
+                'Hafalan': 'rq_history_hafalan',
+                'Murojaah': 'rq_history_murojaah',
+                'Tugas': 'rq_history_tugas'
+            };
+            const list = JSON.parse(localStorage.getItem(storageKeyMap[categoryKey]) || '[]');
+            const santriHistory = list.filter(item => (item.name || '').toLowerCase() === santriName.toLowerCase());
+
+            if (santriHistory.length === 0) {
+                return `<p class="text-xs text-slate-400 font-extrabold p-3">Belum ada riwayat ${categoryKey.toLowerCase()} untuk ${santriName}.</p>`;
+            }
+
+            return santriHistory.map((h, idx) => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
+                    <div class="flex-1 space-y-1">
+                        <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">${h.detail || '-'}</div>
+                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'} | Catatan: ${h.catatan || '-'}</div>
+                        <div class="text-[11px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
+                    </div>
+                    <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-3.5 py-1.5 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-xl font-black text-xs hover:bg-rose-200 transition shrink-0">Hapus</button>
+                </div>
+            `).join('');
+        };
+
+        window.deleteCardHistoryItem = async function(santriName, categoryKey, localIdx) {
+            const storageKeyMap = {
+                'Bacaan': 'rq_history_bacaan',
+                'Hafalan': 'rq_history_hafalan',
+                'Murojaah': 'rq_history_murojaah',
+                'Tugas': 'rq_history_tugas'
+            };
+            const sheetNameMap = {
+                'Bacaan': 'bacaan',
+                'Hafalan': 'hafalan',
+                'Murojaah': 'murojaah',
+                'Tugas': 'tugas'
+            };
+            const key = storageKeyMap[categoryKey];
+            let list = JSON.parse(localStorage.getItem(key) || '[]');
+            const santriHistory = list.filter(item => (item.name || '').toLowerCase() === santriName.toLowerCase());
+            const targetItem = santriHistory[localIdx];
+
+            if (targetItem) {
+                const originalIndex = list.findIndex(item => item === targetItem);
+                if (originalIndex !== -1) {
+                    list.splice(originalIndex, 1);
+                    localStorage.setItem(key, JSON.stringify(list));
+                }
+                window.showToast(`Riwayat ${categoryKey} dihapus`, "success");
+                window.renderSantriCardsAndTable();
+
+                await window.syncToCloud({
+                    type: 'delete_history',
+                    category: sheetNameMap[categoryKey],
+                    name: santriName,
+                    index: localIdx
+                });
+            }
         };
 
         window.renderSantriCardsAndTable = function() {
@@ -721,6 +953,11 @@
                 const isMurojaahOpen = !!window.cardSectionToggleState[`${s.name}_section_murojaah`];
                 const isTugasOpen = !!window.cardSectionToggleState[`${s.name}_section_tugas`];
 
+                const isBacaanHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Bacaan`];
+                const isHafalanHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Hafalan`];
+                const isMurojaahHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Murojaah`];
+                const isTugasHistoryOpen = !!window.cardHistoryToggleState[`${s.name}_history_Tugas`];
+
                 const stickyBannerColor = (index % 2 === 0) ? 'bg-emerald-800 text-white' : 'bg-sky-700 text-white';
 
                 return `
@@ -762,7 +999,7 @@
                                                 <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Bacaan (${s.name}):</label>
                                                 <button type="button" onclick="document.getElementById('bac_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_bac_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Nilai</button>
                                             </div>
-                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                            <select id="bac_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="" ${!defaultBacStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultBacStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Bacaan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultBacStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Bacaan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
@@ -772,7 +1009,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Bacaan (${s.name}):</label>
-                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
+                                            <select id="bac_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_bac_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Makharijul Huruf" ${parsedBacCatType === 'Makharijul Huruf' ? 'selected' : ''}>Makharijul Huruf</option>
                                                 <option value="Sifatul Huruf" ${parsedBacCatType === 'Sifatul Huruf' ? 'selected' : ''}>Sifatul Huruf</option>
@@ -784,13 +1021,21 @@
                                                 <option value="Bacaan Gharib" ${parsedBacCatType === 'Bacaan Gharib' ? 'selected' : ''}>Bacaan Gharib</option>
                                                 <option value="Kesalahan Bacaan" ${parsedBacCatType === 'Kesalahan Bacaan' ? 'selected' : ''}>Kesalahan Bacaan</option>
                                             </select>
-                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
+                                            <input type="text" id="bac_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_bac_cat_desc')" value="${parsedBacCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="window.saveSectionData('${s.name}', 'bacaan')" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Bacaan (${s.name})
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t">
+                                    <button type="button" id="card_history_btn_Bacaan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Bacaan')" class="text-xs sm:text-sm font-black text-emerald-700 dark:text-emerald-400 hover:underline py-1 flex items-center gap-1.5">
+                                        <i class="fa-solid ${isBacaanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isBacaanHistoryOpen ? 'Tutup Riwayat Bacaan' : 'Lihat Riwayat Bacaan'}
+                                    </button>
+                                    <div id="card_history_content_Bacaan_${s.name}" class="mt-2 space-y-2.5 max-h-48 overflow-y-auto custom-scrollbar ${!isBacaanHistoryOpen ? 'hidden' : ''}">
+                                        ${window.renderCardCategoryHistoryList(s.name, 'Bacaan')}
                                     </div>
                                 </div>
                             </div>
@@ -822,7 +1067,7 @@
                                                 <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Hafalan di kelas pertemuan terakhir (${s.name}):</label>
                                                 <button type="button" onclick="document.getElementById('haf_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_haf_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Nilai</button>
                                             </div>
-                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                            <select id="haf_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="" ${!defaultHafStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultHafStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultHafStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
@@ -832,7 +1077,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Hafalan Baru (${s.name}):</label>
-                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
+                                            <select id="haf_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_haf_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran Hafalan" ${parsedHafCatType === 'Kelancaran Hafalan' ? 'selected' : ''}>Kelancaran Hafalan</option>
                                                 <option value="Ketepatan Hafalan" ${parsedHafCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -844,13 +1089,21 @@
                                                 <option value="Hafalan Belum Selesai" ${parsedHafCatType === 'Hafalan Belum Selesai' ? 'selected' : ''}>Hafalan Belum Selesai</option>
                                                 <option value="Hafalan Lulus" ${parsedHafCatType === 'Hafalan Lulus' ? 'selected' : ''}>Hafalan Lulus</option>
                                             </select>
-                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
+                                            <input type="text" id="haf_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_haf_cat_desc')" value="${parsedHafCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="window.saveSectionData('${s.name}', 'hafalan')" class="flex-1 py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Hafalan Baru (${s.name})
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t">
+                                    <button type="button" id="card_history_btn_Hafalan_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Hafalan')" class="text-xs sm:text-sm font-black text-rose-600 dark:text-rose-400 hover:underline py-1 flex items-center gap-1.5">
+                                        <i class="fa-solid ${isHafalanHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isHafalanHistoryOpen ? 'Tutup Riwayat Hafalan' : 'Lihat Riwayat Hafalan'}
+                                    </button>
+                                    <div id="card_history_content_Hafalan_${s.name}" class="mt-2 space-y-2.5 max-h-48 overflow-y-auto custom-scrollbar ${!isHafalanHistoryOpen ? 'hidden' : ''}">
+                                        ${window.renderCardCategoryHistoryList(s.name, 'Hafalan')}
                                     </div>
                                 </div>
                             </div>
@@ -882,7 +1135,7 @@
                                                 <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Nilai Muroja'ah di kelas pertemuan terakhir (${s.name}):</label>
                                                 <button type="button" onclick="document.getElementById('mur_stat_${s.name}').value=''; window.cacheFormInput({value:''}, '${s.name}_mur_stat');" class="text-[11px] text-rose-600 font-extrabold hover:underline"><i class="fa-solid fa-rotate-left"></i> Hapus Nilai</button>
                                             </div>
-                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                            <select id="mur_stat_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_stat')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                                 <option value="" ${!defaultMurStat ? 'selected' : ''}>-- Pilih Nilai --</option>
                                                 <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki." ${defaultMurStat.includes('80 - Baik') ? 'selected' : ''}>80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
                                                 <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." ${defaultMurStat.includes('Alhamdulillah Baik') ? 'selected' : ''}>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
@@ -892,7 +1145,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300 mb-1.5">Catatan Muroja'ah di Kelas (${s.name}):</label>
-                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[64px]">
+                                            <select id="mur_cat_type_${s.name}" onchange="window.cacheFormInput(this, '${s.name}_mur_cat_type')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base mb-3 min-h-[60px]">
                                                 <option value="">-- Kosongkan (Penjelasan Bebas) --</option>
                                                 <option value="Kelancaran" ${parsedMurCatType === 'Kelancaran' ? 'selected' : ''}>Kelancaran</option>
                                                 <option value="Ketepatan Hafalan" ${parsedMurCatType === 'Ketepatan Hafalan' ? 'selected' : ''}>Ketepatan Hafalan</option>
@@ -903,13 +1156,21 @@
                                                 <option value="Hafalan Lama" ${parsedMurCatType === 'Hafalan Lama' ? 'selected' : ''}>Hafalan Lama</option>
                                                 <option value="Hafalan Juz" ${parsedMurCatType === 'Hafalan Juz' ? 'selected' : ''}>Hafalan Juz</option>
                                             </select>
-                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[64px]">
+                                            <input type="text" id="mur_cat_desc_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_mur_cat_desc')" value="${parsedMurCatDesc}" placeholder="Keterangan tambahan..." class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-sm sm:text-base font-black min-h-[60px]">
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="window.saveSectionData('${s.name}', 'murojaah')" class="flex-1 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Muroja'ah (${s.name})
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t">
+                                    <button type="button" id="card_history_btn_Murojaah_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Murojaah')" class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-400 hover:underline py-1 flex items-center gap-1.5">
+                                        <i class="fa-solid ${isMurojaahHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isMurojaahHistoryOpen ? 'Tutup Riwayat Murojaah' : 'Lihat Riwayat Murojaah'}
+                                    </button>
+                                    <div id="card_history_content_Murojaah_${s.name}" class="mt-2 space-y-2.5 max-h-48 overflow-y-auto custom-scrollbar ${!isMurojaahHistoryOpen ? 'hidden' : ''}">
+                                        ${window.renderCardCategoryHistoryList(s.name, 'Murojaah')}
                                     </div>
                                 </div>
                             </div>
@@ -934,12 +1195,20 @@
                                     </div>
                                 </div>
                                 <div id="card_section_content_tugas_${s.name}" class="space-y-3.5 ${!isTugasOpen ? 'hidden' : ''}">
-                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
-                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[64px]">
+                                    <input type="text" id="tug_detail_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_detail')" placeholder="Rincian Tugas..." value="${defaultTugDetail}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
+                                    <input type="text" id="tug_cat_${s.name}" oninput="window.cacheFormInput(this, '${s.name}_tug_cat')" placeholder="Catatan Tugas..." value="${defaultTugCat}" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm sm:text-base min-h-[60px]">
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="window.saveSectionData('${s.name}', 'tugas')" class="flex-1 py-4 bg-amber-700 hover:bg-amber-800 text-white rounded-2xl font-black text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                                             <i class="fa-solid fa-paper-plane"></i> Simpan &amp; Sinkron Tugas (${s.name})
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t">
+                                    <button type="button" id="card_history_btn_Tugas_${s.name}" onclick="window.toggleCardHistory('${s.name}', 'Tugas')" class="text-xs sm:text-sm font-black text-amber-800 dark:text-amber-300 hover:underline py-1 flex items-center gap-1.5">
+                                        <i class="fa-solid ${isTugasHistoryOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i> ${isTugasHistoryOpen ? 'Tutup Riwayat Tugas' : 'Lihat Riwayat Tugas'}
+                                    </button>
+                                    <div id="card_history_content_Tugas_${s.name}" class="mt-2 space-y-2.5 max-h-48 overflow-y-auto custom-scrollbar ${!isTugasHistoryOpen ? 'hidden' : ''}">
+                                        ${window.renderCardCategoryHistoryList(s.name, 'Tugas')}
                                     </div>
                                 </div>
                             </div>
@@ -953,11 +1222,11 @@
             const slots = [1, 2, 3];
             const entries = [];
             slots.forEach(slot => {
-                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || '';
+                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
                 let itemVal = '';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '';
-                } else if (mode === 'quran') {
+                } else {
                     itemVal = document.getElementById(`${category}_surah_${slot}_${santriName}`)?.value || '';
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '';
@@ -991,11 +1260,11 @@
             const slots = [1, 2, 3];
             const slotData = [];
             slots.forEach(slot => {
-                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || '';
-                let itemVal = '-';
+                const mode = window.itemSourceMode[`${santriName}_${category}_${slot}`] || 'quran';
+                let itemVal = '';
                 if (mode === 'iqro') {
                     itemVal = document.getElementById(`${category}_iqro_${slot}_${santriName}`)?.value || '-';
-                } else if (mode === 'quran') {
+                } else {
                     itemVal = document.getElementById(`${category}_surah_${slot}_${santriName}`)?.value || '-';
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '-';
@@ -1013,6 +1282,7 @@
             const tanggalVal = document.getElementById(`tgl_${name}`)?.value || new Date().toISOString().split('T')[0];
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
+            const rekapanList = JSON.parse(localStorage.getItem('rq_history_rekapan') || '[]');
 
             if (sectionType === 'bacaan') {
                 const bacaanFormatted = window.extractSlotEntries('bac', name);
@@ -1032,9 +1302,13 @@
                 s.cloudBacStat = bacaanStat;
                 s.cloudBacCat = bacaanCatCombined;
 
+                const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
+                localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
+                
                 window.syncToCloud({
                     type: 'bacaan',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1046,7 +1320,12 @@
                     slots: structuredSlots
                 });
 
+                if (bacaanCatCombined) {
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
+                }
+
                 window.cardSectionToggleState[`${name}_section_bacaan`] = false;
+                window.cardHistoryToggleState[`${name}_history_Bacaan`] = true;
                 const badge = document.getElementById(`save_badge_bacaan_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
@@ -1068,10 +1347,14 @@
                 s.cloudHafSlots = structuredSlotsHaf;
                 s.cloudHafStat = hafalanStat;
                 s.cloudHafCat = hafalanCatCombined;
+
+                const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
+                localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
                 
                 window.syncToCloud({
                     type: 'hafalan',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1083,7 +1366,12 @@
                     slots: structuredSlotsHaf
                 });
 
+                if (hafalanCatCombined) {
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
+                }
+
                 window.cardSectionToggleState[`${name}_section_hafalan`] = false;
+                window.cardHistoryToggleState[`${name}_history_Hafalan`] = true;
                 const badge = document.getElementById(`save_badge_hafalan_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
@@ -1105,10 +1393,14 @@
                 s.cloudMurSlots = structuredSlotsMur;
                 s.cloudMurStat = murojaahStat;
                 s.cloudMurCat = murojaahCatCombined;
+
+                const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
+                localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
                 
                 window.syncToCloud({
                     type: 'murojaah',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1120,7 +1412,12 @@
                     slots: structuredSlotsMur
                 });
 
+                if (murojaahCatCombined) {
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
+                }
+
                 window.cardSectionToggleState[`${name}_section_murojaah`] = false;
+                window.cardHistoryToggleState[`${name}_history_Murojaah`] = true;
                 const badge = document.getElementById(`save_badge_murojaah_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
@@ -1137,9 +1434,12 @@
                 s.lastTugasDate = tanggalVal;
                 s.cloudTugCat = tugasCat;
 
+                const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: tugasVal, status: '-', catatan: tugasCat, type: 'tugas' });
+                localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
                 window.syncToCloud({
                     type: 'tugas',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggalVal,
                     id: s.id,
                     name: s.name,
@@ -1150,12 +1450,18 @@
                     catatan: tugasCat
                 });
 
+                if (tugasCat) {
+                    rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
+                }
+
                 window.cardSectionToggleState[`${name}_section_tugas`] = false;
+                window.cardHistoryToggleState[`${name}_history_Tugas`] = true;
                 const badge = document.getElementById(`save_badge_tugas_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
             }
 
+            localStorage.setItem('rq_history_rekapan', JSON.stringify(rekapanList));
             window.renderSantriCardsAndTable();
         };
 
@@ -1173,24 +1479,41 @@
             const phoneInput = document.getElementById('waPhoneInput');
             if (phoneInput) phoneInput.value = targetPhone;
 
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
             const liveBac = window.extractSlotEntries('bac', s.name);
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
-            const bacaanStat = (s.cloudBacStat && s.cloudBacStat !== '-' && s.cloudBacStat !== 'undefined') ? s.cloudBacStat : '';
-            const bacaanCat = (s.cloudBacCat && s.cloudBacCat !== '-' && s.cloudBacCat !== 'undefined' && s.cloudBacCat !== 'null') ? window.cleanReportDetail(s.cloudBacCat) : '';
+            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
+            const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
+            const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
+            const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
+            const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
 
-            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
-            const hafalanStat = (s.cloudHafStat && s.cloudHafStat !== '-' && s.cloudHafStat !== 'undefined') ? s.cloudHafStat : '';
-            const hafalanCat = (s.cloudHafCat && s.cloudHafCat !== '-' && s.cloudHafCat !== 'undefined' && s.cloudHafCat !== 'null') ? window.cleanReportDetail(s.cloudHafCat) : '';
+            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
+            const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
+            const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
+            const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
+            const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
 
-            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
-            const murojaahStat = (s.cloudMurStat && s.cloudMurStat !== '-' && s.cloudMurStat !== 'undefined') ? s.cloudMurStat : '';
-            const murojaahCat = (s.cloudMurCat && s.cloudMurCat !== '-' && s.cloudMurCat !== 'undefined' && s.cloudMurCat !== 'null') ? window.cleanReportDetail(s.cloudMurCat) : '';
+            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
+            const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
+            const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
+            const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
+            const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
 
-            const tugasVal = window.cleanReportDetail(s.lastTugas !== '-' ? s.lastTugas : '');
-            const tugasCat = (s.cloudTugCat && s.cloudTugCat !== '-' && s.cloudTugCat !== 'undefined' && s.cloudTugCat !== 'null') ? window.cleanReportDetail(s.cloudTugCat) : '';
+            const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
+            const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
+            const tugasCat = (rawTugC && rawTugC !== '-' && rawTugC !== 'undefined' && rawTugC !== 'null') ? window.cleanReportDetail(rawTugC) : '';
 
             const isValidText = (txt) => {
                 if (!txt) return false;
@@ -1310,24 +1633,41 @@
                 return;
             }
 
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
             const liveBac = window.extractSlotEntries('bac', s.name);
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
-            const bacaanStat = (s.cloudBacStat && s.cloudBacStat !== '-' && s.cloudBacStat !== 'undefined') ? s.cloudBacStat : '';
-            const bacaanCat = (s.cloudBacCat && s.cloudBacCat !== '-' && s.cloudBacCat !== 'undefined' && s.cloudBacCat !== 'null') ? window.cleanReportDetail(s.cloudBacCat) : '';
+            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
+            const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
+            const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
+            const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
+            const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
 
-            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
-            const hafalanStat = (s.cloudHafStat && s.cloudHafStat !== '-' && s.cloudHafStat !== 'undefined') ? s.cloudHafStat : '';
-            const hafalanCat = (s.cloudHafCat && s.cloudHafCat !== '-' && s.cloudHafCat !== 'undefined' && s.cloudHafCat !== 'null') ? window.cleanReportDetail(s.cloudHafCat) : '';
+            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
+            const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
+            const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
+            const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
+            const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
 
-            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
-            const murojaahStat = (s.cloudMurStat && s.cloudMurStat !== '-' && s.cloudMurStat !== 'undefined') ? s.cloudMurStat : '';
-            const murojaahCat = (s.cloudMurCat && s.cloudMurCat !== '-' && s.cloudMurCat !== 'undefined' && s.cloudMurCat !== 'null') ? window.cleanReportDetail(s.cloudMurCat) : '';
+            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
+            const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
+            const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
+            const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
+            const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
 
-            const tugasVal = window.cleanReportDetail(s.lastTugas !== '-' ? s.lastTugas : '');
-            const tugasCat = (s.cloudTugCat && s.cloudTugCat !== '-' && s.cloudTugCat !== 'undefined' && s.cloudTugCat !== 'null') ? window.cleanReportDetail(s.cloudTugCat) : '';
+            const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
+            const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
+            const tugasCat = (rawTugC && rawTugC !== '-' && rawTugC !== 'undefined' && rawTugC !== 'null') ? window.cleanReportDetail(rawTugC) : '';
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
@@ -1487,6 +1827,11 @@
                 latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
             }
 
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
             let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
@@ -1525,10 +1870,15 @@
             msg += `👥 *Daftar Santri & Prestasi:*`;
             let activeSantriCount = 0;
             list.forEach((s) => {
-                const bacaanVal = window.cleanReportDetail(s.lastBacaan !== '-' ? s.lastBacaan : '');
-                const hafalanVal = window.cleanReportDetail(s.lastHafalan !== '-' ? s.lastHafalan : '');
-                const murojaahVal = window.cleanReportDetail(s.lastMurojaah !== '-' ? s.lastMurojaah : '');
-                const tugasVal = window.cleanReportDetail(s.lastTugas !== '-' ? s.lastTugas : '');
+                const sBac = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const sHaf = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const sMur = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
+                const bacaanVal = window.cleanReportDetail(sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
+                const hafalanVal = window.cleanReportDetail(sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
+                const murojaahVal = window.cleanReportDetail(sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
+                const tugasVal = window.cleanReportDetail(sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
                 if (hasAnySetoran) {
@@ -1609,6 +1959,10 @@
                     s.cloudHafSlots = null;
                     s.cloudMurSlots = null;
                 });
+                localStorage.removeItem('rq_history_bacaan');
+                localStorage.removeItem('rq_history_hafalan');
+                localStorage.removeItem('rq_history_murojaah');
+                localStorage.removeItem('rq_history_tugas');
                 window.renderSantriCardsAndTable();
                 window.showToast("Data setoran harian direset!", "success");
             }
@@ -1761,24 +2115,41 @@
                 return;
             }
 
+            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
+            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
+            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+
             const liveBac = window.extractSlotEntries('bac', s.name);
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
-            const bacaanStat = (s.cloudBacStat && s.cloudBacStat !== '-' && s.cloudBacStat !== 'undefined') ? s.cloudBacStat : '';
-            const bacaanCat = (s.cloudBacCat && s.cloudBacCat !== '-' && s.cloudBacCat !== 'undefined' && s.cloudBacCat !== 'null') ? window.cleanReportDetail(s.cloudBacCat) : '';
+            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
+            const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
+            const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
+            const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
+            const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
 
-            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
-            const hafalanStat = (s.cloudHafStat && s.cloudHafStat !== '-' && s.cloudHafStat !== 'undefined') ? s.cloudHafStat : '';
-            const hafalanCat = (s.cloudHafCat && s.cloudHafCat !== '-' && s.cloudHafCat !== 'undefined' && s.cloudHafCat !== 'null') ? window.cleanReportDetail(s.cloudHafCat) : '';
+            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
+            const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
+            const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
+            const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
+            const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
 
-            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
-            const murojaahStat = (s.cloudMurStat && s.cloudMurStat !== '-' && s.cloudMurStat !== 'undefined') ? s.cloudMurStat : '';
-            const murojaahCat = (s.cloudMurCat && s.cloudMurCat !== '-' && s.cloudMurCat !== 'undefined' && s.cloudMurCat !== 'null') ? window.cleanReportDetail(s.cloudMurCat) : '';
+            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
+            const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
+            const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
+            const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
+            const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
 
-            const tugasVal = window.cleanReportDetail(s.lastTugas !== '-' ? s.lastTugas : '');
-            const tugasCat = (s.cloudTugCat && s.cloudTugCat !== '-' && s.cloudTugCat !== 'undefined' && s.cloudTugCat !== 'null') ? window.cleanReportDetail(s.cloudTugCat) : '';
+            const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
+            const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
+            const tugasCat = (rawTugC && rawTugC !== '-' && rawTugC !== 'undefined' && rawTugC !== 'null') ? window.cleanReportDetail(rawTugC) : '';
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
@@ -1981,6 +2352,7 @@
 
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
+            const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
 
             for (const name of window.massalSelectedSantri) {
                 const s = window.santriList.find(x => x.name === name);
@@ -1991,9 +2363,20 @@
                 s.cloudMurStat = stat;
                 s.cloudMurCat = '';
 
+                hist.unshift({
+                    timestamp: formattedTimeStr,
+                    tanggal: tanggal,
+                    rawTime: nowObj.getTime(),
+                    name: s.name,
+                    detail: detailStr,
+                    status: stat,
+                    catatan: '',
+                    type: 'murojaah'
+                });
+
                 await window.syncToCloud({
                     type: 'murojaah',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggal,
                     id: s.id,
                     name: s.name,
@@ -2006,6 +2389,7 @@
                 });
             }
 
+            localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
             window.closeMurojaahMassalModal();
             window.renderSantriCardsAndTable();
             window.showToast(`✨ Muroja'ah bersama berhasil disimpan untuk ${window.massalSelectedSantri.size} santri!`, "success");
@@ -2027,6 +2411,7 @@
 
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
+            const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
 
             for (const name of window.massalSelectedSantri) {
                 const s = window.santriList.find(x => x.name === name);
@@ -2036,9 +2421,20 @@
                 s.lastTugasDate = tanggal;
                 s.cloudTugCat = catatan;
 
+                hist.unshift({
+                    timestamp: formattedTimeStr,
+                    tanggal: tanggal,
+                    rawTime: nowObj.getTime(),
+                    name: s.name,
+                    detail: detail,
+                    status: '-',
+                    catatan: catatan,
+                    type: 'tugas'
+                });
+
                 await window.syncToCloud({
                     type: 'tugas',
-                    timestamp: formattedTimeStr,
+                    timestamp: nowObj.toISOString(),
                     tanggal: tanggal,
                     id: s.id,
                     name: s.name,
@@ -2050,6 +2446,7 @@
                 });
             }
 
+            localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
             window.closeTugasMassalModal();
             window.renderSantriCardsAndTable();
             window.showToast(`✨ Tugas bersama berhasil disimpan untuk ${window.massalSelectedSantri.size} santri!`, "success");
@@ -2083,25 +2480,6 @@
             if (window.scrollY > 350) btn.classList.remove('opacity-0', 'pointer-events-none');
             else btn.classList.add('opacity-0', 'pointer-events-none');
         });
-
-        window.toggleClearBtn = function(inputId, btnId) {
-            const input = document.getElementById(inputId);
-            const btn = document.getElementById(btnId);
-            if (input && btn) {
-                if (input.value.trim().length > 0) btn.classList.remove('hidden');
-                else btn.classList.add('hidden');
-            }
-        };
-
-        window.clearSearchInput = function(inputId, btnId) {
-            const input = document.getElementById(inputId);
-            const btn = document.getElementById(btnId);
-            if (input) {
-                input.value = '';
-                if (inputId === 'kartuSearchInput') window.renderKartuCardGrid(window.kartuClassFilter);
-            }
-            if (btn) btn.classList.add('hidden');
-        };
     </script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
@@ -2537,10 +2915,7 @@
                         <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
                             <i class="fa-solid fa-circle-info text-emerald-600"></i> Status Sinkronisasi
                         </span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-extrabold text-slate-600 dark:text-slate-300">Waktu & Tanggal Terakhir Update: <span id="lastCloudUpdateLabel" class="font-black text-emerald-700 dark:text-emerald-400">Belum disinkronkan</span></span>
-                            <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-full">Aktif & Live</span>
-                        </div>
+                        <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-black rounded-full">Aktif & Live</span>
                     </div>
                     <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1.5">
                         <span class="text-xs font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
@@ -2614,11 +2989,10 @@
                     <div>
                         <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Nilai Muroja'ah:</label>
                         <select id="massalMurojaahStat" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]">
-                            <option value="" selected>-- Pilih Nilai --</option>
-                            <option value="80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">80 - Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
-                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.">Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
-                            <option value="75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">75 - Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
-                            <option value="70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">70 - Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
+                            <option value="Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan." selected>Alhamdulillah Baik, Hafalan sangat lancar, tepat, dan kuat di kelas pertemuan terakhir. Hampir tidak ada kesalahan.</option>
+                            <option value="Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.">Baik, Hafalan cukup lancar di kelas pertemuan terakhir, ada sedikit kesalahan atau lupa tetapi dapat diperbaiki.</option>
+                            <option value="Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.">Masih beberapa kali lupa di kelas pertemuan terakhir, berhenti, atau salah urutan ayat.</option>
+                            <option value="Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum">Semangat belajar ya anak sholeh, Bacaan nya masih banyak kesalahan, kurang lancar, dan memerlukan latihan, barakallah fiikum</option>
                         </select>
                     </div>
                 </div>
