@@ -535,7 +535,8 @@
                                 detail: detailStr,
                                 status: row[15] || '-',
                                 catatan: row[16] || '',
-                                type: typeName
+                                type: typeName,
+                                groupId: row[17] || ''
                             };
                         });
                     };
@@ -621,7 +622,8 @@
                             detail: row[6] || '-',
                             status: '-',
                             catatan: row[8] || '',
-                            type: 'tugas'
+                            type: 'tugas',
+                            groupId: row[9] || ''
                         }));
                         localStorage.setItem('rq_history_tugas', JSON.stringify(tugHist));
 
@@ -642,6 +644,30 @@
                         Object.values(latestByName).forEach(r => window.applyLatestCloudRowToFormCache(r, 'tugas'));
                     }
                     
+                    // Bangun ulang riwayat khusus fitur Bersama dari Group ID di Sheet.
+                    const buildMassalHistory = (rows, modalType) => {
+                        const groups = {};
+                        (rows || []).forEach(row => {
+                            const gid = modalType === 'murojaah' ? row[17] : row[9];
+                            if (!gid) return;
+                            if (!groups[gid]) groups[gid] = { groupId: gid, timestamp: row[0] ? window.formatTimestampCustom(row[0]) : '-', tanggal: row[1] || '-', names: [], detail: modalType === 'murojaah' ? '-' : (row[6] || '-'), status: row[15] || '', catatan: row[16] || '', mode: 'quran' };
+                            if (row[3] && !groups[gid].names.includes(row[3])) groups[gid].names.push(row[3]);
+                            if (modalType === 'murojaah') {
+                                const slots = parseCloudSlots(row);
+                                if (slots[0] && slots[0].item && slots[0].item !== '-') {
+                                    groups[gid].item = slots[0].item;
+                                    groups[gid].detail = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ');
+                                    groups[gid].range = '';
+                                    groups[gid].mode = slots[0].mode || 'quran';
+                                }
+                            }
+                        });
+                        const arr = Object.values(groups).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                        window.massalWriteHistory(modalType, arr);
+                    };
+                    buildMassalHistory(cloudData.input_murojaah_dikelas, 'murojaah');
+                    buildMassalHistory(cloudData.input_tugas, 'tugas');
+
                     if (cloudData.materi) {
                         const formattedMateri = cloudData.materi.map(row => ({ kelas: row[0], judul: row[1], bab: row[2], tanggal: row[3], ket: row[4], tampilWa: row[5] !== false && row[5] !== 'false' && row[5] !== 'FALSE' }));
                         localStorage.setItem('rq_materi_utama', JSON.stringify(formattedMateri));
@@ -2450,6 +2476,75 @@
         // Satu sistem pilihan santri dipakai oleh Muroja'ah Bersama dan Tugas Bersama.
         // Pilihan santri dipisahkan untuk masing-masing modal agar pilihan
         // Muroja'ah Bersama dan Tugas Bersama tidak saling mengganggu.
+        // RIWAYAT KHUSUS FITUR BERSAMAAN
+        window.massalHistoryKeys = {
+            murojaah: 'rq_massal_history_murojaah',
+            tugas: 'rq_massal_history_tugas'
+        };
+
+        window.massalReadHistory = function(modalType) {
+            try { return JSON.parse(localStorage.getItem(window.massalHistoryKeys[modalType]) || '[]'); }
+            catch (e) { return []; }
+        };
+
+        window.massalWriteHistory = function(modalType, list) {
+            localStorage.setItem(window.massalHistoryKeys[modalType], JSON.stringify(list));
+        };
+
+        window.renderMassalHistory = function(modalType) {
+            const el = document.getElementById(modalType === 'murojaah' ? 'massalMurojaahHistory' : 'massalTugasHistory');
+            if (!el) return;
+            const list = window.massalReadHistory(modalType);
+            if (!list.length) {
+                el.innerHTML = '<div class="p-4 text-center text-xs font-bold text-slate-500">Belum ada riwayat input bersama.</div>';
+                return;
+            }
+            el.innerHTML = list.map((h, idx) => {
+                const names = Array.isArray(h.names) ? h.names : [];
+                const detail = modalType === 'murojaah'
+                    ? `${window.massalEsc(h.item || h.detail || '-')} ${window.massalEsc(h.range || '')}`.trim()
+                    : window.massalEsc(h.detail || '-');
+                const safeId = JSON.stringify(String(h.groupId || ''));
+                return `<div class="rounded-xl border-2 ${modalType === 'murojaah' ? 'border-purple-200 dark:border-purple-800' : 'border-amber-200 dark:border-amber-800'} p-3 bg-white dark:bg-slate-900">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="font-black text-xs sm:text-sm">${window.massalEsc(h.tanggal || '-')} • ${window.massalEsc(h.timestamp || '-')}</div>
+                            <div class="mt-1 text-xs font-black ${modalType === 'murojaah' ? 'text-purple-700 dark:text-purple-300' : 'text-amber-700 dark:text-amber-300'}">${detail}</div>
+                            <div class="mt-1 text-[11px] font-bold text-slate-600 dark:text-slate-400">${names.length} santri: ${window.massalEsc(names.join(', '))}</div>
+                            ${h.status ? `<div class="mt-1 text-[11px] font-bold text-slate-500">Nilai: ${window.massalEsc(h.status)}</div>` : ''}
+                            ${h.catatan ? `<div class="mt-1 text-[11px] font-bold text-slate-500">Catatan: ${window.massalEsc(h.catatan)}</div>` : ''}
+                        </div>
+                        <button type="button" onclick='window.deleteMassalHistory(${safeId}, "${modalType}")' class="shrink-0 px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-black">Hapus</button>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+
+        window.deleteMassalHistory = async function(groupId, modalType) {
+            if (!groupId) { window.showToast('ID riwayat tidak ditemukan.', 'error'); return; }
+            const list = window.massalReadHistory(modalType);
+            const item = list.find(x => String(x.groupId) === String(groupId));
+            if (!item) { window.showToast('Riwayat sudah tidak ada.', 'error'); return; }
+            if (!confirm('Hapus riwayat input bersama ini? Data yang terkait pada santri yang dipilih juga akan dihapus dari Google Sheet.')) return;
+            window.setSyncIndicator('pending');
+            try {
+                const url = window.getGsUrl();
+                await fetch(url, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ type: 'delete_massal_history', category: modalType, groupId: groupId })
+                });
+                window.massalWriteHistory(modalType, list.filter(x => String(x.groupId) !== String(groupId)));
+                window.showToast(modalType === 'murojaah' ? '🗑️ Riwayat Muroja\'ah Bersama sudah dihapus.' : '🗑️ Riwayat Tugas Bersama sudah dihapus.', 'success');
+                window.renderMassalHistory(modalType);
+                setTimeout(() => window.fetchAllDataFromCloud(true), 500);
+            } catch (err) {
+                console.error(err);
+                window.setSyncIndicator('error');
+                window.showToast('Gagal menghapus riwayat.', 'error');
+            }
+        };
+
         window.massalSelectedByModal = {
             murojaah: new Set(),
             tugas: new Set()
@@ -2491,6 +2586,7 @@
             window.populateMassalBacaanOptions();
             window.renderMassalSantriGrid('murojaah');
             window.updateMassalSelectedCount('murojaah');
+            window.renderMassalHistory('murojaah');
         };
 
         window.closeMurojaahMassalModal = function() {
@@ -2516,6 +2612,7 @@
 
             window.renderMassalSantriGrid('tugas');
             window.updateMassalSelectedCount('tugas');
+            window.renderMassalHistory('tugas');
         };
 
         window.closeTugasMassalModal = function() {
@@ -2684,10 +2781,7 @@
 
         window.saveMassalMurojaah = async function() {
             const selectedNames = Array.from(window.getMassalSelectedSet('murojaah'));
-            if (!selectedNames.length) {
-                window.showToast('Pilih minimal 1 nama santri!', 'error');
-                return;
-            }
+            if (!selectedNames.length) { window.showToast('Pilih minimal 1 nama santri!', 'error'); return; }
 
             const mode = document.getElementById('massalBacaanMode')?.value || 'quran';
             const surah = document.getElementById('massalSurahSelect')?.value || '';
@@ -2698,17 +2792,15 @@
             const catatan = document.getElementById('massalMurojaahCat')?.value.trim() || '';
             const tanggal = document.getElementById('massalMurojaahTanggal')?.value || new Date().toISOString().split('T')[0];
             const item = mode === 'iqro' ? iqro : surah;
-
-            if (!item) {
-                window.showToast(mode === 'iqro' ? 'Pilih Iqro terlebih dahulu!' : 'Pilih surat terlebih dahulu!', 'error');
-                return;
-            }
+            if (!item) { window.showToast(mode === 'iqro' ? 'Pilih Iqro terlebih dahulu!' : 'Pilih surat terlebih dahulu!', 'error'); return; }
             if (!window.validateMassalQuranRange()) return;
 
             let detailStr = item;
-            if (start && end) detailStr += ` ${start}-${end}`;
-            else if (start) detailStr += ` ${start}`;
+            let rangeStr = '';
+            if (start && end) { detailStr += ` ${start}-${end}`; rangeStr = `${mode === 'iqro' ? 'Halaman' : 'Ayat'} ${start}-${end}`; }
+            else if (start) { detailStr += ` ${start}`; rangeStr = `${mode === 'iqro' ? 'Halaman' : 'Ayat'} ${start}`; }
 
+            const groupId = `MURBERSAMA-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
             const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
@@ -2717,52 +2809,34 @@
             for (const name of selectedNames) {
                 const s = window.santriList.find(x => x.name === name);
                 if (!s) continue;
-
                 s.lastMurojaah = detailStr;
                 s.lastMurojaahDate = tanggal;
                 s.cloudMurStat = stat;
                 s.cloudMurCat = catatan;
-
                 hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail: detailStr, status: stat, catatan, type: 'murojaah' });
-
-                await window.syncToCloud({
-                    type: 'murojaah',
-                    timestamp: nowObj.toISOString(),
-                    tanggal,
-                    id: s.id,
-                    name: s.name,
-                    class: s.class,
-                    teacher: s.teacher,
-                    detail: detailStr,
-                    status: stat,
-                    catatan,
-                    slots: [{ item, start: start || '-', end: end || '-', mode }]
-                });
+                await window.syncToCloud({ type: 'murojaah', timestamp: nowObj.toISOString(), tanggal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail: detailStr, status: stat, catatan, groupId, slots: [{ item, start: start || '-', end: end || '-', mode }] });
                 saved++;
             }
 
             localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
+            const massHist = window.massalReadHistory('murojaah');
+            massHist.unshift({ groupId, timestamp: formattedTimeStr, tanggal, names: selectedNames, item, range: rangeStr, detail: detailStr, status: stat, catatan, mode });
+            window.massalWriteHistory('murojaah', massHist);
             window.getMassalSelectedSet('murojaah').clear();
             window.closeMurojaahMassalModal();
             window.renderSantriCardsAndTable();
-            window.showToast(`✓ Muroja'ah berhasil masuk ke data ${saved} santri sesuai kelas/nama yang dipilih.`, 'success');
+            window.showToast(`✅ SUDAH DI-INPUT: Muroja'ah bersama masuk ke data ${saved} santri.`, 'success');
         };
 
         window.saveMassalTugas = async function() {
             const selectedNames = Array.from(window.getMassalSelectedSet('tugas'));
-            if (!selectedNames.length) {
-                window.showToast('Pilih minimal 1 nama santri!', 'error');
-                return;
-            }
-
+            if (!selectedNames.length) { window.showToast('Pilih minimal 1 nama santri!', 'error'); return; }
             const detail = document.getElementById('massalTugasDetail')?.value.trim() || '';
             const catatan = document.getElementById('massalTugasCat')?.value.trim() || '';
             const tanggal = document.getElementById('massalTugasTanggal')?.value || new Date().toISOString().split('T')[0];
-            if (!detail) {
-                window.showToast('Rincian tugas wajib diisi!', 'error');
-                return;
-            }
+            if (!detail) { window.showToast('Rincian tugas wajib diisi!', 'error'); return; }
 
+            const groupId = `TUGBERSAMA-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
             const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
@@ -2771,32 +2845,22 @@
             for (const name of selectedNames) {
                 const s = window.santriList.find(x => x.name === name);
                 if (!s) continue;
-
                 s.lastTugas = detail;
                 s.lastTugasDate = tanggal;
                 s.cloudTugCat = catatan;
-
                 hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail, status: '-', catatan, type: 'tugas' });
-
-                await window.syncToCloud({
-                    type: 'tugas',
-                    timestamp: nowObj.toISOString(),
-                    tanggal,
-                    id: s.id,
-                    name: s.name,
-                    class: s.class,
-                    teacher: s.teacher,
-                    detail,
-                    status: '-',
-                    catatan
-                });
+                await window.syncToCloud({ type: 'tugas', timestamp: nowObj.toISOString(), tanggal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail, status: '-', catatan, groupId });
                 saved++;
             }
 
             localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
+            const massHist = window.massalReadHistory('tugas');
+            massHist.unshift({ groupId, timestamp: formattedTimeStr, tanggal, names: selectedNames, detail, catatan });
+            window.massalWriteHistory('tugas', massHist);
+            window.getMassalSelectedSet('tugas').clear();
             window.closeTugasMassalModal();
             window.renderSantriCardsAndTable();
-            window.showToast(`✓ Tugas berhasil masuk ke data ${saved} santri sesuai kelas/nama yang dipilih.`, 'success');
+            window.showToast(`✅ SUDAH DI-INPUT: Tugas bersama masuk ke data ${saved} santri.`, 'success');
         };
 
         window.updateSantriStickyOffset = function() {
@@ -3533,6 +3597,11 @@
                 <div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Keterangan/Catatan:</label><textarea id="massalMurojaahCat" rows="2" placeholder="Contoh: Surat Al-Mulk ayat 1 sampai 10, muroja'ah bersama di kelas." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm"></textarea></div>
             </div>
 
+            <div class="mt-2 rounded-2xl border-2 border-purple-200 dark:border-purple-800 bg-purple-50/60 dark:bg-purple-950/20 p-3">
+                <div class="flex items-center justify-between gap-2 mb-2"><h4 class="font-black text-xs sm:text-sm text-purple-800 dark:text-purple-300">📚 Riwayat Muroja'ah Bersama</h4><span class="text-[10px] font-bold text-slate-500">Bisa dihapus</span></div>
+                <div id="massalMurojaahHistory" class="space-y-2 max-h-56 overflow-y-auto"></div>
+            </div>
+
             <div class="flex justify-end gap-2 pt-1"><button type="button" onclick="window.closeMurojaahMassalModal()" class="px-4 py-3 bg-slate-200 dark:bg-slate-700 rounded-xl text-xs font-black">Batal</button><button type="button" onclick="window.saveMassalMurojaah()" class="px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-black shadow">Simpan ke Data Muroja'ah</button></div>
         </div>
     </div>
@@ -3548,6 +3617,11 @@
             <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-100 dark:bg-slate-900 rounded-xl"><span id="massalTugasSelectedCount" class="font-black text-xs text-amber-700 dark:text-amber-300">0 santri dipilih</span><div class="flex gap-2"><button type="button" onclick="window.massalSelectAllSantri('tugas')" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-black">Pilih Semua</button><button type="button" onclick="window.massalDeselectAllSantri('tugas')" class="px-3 py-2 bg-slate-500 text-white rounded-lg text-xs font-black">Batal Semua</button></div></div>
             <div id="massalTugasSantriGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-1"></div>
             <div class="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border-2 border-amber-300 space-y-3"><h4 class="font-black text-xs sm:text-sm text-amber-900 dark:text-amber-200">📋 Tugas yang Sama untuk Santri Terpilih</h4><div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Rincian Tugas:</label><textarea id="massalTugasDetail" rows="4" placeholder="Contoh: Muroja'ah Surat Al-Mulk ayat 1-10 dan setor pada pertemuan berikutnya." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm"></textarea></div><div><label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1">Catatan:</label><textarea id="massalTugasCat" rows="2" placeholder="Keterangan tambahan untuk semua santri terpilih..." class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-bold text-xs sm:text-sm"></textarea></div></div>
+            <div class="mt-2 rounded-2xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/20 p-3">
+                <div class="flex items-center justify-between gap-2 mb-2"><h4 class="font-black text-xs sm:text-sm text-amber-800 dark:text-amber-300">📚 Riwayat Tugas Bersama</h4><span class="text-[10px] font-bold text-slate-500">Bisa dihapus</span></div>
+                <div id="massalTugasHistory" class="space-y-2 max-h-56 overflow-y-auto"></div>
+            </div>
+
             <div class="flex justify-end gap-2"><button type="button" onclick="window.closeTugasMassalModal()" class="px-4 py-3 bg-slate-200 dark:bg-slate-700 rounded-xl text-xs font-black">Batal</button><button type="button" onclick="window.saveMassalTugas()" class="px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black shadow">Simpan ke Data Tugas</button></div>
         </div>
     </div>
