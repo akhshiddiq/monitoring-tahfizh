@@ -46,7 +46,12 @@
             #inlineWaReportPanel { order: 2; width: 100%; }
             #santriGridContainer { order: 1; width: 100%; }
             #inlineWaReportPanel textarea { min-height: 360px !important; }
-            #inlineLiveReportBar { position: sticky; top: 8px; z-index: 35; }
+            #inlineLiveReportBar {
+            display:block !important;
+            width:100%;
+            margin:0 0 12px 0;
+            border-radius:14px;
+        }
         }
         @media (min-width: 1024px) {
             #inlineWaReportPanel textarea { min-height: 520px !important; }
@@ -54,7 +59,30 @@
         #santriGridContainer {
             scroll-margin-top: var(--app-header-height);
         }
-    </style>
+    
+        #inlineLiveReportBar {
+            border: 1px solid rgb(167 243 208);
+            background: linear-gradient(180deg, rgba(236,253,245,.98), rgba(255,255,255,.98));
+            box-shadow: 0 2px 10px rgba(15,23,42,.06);
+        }
+        #inlineLiveReportBar button {
+            white-space: nowrap;
+        }
+        @media (max-width: 1023px) {
+            #inlineLiveReportBar {
+                position: sticky;
+                top: 8px;
+                z-index: 50;
+            }
+        }
+        @media (prefers-color-scheme: dark) {
+            #inlineLiveReportBar {
+                background: linear-gradient(180deg, rgba(6,78,59,.42), rgba(15,23,42,.96));
+                border-color: rgb(6 95 70);
+            }
+        }
+
+</style>
     <script>
         window.santriList = [
             { id: "IDSRQ001", name: "Alfatih Ahmad Badawi", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", gender: "L" },
@@ -1855,6 +1883,12 @@
             const s = window.santriList.find(x => x.name === name);
             if (!s) return;
 
+            // Live Laporan Personal selalu mengikuti nama santri yang sedang aktif di Input.
+            const liveNameLabel = document.getElementById('inlineWaSelectedName');
+            const liveClassLabel = document.getElementById('inlineWaSelectedClass');
+            if (liveNameLabel) liveNameLabel.textContent = s.name;
+            if (liveClassLabel) liveClassLabel.textContent = `Kelas ${s.class}`;
+
             const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
             const targetPhone = teacherClasses.includes(s.class) ? '+6285697296114' : s.phone;
             const phoneInput = document.getElementById('waPhoneInput');
@@ -1980,6 +2014,7 @@
 
             if (!keepScroll) {
                 const panel = document.getElementById('inlineWaReportPanel');
+            const bar = document.getElementById('inlineLiveReportBar');
                 if (panel && window.innerWidth < 1024) {
                     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
@@ -1993,7 +2028,14 @@
 
         window.toggleInlineLiveReport = function() {
             const panel = document.getElementById('inlineWaReportPanel');
+            const bar = document.getElementById('inlineLiveReportBar');
             if (!panel) return;
+
+            // Bar selalu tetap tampil; hanya jendela laporan yang dibuka/tutup.
+            if (bar) {
+                bar.hidden = false;
+                bar.style.display = 'block';
+            }
 
             const willOpen = panel.classList.contains('hidden');
             panel.classList.toggle('hidden', !willOpen);
@@ -2005,14 +2047,19 @@
 
             const topBtn = document.getElementById('inlineLiveReportToggleBtnTop');
             const insideBtn = document.getElementById('inlineLiveReportToggleBtn');
-            if (topBtn) topBtn.innerHTML = iconText;
+            if (topBtn) {
+                topBtn.innerHTML = iconText;
+                topBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            }
             if (insideBtn) insideBtn.innerHTML = iconText;
 
             const status = document.getElementById('inlineLiveReportBarStatus');
             if (status) {
                 status.textContent = willOpen
-                    ? (window.inlineLiveReportType === 'kelas' ? 'Laporan Kelas sedang terbuka.' : 'WA Personal sedang terbuka.')
-                    : 'Jendela laporan ditutup — area input kembali melebar.';
+                    ? (window.inlineLiveReportType === 'kelas'
+                        ? 'Laporan Kelas sedang terbuka.'
+                        : 'WA Personal sedang terbuka.')
+                    : 'Laporan ditutup — klik Buka untuk menampilkan kembali.';
             }
         };
 
@@ -2081,6 +2128,13 @@
             window.inlineLiveReportType = localStorage.getItem('rq_inline_live_report_type') || 'wa';
             const open = localStorage.getItem('rq_inline_live_report_open');
             const panel = document.getElementById('inlineWaReportPanel');
+            const bar = document.getElementById('inlineLiveReportBar');
+
+            // Bar permanen di atas pencarian.
+            if (bar) {
+                bar.hidden = false;
+                bar.style.display = 'block';
+            }
 
             if (panel && open === '0') panel.classList.add('hidden');
             window.switchInlineLiveReport(window.inlineLiveReportType);
@@ -2093,14 +2147,19 @@
 
             const topBtn = document.getElementById('inlineLiveReportToggleBtnTop');
             const insideBtn = document.getElementById('inlineLiveReportToggleBtn');
-            if (topBtn) topBtn.innerHTML = iconText;
+            if (topBtn) {
+                topBtn.innerHTML = iconText;
+                topBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
             if (insideBtn) insideBtn.innerHTML = iconText;
 
             const status = document.getElementById('inlineLiveReportBarStatus');
             if (status) {
                 status.textContent = isOpen
-                    ? (window.inlineLiveReportType === 'kelas' ? 'Laporan Kelas sedang terbuka.' : 'WA Personal sedang terbuka.')
-                    : 'Jendela laporan ditutup — area input kembali melebar.';
+                    ? (window.inlineLiveReportType === 'kelas'
+                        ? 'Laporan Kelas sedang terbuka.'
+                        : 'WA Personal sedang terbuka.')
+                    : 'Laporan ditutup — klik Buka untuk menampilkan kembali.';
             }
         };
 
@@ -3635,12 +3694,12 @@
 
                     <div id="inlineLiveWaContent" class="p-3.5 space-y-3">
                         <div class="flex items-center justify-between gap-2">
-                            <div class="min-w-0"><div class="font-black text-xs truncate" id="inlineWaSelectedName">Pilih santri</div><div class="text-[10px] text-slate-500 font-bold" id="inlineWaSelectedClass">-</div></div>
+                            <div class="min-w-0">
+                                <div class="font-black text-xs truncate" id="inlineWaSelectedName">Pilih santri</div>
+                                <div class="text-[10px] text-slate-500 font-bold" id="inlineWaSelectedClass">-</div>
+                                <div class="text-[9px] text-emerald-600 font-bold mt-0.5">Otomatis mengikuti nama pada input yang sedang dipilih</div>
+                            </div>
                             <span class="text-[9px] font-black text-emerald-600 shrink-0">Personal</span>
-                        </div>
-                        <div>
-                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">No WA Wali</label>
-                            <input type="text" id="waPhoneInputInline" oninput="const x=document.getElementById('waPhoneInput'); if(x) x.value=this.value" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs min-h-[44px]" value="+6285774042121">
                         </div>
                         <div class="grid grid-cols-1 gap-2">
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeMateriWaInlineCheckbox" checked onchange="const x=document.getElementById('includeMateriWaCheckbox'); if(x) x.checked=this.checked; window.generateWaReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Belajar</label>
