@@ -2779,9 +2779,50 @@
             return true;
         };
 
+        window._massalSaving = { murojaah: false, tugas: false };
+
+        window.massalShowResult = function(modalType, message, ok = true) {
+            const id = modalType === 'murojaah' ? 'massalMurojaahResult' : 'massalTugasResult';
+            let el = document.getElementById(id);
+            if (!el) {
+                const modalId = modalType === 'murojaah' ? 'murojaahMassalModal' : 'tugasMassalModal';
+                const modal = document.getElementById(modalId);
+                const box = modal?.querySelector('.space-y-4');
+                if (!box) return;
+                el = document.createElement('div');
+                el.id = id;
+                el.className = 'rounded-xl border-2 p-3 font-black text-xs sm:text-sm';
+                box.insertBefore(el, box.lastElementChild);
+            }
+            el.className = `rounded-xl border-2 p-3 font-black text-xs sm:text-sm ${ok ? 'bg-emerald-50 border-emerald-400 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200' : 'bg-rose-50 border-rose-400 text-rose-800 dark:bg-rose-950/30 dark:text-rose-200'}`;
+            el.textContent = message;
+            el.classList.remove('hidden');
+        };
+
+        window.setMassalSaveButton = function(modalType, saving) {
+            const modalId = modalType === 'murojaah' ? 'murojaahMassalModal' : 'tugasMassalModal';
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            const btn = Array.from(modal.querySelectorAll('button')).find(b => (b.textContent || '').toLowerCase().includes('simpan ke data'));
+            if (!btn) return;
+            btn.disabled = !!saving;
+            btn.style.pointerEvents = saving ? 'none' : '';
+            btn.classList.toggle('opacity-60', !!saving);
+            btn.classList.toggle('cursor-not-allowed', !!saving);
+            if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
+            btn.innerHTML = saving
+                ? '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...'
+                : btn.dataset.originalText;
+        };
+
         window.saveMassalMurojaah = async function() {
+            if (window._massalSaving.murojaah) return;
             const selectedNames = Array.from(window.getMassalSelectedSet('murojaah'));
-            if (!selectedNames.length) { window.showToast('Pilih minimal 1 nama santri!', 'error'); return; }
+            if (!selectedNames.length) {
+                window.showToast('⚠️ Pilih minimal 1 nama santri!', 'error');
+                window.massalShowResult('murojaah', '⚠️ Belum disimpan: pilih minimal 1 santri.', false);
+                return;
+            }
 
             const mode = document.getElementById('massalBacaanMode')?.value || 'quran';
             const surah = document.getElementById('massalSurahSelect')?.value || '';
@@ -2792,7 +2833,11 @@
             const catatan = document.getElementById('massalMurojaahCat')?.value.trim() || '';
             const tanggal = document.getElementById('massalMurojaahTanggal')?.value || new Date().toISOString().split('T')[0];
             const item = mode === 'iqro' ? iqro : surah;
-            if (!item) { window.showToast(mode === 'iqro' ? 'Pilih Iqro terlebih dahulu!' : 'Pilih surat terlebih dahulu!', 'error'); return; }
+
+            if (!item) {
+                window.showToast(mode === 'iqro' ? '⚠️ Pilih Iqro terlebih dahulu!' : '⚠️ Pilih surat terlebih dahulu!', 'error');
+                return;
+            }
             if (!window.validateMassalQuranRange()) return;
 
             let detailStr = item;
@@ -2804,63 +2849,129 @@
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
             const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-            let saved = 0;
 
-            for (const name of selectedNames) {
-                const s = window.santriList.find(x => x.name === name);
-                if (!s) continue;
-                s.lastMurojaah = detailStr;
-                s.lastMurojaahDate = tanggal;
-                s.cloudMurStat = stat;
-                s.cloudMurCat = catatan;
-                hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail: detailStr, status: stat, catatan, type: 'murojaah' });
-                await window.syncToCloud({ type: 'murojaah', timestamp: nowObj.toISOString(), tanggal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail: detailStr, status: stat, catatan, groupId, slots: [{ item, start: start || '-', end: end || '-', mode }] });
-                saved++;
+            window._massalSaving.murojaah = true;
+            window.setMassalSaveButton('murojaah', true);
+            window.massalShowResult('murojaah', `⏳ Menyimpan Muroja'ah Bersama untuk ${selectedNames.length} santri...`, true);
+            window.setSyncIndicator('pending');
+
+            try {
+                const jobs = selectedNames.map(name => {
+                    const s = window.santriList.find(x => x.name === name);
+                    if (!s) return null;
+                    s.lastMurojaah = detailStr;
+                    s.lastMurojaahDate = tanggal;
+                    s.cloudMurStat = stat;
+                    s.cloudMurCat = catatan;
+                    hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail: detailStr, status: stat, catatan, type: 'murojaah' });
+                    return window.syncToCloud({
+                        type: 'murojaah', timestamp: nowObj.toISOString(), tanggal,
+                        id: s.id, name: s.name, class: s.class, teacher: s.teacher,
+                        detail: detailStr, status: stat, catatan, groupId,
+                        slots: [{ item, start: start || '-', end: end || '-', mode }]
+                    });
+                }).filter(Boolean);
+
+                await Promise.all(jobs);
+                const saved = jobs.length;
+                localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
+
+                const massHist = window.massalReadHistory('murojaah');
+                massHist.unshift({ groupId, timestamp: formattedTimeStr, tanggal, names: selectedNames, item, range: rangeStr, detail: detailStr, status: stat, catatan, mode });
+                window.massalWriteHistory('murojaah', massHist);
+                window.getMassalSelectedSet('murojaah').clear();
+                window.renderMassalHistory('murojaah');
+                window.renderSantriCardsAndTable();
+                window.setSyncIndicator('success');
+
+                window.massalShowResult('murojaah', `✅ SUDAH DI-INPUT — Muroja'ah Bersama berhasil disimpan untuk ${saved} santri.`, true);
+                window.showToast(`✅ SUDAH DI-INPUT: Muroja'ah Bersama • ${saved} santri`, 'success');
+
+                setTimeout(() => {
+                    window.closeMurojaahMassalModal();
+                    window.fetchAllDataFromCloud(true);
+                }, 900);
+            } catch (err) {
+                console.error('Gagal simpan Murojaah Bersama:', err);
+                window.setSyncIndicator('error');
+                window.massalShowResult('murojaah', `❌ Gagal menyimpan: ${err?.message || err}`, false);
+                window.showToast('❌ Muroja\'ah Bersama gagal disimpan.', 'error');
+            } finally {
+                window._massalSaving.murojaah = false;
+                window.setMassalSaveButton('murojaah', false);
             }
-
-            localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
-            const massHist = window.massalReadHistory('murojaah');
-            massHist.unshift({ groupId, timestamp: formattedTimeStr, tanggal, names: selectedNames, item, range: rangeStr, detail: detailStr, status: stat, catatan, mode });
-            window.massalWriteHistory('murojaah', massHist);
-            window.getMassalSelectedSet('murojaah').clear();
-            window.closeMurojaahMassalModal();
-            window.renderSantriCardsAndTable();
-            window.showToast(`✅ SUDAH DI-INPUT: Muroja'ah bersama masuk ke data ${saved} santri.`, 'success');
         };
 
         window.saveMassalTugas = async function() {
+            if (window._massalSaving.tugas) return;
             const selectedNames = Array.from(window.getMassalSelectedSet('tugas'));
-            if (!selectedNames.length) { window.showToast('Pilih minimal 1 nama santri!', 'error'); return; }
+            if (!selectedNames.length) {
+                window.showToast('⚠️ Pilih minimal 1 nama santri!', 'error');
+                window.massalShowResult('tugas', '⚠️ Belum disimpan: pilih minimal 1 santri.', false);
+                return;
+            }
             const detail = document.getElementById('massalTugasDetail')?.value.trim() || '';
             const catatan = document.getElementById('massalTugasCat')?.value.trim() || '';
             const tanggal = document.getElementById('massalTugasTanggal')?.value || new Date().toISOString().split('T')[0];
-            if (!detail) { window.showToast('Rincian tugas wajib diisi!', 'error'); return; }
+            if (!detail) {
+                window.showToast('⚠️ Rincian tugas wajib diisi!', 'error');
+                window.massalShowResult('tugas', '⚠️ Belum disimpan: rincian tugas wajib diisi.', false);
+                return;
+            }
 
             const groupId = `TUGBERSAMA-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
             const nowObj = new Date();
             const formattedTimeStr = window.formatTimestampCustom(nowObj);
             const hist = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-            let saved = 0;
 
-            for (const name of selectedNames) {
-                const s = window.santriList.find(x => x.name === name);
-                if (!s) continue;
-                s.lastTugas = detail;
-                s.lastTugasDate = tanggal;
-                s.cloudTugCat = catatan;
-                hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail, status: '-', catatan, type: 'tugas' });
-                await window.syncToCloud({ type: 'tugas', timestamp: nowObj.toISOString(), tanggal, id: s.id, name: s.name, class: s.class, teacher: s.teacher, detail, status: '-', catatan, groupId });
-                saved++;
+            window._massalSaving.tugas = true;
+            window.setMassalSaveButton('tugas', true);
+            window.massalShowResult('tugas', `⏳ Menyimpan Tugas Bersama untuk ${selectedNames.length} santri...`, true);
+            window.setSyncIndicator('pending');
+
+            try {
+                const jobs = selectedNames.map(name => {
+                    const s = window.santriList.find(x => x.name === name);
+                    if (!s) return null;
+                    s.lastTugas = detail;
+                    s.lastTugasDate = tanggal;
+                    s.cloudTugCat = catatan;
+                    hist.unshift({ timestamp: formattedTimeStr, tanggal, rawTime: nowObj.getTime(), name: s.name, detail, status: '-', catatan, type: 'tugas' });
+                    return window.syncToCloud({
+                        type: 'tugas', timestamp: nowObj.toISOString(), tanggal,
+                        id: s.id, name: s.name, class: s.class, teacher: s.teacher,
+                        detail, status: '-', catatan, groupId
+                    });
+                }).filter(Boolean);
+
+                await Promise.all(jobs);
+                const saved = jobs.length;
+                localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
+
+                const massHist = window.massalReadHistory('tugas');
+                massHist.unshift({ groupId, timestamp: formattedTimeStr, tanggal, names: selectedNames, detail, catatan });
+                window.massalWriteHistory('tugas', massHist);
+                window.getMassalSelectedSet('tugas').clear();
+                window.renderMassalHistory('tugas');
+                window.renderSantriCardsAndTable();
+                window.setSyncIndicator('success');
+
+                window.massalShowResult('tugas', `✅ SUDAH DI-INPUT — Tugas Bersama berhasil disimpan untuk ${saved} santri.`, true);
+                window.showToast(`✅ SUDAH DI-INPUT: Tugas Bersama • ${saved} santri`, 'success');
+
+                setTimeout(() => {
+                    window.closeTugasMassalModal();
+                    window.fetchAllDataFromCloud(true);
+                }, 900);
+            } catch (err) {
+                console.error('Gagal simpan Tugas Bersama:', err);
+                window.setSyncIndicator('error');
+                window.massalShowResult('tugas', `❌ Gagal menyimpan: ${err?.message || err}`, false);
+                window.showToast('❌ Tugas Bersama gagal disimpan.', 'error');
+            } finally {
+                window._massalSaving.tugas = false;
+                window.setMassalSaveButton('tugas', false);
             }
-
-            localStorage.setItem('rq_history_tugas', JSON.stringify(hist));
-            const massHist = window.massalReadHistory('tugas');
-            massHist.unshift({ groupId, timestamp: formattedTimeStr, tanggal, names: selectedNames, detail, catatan });
-            window.massalWriteHistory('tugas', massHist);
-            window.getMassalSelectedSet('tugas').clear();
-            window.closeTugasMassalModal();
-            window.renderSantriCardsAndTable();
-            window.showToast(`✅ SUDAH DI-INPUT: Tugas bersama masuk ke data ${saved} santri.`, 'success');
         };
 
         window.updateSantriStickyOffset = function() {
@@ -3063,6 +3174,8 @@
 </script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
+    <div id="toastContainer" class="fixed top-4 right-4 z-[20000] space-y-2 w-[min(92vw,420px)] pointer-events-none"></div>
+
     
     <header id="appHeader" class="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md sticky top-0 z-40 border-b border-emerald-700/50">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
