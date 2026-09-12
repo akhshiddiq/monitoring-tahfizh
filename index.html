@@ -420,7 +420,7 @@
         window.setupLiveSantriScrollSync = function() {
             if (window.__liveSantriScrollSyncBound) return;
             window.__liveSantriScrollSyncBound = true;
-            window.addEventListener('scroll', window.syncLiveReportToVisibleSantri, { passive: true });
+            window.addEventListener('scroll', window.syncLiveReportToVisibleSantri, { passive: true, capture: true });
             window.addEventListener('resize', window.syncLiveReportToVisibleSantri, { passive: true });
             setTimeout(window.syncLiveReportToVisibleSantri, 150);
         };
@@ -1086,10 +1086,6 @@
             if (!s) return;
             window.selectedWaSantriName = s.name;
             window.reportWaClassFilter = s.class;
-            const nameLabel = document.getElementById('inlineWaSelectedName');
-            const classLabel = document.getElementById('inlineWaSelectedClass');
-            if (nameLabel) nameLabel.textContent = s.name;
-            if (classLabel) classLabel.textContent = `Kelas ${s.class}`;
             window.generateWaReport();
         };
 
@@ -1966,10 +1962,6 @@
             if (!s) return;
 
             // Live Laporan Personal selalu mengikuti nama santri yang sedang aktif di Input.
-            const liveNameLabel = document.getElementById('inlineWaSelectedName');
-            const liveClassLabel = document.getElementById('inlineWaSelectedClass');
-            if (liveNameLabel) liveNameLabel.textContent = s.name;
-            if (liveClassLabel) liveClassLabel.textContent = `Kelas ${s.class}`;
 
             const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
             const targetPhone = teacherClasses.includes(s.class) ? '+6285697296114' : s.phone;
@@ -3715,7 +3707,7 @@
                                 <span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-black">LIVE</span>
                             </div>
                             <div id="inlineLiveReportBarStatus" class="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold truncate">
-                                Live WA Personal mengikuti santri yang sedang aktif di Input.
+                                WA Personal
                             </div>
                         </div>
                     </div>
@@ -3744,7 +3736,6 @@
                                     <h3 class="font-black text-sm">Live Laporan</h3>
                                     <span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-black">LIVE</span>
                                 </div>
-                                <p class="mt-1 text-[10px] text-slate-500 dark:text-slate-400 font-bold">WA Personal — otomatis mengikuti santri yang sedang aktif.</p>
                             </div>
                             <button id="inlineLiveReportToggleBtn" onclick="window.toggleInlineLiveReport()" class="shrink-0 px-2.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 text-emerald-700 dark:text-emerald-300 text-[10px] font-black shadow-sm"><i class="fa-solid fa-chevron-up"></i> Tutup</button>
                         </div>
