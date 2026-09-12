@@ -4229,5 +4229,38 @@
         </div>
     </div>
 
+
+<script>
+/* Live Laporan: selalu mengikuti santri yang sedang dicari/dipilih pada Input. */
+(function(){
+  function refreshLiveReportFromActiveSantri(){
+    try {
+      if (typeof window.generateWaReport === 'function') {
+        window.generateWaReport();
+      }
+      var name = document.getElementById('santriSelect')?.value ||
+                 document.getElementById('namaSantri')?.value ||
+                 document.getElementById('selectedSantriName')?.textContent || '';
+      if (name && typeof window.selectInlineWaSantri === 'function') {
+        window.selectInlineWaSantri(name);
+      }
+    } catch(e) {}
+  }
+
+  document.addEventListener('input', function(e){
+    var id = (e.target && e.target.id) || '';
+    if (/santri|nama/i.test(id)) {
+      setTimeout(refreshLiveReportFromActiveSantri, 0);
+    }
+  });
+
+  document.addEventListener('change', function(e){
+    var id = (e.target && e.target.id) || '';
+    if (/santri|nama/i.test(id)) {
+      setTimeout(refreshLiveReportFromActiveSantri, 0);
+    }
+  });
+})();
+</script>
 </body>
 </html>
