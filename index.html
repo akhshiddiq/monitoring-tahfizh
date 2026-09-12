@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Tahfizh RQ Al-Khansa</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -2090,13 +2089,14 @@
             // Pesan untuk menu Laporan utama (materi tetap ada sesuai checkbox).
             let fullMsg = reportHeader;
             if (bagianSetoran) fullMsg += `${bagianSetoran}`;
-            else fullMsg += `Belum ada data setoran tercatat\n_______________\n\n`;
+            // Jika belum ada input/setoran, jangan tampilkan kalimat pengganti.
+            // Biarkan bagian setoran kosong sesuai permintaan.
             fullMsg += reportFooter;
 
             // Pesan Live WA (tanpa Materi/Materi Tambahan).
             let liveFullMsg = reportHeader;
             if (bagianSetoranLive) liveFullMsg += `${bagianSetoranLive}`;
-            else liveFullMsg += `Belum ada data setoran tercatat\n_______________\n\n`;
+            // Jika belum ada input/setoran, jangan tampilkan kalimat pengganti.
             liveFullMsg += reportFooter;
 
             const previewEl = document.getElementById('waMessagePreview');
@@ -2293,188 +2293,6 @@
             window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
         };
 
-        window.downloadPdfWaReport = function() {
-            let name = window.selectedWaSantriName;
-            if (!name && window.santriList.length > 0) name = window.santriList[0].name;
-            const s = window.santriList.find(x => x.name === name);
-            if (!s) {
-                window.showToast("Pilih santri terlebih dahulu!", "error");
-                return;
-            }
-
-            const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-            const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-            const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-            const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-
-            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-
-            const liveBac = window.extractSlotEntries('bac', s.name);
-            const liveHaf = window.extractSlotEntries('haf', s.name);
-            const liveMur = window.extractSlotEntries('mur', s.name);
-
-            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
-            const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
-            const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? String(rawBacStat).trim() : '';
-            const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
-            const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanCat = window.cleanReportCatatan(rawBacC);
-
-            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
-            const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
-            const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? String(rawHafStat).trim() : '';
-            const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
-            const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanCat = window.cleanReportCatatan(rawHafC);
-
-            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
-            const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
-            const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? String(rawMurStat).trim() : '';
-            const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
-            const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
-            const murojaahCat = window.cleanReportCatatan(rawMurC);
-
-            const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
-            const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
-            const tugasCat = window.cleanReportCatatan(rawTugC);
-
-            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
-
-            // PDF dibuat sebagai lembar A4 dengan lebar CSS tetap yang setara area cetak.
-            // Ini mencegah html2canvas mengecilkan kartu menjadi sangat kecil di sisi kiri.
-            const element = document.createElement('div');
-            element.className = 'rq-pdf-sheet';
-            element.style.width = '718px';
-            element.style.maxWidth = '718px';
-            element.style.boxSizing = 'border-box';
-            element.style.padding = '28px';
-            element.style.margin = '0';
-            element.style.background = '#ffffff';
-            element.style.color = '#172033';
-            element.style.fontFamily = 'Arial, Helvetica, sans-serif';
-            element.style.fontSize = '13px';
-            element.style.lineHeight = '1.55';
-            element.style.position = 'relative';
-
-            const isValidText = (txt) => {
-                if (txt === null || txt === undefined) return false;
-                const trimmed = String(txt).trim();
-                return trimmed !== '' && trimmed !== '-' && trimmed.toLowerCase() !== 'undefined' && trimmed.toLowerCase() !== 'null';
-            };
-
-            const pdfEsc = (value) => String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;')
-                .replace(/\n/g, '<br>');
-
-            const hasAny = (...values) => values.some(isValidText);
-
-            const makeField = (label, value) => {
-                if (!isValidText(value)) return '';
-                return `<div style="margin-top:9px; padding:9px 11px; background:#ffffff; border:1px solid #e2e8f0; border-radius:9px;">
-                    <div style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.35px; margin-bottom:3px;">${pdfEsc(label)}</div>
-                    <div style="font-size:13px; color:#172033; line-height:1.55; word-break:break-word;">${pdfEsc(value)}</div>
-                </div>`;
-            };
-
-            const makeCard = (title, accent, bg, icon, detail, status, progress, catatan) => {
-                if (!hasAny(detail, status, progress, catatan)) return '';
-                let body = '';
-                if (isValidText(detail)) body += makeField('Setoran', detail);
-                if (isValidText(status)) body += makeField('Status', status);
-                if (isValidText(progress)) body += makeField('Perkembangan', progress);
-                if (isValidText(catatan)) body += makeField('Catatan', catatan);
-                return `<section class="pdf-card" style="background:${bg}; border:1px solid ${accent}; border-left:5px solid ${accent}; border-radius:12px; padding:15px 16px; margin:0 0 14px 0; break-inside:avoid; page-break-inside:avoid;">
-                    <div style="display:flex; align-items:center; gap:9px; margin-bottom:5px;">
-                        <div style="width:28px; height:28px; border-radius:8px; background:${accent}; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800;">${icon}</div>
-                        <div style="font-size:15px; font-weight:800; color:#172033;">${pdfEsc(title)}</div>
-                    </div>
-                    ${body}
-                </section>`;
-            };
-
-            let sectionsHtml = '';
-            sectionsHtml += makeCard('Bacaan', '#059669', '#f0fdf4', 'B', bacaanVal, bacaanStat, bacaanProgressStatus, bacaanCat);
-            sectionsHtml += makeCard('Hafalan', '#e11d48', '#fff1f2', 'H', hafalanVal, hafalanStat, hafalanProgressStatus, hafalanCat);
-            sectionsHtml += makeCard("Muroja'ah", '#7c3aed', '#faf5ff', 'M', murojaahVal, murojaahStat, murojaahProgressStatus, murojaahCat);
-            sectionsHtml += makeCard('Tugas', '#d97706', '#fffbeb', 'T', tugasVal, '', '', tugasCat);
-
-            if (!sectionsHtml) {
-                sectionsHtml = `<div style="border:1px dashed #cbd5e1; border-radius:12px; padding:22px; text-align:center; color:#64748b; background:#f8fafc; break-inside:avoid; page-break-inside:avoid;">Belum ada data yang diisi untuk dilaporkan.</div>`;
-            }
-
-            element.innerHTML = `
-                <div class="pdf-header" style="display:flex; align-items:center; gap:13px; padding-bottom:15px; border-bottom:2px solid #10b981; margin-bottom:14px; break-inside:avoid; page-break-inside:avoid;">
-                    <div style="width:46px; height:46px; border-radius:12px; background:#ecfdf5; border:1px solid #a7f3d0; display:flex; align-items:center; justify-content:center; flex:0 0 auto; color:#047857; font-size:18px; font-weight:900;">RQ</div>
-                    <div style="min-width:0;">
-                        <div style="font-size:17px; font-weight:900; color:#0f172a; letter-spacing:.15px;">RUMAH QUR'AN AL-KHANSA</div>
-                        <div style="font-size:11px; font-weight:700; color:#047857; margin-top:2px;">Laporan Perkembangan Santri</div>
-                    </div>
-                </div>
-
-                <div class="pdf-identity" style="background:#f8fafc; border:1px solid #dbe3ec; border-radius:12px; padding:14px 16px; margin-bottom:14px; break-inside:avoid; page-break-inside:avoid;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px 20px;">
-                        <div><div style="font-size:9.5px; color:#64748b; font-weight:700; text-transform:uppercase;">Nama Santri</div><div style="font-size:14px; font-weight:800; color:#0f172a; margin-top:2px;">${pdfEsc(s.name)}</div></div>
-                        <div><div style="font-size:9.5px; color:#64748b; font-weight:700; text-transform:uppercase;">Kelas</div><div style="font-size:13px; font-weight:700; color:#0f172a; margin-top:2px;">${pdfEsc(s.class || '-')}</div></div>
-                        <div><div style="font-size:9.5px; color:#64748b; font-weight:700; text-transform:uppercase;">Pengajar</div><div style="font-size:13px; font-weight:700; color:#0f172a; margin-top:2px;">${pdfEsc(s.teacher || '-')}</div></div>
-                        <div><div style="font-size:9.5px; color:#64748b; font-weight:700; text-transform:uppercase;">Tanggal Laporan</div><div style="font-size:13px; font-weight:700; color:#0f172a; margin-top:2px;">${pdfEsc(currentDateStr)}</div></div>
-                    </div>
-                </div>
-
-                <div class="pdf-section-title" style="font-size:11px; font-weight:900; color:#047857; text-transform:uppercase; letter-spacing:.55px; margin:0 0 9px 1px; break-after:avoid; page-break-after:avoid;">Data yang telah diisi</div>
-                ${sectionsHtml}
-
-                <div class="pdf-footer" style="margin-top:8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:11px; padding:12px 15px; text-align:center; color:#475569; font-size:10.5px; line-height:1.65; break-inside:avoid; page-break-inside:avoid;">
-                    Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.
-                </div>
-            `;
-
-            // Tempatkan sementara di luar layar agar browser menghitung ukuran secara stabil,
-            // tetapi tetap dengan lebar A4 area-cetak yang konsisten di laptop maupun HP.
-            element.style.position = 'fixed';
-            element.style.left = '-10000px';
-            element.style.top = '0';
-            element.style.zIndex = '-1';
-            document.body.appendChild(element);
-
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: `Laporan_Perkembangan_Santri_${s.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
-                image: { type: 'jpeg', quality: 0.96 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: '#ffffff',
-                    letterRendering: true,
-                    width: 718,
-                    windowWidth: 718,
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                pagebreak: {
-                    mode: ['css', 'legacy'],
-                    avoid: ['.pdf-card', '.pdf-header', '.pdf-identity', '.pdf-footer']
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
-            };
-
-            html2pdf().from(element).set(opt).save().then(() => {
-                element.remove();
-                window.showToast("PDF Laporan Perkembangan Santri berhasil didownload!", "success");
-            }).catch(err => {
-                console.error("PDF generation error:", err);
-                element.remove();
-                window.showToast("Gagal menghasilkan PDF.", "error");
-            });
-        };
-
         window.generateClassReport = function() {
             const inlineClassSelect = document.getElementById('reportClassSelectInline');
             const originalClassSelect = document.getElementById('reportClassSelect');
@@ -2498,7 +2316,6 @@
             
             msg = window.appendReportMateriSection(msg, className, includeMateriClass, includeTambahanClass);
 
-            msg += `👥 *Daftar Santri & Prestasi:*`;
             let activeSantriCount = 0;
             list.forEach((s) => {
                 const sBac = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
@@ -2515,7 +2332,7 @@
                 if (hasAnySetoran) {
                     activeSantriCount++;
                     const emojiNum = window.numberToEmoji(activeSantriCount);
-                    let santriLine = `\n${emojiNum} *${s.name}*`;
+                    let santriLine = (activeSantriCount === 1 ? `👥 *Daftar Santri & Prestasi:*\n` : '') + `\n${emojiNum} *${s.name}*`;
                     if (bacaanVal && bacaanVal !== '-') santriLine += `\n    - Bacaan: ${bacaanVal}`;
                     if (hafalanVal && hafalanVal !== '-') santriLine += `\n    - Hafalan: ${hafalanVal}`;
                     if (murojaahVal && murojaahVal !== '-') santriLine += `\n    - Muroja'ah di Kelas: ${murojaahVal}`;
@@ -2524,9 +2341,9 @@
                 }
             });
 
-            if (activeSantriCount === 0) {
-                msg += `\n_Belum ada santri yang melakukan setoran tercatat._`;
-            }
+            // Tidak ada pesan pengganti ketika belum ada santri yang memiliki input.
+            // Santri tanpa input juga tidak ditulis sama sekali.
+
 
             const classPreview = document.getElementById('classReportMessagePreviewInline') || document.getElementById('classReportMessagePreview');
             if (classPreview) classPreview.value = msg;
@@ -4044,9 +3861,6 @@
                     <div class="flex items-center gap-2.5 flex-wrap">
                         <button onclick="window.copyWaReportText()" class="px-4 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl font-black text-xs sm:text-sm active:scale-95 transition">Salin Teks</button>
                         <button onclick="window.sendWaReportDirect()" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition active:scale-95">Kirim WhatsApp</button>
-                        <button onclick="window.downloadPdfWaReport()" class="px-4.5 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-file-pdf"></i> Download PDF
-                        </button>
                         <button onclick="window.jumpToInputSantriFromReport()" class="px-4.5 py-3 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 active:scale-95" title="Buka form input untuk santri yang sedang dipilih">
                             <i class="fa-solid fa-pen-to-square"></i> Input / Cek Santri Ini
                         </button>
