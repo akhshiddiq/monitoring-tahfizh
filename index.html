@@ -372,6 +372,16 @@
             }
         };
 
+        // Klik nama pada daftar hasil pencarian/nama santri: pilih santri sekaligus
+        // otomatis melompat ke kartu input santri tersebut.
+        window.selectAndScrollToSantri = function(santriName) {
+            if (!santriName) return;
+            if (typeof window.selectInlineWaSantri === 'function') {
+                window.selectInlineWaSantri(santriName, true);
+            }
+            setTimeout(() => window.scrollToSantri(santriName), 80);
+        };
+
         // Tombol cepat di setiap kartu santri: menuju Kartu Prestasi atau WA Personal.
         window.quickOpenKartuSantri = function(santriName) {
             const s = window.santriList.find(x => x.name === santriName);
@@ -1219,7 +1229,7 @@
                 const cardBg = isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800';
 
                 return `
-                    <button type="button" onclick="window.selectInlineWaSantri('${s.name}')" class="p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center min-h-[48px]">
+                    <button type="button" onclick='window.selectAndScrollToSantri(${JSON.stringify(s.name)})' class="p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center min-h-[48px]">
                         <span class="leading-snug break-words">${s.name}</span>
                     </button>
                 `;
@@ -1980,26 +1990,33 @@
                 bagianSetoran += `_______________\n\n`;
             }
 
+            // Laporan utama tetap mengikuti pengaturan Materi di menu Laporan.
+            // Live Laporan WA sengaja TIDAK menampilkan Materi Belajar maupun Materi Tambahan.
+            const bagianSetoranLive = bagianSetoran;
             const includeMateriWa = document.getElementById('includeMateriWaCheckbox')?.checked ?? true;
             const includeTambahanWa = document.getElementById('includeTambahanWaCheckbox')?.checked ?? true;
             bagianSetoran = window.appendReportMateriSection(bagianSetoran, s.class, includeMateriWa, includeTambahanWa);
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
+            const reportHeader = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n\n`;
+            const reportFooter = `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
 
-            let fullMsg = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n\n`;
-            
-            if (bagianSetoran) {
-                fullMsg += `${bagianSetoran}`;
-            } else {
-                fullMsg += `Belum ada data setoran tercatat\n_______________\n\n`;
-            }
+            // Pesan untuk menu Laporan utama (materi tetap ada sesuai checkbox).
+            let fullMsg = reportHeader;
+            if (bagianSetoran) fullMsg += `${bagianSetoran}`;
+            else fullMsg += `Belum ada data setoran tercatat\n_______________\n\n`;
+            fullMsg += reportFooter;
 
-            fullMsg += `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
+            // Pesan Live WA (tanpa Materi/Materi Tambahan).
+            let liveFullMsg = reportHeader;
+            if (bagianSetoranLive) liveFullMsg += `${bagianSetoranLive}`;
+            else liveFullMsg += `Belum ada data setoran tercatat\n_______________\n\n`;
+            liveFullMsg += reportFooter;
 
             const previewEl = document.getElementById('waMessagePreview');
             const inlinePreviewEl = document.getElementById('waMessagePreviewInline');
             if (previewEl) previewEl.value = fullMsg;
-            if (inlinePreviewEl) inlinePreviewEl.value = fullMsg;
+            if (inlinePreviewEl) inlinePreviewEl.value = liveFullMsg;
         };
 
         window.selectInlineWaSantri = function(santriName, keepScroll = false) {
