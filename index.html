@@ -290,7 +290,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'kartu', 'laporan', 'export'].forEach(t => {
+            ['setoran', 'materi', 'kartu', 'laporan', 'riwayat', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
@@ -303,6 +303,7 @@
             if (tabId === 'materi') window.renderMateriList('utama');
             if (tabId === 'kartu') window.initKartuTab();
             if (tabId === 'laporan') window.switchLaporanSubTab('wa');
+            if (tabId === 'riwayat') window.renderRiwayatInputMenu();
             if (tabId === 'export') {
                 const urlInput = document.getElementById('customGsUrlInput');
                 if (urlInput) urlInput.value = window.getGsUrl();
@@ -479,10 +480,12 @@
                         m: cloudData.input_murojaah_dikelas || [],
                         t: cloudData.input_tugas || [],
                         mu: cloudData.materi || [],
-                        mt: cloudData.materi_tambahan || []
+                        mt: cloudData.materi_tambahan || [],
+                        r: cloudData.riwayat_input || []
                     });
                     const cloudChanged = forceRender || fingerprint !== window._cloudFingerprint;
                     window._cloudFingerprint = fingerprint;
+                    window._riwayatInputCloud = Array.isArray(cloudData.riwayat_input) ? cloudData.riwayat_input : [];
                     if (cloudData.santri && cloudData.santri.length > 0) {
                         window.santriList = cloudData.santri;
                         localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
@@ -3053,6 +3056,190 @@
             }
         };
 
+
+        // ============================================================
+        // RIWAYAT INPUT PER NAMA
+        // Data utama diambil dari Google Sheet melalui cloudData.riwayat_input.
+        // Filter kelas dan nama hanya memfilter tampilan, tidak mengubah data Sheet.
+        // ============================================================
+        window.riwayatInputEsc = function(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        };
+
+        window.riwayatInputFormatDate = function(value) {
+            if (!value) return '-';
+            const d = new Date(value);
+            if (isNaN(d.getTime())) return String(value);
+            return d.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        };
+
+        window.riwayatInputFormatTime = function(value) {
+            if (!value) return '';
+            const d = new Date(value);
+            if (isNaN(d.getTime())) return '';
+            return d.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        window.riwayatInputDetail = function(item) {
+            if (item.jenis === 'tugas') {
+                return item.detail || '-';
+            }
+
+            const slots = Array.isArray(item.slots) ? item.slots : [];
+            if (!slots.length) return '-';
+
+            return slots.map(slot => {
+                const mode = String(slot.mode || 'quran').toLowerCase();
+                const isIqro = mode === 'iqro' || String(slot.item || '').toLowerCase().includes('iqro');
+                const range = slot.start && slot.end && slot.start !== '-' && slot.end !== '-' && String(slot.end) !== String(slot.start)
+                    ? `${slot.start}-${slot.end}`
+                    : (slot.start && slot.start !== '-' ? String(slot.start) : '-');
+                return `${slot.item || '-'} ${isIqro ? 'Hlm' : 'Ayat'} ${range}`;
+            }).join(' • ');
+        };
+
+        window.renderRiwayatInputNameOptions = function(list, selectedName) {
+            const nameSelect = document.getElementById('riwayatInputNameFilter');
+            if (!nameSelect) return;
+
+            const names = [...new Set(
+                list
+                    .map(x => String(x.nama || '').trim())
+                    .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b, 'id'));
+
+            nameSelect.innerHTML = '<option value="ALL">Semua Nama</option>' +
+                names.map(name => `<option value="${window.riwayatInputEsc(name)}">${window.riwayatInputEsc(name)}</option>`).join('');
+
+            if (selectedName && names.includes(selectedName)) {
+                nameSelect.value = selectedName;
+            } else {
+                nameSelect.value = 'ALL';
+            }
+        };
+
+        window.renderRiwayatInputMenu = function() {
+            const container = document.getElementById('riwayatInputList');
+            const classSelect = document.getElementById('riwayatInputClassFilter');
+            const nameSelect = document.getElementById('riwayatInputNameFilter');
+            const typeSelect = document.getElementById('riwayatInputTypeFilter');
+            const countEl = document.getElementById('riwayatInputCount');
+            if (!container || !classSelect || !nameSelect || !typeSelect) return;
+
+            const allData = Array.isArray(window._riwayatInputCloud)
+                ? window._riwayatInputCloud
+                : [];
+
+            const previousName = nameSelect.value || 'ALL';
+            const classes = [...new Set(
+                allData.map(x => String(x.kelas || '').trim()).filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b, 'id'));
+
+            const currentClass = classSelect.value || 'ALL';
+            classSelect.innerHTML = '<option value="ALL">Semua Kelas</option>' +
+                classes.map(k => `<option value="${window.riwayatInputEsc(k)}">${window.riwayatInputEsc(k)}</option>`).join('');
+            classSelect.value = classes.includes(currentClass) ? currentClass : 'ALL';
+
+            const classData = classSelect.value === 'ALL'
+                ? allData
+                : allData.filter(x => String(x.kelas || '') === classSelect.value);
+
+            window.renderRiwayatInputNameOptions(classData, previousName);
+
+            const selectedName = nameSelect.value || 'ALL';
+            const selectedType = typeSelect.value || 'ALL';
+
+            const filtered = allData
+                .filter(item => classSelect.value === 'ALL' || String(item.kelas || '') === classSelect.value)
+                .filter(item => selectedName === 'ALL' || String(item.nama || '') === selectedName)
+                .filter(item => selectedType === 'ALL' || String(item.jenis || '') === selectedType)
+                .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
+
+            if (countEl) countEl.textContent = `${filtered.length} riwayat`;
+
+            if (!filtered.length) {
+                container.innerHTML = `
+                    <div class="p-6 text-center rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700">
+                        <div class="text-3xl mb-2">📭</div>
+                        <div class="font-black text-sm text-slate-600 dark:text-slate-300">Belum ada riwayat input sesuai filter.</div>
+                        <div class="text-xs font-bold text-slate-400 mt-1">Data ditarik langsung dari Google Sheet saat sinkronisasi.</div>
+                    </div>`;
+                return;
+            }
+
+            const grouped = {};
+            filtered.forEach(item => {
+                const key = String(item.nama || '-');
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(item);
+            });
+
+            container.innerHTML = Object.keys(grouped)
+                .sort((a, b) => a.localeCompare(b, 'id'))
+                .map(name => {
+                    const rows = grouped[name];
+                    const kelas = rows[0]?.kelas || '-';
+                    return `
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                            <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-100 dark:border-emerald-900">
+                                <div class="flex items-center justify-between gap-3 flex-wrap">
+                                    <div>
+                                        <div class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200">${window.riwayatInputEsc(name)}</div>
+                                        <div class="text-[11px] font-bold text-slate-500 mt-0.5">Kelas: ${window.riwayatInputEsc(kelas)} • ${rows.length} input</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                                ${rows.map(item => {
+                                    const typeLabel = item.label || item.jenis || '-';
+                                    const detail = window.riwayatInputDetail(item);
+                                    const date = window.riwayatInputFormatDate(item.tanggal || item.timestamp);
+                                    const time = window.riwayatInputFormatTime(item.timestamp);
+                                    const status = item.status ? `<span class="px-2 py-1 rounded-lg bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200">${window.riwayatInputEsc(item.status)}</span>` : '';
+                                    const progress = item.progressStatus ? `<span class="px-2 py-1 rounded-lg bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-200">${window.riwayatInputEsc(item.progressStatus)}</span>` : '';
+                                    const note = item.catatan ? `<div class="mt-2 text-[11px] font-bold text-slate-500 dark:text-slate-400">Catatan: ${window.riwayatInputEsc(item.catatan)}</div>` : '';
+                                    return `
+                                        <div class="p-3.5 sm:p-4">
+                                            <div class="flex items-start justify-between gap-3 flex-wrap">
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                        <span class="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 text-[11px] font-black">${window.riwayatInputEsc(typeLabel)}</span>
+                                                        <span class="text-[11px] font-bold text-slate-500">${window.riwayatInputEsc(date)}${time ? ' • ' + window.riwayatInputEsc(time) : ''}</span>
+                                                        ${status}${progress}
+                                                    </div>
+                                                    <div class="mt-2 text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-200 leading-relaxed">${window.riwayatInputEsc(detail)}</div>
+                                                    ${note}
+                                                </div>
+                                            </div>
+                                        </div>`;
+                                }).join('')}
+                            </div>
+                        </div>`;
+                }).join('');
+        };
+
+        window.resetRiwayatInputFilter = function() {
+            const classSelect = document.getElementById('riwayatInputClassFilter');
+            const nameSelect = document.getElementById('riwayatInputNameFilter');
+            const typeSelect = document.getElementById('riwayatInputTypeFilter');
+            if (classSelect) classSelect.value = 'ALL';
+            if (nameSelect) nameSelect.value = 'ALL';
+            if (typeSelect) typeSelect.value = 'ALL';
+            window.renderRiwayatInputMenu();
+        };
+
         window.updateSantriStickyOffset = function() {
             const header = document.getElementById('appHeader');
             if (!header) return;
@@ -3140,6 +3327,7 @@
                 <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
                 <button onclick="window.switchTab('kartu')" id="btnTab-kartu" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Kartu</button>
                 <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
+                <button onclick="window.switchTab('riwayat')" id="btnTab-riwayat" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat Input</button>
                 
                 <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
@@ -3491,6 +3679,56 @@
                         <button onclick="window.sendClassReportDirect()" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition active:scale-95">Kirim WA Kelas</button>
                     </div>
                 </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION: RIWAYAT INPUT PER NAMA -->
+        <section id="section-riwayat" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+                <div class="flex items-start justify-between gap-3 flex-wrap">
+                    <div>
+                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Riwayat Input Per Nama</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-bold mt-1">Riwayat diambil dari data Google Sheet dan diperbarui saat sinkronisasi.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="riwayatInputCount" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 text-xs font-black text-slate-600 dark:text-slate-300">0 riwayat</span>
+                        <button onclick="window.fetchAllDataFromCloud(true).then(() => window.renderRiwayatInputMenu())" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-sm">
+                            <i class="fa-solid fa-rotate"></i> Sync
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label for="riwayatInputClassFilter" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Filter Kelas</label>
+                        <select id="riwayatInputClassFilter" onchange="window.renderRiwayatInputMenu()" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-black outline-none">
+                            <option value="ALL">Semua Kelas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="riwayatInputNameFilter" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Filter Nama</label>
+                        <select id="riwayatInputNameFilter" onchange="window.renderRiwayatInputMenu()" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-black outline-none">
+                            <option value="ALL">Semua Nama</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="riwayatInputTypeFilter" class="block text-xs font-black text-slate-600 dark:text-slate-300 mb-1.5">Jenis Input</label>
+                        <select id="riwayatInputTypeFilter" onchange="window.renderRiwayatInputMenu()" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm font-black outline-none">
+                            <option value="ALL">Semua Jenis</option>
+                            <option value="bacaan">Bacaan</option>
+                            <option value="hafalan">Hafalan</option>
+                            <option value="murojaah">Murojaah</option>
+                            <option value="tugas">Tugas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="window.resetRiwayatInputFilter()" class="px-3.5 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 rounded-xl text-xs font-black text-slate-700 dark:text-slate-200">
+                    Reset Filter
+                </button>
+
+                <div id="riwayatInputList" class="space-y-3"></div>
             </div>
         </section>
 
