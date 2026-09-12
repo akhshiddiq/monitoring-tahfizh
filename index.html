@@ -2475,6 +2475,7 @@
                         <h4 class="font-black text-sm text-emerald-900 dark:text-emerald-200">📖 Bacaan</h4>
                         <p class="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-100">• ${bacaanVal}</p>
                         ${isValidText(bacaanStat) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Nilai: ${bacaanStat}</p>` : ''}
+                        ${isValidText(bacaanProgressStatus) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Keterangan: ${bacaanProgressStatus}</p>` : ''}
                         ${isValidText(bacaanCat) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Catatan: ${bacaanCat}</p>` : ''}
                     </div>
                 `;
@@ -2486,6 +2487,7 @@
                         <h4 class="font-black text-sm text-rose-900 dark:text-rose-200">⭐ Hafalan Baru</h4>
                         <p class="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-100">• ${hafalanVal}</p>
                         ${isValidText(hafalanStat) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Nilai: ${hafalanStat}</p>` : ''}
+                        ${isValidText(hafalanProgressStatus) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Keterangan: ${hafalanProgressStatus}</p>` : ''}
                         ${isValidText(hafalanCat) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Catatan: ${hafalanCat}</p>` : ''}
                     </div>
                 `;
@@ -2497,6 +2499,7 @@
                         <h4 class="font-black text-sm text-purple-900 dark:text-purple-200">🔄 Muroja'ah di Kelas</h4>
                         <p class="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-100">• ${murojaahVal}</p>
                         ${isValidText(murojaahStat) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Nilai: ${murojaahStat}</p>` : ''}
+                        ${isValidText(murojaahProgressStatus) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Keterangan: ${murojaahProgressStatus}</p>` : ''}
                         ${isValidText(murojaahCat) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Catatan: ${murojaahCat}</p>` : ''}
                     </div>
                 `;
@@ -2507,6 +2510,7 @@
                     <div class="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border-2 border-amber-300 dark:border-amber-800 space-y-1.5">
                         <h4 class="font-black text-sm text-amber-900 dark:text-amber-200">📝 Tugas</h4>
                         <p class="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-100">• ${tugasVal}</p>
+                        ${isValidText(lastTugObj?.status) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Nilai/Keterangan: ${window.riwayatInputEsc(lastTugObj.status)}</p>` : ''}
                         ${isValidText(tugasCat) ? `<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">- Catatan: ${tugasCat}</p>` : ''}
                     </div>
                 `;
@@ -3073,13 +3077,41 @@
 
         window.riwayatInputFormatDate = function(value) {
             if (!value) return '-';
-            const d = new Date(value);
-            if (isNaN(d.getTime())) return String(value);
-            return d.toLocaleDateString('id-ID', {
+            const raw = String(value).trim();
+
+            // Tanggal dari Sheet umumnya YYYY-MM-DD. Buat tanggal lokal
+            // agar nama hari tidak bergeser karena timezone.
+            let d;
+            const isoDate = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+            if (isoDate) {
+                d = new Date(
+                    Number(isoDate[1]),
+                    Number(isoDate[2]) - 1,
+                    Number(isoDate[3])
+                );
+            } else {
+                d = new Date(raw);
+            }
+
+            if (isNaN(d.getTime())) return raw;
+
+            const hari = [
+                'Ahad',
+                'Senin',
+                'Selasa',
+                'Rabu',
+                'Kamis',
+                "Jum'at",
+                'Sabtu'
+            ];
+
+            const tanggal = d.toLocaleDateString('id-ID', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric'
             });
+
+            return `${hari[d.getDay()]}, ${tanggal}`;
         };
 
         window.riwayatInputFormatTime = function(value) {
