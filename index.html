@@ -978,7 +978,7 @@
             if (category === 'haf' && sObj?.cloudHafSlots) cloudSlots = sObj.cloudHafSlots;
             if (category === 'mur' && sObj?.cloudMurSlots) cloudSlots = sObj.cloudMurSlots;
 
-            return slots.map(slot => {
+            const slotsHtml = slots.map(slot => {
                 const isFirst = slot === 1;
                 const stateKey = `${santriName}_${category}_slot_${slot}`;
                 const slotData = cloudSlots && cloudSlots[slot-1] ? cloudSlots[slot-1] : null;
@@ -990,12 +990,12 @@
                 const cacheKeyStart = `${santriName}_${category}_start_${slot}`;
                 const cacheKeyEnd = `${santriName}_${category}_end_${slot}`;
                 const cacheKeyMode = `${santriName}_${category}_mode_${slot}`;
-                const statusKey = `${santriName}_${category}_status_${slot}`;
+                const statusKey = `${santriName}_${category}_progress_status`;
 
                 const slotItem = slotData ? (slotData.item || '') : '';
                 const slotStart = slotData ? (slotData.start || '') : '';
                 const slotEnd = slotData ? (slotData.end || '') : '';
-                const slotStatus = slotData ? (slotData.status || '') : '';
+                const slotStatus = '';
                 
                 let cloudMode = slotData && slotData.mode ? slotData.mode : 'quran';
                 if (!slotData && slotItem.toLowerCase().includes('iqro')) cloudMode = 'iqro';
