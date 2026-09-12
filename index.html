@@ -290,7 +290,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'kartu', 'laporan', 'otomatis', 'export'].forEach(t => {
+            ['setoran', 'materi', 'kartu', 'laporan', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
@@ -3098,158 +3098,6 @@
         });
     
 
-        /* ============================================================
-           PENGISIAN OTOMATIS - CATATAN MANUAL + GEMINI AI
-           ============================================================ */
-        window.autoParsedData = null;
-        window.autoAiBusy = false;
-
-        window.cleanAutoNote = function(text) {
-            return String(text || '').replace(/\s+/g, ' ').trim();
-        };
-
-        window.findAutoSantriByName = function(name) {
-            const source = String(name || '').toLowerCase().trim();
-            if (!source) return null;
-            const list = window.santriList || [];
-            const exact = list.find(s => String(s.name || '').toLowerCase() === source);
-            if (exact) return exact;
-            const matches = list.filter(s => {
-                const n = String(s.name || '').toLowerCase();
-                return n.includes(source) || source.includes(n);
-            });
-            return matches.length === 1 ? matches[0] : (matches[0] || null);
-        };
-
-        window.getAutoGsUrl = function() {
-            return typeof window.getGsUrl === 'function' ? window.getGsUrl() : '';
-        };
-
-        window.autoEscape = function(v) {
-            return String(v ?? '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-        };
-
-        window.renderAutoAiResult = function(result) {
-            const preview = document.getElementById('autoPreview');
-            const action = document.getElementById('autoActionArea');
-            if (!preview || !action) return;
-            const d = result || {};
-            const santri = window.findAutoSantriByName(d.santri_name || '');
-            d.santri = santri || {name: d.santri_name || '', class: '', id: '', teacher: ''};
-            window.autoParsedData = d;
-
-            let html = `<div class="space-y-3"><div class="font-black text-emerald-800 dark:text-emerald-300">🤖 Hasil pemeriksaan AI</div>`;
-            html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Santri</b><br>${window.autoEscape(d.santri.name)}</div><div class="p-3 bg-white dark:bg-slate-900 rounded-xl border"><b>Kelas</b><br>${window.autoEscape(d.santri.class || '-')}</div></div>`;
-
-            [['bacaan','Bacaan'],['hafalan','Hafalan'],['murojaah',"Muroja'ah di Kelas"]].forEach(([key,label]) => {
-                const cat = d[key];
-                if (!cat) return;
-                const slots = Array.isArray(cat.slots) ? cat.slots : [];
-                if (!slots.length && !cat.status && !cat.catatan_type && !cat.catatan) return;
-                html += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>${label}</b>`;
-                slots.forEach(slot => {
-                    html += `<div class="mt-2">📖 ${window.autoEscape(slot.item || '-')} ${slot.start ? `ayat ${window.autoEscape(slot.start)}–${window.autoEscape(slot.end || slot.start)}` : ''}</div>`;
-                });
-                if (cat.status) html += `<div class="mt-1">⭐ <b>Status/Nilai:</b> ${window.autoEscape(cat.status)}</div>`;
-                if (cat.catatan_type || cat.catatan) html += `<div class="mt-1">📝 <b>Catatan:</b> ${window.autoEscape(cat.catatan_type ? cat.catatan_type + ' — ' : '')}${window.autoEscape(cat.catatan || '')}</div>`;
-                html += `</div>`;
-            });
-
-            if (d.tugas && (d.tugas.detail || d.tugas.catatan)) {
-                html += `<div class="p-3 rounded-xl border bg-white dark:bg-slate-900"><b>Tugas</b><br>📝 ${window.autoEscape(d.tugas.detail || '-')} ${d.tugas.catatan ? `<br>Catatan: ${window.autoEscape(d.tugas.catatan)}` : ''}</div>`;
-            }
-            html += `<div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs font-bold text-amber-800 dark:text-amber-200">⚠️ Periksa hasil AI. Belum ada data yang dimasukkan ke form. Tekan <b>OKE — Kerjakan Hasil AI</b> jika sudah sesuai.</div></div>`;
-            preview.innerHTML = html;
-            action.classList.remove('hidden');
-        };
-
-        window.parseAutoVoice = async function() {
-            const area = document.getElementById('autoVoiceText');
-            const raw = window.cleanAutoNote(area ? area.value : '');
-            const status = document.getElementById('autoVoiceStatus');
-            const button = document.getElementById('autoAnalyzeBtn');
-            if (!raw) { window.showToast('Silakan tulis catatan terlebih dahulu.', 'error'); return; }
-            if (window.autoAiBusy) return;
-            const gsUrl = window.getAutoGsUrl();
-            if (!gsUrl) { window.showToast('Alamat Google Apps Script belum tersedia.', 'error'); return; }
-
-            window.autoAiBusy = true;
-            if (button) { button.disabled = true; button.classList.add('opacity-60','cursor-wait'); button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI sedang memeriksa...'; }
-            if (status) status.textContent = 'AI sedang memeriksa catatan...';
-
-            const jobId = 'AI-' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
-            const knownSantri = (window.santriList || []).map(s => s.name);
-            const knownSurah = (window.surahList || []).map(s => s.name);
-            const payload = {type:'ai_parse', jobId, transcript:raw, knownSantri, knownSurah};
-
-            try {
-                await fetch(gsUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
-                let done = false;
-                for (let i=0; i<30; i++) {
-                    await new Promise(resolve => setTimeout(resolve,1000));
-                    const response = await fetch(gsUrl + (gsUrl.includes('?')?'&':'?') + 'action=ai_job&jobId=' + encodeURIComponent(jobId), {cache:'no-store'});
-                    const data = await response.json();
-                    if (data.jobStatus === 'done') {
-                        window.renderAutoAiResult(data.result || {});
-                        if (status) status.textContent = 'Pemeriksaan AI selesai.';
-                        window.showToast('AI sudah memeriksa catatan. Silakan periksa hasilnya.', 'success');
-                        done = true; break;
-                    }
-                    if (data.jobStatus === 'error') throw new Error(data.error || 'AI gagal memeriksa catatan.');
-                    if (status) status.textContent = `AI memeriksa... ${i+1}/30`;
-                }
-                if (!done) throw new Error('AI belum selesai dalam waktu yang ditentukan. Coba lagi.');
-            } catch (err) {
-                console.error(err);
-                if (status) status.textContent = 'Pemeriksaan gagal.';
-                window.showToast(err.message || 'Gagal menghubungi AI.', 'error');
-            } finally {
-                window.autoAiBusy = false;
-                if (button) { button.disabled = false; button.classList.remove('opacity-60','cursor-wait'); button.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Periksa dengan AI'; }
-            }
-        };
-
-        window.applyAutoFill = function() {
-            const d = window.autoParsedData;
-            if (!d || !d.santri || !d.santri.name) { window.showToast('Belum ada hasil AI yang siap dikerjakan.', 'error'); return; }
-            const name = d.santri.name;
-            const set = (key,value) => { if (value !== undefined && value !== null) window.localFormCache[key] = value; };
-            const fillCat = (cat,dcat) => {
-                if (!dcat || !Array.isArray(dcat.slots)) return;
-                const prefix = cat === 'bacaan' ? 'bac' : cat === 'hafalan' ? 'haf' : 'mur';
-                dcat.slots.slice(0,3).forEach((slot,idx) => {
-                    const n = idx + 1;
-                    set(`${name}_${prefix}_mode_${n}`, slot.mode || 'quran');
-                    set(`${name}_${prefix}_surah_${n}`, slot.item || '');
-                    set(`${name}_${prefix}_start_${n}`, slot.start || '');
-                    set(`${name}_${prefix}_end_${n}`, slot.end || slot.start || '');
-                });
-                if (dcat.status) {
-                    set(`${name}_${prefix}_status_1`, dcat.status);
-                    if (cat === 'bacaan') set(`${name}_bac_stat`, dcat.status);
-                    if (cat === 'hafalan') set(`${name}_haf_stat`, dcat.status);
-                    if (cat === 'murojaah') set(`${name}_mur_stat`, dcat.status);
-                }
-            };
-            fillCat('bacaan',d.bacaan); fillCat('hafalan',d.hafalan); fillCat('murojaah',d.murojaah);
-            if (d.tugas) { set(`${name}_tug_detail`,d.tugas.detail || ''); set(`${name}_tug_cat`,d.tugas.catatan || ''); }
-            if (d.tanggal) set(`${name}_tanggal`,d.tanggal);
-            window.selectedSantriForInput = name;
-            window.switchTab('setoran');
-            setTimeout(() => { const card=document.querySelector(`[data-santri-name="${CSS.escape(name)}"]`); if(card) card.scrollIntoView({behavior:'smooth',block:'start'}); },250);
-            const result=document.getElementById('autoResult');
-            if(result){ result.classList.remove('hidden'); result.innerHTML=`✅ <b>Hasil AI sudah dikerjakan.</b><br>Form untuk <b>${window.autoEscape(name)}</b> sudah diisi sesuai hasil pemeriksaan AI. Silakan periksa kembali lalu tekan <b>Simpan & Sinkron</b> seperti biasa.`; }
-            window.showToast('Hasil AI sudah dimasukkan ke form. Periksa lalu simpan seperti biasa.','success');
-        };
-
-        window.clearAutoNote = function() {
-            const area=document.getElementById('autoVoiceText'); if(area) area.value='';
-            window.autoParsedData=null;
-            const preview=document.getElementById('autoPreview'); const action=document.getElementById('autoActionArea'); const result=document.getElementById('autoResult');
-            if(preview) preview.innerHTML='<p class="text-xs text-slate-400 font-bold">Hasil pemeriksaan AI akan muncul di sini.</p>';
-            if(action) action.classList.add('hidden');
-            if(result){ result.classList.add('hidden'); result.innerHTML=''; }
-        };
 </script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
@@ -3292,7 +3140,7 @@
                 <button onclick="window.switchTab('materi')" id="btnTab-materi" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Materi</button>
                 <button onclick="window.switchTab('kartu')" id="btnTab-kartu" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Kartu</button>
                 <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
-                <button onclick="window.switchTab('otomatis')" id="btnTab-otomatis" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">AI Otomatis</button>
+                
                 <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
@@ -3303,38 +3151,7 @@
             <i class="fa-solid fa-arrow-up animate-bounce"></i> Kembali Ke Atas
         </button>
 
-<!-- SECTION: PENGISIAN OTOMATIS -->
-        <section id="section-otomatis" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-5">
-                <div class="flex items-start gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-xl">🤖</div>
-                    <div>
-                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300">Pengisian Otomatis dengan AI</h3>
-                        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-1">Tulis catatan manual tentang santri. AI akan memeriksa, memahami nama panggilan/sebagian nama, lalu menyusun pekerjaan yang harus dimasukkan ke form.</p>
-                    </div>
-                </div>
-                <div class="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800 space-y-3">
-                    <div class="flex items-center justify-between gap-2 flex-wrap">
-                        <label class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">📝 Catatan manual</label>
-                        <span id="autoVoiceStatus" class="text-[11px] font-black text-slate-500">Siap</span>
-                    </div>
-                    <textarea id="autoVoiceText" rows="9" placeholder="Contoh: Yudanta bacaan Al-Baqarah ayat 260 sampai 264 nilai 80. Hafalan Al-Qiyamah ayat 21 sampai 30 nilai baik. Murojaah di kelas Al-Insan ayat 1 sampai 31 dan Al-Mursalat ayat 1 sampai 50. Tugas persiapkan ujian dua surat Al-Mursalat dan Al-Insan." class="w-full p-4 bg-white dark:bg-slate-900 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl text-sm font-bold outline-none"></textarea>
-                    <div class="flex gap-2 flex-wrap">
-                        <button type="button" id="autoAnalyzeBtn" onclick="window.parseAutoVoice()" class="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-sm"><i class="fa-solid fa-wand-magic-sparkles"></i> Periksa dengan AI</button>
-                        <button type="button" onclick="window.clearAutoNote()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-black text-xs sm:text-sm">Bersihkan</button>
-                    </div>
-                    <p class="text-[11px] text-slate-500 font-bold">Alur: <b>tulis catatan → Periksa dengan AI → periksa hasil AI → OKE — Kerjakan Hasil AI → periksa form → Simpan & Sinkron.</b></p>
-                </div>
-                <div id="autoPreview" class="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 min-h-24"><p class="text-xs text-slate-400 font-bold">Hasil pemeriksaan AI akan muncul di sini.</p></div>
-                <div id="autoActionArea" class="hidden flex gap-2 flex-wrap">
-                    <button type="button" onclick="window.applyAutoFill()" class="flex-1 min-w-[180px] py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow-md">✅ OKE — Kerjakan Hasil AI</button>
-                    <button type="button" onclick="window.autoParsedData=null; document.getElementById('autoActionArea').classList.add('hidden'); document.getElementById('autoPreview').innerHTML='<p class=&quot;text-xs text-slate-400 font-bold&quot;>Hasil dibatalkan.</p>';" class="py-3.5 px-5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-black text-sm">❌ Batal</button>
-                </div>
-                <div id="autoResult" class="hidden p-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 text-sm font-black text-emerald-800 dark:text-emerald-200"></div>
-            </div>
-        </section>
-
-        <!-- SECTION: INPUT SETORAN -->
+<!-- SECTION: INPUT SETORAN -->
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3.5">
                 <div class="w-full sm:w-auto flex items-center gap-2.5">
