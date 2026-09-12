@@ -2013,12 +2013,47 @@
             }
         };
 
+        window.liveReportFontSize = parseInt(localStorage.getItem('rq_live_report_font_size') || '14', 10);
+        if (![11,12,14,16,18,20,22].includes(window.liveReportFontSize)) window.liveReportFontSize = 14;
+
+        window.applyLiveReportFontSize = function() {
+            const size = window.liveReportFontSize || 14;
+            ['waMessagePreviewInline','classReportMessagePreviewInline'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.fontSize = size + 'px';
+                    el.style.lineHeight = '1.65';
+                }
+            });
+            ['inlineWaFontSizeLabel','inlineClassFontSizeLabel'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = size + ' px';
+            });
+        };
+
+        window.changeLiveReportFontSize = function(direction) {
+            const sizes = [11,12,14,16,18,20,22];
+            let i = sizes.indexOf(window.liveReportFontSize || 14);
+            if (i < 0) i = 2;
+            i = Math.max(0, Math.min(sizes.length - 1, i + (direction > 0 ? 1 : -1)));
+            window.liveReportFontSize = sizes[i];
+            localStorage.setItem('rq_live_report_font_size', String(window.liveReportFontSize));
+            window.applyLiveReportFontSize();
+        };
+
+        window.resetLiveReportFontSize = function() {
+            window.liveReportFontSize = 14;
+            localStorage.setItem('rq_live_report_font_size', '14');
+            window.applyLiveReportFontSize();
+        };
+
         window.initInlineLiveReport = function() {
             window.inlineLiveReportType = localStorage.getItem('rq_inline_live_report_type') || 'wa';
             const open = localStorage.getItem('rq_inline_live_report_open');
             const panel = document.getElementById('inlineWaReportPanel');
             if (panel && open === '0') panel.classList.add('hidden');
             window.switchInlineLiveReport(window.inlineLiveReportType);
+            window.applyLiveReportFontSize();
             const btn = document.getElementById('inlineLiveReportToggleBtn');
             if (btn) btn.innerHTML = (open === '0') ? '<i class=\"fa-solid fa-chevron-down\"></i> Buka' : '<i class=\"fa-solid fa-chevron-up\"></i> Tutup';
         };
@@ -3540,7 +3575,7 @@
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeMateriWaInlineCheckbox" checked onchange="const x=document.getElementById('includeMateriWaCheckbox'); if(x) x.checked=this.checked; window.generateWaReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Belajar</label>
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeTambahanWaInlineCheckbox" checked onchange="const x=document.getElementById('includeTambahanWaCheckbox'); if(x) x.checked=this.checked; window.generateWaReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Tambahan</label>
                         </div>
-                        <div><div class="flex justify-between"><label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Preview Pesan</label><span class="text-[9px] font-black text-emerald-600">otomatis</span></div><textarea id="waMessagePreviewInline" rows="14" oninput="const x=document.getElementById('waMessagePreview'); if(x) x.value=this.value" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[10px] leading-relaxed custom-scrollbar resize-y"></textarea></div>
+                        <div><div class="flex items-center justify-between gap-2"><div><label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Pesan WhatsApp</label><span class="block text-[9px] text-slate-500 dark:text-slate-400 font-bold">Ukuran teks bisa diperbesar / diperkecil</span></div><span id="inlineWaFontSizeLabel" class="text-[10px] font-black text-emerald-600 shrink-0">14 px</span></div><div class="flex items-center gap-2 mt-2"><button type="button" onclick="window.changeLiveReportFontSize(-1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perkecil teks">A−</button><button type="button" onclick="window.resetLiveReportFontSize()" class="flex-1 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-[10px] active:scale-95">Reset 14 px</button><button type="button" onclick="window.changeLiveReportFontSize(1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perbesar teks">A+</button></div><textarea id="waMessagePreviewInline" rows="14" oninput="const x=document.getElementById('waMessagePreview'); if(x) x.value=this.value" class="w-full mt-2 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono leading-relaxed custom-scrollbar resize-y" style="font-size:14px; min-height:340px;"></textarea></div>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="window.copyWaReportText()" class="px-3 py-2.5 bg-slate-200 dark:bg-slate-700 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-regular fa-copy"></i> Salin</button>
                             <button onclick="window.sendWaReportDirect()" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] shadow-md active:scale-95"><i class="fa-brands fa-whatsapp"></i> Kirim WA</button>
@@ -3559,7 +3594,7 @@
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeMateriClassInlineCheckbox" checked onchange="const x=document.getElementById('includeMateriClassCheckbox'); if(x) x.checked=this.checked; window.generateClassReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Belajar</label>
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeTambahanClassInlineCheckbox" checked onchange="const x=document.getElementById('includeTambahanClassCheckbox'); if(x) x.checked=this.checked; window.generateClassReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Tambahan</label>
                         </div>
-                        <div><div class="flex justify-between"><label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Preview Laporan Kelas</label><span class="text-[9px] font-black text-emerald-600">otomatis</span></div><textarea id="classReportMessagePreviewInline" rows="14" oninput="const x=document.getElementById('classReportMessagePreview'); if(x) x.value=this.value" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[10px] leading-relaxed custom-scrollbar resize-y"></textarea></div>
+                        <div><div class="flex items-center justify-between gap-2"><div><label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Laporan Kelas</label><span class="block text-[9px] text-slate-500 dark:text-slate-400 font-bold">Ukuran teks bisa diperbesar / diperkecil</span></div><span id="inlineClassFontSizeLabel" class="text-[10px] font-black text-emerald-600 shrink-0">14 px</span></div><div class="flex items-center gap-2 mt-2"><button type="button" onclick="window.changeLiveReportFontSize(-1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perkecil teks">A−</button><button type="button" onclick="window.resetLiveReportFontSize()" class="flex-1 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-[10px] active:scale-95">Reset 14 px</button><button type="button" onclick="window.changeLiveReportFontSize(1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perbesar teks">A+</button></div><textarea id="classReportMessagePreviewInline" rows="14" oninput="const x=document.getElementById('classReportMessagePreview'); if(x) x.value=this.value" class="w-full mt-2 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono leading-relaxed custom-scrollbar resize-y" style="font-size:14px; min-height:340px;"></textarea></div>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="window.copyClassReportText()" class="px-3 py-2.5 bg-slate-200 dark:bg-slate-700 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-regular fa-copy"></i> Salin</button>
                             <button onclick="window.sendClassReportDirect()" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] shadow-md active:scale-95"><i class="fa-brands fa-whatsapp"></i> Kirim WA Kelas</button>
