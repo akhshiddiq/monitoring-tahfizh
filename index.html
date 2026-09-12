@@ -1762,6 +1762,62 @@
             window.renderSantriCardsAndTable();
         };
 
+        // --- UPDATE: Materi & Materi Tambahan otomatis masuk ke WA Personal/Grup jika terisi ---
+        window.getReportMateriForClass = function(className) {
+            const isValid = (v) => {
+                if (v === undefined || v === null) return false;
+                const t = String(v).trim();
+                return t !== '' && t !== '-' && t.toLowerCase() !== 'undefined' && t.toLowerCase() !== 'null';
+            };
+
+            const getLatest = (key) => {
+                let list = [];
+                try { list = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { list = []; }
+                const candidates = list.filter(m =>
+                    (m?.kelas === className || m?.kelas === 'SEMUA KELAS') &&
+                    m?.tampilWa !== false &&
+                    isValid(m?.judul)
+                );
+                candidates.sort((a, b) => {
+                    const da = new Date(a?.tanggal || 0).getTime() || 0;
+                    const db = new Date(b?.tanggal || 0).getTime() || 0;
+                    return db - da;
+                });
+                return candidates[0] || null;
+            };
+
+            return {
+                utama: getLatest('rq_materi_utama'),
+                tambahan: getLatest('rq_materi_tambahan')
+            };
+        };
+
+        window.appendReportMateriSection = function(target, className, includeUtama, includeTambahan) {
+            const data = window.getReportMateriForClass(className);
+            const isValid = (v) => {
+                if (v === undefined || v === null) return false;
+                const t = String(v).trim();
+                return t !== '' && t !== '-' && t.toLowerCase() !== 'undefined' && t.toLowerCase() !== 'null';
+            };
+
+            const items = [];
+            if (includeUtama && data.utama) items.push({ label: 'Materi Belajar', item: data.utama });
+            if (includeTambahan && data.tambahan) items.push({ label: 'Materi Tambahan', item: data.tambahan });
+            if (!items.length) return target;
+
+            target += `📚 *Materi Pembelajaran Hari Ini:*\n`;
+            items.forEach(({label, item}) => {
+                target += `- *${label}: ${item.judul}*`;
+                const bab = String(item.bab || '').trim();
+                if (isValid(bab)) target += ` (Bab: ${bab})`;
+                const ket = String(item.ket || '').trim();
+                if (isValid(ket)) target += `\n  ${ket}`;
+                target += `\n`;
+            });
+            target += `_______________\n\n`;
+            return target;
+        };
+
         window.generateWaReport = function() {
             let name = window.selectedWaSantriName;
             if (!name && window.santriList.length > 0) {
@@ -1851,32 +1907,7 @@
 
             const includeMateriWa = document.getElementById('includeMateriWaCheckbox')?.checked ?? true;
             const includeTambahanWa = document.getElementById('includeTambahanWaCheckbox')?.checked ?? true;
-
-            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            const latestMateri = materiUtama.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-            const latestTambahan = materiTambahan.find(m => (m.kelas === s.class || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-
-            if ((includeMateriWa && latestMateri) || (includeTambahanWa && latestTambahan)) {
-                bagianSetoran += `📚 *Materi Pembelajaran Hari Ini:*\n`;
-                if (includeMateriWa && latestMateri) {
-                    bagianSetoran += `- *${latestMateri.judul}*`;
-                    const bab = (latestMateri.bab || '').trim();
-                    if (bab && bab !== '-') bagianSetoran += ` (Bab: ${bab})`;
-                    const ket = (latestMateri.ket || '').trim();
-                    if (isValidText(ket) && ket !== '-') bagianSetoran += `\n  ${ket}`;
-                    bagianSetoran += `\n`;
-                }
-                if (includeTambahanWa && latestTambahan) {
-                    bagianSetoran += `- *${latestTambahan.judul}*`;
-                    const babT = (latestTambahan.bab || '').trim();
-                    if (babT && babT !== '-') bagianSetoran += ` (Bab: ${babT})`;
-                    const ketT = (latestTambahan.ket || '').trim();
-                    if (isValidText(ketT) && ketT !== '-') bagianSetoran += `\n  ${ketT}`;
-                    bagianSetoran += `\n`;
-                }
-                bagianSetoran += `_______________\n\n`;
-            }
+            bagianSetoran = window.appendReportMateriSection(bagianSetoran, s.class, includeMateriWa, includeTambahanWa);
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
@@ -2120,18 +2151,9 @@
             const includeMateriClass = document.getElementById('includeMateriClassCheckbox')?.checked ?? true;
             const includeTambahanClass = document.getElementById('includeTambahanClassCheckbox')?.checked ?? true;
 
-            let latestMateri = null;
-            let latestTambahan = null;
-
-            const materiUtama = JSON.parse(localStorage.getItem('rq_materi_utama') || '[]');
-            const materiTambahan = JSON.parse(localStorage.getItem('rq_materi_tambahan') || '[]');
-            
-            if (includeMateriClass) {
-                latestMateri = materiUtama.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-            }
-            if (includeTambahanClass) {
-                latestTambahan = materiTambahan.find(m => (m.kelas === className || m.kelas === 'SEMUA KELAS') && m.tampilWa !== false);
-            }
+            const reportMateri = window.getReportMateriForClass(className);
+            const latestMateri = includeMateriClass ? reportMateri.utama : null;
+            const latestTambahan = includeTambahanClass ? reportMateri.tambahan : null;
 
             const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
             const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
@@ -2142,36 +2164,7 @@
 
             let msg = `bismillah\nAyah bunda yang semoga senantiasa dirahmati Allah, berikut adalah rekapan hafalan dan bacaan kelas *${className}* (${currentDateStr}):\n\n`;
             
-            if (latestMateri || latestTambahan) {
-                msg += `📚 *Materi Pembelajaran Hari Ini:*\n`;
-                if (includeMateriClass && latestMateri) {
-                    msg += `- *${latestMateri.judul}*`;
-                    const bab = (latestMateri.bab || '').trim();
-                    if (bab && bab !== '-') msg += ` (Bab: ${bab})`;
-                    const ket = (latestMateri.ket || '').trim();
-                    const isValidText = (txt) => {
-                        if (!txt) return false;
-                        const trimmed = String(txt).trim();
-                        return trimmed !== '' && trimmed !== '-' && trimmed !== 'undefined' && trimmed !== 'null';
-                    };
-                    if (isValidText(ket) && ket !== '-') msg += `\n  ${ket}`;
-                    msg += `\n`;
-                }
-                if (includeTambahanClass && latestTambahan) {
-                    msg += `- *${latestTambahan.judul}*`;
-                    const babT = (latestTambahan.bab || '').trim();
-                    if (babT && babT !== '-') msg += ` (Bab: ${babT})`;
-                    const ketT = (latestTambahan.ket || '').trim();
-                    const isValidText = (txt) => {
-                        if (!txt) return false;
-                        const trimmed = String(txt).trim();
-                        return trimmed !== '' && trimmed !== '-' && trimmed !== 'undefined' && trimmed !== 'null';
-                    };
-                    if (isValidText(ketT) && ketT !== '-') msg += `\n  ${ketT}`;
-                    msg += `\n`;
-                }
-                msg += `_______________\n\n`;
-            }
+            msg = window.appendReportMateriSection(msg, className, includeMateriClass, includeTambahanClass);
 
             msg += `👥 *Daftar Santri & Prestasi:*`;
             let activeSantriCount = 0;
