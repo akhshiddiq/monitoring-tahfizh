@@ -2344,13 +2344,15 @@
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
             const element = document.createElement('div');
-            element.style.padding = '36px 40px';
+            element.style.padding = '28px 28px';
             element.style.fontFamily = "'Comic Sans MS', sans-serif";
             element.style.color = '#000000';
             element.style.background = '#ffffff';
-            element.style.borderRadius = '16px';
-            element.style.border = '2px solid #047857';
-            element.style.maxWidth = '750px';
+            element.style.borderRadius = '18px';
+            element.style.border = '2px solid #d1d5db';
+            element.style.width = '180mm';
+            element.style.maxWidth = '180mm';
+            element.style.boxSizing = 'border-box';
             element.style.margin = '0 auto';
 
             let sectionsHtml = '';
@@ -2370,7 +2372,7 @@
                     bacContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${bacaanCat}</div>`;
                 }
                 sectionsHtml += `
-                    <div style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                    <div class="pdf-card" style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; break-inside: avoid; page-break-inside: avoid;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Bacaan</div>
                         ${bacContent}
                     </div>
@@ -2386,7 +2388,7 @@
                     hafContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${hafalanCat}</div>`;
                 }
                 sectionsHtml += `
-                    <div style="background-color: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                    <div class="pdf-card" style="background-color: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; break-inside: avoid; page-break-inside: avoid;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Hafalan</div>
                         ${hafContent}
                     </div>
@@ -2402,7 +2404,7 @@
                     murContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${murojaahCat}</div>`;
                 }
                 sectionsHtml += `
-                    <div style="background-color: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px;">
+                    <div class="pdf-card" style="background-color: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; break-inside: avoid; page-break-inside: avoid;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Muroja'ah</div>
                         ${murContent}
                     </div>
@@ -2415,7 +2417,7 @@
                     tugContent += `<div style="font-size: 13.5px; font-weight: normal; color: #000000; line-height: 1.6;">- Catatan: ${tugasCat}</div>`;
                 }
                 sectionsHtml += `
-                    <div style="background-color: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px;">
+                    <div class="pdf-card" style="background-color: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; break-inside: avoid; page-break-inside: avoid;">
                         <div style="font-size: 19px; font-weight: bold; color: #000000; margin-bottom: 12px;">Tugas</div>
                         ${tugContent}
                     </div>
@@ -2423,11 +2425,11 @@
             }
 
             if (!sectionsHtml) {
-                sectionsHtml = `<div style="font-size: 14.5px; font-weight: normal; color: #000000; text-align: center; padding: 24px;">Belum ada data setoran tercatat.</div>`;
+                sectionsHtml = `<div class="pdf-block" style="font-size: 14.5px; font-weight: normal; color: #000000; text-align: center; padding: 24px;">Belum ada data setoran tercatat.</div>`;
             }
 
             element.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #047857; padding-bottom: 20px; margin-bottom: 24px;">
+                <div class="pdf-block" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #047857; padding-bottom: 16px; margin-bottom: 18px; break-inside: avoid; page-break-inside: avoid;">
                     <div style="display: flex; align-items: center; gap: 16px;">
                         <img src="https://lh3.googleusercontent.com/d/1DXnWTl6rdZe6ax5kXfF9gnW4625rloJi" style="width: 55px; height: 55px; object-fit: contain; border-radius: 50%; border: 2px solid #fbbf24; padding: 3px; background: #fff;" crossorigin="anonymous" />
                         <div>
@@ -2437,7 +2439,7 @@
                     </div>
                 </div>
 
-                <div style="background: #f8fafc; padding: 18px 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid #cbd5e1;">
+                <div class="pdf-block" style="background: #f8fafc; padding: 18px 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid #cbd5e1; break-inside: avoid; page-break-inside: avoid;">
                     <table style="width: 100%; font-size: 14px; font-weight: normal; color: #000000; border-collapse: collapse;">
                         <tr>
                             <td style="padding: 7px 0; width: 140px;">Nama Santri</td>
@@ -2458,17 +2460,27 @@
                     ${sectionsHtml}
                 </div>
 
-                <div style="background: #f1f5f9; padding: 18px 24px; border-radius: 12px; font-size: 13.5px; font-weight: normal; color: #000000; text-align: center; line-height: 1.8;">
+                <div class="pdf-block" style="background: #f1f5f9; padding: 18px 24px; border-radius: 12px; font-size: 13.5px; font-weight: normal; color: #000000; text-align: center; line-height: 1.8; break-inside: avoid; page-break-inside: avoid;">
                     Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.
                 </div>
             `;
 
             const opt = {
-                margin:       14,
+                margin:       [10, 10, 10, 10],
                 filename:     `Laporan_Perkembangan_Santri_${s.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas:  {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: '#ffffff',
+                    letterRendering: true,
+                    windowWidth: 794,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                pagebreak:    { mode: ['css', 'legacy'], avoid: ['.pdf-card', '.pdf-block'] },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
