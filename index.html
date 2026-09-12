@@ -443,6 +443,7 @@
                     window.localFormCache[`${name}_${prefix}_status_${slot}`] = row[15] || '';
                 }
                 window.localFormCache[`${name}_${prefix}_status_1`] = row[15] || '';
+                window.localFormCache[`${name}_${prefix}_progress_status`] = row[18] || '';
             } else if (category === 'tugas') {
                 window.localFormCache[`${name}_tug_detail`] = row[6] || '';
                 window.localFormCache[`${name}_tug_cat`] = row[8] || '';
@@ -534,6 +535,7 @@
                                 name: row[3],
                                 detail: detailStr,
                                 status: row[15] || '-',
+                                progressStatus: row[18] || '',
                                 catatan: row[16] || '',
                                 type: typeName,
                                 groupId: row[17] || ''
@@ -554,7 +556,8 @@
                                 sObj.lastBacaan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastBacaanDate = row[1] || '';
                                 if (row[15]) sObj.cloudBacStat = row[15];
-                                if (row[16]) sObj.cloudBacCat = row[16];
+                                if (row[18]) sObj.cloudBacProgressStatus = row[18];
+                                 if (row[16]) sObj.cloudBacCat = row[16];
                             }
                         });
                         const latestByName = {};
@@ -578,7 +581,8 @@
                                 sObj.lastHafalan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastHafalanDate = row[1] || '';
                                 if (row[15]) sObj.cloudHafStat = row[15];
-                                if (row[16]) sObj.cloudHafCat = row[16];
+                                if (row[18]) sObj.cloudHafProgressStatus = row[18];
+                                 if (row[16]) sObj.cloudHafCat = row[16];
                             }
                         });
                         const latestByName = {};
@@ -602,7 +606,8 @@
                                 sObj.lastMurojaah = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastMurojaahDate = row[1] || '';
                                 if (row[15]) sObj.cloudMurStat = row[15];
-                                if (row[16]) sObj.cloudMurCat = row[16];
+                                if (row[18]) sObj.cloudMurProgressStatus = row[18];
+                                 if (row[16]) sObj.cloudMurCat = row[16];
                             }
                         });
                         const latestByName = {};
@@ -862,6 +867,23 @@
                 if (btnLanjut) btnLanjut.className = "flex-1 py-3 px-3 rounded-xl text-xs font-black bg-emerald-600 text-white shadow-md transition min-h-[50px]";
                 if (btnUlangi) btnUlangi.className = "flex-1 py-3 px-3 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition min-h-[50px]";
             }
+
+            // STATUS LANGSUNG DISIMPAN KE RIWAYAT + GOOGLE SHEET.
+            // Jadi setelah Bacaan/Hafalan/Muroja'ah sudah diinput, menekan
+            // Lanjut/Ulangi langsung membuat rekaman status dan laporan orang tua.
+            if (category === 'bac' || category === 'haf' || category === 'mur') {
+                const sectionType = category === 'bac' ? 'bacaan' : (category === 'haf' ? 'hafalan' : 'murojaah');
+                const hasData = typeof window.extractSlotEntries === 'function' && window.extractSlotEntries(category, santriName) !== '-';
+                if (hasData) {
+                    clearTimeout(window._statusSaveTimers && window._statusSaveTimers[statusKey]);
+                    window._statusSaveTimers = window._statusSaveTimers || {};
+                    window._statusSaveTimers[statusKey] = setTimeout(() => {
+                        window.saveSectionData(santriName, sectionType);
+                    }, 60);
+                } else {
+                    window.showToast('Status dipilih. Isi setoran lalu tekan Simpan & Sinkron.', 'success');
+                }
+            }
         };
 
         window.toggleSlotVisibility = function(category, slot, santriName) {
@@ -1045,7 +1067,7 @@
                 <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
                     <div class="flex-1 space-y-1">
                         <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">${h.detail || '-'}</div>
-                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'} | Catatan: ${h.catatan || '-'}</div>
+                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'}${h.progressStatus ? ` | Status Setoran: ${h.progressStatus}` : ''} | Catatan: ${h.catatan || '-'}</div>
                         <div class="text-[11px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
                     </div>
                     <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-3.5 py-1.5 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-xl font-black text-xs hover:bg-rose-200 transition shrink-0">Hapus</button>
@@ -1502,6 +1524,12 @@
             return slotData;
         };
 
+        window.getProgressStatusFromSlots = function(slots) {
+            const statuses = (slots || []).map(x => String(x?.status || '').trim()).filter(x => x === 'Lanjut' || x === 'Ulangi');
+            if (!statuses.length) return '';
+            return statuses.includes('Ulangi') ? 'Ulangi' : 'Lanjut';
+        };
+
         window.saveSectionData = function(name, sectionType) {
             const s = window.santriList.find(x => x.name === name);
             if (!s) return;
@@ -1522,6 +1550,7 @@
                 const bacDesc = document.getElementById(`bac_cat_desc_${name}`)?.value.trim() || '';
                 const bacaanCatCombined = bacType ? (bacDesc ? `[${bacType}] ${bacDesc}` : `[${bacType}]`) : bacDesc;
                 const structuredSlots = window.extractSlotsStructured('bac', name);
+                const bacaanProgressStatus = window.getProgressStatusFromSlots(structuredSlots);
 
                 s.lastBacaan = bacaanFormatted;
                 s.lastBacaanDate = tanggalVal;
@@ -1530,7 +1559,7 @@
                 s.cloudBacCat = bacaanCatCombined;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, catatan: bacaanCatCombined, type: 'bacaan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: bacaanFormatted, status: bacaanStat, progressStatus: bacaanProgressStatus, catatan: bacaanCatCombined, type: 'bacaan' });
                 localStorage.setItem('rq_history_bacaan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -1543,6 +1572,7 @@
                     teacher: s.teacher,
                     detail: bacaanFormatted,
                     status: bacaanStat,
+                    progressStatus: bacaanProgressStatus,
                     catatan: bacaanCatCombined,
                     slots: structuredSlots
                 });
@@ -1568,6 +1598,7 @@
                 const hafDesc = document.getElementById(`haf_cat_desc_${name}`)?.value.trim() || '';
                 const hafalanCatCombined = hafType ? (hafDesc ? `[${hafType}] ${hafDesc}` : `[${hafType}]`) : hafDesc;
                 const structuredSlotsHaf = window.extractSlotsStructured('haf', name);
+                const hafalanProgressStatus = window.getProgressStatusFromSlots(structuredSlotsHaf);
 
                 s.lastHafalan = hafalanFormatted;
                 s.lastHafalanDate = tanggalVal;
@@ -1576,7 +1607,7 @@
                 s.cloudHafCat = hafalanCatCombined;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, catatan: hafalanCatCombined, type: 'hafalan' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: hafalanFormatted, status: hafalanStat, progressStatus: hafalanProgressStatus, catatan: hafalanCatCombined, type: 'hafalan' });
                 localStorage.setItem('rq_history_hafalan', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -1589,6 +1620,7 @@
                     teacher: s.teacher,
                     detail: hafalanFormatted,
                     status: hafalanStat,
+                    progressStatus: hafalanProgressStatus,
                     catatan: hafalanCatCombined,
                     slots: structuredSlotsHaf
                 });
@@ -1614,6 +1646,7 @@
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
                 const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
                 const structuredSlotsMur = window.extractSlotsStructured('mur', name);
+                const murojaahProgressStatus = window.getProgressStatusFromSlots(structuredSlotsMur);
 
                 s.lastMurojaah = murojaahFormatted;
                 s.lastMurojaahDate = tanggalVal;
@@ -1622,7 +1655,7 @@
                 s.cloudMurCat = murojaahCatCombined;
 
                 const hist = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
-                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, catatan: murojaahCatCombined, type: 'murojaah' });
+                hist.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), name: s.name, detail: murojaahFormatted, status: murojaahStat, progressStatus: murojaahProgressStatus, catatan: murojaahCatCombined, type: 'murojaah' });
                 localStorage.setItem('rq_history_murojaah', JSON.stringify(hist));
                 
                 window.syncToCloud({
@@ -1635,6 +1668,7 @@
                     teacher: s.teacher,
                     detail: murojaahFormatted,
                     status: murojaahStat,
+                    progressStatus: murojaahProgressStatus,
                     catatan: murojaahCatCombined,
                     slots: structuredSlotsMur
                 });
@@ -1723,18 +1757,21 @@
             const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
             const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
+            const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
             const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
             const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
 
             const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
+            const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
             const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
             const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
 
             const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
+            const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
             const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
             const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
 
@@ -1752,18 +1789,21 @@
             if (isValidText(bacaanVal)) {
                 bagianSetoran += `📖 *Bacaan:* ${bacaanVal}\n`;
                 if (isValidText(bacaanStat)) bagianSetoran += `   - Nilai: ${bacaanStat}\n`;
+                if (isValidText(bacaanProgressStatus)) bagianSetoran += `   - Status Setoran: ${bacaanProgressStatus}\n`;
                 if (isValidText(bacaanCat)) bagianSetoran += `   - Catatan: ${bacaanCat}\n`;
                 bagianSetoran += `_________\n\n`;
             }
             if (isValidText(hafalanVal)) {
                 bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}\n`;
                 if (isValidText(hafalanStat)) bagianSetoran += `   - Nilai: ${hafalanStat}\n`;
+                if (isValidText(hafalanProgressStatus)) bagianSetoran += `   - Status Setoran: ${hafalanProgressStatus}\n`;
                 if (isValidText(hafalanCat)) bagianSetoran += `   - Catatan: ${hafalanCat}\n`;
                 bagianSetoran += `__________\n\n`;
             }
             if (isValidText(murojaahVal)) {
                 bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}\n`;
                 if (isValidText(murojaahStat)) bagianSetoran += `   - Nilai: ${murojaahStat}\n`;
+                if (isValidText(murojaahProgressStatus)) bagianSetoran += `   - Status Setoran: ${murojaahProgressStatus}\n`;
                 if (isValidText(murojaahCat)) bagianSetoran += `   - Catatan: ${murojaahCat}\n`;
                 bagianSetoran += `__________\n\n`;
             }
@@ -1877,18 +1917,21 @@
             const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
             const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
+            const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
             const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
             const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
 
             const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
+            const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
             const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
             const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
 
             const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
+            const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
             const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
             const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
 
@@ -2359,18 +2402,21 @@
             const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
             const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
             const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
+            const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
             const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
             const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
 
             const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
+            const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
             const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
             const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
 
             const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
+            const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
             const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
             const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
 
