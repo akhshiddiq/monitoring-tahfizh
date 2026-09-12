@@ -372,6 +372,61 @@
             }
         };
 
+        // Saat operator menggulir daftar kartu Input, Live Laporan WA Personal
+        // otomatis berpindah mengikuti kartu santri yang sedang terlihat.
+        // Tidak perlu klik nama terlebih dahulu.
+        window.syncLiveReportToVisibleSantri = function() {
+            if (window.__liveSantriScrollSyncRaf) return;
+            window.__liveSantriScrollSyncRaf = requestAnimationFrame(() => {
+                window.__liveSantriScrollSyncRaf = null;
+                const grid = document.getElementById('santriGridContainer');
+                if (!grid) return;
+
+                const cards = Array.from(grid.querySelectorAll('[id^="santri_card_"]'));
+                if (!cards.length) return;
+
+                const viewportTop = Math.max(0, document.querySelector('header')?.getBoundingClientRect().bottom || 0);
+                const viewportBottom = window.innerHeight;
+                const viewportCenter = (viewportTop + viewportBottom) / 2;
+
+                let bestCard = null;
+                let bestDistance = Infinity;
+
+                cards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    if (rect.bottom <= viewportTop || rect.top >= viewportBottom) return;
+                    const center = rect.top + rect.height / 2;
+                    const distance = Math.abs(center - viewportCenter);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestCard = card;
+                    }
+                });
+
+                if (!bestCard) return;
+                const prefix = 'santri_card_';
+                const santriName = bestCard.id.startsWith(prefix)
+                    ? bestCard.id.slice(prefix.length)
+                    : '';
+                if (!santriName) return;
+
+                // Hindari generate laporan berulang untuk santri yang sama.
+                if (window.selectedWaSantriName !== santriName && typeof window.selectInlineWaSantri === 'function') {
+                    window.selectInlineWaSantri(santriName, true);
+                }
+            });
+        };
+
+        window.setupLiveSantriScrollSync = function() {
+            if (window.__liveSantriScrollSyncBound) return;
+            window.__liveSantriScrollSyncBound = true;
+            window.addEventListener('scroll', window.syncLiveReportToVisibleSantri, { passive: true });
+            window.addEventListener('resize', window.syncLiveReportToVisibleSantri, { passive: true });
+            setTimeout(window.syncLiveReportToVisibleSantri, 150);
+        };
+
+        window.setupLiveSantriScrollSync();
+
         // Klik nama pada daftar hasil pencarian/nama santri: pilih santri sekaligus
         // otomatis melompat ke kartu input santri tersebut.
         window.selectAndScrollToSantri = function(santriName) {
@@ -1577,6 +1632,12 @@
                     : filtered[0].name;
                 window.selectInlineWaSantri(activeName, true);
             }
+
+            // Kartu baru saja dirender ulang; sinkronkan lagi dengan kartu yang
+            // sedang terlihat setelah posisi/layout halaman stabil.
+            if (typeof window.syncLiveReportToVisibleSantri === 'function') {
+                setTimeout(window.syncLiveReportToVisibleSantri, 80);
+            }
         };
 
         window.extractSlotEntries = function(category, santriName) {
@@ -2027,16 +2088,7 @@
             window.reportWaClassFilter = s.class;
             const reportClass = document.getElementById('reportWaClassFilter');
             if (reportClass) reportClass.value = s.class;
-            const nameLabel = document.getElementById('inlineWaSelectedName');
-            const classLabel = document.getElementById('inlineWaSelectedClass');
-            if (nameLabel) nameLabel.textContent = s.name;
-            if (classLabel) classLabel.textContent = `Kelas ${s.class}`;
             window.generateWaReport();
-
-            const label = document.getElementById('inlineWaSelectedName');
-            const cls = document.getElementById('inlineWaSelectedClass');
-            if (label) label.textContent = s.name;
-            if (cls) cls.textContent = `Kelas ${s.class}`;
 
             if (!keepScroll) {
                 const panel = document.getElementById('inlineWaReportPanel');
@@ -3699,12 +3751,7 @@
                     </div>
 
                     <div id="inlineLiveWaContent" class="p-3.5 space-y-3">
-                        <div class="flex items-center justify-between gap-2">
-                            <div class="min-w-0">
-                                <div class="font-black text-xs truncate" id="inlineWaSelectedName">Pilih santri</div>
-                                <div class="text-[10px] text-slate-500 font-bold" id="inlineWaSelectedClass">-</div>
-                                <div class="text-[9px] text-emerald-600 font-bold mt-0.5">Otomatis mengikuti nama pada input yang sedang dipilih</div>
-                            </div>
+                        <div class="flex items-center justify-end gap-2">
                             <span class="text-[9px] font-black text-emerald-600 shrink-0">Personal</span>
                         </div>
                         <div class="grid grid-cols-1 gap-2">
