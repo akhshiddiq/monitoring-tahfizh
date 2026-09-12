@@ -966,6 +966,17 @@
 
         window.cacheFormInput = function(elem, key) {
             window.localFormCache[key] = elem.value;
+
+            // Preview Laporan WA Personal di halaman Input ikut berubah
+            // setiap kali operator mengedit data.
+            const keyText = String(key || '');
+            const santri = (window.santriList || []).find(s =>
+                keyText === s.name || keyText.startsWith(`${s.name}_`)
+            );
+            if (santri && typeof window.selectInlineWaSantri === 'function') {
+                window.selectInlineWaSantri(santri.name, true);
+                    if (window.inlineLiveReportType === 'kelas') window.generateClassReport();
+            }
         };
 
         window.getFormCache = function(key, defaultVal = '') {
@@ -1159,7 +1170,7 @@
                 const cardBg = isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800';
 
                 return `
-                    <button type="button" onclick="window.scrollToSantri('${s.name}')" class="p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center min-h-[48px]">
+                    <button type="button" onclick="window.selectInlineWaSantri('${s.name}')" class="p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center min-h-[48px]">
                         <span class="leading-snug break-words">${s.name}</span>
                     </button>
                 `;
@@ -1252,7 +1263,7 @@
 
                         <div class="p-4 sm:p-5 space-y-4">
                             <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 p-3.5 rounded-2xl">
-                                <span>Tanggal: <input type="date" id="tgl_${s.name}" value="${todayStr}" class="p-2.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-xs sm:text-sm min-h-[46px]"></span>
+                                <span>Tanggal: <input type="date" id="tgl_${s.name}" value="${todayStr}" oninput="window.selectInlineWaSantri('${s.name}', true)" onchange="window.selectInlineWaSantri('${s.name}', true)" class="p-2.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-xs sm:text-sm min-h-[46px]"></span>
                                 <span class="text-emerald-700 dark:text-emerald-400 font-black">Form Input Setoran</span>
                             </div>
 
@@ -1500,6 +1511,13 @@
                     </div>
                 `;
             }).join('');
+
+            if (filtered.length > 0 && typeof window.selectInlineWaSantri === 'function') {
+                const activeName = window.selectedWaSantriName && filtered.some(s => s.name === window.selectedWaSantriName)
+                    ? window.selectedWaSantriName
+                    : filtered[0].name;
+                window.selectInlineWaSantri(activeName, true);
+            }
         };
 
         window.extractSlotEntries = function(category, santriName) {
@@ -1830,7 +1848,9 @@
             const teacherClasses = ['Abu Bakar', 'Bilal', 'Hamzah', 'Fatimah', 'Umar'];
             const targetPhone = teacherClasses.includes(s.class) ? '+6285697296114' : s.phone;
             const phoneInput = document.getElementById('waPhoneInput');
+            const inlinePhoneInput = document.getElementById('waPhoneInputInline');
             if (phoneInput) phoneInput.value = targetPhone;
+            if (inlinePhoneInput) inlinePhoneInput.value = targetPhone;
 
             const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
             const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
@@ -1907,6 +1927,10 @@
 
             const includeMateriWa = document.getElementById('includeMateriWaCheckbox')?.checked ?? true;
             const includeTambahanWa = document.getElementById('includeTambahanWaCheckbox')?.checked ?? true;
+            const inlineMateri = document.getElementById('includeMateriWaInlineCheckbox');
+            const inlineTambahan = document.getElementById('includeTambahanWaInlineCheckbox');
+            if (inlineMateri) inlineMateri.checked = includeMateriWa;
+            if (inlineTambahan) inlineTambahan.checked = includeTambahanWa;
             bagianSetoran = window.appendReportMateriSection(bagianSetoran, s.class, includeMateriWa, includeTambahanWa);
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
@@ -1922,7 +1946,81 @@
             fullMsg += `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
 
             const previewEl = document.getElementById('waMessagePreview');
+            const inlinePreviewEl = document.getElementById('waMessagePreviewInline');
             if (previewEl) previewEl.value = fullMsg;
+            if (inlinePreviewEl) inlinePreviewEl.value = fullMsg;
+        };
+
+        window.selectInlineWaSantri = function(santriName, keepScroll = false) {
+            const s = (window.santriList || []).find(x => x.name === santriName);
+            if (!s) return;
+
+            window.selectedWaSantriName = s.name;
+            window.reportWaClassFilter = s.class;
+            const reportClass = document.getElementById('reportWaClassFilter');
+            if (reportClass) reportClass.value = s.class;
+
+            if (window.inlineLiveReportType === 'kelas') window.generateClassReport();
+            else window.generateWaReport();
+
+            const label = document.getElementById('inlineWaSelectedName');
+            const cls = document.getElementById('inlineWaSelectedClass');
+            if (label) label.textContent = s.name;
+            if (cls) cls.textContent = `Kelas ${s.class}`;
+
+            if (!keepScroll) {
+                const panel = document.getElementById('inlineWaReportPanel');
+                if (panel && window.innerWidth < 1024) {
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        };
+
+        window.refreshInlineWaReport = function() {
+            if (window.inlineLiveReportType === 'kelas') window.generateClassReport();
+            else if (window.selectedWaSantriName) window.generateWaReport();
+        };
+
+        window.toggleInlineLiveReport = function() {
+            const panel = document.getElementById('inlineWaReportPanel');
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+            const isOpen = !panel.classList.contains('hidden');
+            localStorage.setItem('rq_inline_live_report_open', isOpen ? '1' : '0');
+            const btn = document.getElementById('inlineLiveReportToggleBtn');
+            if (btn) btn.innerHTML = isOpen ? '<i class=\"fa-solid fa-chevron-up\"></i> Tutup' : '<i class=\"fa-solid fa-chevron-down\"></i> Buka';
+        };
+
+        window.switchInlineLiveReport = function(type) {
+            window.inlineLiveReportType = type === 'kelas' ? 'kelas' : 'wa';
+            localStorage.setItem('rq_inline_live_report_type', window.inlineLiveReportType);
+            const personal = document.getElementById('inlineLiveWaContent');
+            const kelas = document.getElementById('inlineLiveClassContent');
+            const btnWa = document.getElementById('inlineLiveType-wa');
+            const btnKelas = document.getElementById('inlineLiveType-kelas');
+            if (personal) personal.classList.toggle('hidden', window.inlineLiveReportType !== 'wa');
+            if (kelas) kelas.classList.toggle('hidden', window.inlineLiveReportType !== 'kelas');
+            [btnWa, btnKelas].forEach(btn => { if (btn) btn.classList.remove('bg-emerald-600','text-white','shadow-sm','font-black'); });
+            const active = window.inlineLiveReportType === 'wa' ? btnWa : btnKelas;
+            if (active) active.classList.add('bg-emerald-600','text-white','shadow-sm','font-black');
+            if (window.inlineLiveReportType === 'kelas') {
+                const src = document.getElementById('reportClassSelect');
+                const dst = document.getElementById('reportClassSelectInline');
+                if (dst && src) dst.value = src.value;
+                window.generateClassReport();
+            } else {
+                window.generateWaReport();
+            }
+        };
+
+        window.initInlineLiveReport = function() {
+            window.inlineLiveReportType = localStorage.getItem('rq_inline_live_report_type') || 'wa';
+            const open = localStorage.getItem('rq_inline_live_report_open');
+            const panel = document.getElementById('inlineWaReportPanel');
+            if (panel && open === '0') panel.classList.add('hidden');
+            window.switchInlineLiveReport(window.inlineLiveReportType);
+            const btn = document.getElementById('inlineLiveReportToggleBtn');
+            if (btn) btn.innerHTML = (open === '0') ? '<i class=\"fa-solid fa-chevron-down\"></i> Buka' : '<i class=\"fa-solid fa-chevron-up\"></i> Tutup';
         };
 
         window.refreshWaReport = async function() {
@@ -1942,7 +2040,7 @@
         };
 
         window.copyWaReportText = function() {
-            const textarea = document.getElementById('waMessagePreview');
+            const textarea = document.getElementById('waMessagePreviewInline') || document.getElementById('waMessagePreview');
             if (!textarea) return;
             textarea.select();
             try {
@@ -1954,8 +2052,9 @@
         };
 
         window.sendWaReportDirect = function() {
-            const phone = document.getElementById('waPhoneInput')?.value || '+6285774042121';
-            window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(document.getElementById('waMessagePreview')?.value)}`, '_blank');
+            const phone = document.getElementById('waPhoneInputInline')?.value || document.getElementById('waPhoneInput')?.value || '+6285774042121';
+            const message = document.getElementById('waMessagePreviewInline')?.value || document.getElementById('waMessagePreview')?.value || '';
+            window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
         };
 
         window.downloadPdfWaReport = function() {
@@ -2145,12 +2244,13 @@
         };
 
         window.generateClassReport = function() {
-            const className = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
+            const inlineClassSelect = document.getElementById('reportClassSelectInline');
+            const originalClassSelect = document.getElementById('reportClassSelect');
+            const className = inlineClassSelect?.value || originalClassSelect?.value || 'Abdurrahman';
             const list = window.santriList.filter(s => s.class === className);
             
-            const includeMateriClass = document.getElementById('includeMateriClassCheckbox')?.checked ?? true;
-            const includeTambahanClass = document.getElementById('includeTambahanClassCheckbox')?.checked ?? true;
-
+            const includeMateriClass = (document.getElementById('includeMateriClassInlineCheckbox') || document.getElementById('includeMateriClassCheckbox'))?.checked ?? true;
+            const includeTambahanClass = (document.getElementById('includeTambahanClassInlineCheckbox') || document.getElementById('includeTambahanClassCheckbox'))?.checked ?? true;
             const reportMateri = window.getReportMateriForClass(className);
             const latestMateri = includeMateriClass ? reportMateri.utama : null;
             const latestTambahan = includeTambahanClass ? reportMateri.tambahan : null;
@@ -2196,7 +2296,10 @@
                 msg += `\n_Belum ada santri yang melakukan setoran tercatat._`;
             }
 
-            document.getElementById('classReportMessagePreview').value = msg;
+            const classPreview = document.getElementById('classReportMessagePreviewInline') || document.getElementById('classReportMessagePreview');
+            if (classPreview) classPreview.value = msg;
+            const originalClassPreview = document.getElementById('classReportMessagePreview');
+            if (originalClassPreview && originalClassPreview !== classPreview) originalClassPreview.value = msg;
         };
 
         window.refreshClassReport = async function() {
@@ -3401,7 +3504,70 @@
                 <div id="santriKotakContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-56 overflow-y-auto custom-scrollbar p-1"></div>
             </div>
 
-            <div id="santriGridContainer" class="space-y-4"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_390px] gap-4 items-start">
+                <div id="santriGridContainer" class="space-y-4 min-w-0"></div>
+
+                <!-- LIVE LAPORAN: satu jendela, bisa buka/tutup + pilih Personal/Kelas -->
+                <aside id="inlineWaReportPanel" class="order-first lg:order-last lg:sticky lg:top-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-emerald-200 dark:border-emerald-900/60 overflow-hidden">
+                    <div class="p-3.5 sm:p-4 border-b bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-900/60">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
+                                    <i class="fa-solid fa-file-lines text-lg"></i>
+                                    <h3 class="font-black text-sm">Live Laporan</h3>
+                                    <span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-black">LIVE</span>
+                                </div>
+                                <p class="mt-1 text-[10px] text-slate-500 dark:text-slate-400 font-bold">Pilih jendela laporan. Otomatis mengikuti input.</p>
+                            </div>
+                            <button id="inlineLiveReportToggleBtn" onclick="window.toggleInlineLiveReport()" class="shrink-0 px-2.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 text-emerald-700 dark:text-emerald-300 text-[10px] font-black shadow-sm"><i class="fa-solid fa-chevron-up"></i> Tutup</button>
+                        </div>
+                        <div class="mt-3 grid grid-cols-2 gap-1.5 p-1 bg-white/70 dark:bg-slate-900/50 rounded-xl">
+                            <button id="inlineLiveType-wa" onclick="window.switchInlineLiveReport('wa')" class="px-3 py-2.5 rounded-lg text-[10px] sm:text-[11px] font-black bg-emerald-600 text-white shadow-sm transition"><i class="fa-brands fa-whatsapp mr-1"></i> WA Personal</button>
+                            <button id="inlineLiveType-kelas" onclick="window.switchInlineLiveReport('kelas')" class="px-3 py-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 transition"><i class="fa-solid fa-users mr-1"></i> Laporan Kelas</button>
+                        </div>
+                    </div>
+
+                    <div id="inlineLiveWaContent" class="p-3.5 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="min-w-0"><div class="font-black text-xs truncate" id="inlineWaSelectedName">Pilih santri</div><div class="text-[10px] text-slate-500 font-bold" id="inlineWaSelectedClass">-</div></div>
+                            <span class="text-[9px] font-black text-emerald-600 shrink-0">Personal</span>
+                        </div>
+                        <div>
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">No WA Wali</label>
+                            <input type="text" id="waPhoneInputInline" oninput="const x=document.getElementById('waPhoneInput'); if(x) x.value=this.value" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold text-xs min-h-[44px]" value="+6285774042121">
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeMateriWaInlineCheckbox" checked onchange="const x=document.getElementById('includeMateriWaCheckbox'); if(x) x.checked=this.checked; window.generateWaReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Belajar</label>
+                            <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeTambahanWaInlineCheckbox" checked onchange="const x=document.getElementById('includeTambahanWaCheckbox'); if(x) x.checked=this.checked; window.generateWaReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Tambahan</label>
+                        </div>
+                        <div><div class="flex justify-between"><label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Preview Pesan</label><span class="text-[9px] font-black text-emerald-600">otomatis</span></div><textarea id="waMessagePreviewInline" rows="14" oninput="const x=document.getElementById('waMessagePreview'); if(x) x.value=this.value" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[10px] leading-relaxed custom-scrollbar resize-y"></textarea></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="window.copyWaReportText()" class="px-3 py-2.5 bg-slate-200 dark:bg-slate-700 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-regular fa-copy"></i> Salin</button>
+                            <button onclick="window.sendWaReportDirect()" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] shadow-md active:scale-95"><i class="fa-brands fa-whatsapp"></i> Kirim WA</button>
+                        </div>
+                        <button onclick="window.refreshWaReport()" class="w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-emerald-300 text-emerald-700 dark:text-emerald-300 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-solid fa-rotate"></i> Refresh dari Cloud</button>
+                    </div>
+
+                    <div id="inlineLiveClassContent" class="p-3.5 space-y-3 hidden">
+                        <div>
+                            <label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Kelas yang ditampilkan</label>
+                            <select id="reportClassSelectInline" onchange="const x=document.getElementById('reportClassSelect'); if(x) x.value=this.value; window.generateClassReport();" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-black text-xs min-h-[44px]">
+                                <option value="Abdurrahman">Abdurrahman</option><option value="Abu Ubaidah">Abu Ubaidah</option><option value="Zubair">Zubair</option><option value="Ali">Ali</option><option value="Utsman">Utsman</option><option value="Abu Bakar">Abu Bakar</option><option value="Bilal">Bilal</option><option value="Hamzah">Hamzah</option><option value="Fatimah">Fatimah</option><option value="Umar">Umar</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeMateriClassInlineCheckbox" checked onchange="const x=document.getElementById('includeMateriClassCheckbox'); if(x) x.checked=this.checked; window.generateClassReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Belajar</label>
+                            <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeTambahanClassInlineCheckbox" checked onchange="const x=document.getElementById('includeTambahanClassCheckbox'); if(x) x.checked=this.checked; window.generateClassReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Tambahan</label>
+                        </div>
+                        <div><div class="flex justify-between"><label class="font-black text-[10px] text-slate-700 dark:text-slate-200">Preview Laporan Kelas</label><span class="text-[9px] font-black text-emerald-600">otomatis</span></div><textarea id="classReportMessagePreviewInline" rows="14" oninput="const x=document.getElementById('classReportMessagePreview'); if(x) x.value=this.value" class="w-full mt-1 p-3 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono text-[10px] leading-relaxed custom-scrollbar resize-y"></textarea></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="window.copyClassReportText()" class="px-3 py-2.5 bg-slate-200 dark:bg-slate-700 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-regular fa-copy"></i> Salin</button>
+                            <button onclick="window.sendClassReportDirect()" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] shadow-md active:scale-95"><i class="fa-brands fa-whatsapp"></i> Kirim WA Kelas</button>
+                        </div>
+                        <button onclick="window.refreshClassReport()" class="w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-emerald-300 text-emerald-700 dark:text-emerald-300 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-solid fa-rotate"></i> Refresh dari Cloud</button>
+                    </div>
+                </aside>
+            </div>
         </section>
 
         <!-- SECTION: MATERI -->
