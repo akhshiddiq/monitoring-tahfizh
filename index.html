@@ -1065,6 +1065,21 @@
                     </div>
                 `;
             }).join('');
+
+            const progressKey = `${santriName}_${category}_progress_status`;
+            const progressStatus = window.getFormCache(progressKey, window.itemSlotStatus[progressKey] || '');
+            window.itemSlotStatus[progressKey] = progressStatus;
+            const statusLabel = category === 'bac' ? 'Status Bacaan' : (category === 'haf' ? 'Status Hafalan' : 'Status Murojaah');
+            const statusHtml = `
+                <div class="mt-3 p-3.5 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-700">
+                    <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-2">${statusLabel}:</label>
+                    <div class="flex items-center gap-2.5">
+                        <button type="button" id="btn_status_lanjut_${category}_${santriName}" onclick="window.setSlotStatus('${category}', 0, '${santriName}', 'Lanjut')" class="flex-1 py-3 px-3 rounded-xl text-xs ${progressStatus === 'Lanjut' ? 'font-black bg-emerald-600 text-white shadow-md' : 'font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition min-h-[50px]">Lanjut</button>
+                        <button type="button" id="btn_status_ulangi_${category}_${santriName}" onclick="window.setSlotStatus('${category}', 0, '${santriName}', 'Ulangi')" class="flex-1 py-3 px-3 rounded-xl text-xs ${progressStatus === 'Ulangi' ? 'font-black bg-rose-600 text-white shadow-md' : 'font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} transition min-h-[50px]">Ulangi</button>
+                    </div>
+                </div>`;
+
+            return slotsHtml + statusHtml;
         };
 
         window.renderCardCategoryHistoryList = function(santriName, categoryKey) {
@@ -1497,7 +1512,7 @@
                 }
                 const start = document.getElementById(`${category}_start_${slot}_${santriName}`)?.value.trim() || '';
                 const end = document.getElementById(`${category}_end_${slot}_${santriName}`)?.value.trim() || '';
-                const statusVal = window.itemSlotStatus[`${santriName}_${category}_status_${slot}`] || '';
+                const statusVal = window.itemSlotStatus[`${santriName}_${category}_progress_status`] || '';
 
                 if (itemVal) {
                     const isIqro = (mode === 'iqro' || itemVal.toLowerCase().includes('iqro'));
