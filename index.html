@@ -1091,7 +1091,7 @@
                 <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
                     <div class="flex-1 space-y-1">
                         <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">${h.detail || '-'}</div>
-                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'}${h.progressStatus ? ` | Status Setoran: ${h.progressStatus}` : ''}${window.cleanReportCatatan(h.catatan) ? ` | Catatan: ${window.cleanReportCatatan(h.catatan)}` : ''}</div>
+                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'}${h.progressStatus ? ` | ${h.progressStatus}` : ''}${window.cleanReportCatatan(h.catatan) ? ` | Catatan: ${window.cleanReportCatatan(h.catatan)}` : ''}</div>
                         <div class="text-[11px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
                     </div>
                     <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-3.5 py-1.5 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-xl font-black text-xs hover:bg-rose-200 transition shrink-0">Hapus</button>
@@ -1813,21 +1813,21 @@
             if (isValidText(bacaanVal)) {
                 bagianSetoran += `📖 *Bacaan:* ${bacaanVal}\n`;
                 if (isValidText(bacaanStat)) bagianSetoran += `   - Nilai: ${bacaanStat}\n`;
-                if (isValidText(bacaanProgressStatus)) bagianSetoran += `   - Status Setoran: ${bacaanProgressStatus}\n`;
+                if (isValidText(bacaanProgressStatus)) bagianSetoran += `   - ${bacaanProgressStatus}\n`;
                 if (isValidText(bacaanCat)) bagianSetoran += `   - Catatan: ${bacaanCat}\n`;
                 bagianSetoran += `_________\n\n`;
             }
             if (isValidText(hafalanVal)) {
                 bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}\n`;
                 if (isValidText(hafalanStat)) bagianSetoran += `   - Nilai: ${hafalanStat}\n`;
-                if (isValidText(hafalanProgressStatus)) bagianSetoran += `   - Status Setoran: ${hafalanProgressStatus}\n`;
+                if (isValidText(hafalanProgressStatus)) bagianSetoran += `   - ${hafalanProgressStatus}\n`;
                 if (isValidText(hafalanCat)) bagianSetoran += `   - Catatan: ${hafalanCat}\n`;
                 bagianSetoran += `__________\n\n`;
             }
             if (isValidText(murojaahVal)) {
                 bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}\n`;
                 if (isValidText(murojaahStat)) bagianSetoran += `   - Nilai: ${murojaahStat}\n`;
-                if (isValidText(murojaahProgressStatus)) bagianSetoran += `   - Status Setoran: ${murojaahProgressStatus}\n`;
+                if (isValidText(murojaahProgressStatus)) bagianSetoran += `   - ${murojaahProgressStatus}\n`;
                 if (isValidText(murojaahCat)) bagianSetoran += `   - Catatan: ${murojaahCat}\n`;
                 bagianSetoran += `__________\n\n`;
             }
