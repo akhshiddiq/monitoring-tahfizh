@@ -205,7 +205,15 @@
 
         window.cleanReportDetail = function(detailStr) {
             if (!detailStr) return '-';
-            return detailStr.replace(/\s*\(bertambah\s+\d+\s+(ayat|halaman)\)/gi, '').trim();
+            return String(detailStr).replace(/\s*\(bertambah\s+\d+\s+(ayat|halaman)\)/gi, '').trim();
+        };
+
+        // Catatan hanya boleh tampil di WA Personal jika benar-benar ada isi.
+        window.cleanReportCatatan = function(catatan) {
+            if (catatan === null || catatan === undefined) return '';
+            const value = String(catatan).trim();
+            if (!value || value === '-' || value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null') return '';
+            return window.cleanReportDetail(value) === '-' ? '' : window.cleanReportDetail(value);
         };
 
         window.formatTimestampCustom = function(inputDate) {
@@ -443,7 +451,7 @@
                     window.localFormCache[`${name}_${prefix}_status_${slot}`] = row[15] || '';
                 }
                 window.localFormCache[`${name}_${prefix}_status_1`] = row[15] || '';
-                window.localFormCache[`${name}_${prefix}_progress_status`] = row[18] || '';
+                window.localFormCache[`${name}_${prefix}_progress_status`] = (String(row[18] || '').trim() === 'Lanjut' || String(row[18] || '').trim() === 'Ulangi') ? String(row[18]).trim() : ((String(row[17] || '').trim() === 'Lanjut' || String(row[17] || '').trim() === 'Ulangi') ? String(row[17]).trim() : '');
             } else if (category === 'tugas') {
                 window.localFormCache[`${name}_tug_detail`] = row[6] || '';
                 window.localFormCache[`${name}_tug_cat`] = row[8] || '';
@@ -524,6 +532,22 @@
                         return `${sl.item} ${rangeLabel}${countStr}`.trim();
                     };
 
+                    const getCloudProgressStatus = (row) => {
+                        // Format terbaru: col 18 = Group ID, col 19 = Status Setoran (zero-based 17/18).
+                        // Kompatibilitas: bila versi lama pernah menaruh status di col 18, tetap dibaca.
+                        const c18 = String(row?.[18] || '').trim();
+                        const c17 = String(row?.[17] || '').trim();
+                        if (c18 === 'Lanjut' || c18 === 'Ulangi') return c18;
+                        if (c17 === 'Lanjut' || c17 === 'Ulangi') return c17;
+                        return '';
+                    };
+                    const getCloudGroupId = (row) => {
+                        const c17 = String(row?.[17] || '').trim();
+                        const c18 = String(row?.[18] || '').trim();
+                        if (c17 && c17 !== 'Lanjut' && c17 !== 'Ulangi') return c17;
+                        if (c18 && c18 !== 'Lanjut' && c18 !== 'Ulangi') return c18;
+                        return '';
+                    };
                     const processInputRowsToHistory = (inputRows, typeName) => {
                         return inputRows.map(row => {
                             const slots = parseCloudSlots(row);
@@ -535,10 +559,10 @@
                                 name: row[3],
                                 detail: detailStr,
                                 status: row[15] || '-',
-                                progressStatus: row[18] || '',
+                                progressStatus: getCloudProgressStatus(row),
                                 catatan: row[16] || '',
                                 type: typeName,
-                                groupId: row[17] || ''
+                                groupId: getCloudGroupId(row)
                             };
                         });
                     };
@@ -556,7 +580,7 @@
                                 sObj.lastBacaan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastBacaanDate = row[1] || '';
                                 if (row[15]) sObj.cloudBacStat = row[15];
-                                if (row[18]) sObj.cloudBacProgressStatus = row[18];
+                                if (row[18]) sObj.cloudBacProgressStatus = getCloudProgressStatus(row);
                                  if (row[16]) sObj.cloudBacCat = row[16];
                             }
                         });
@@ -581,7 +605,7 @@
                                 sObj.lastHafalan = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastHafalanDate = row[1] || '';
                                 if (row[15]) sObj.cloudHafStat = row[15];
-                                if (row[18]) sObj.cloudHafProgressStatus = row[18];
+                                if (row[18]) sObj.cloudHafProgressStatus = getCloudProgressStatus(row);
                                  if (row[16]) sObj.cloudHafCat = row[16];
                             }
                         });
@@ -606,7 +630,7 @@
                                 sObj.lastMurojaah = [formatDetailSlot(slots[0]), formatDetailSlot(slots[1]), formatDetailSlot(slots[2])].filter(Boolean).join(', ') || '-';
                                 sObj.lastMurojaahDate = row[1] || '';
                                 if (row[15]) sObj.cloudMurStat = row[15];
-                                if (row[18]) sObj.cloudMurProgressStatus = row[18];
+                                if (row[18]) sObj.cloudMurProgressStatus = getCloudProgressStatus(row);
                                  if (row[16]) sObj.cloudMurCat = row[16];
                             }
                         });
@@ -653,7 +677,7 @@
                     const buildMassalHistory = (rows, modalType) => {
                         const groups = {};
                         (rows || []).forEach(row => {
-                            const gid = modalType === 'murojaah' ? row[17] : row[9];
+                            const gid = modalType === 'murojaah' ? getCloudGroupId(row) : row[9];
                             if (!gid) return;
                             if (!groups[gid]) groups[gid] = { groupId: gid, timestamp: row[0] ? window.formatTimestampCustom(row[0]) : '-', tanggal: row[1] || '-', names: [], detail: modalType === 'murojaah' ? '-' : (row[6] || '-'), status: row[15] || '', catatan: row[16] || '', mode: 'quran' };
                             if (row[3] && !groups[gid].names.includes(row[3])) groups[gid].names.push(row[3]);
@@ -1067,7 +1091,7 @@
                 <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between text-xs gap-3">
                     <div class="flex-1 space-y-1">
                         <div class="font-black text-emerald-800 dark:text-emerald-300 text-xs">${h.detail || '-'}</div>
-                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'}${h.progressStatus ? ` | Status Setoran: ${h.progressStatus}` : ''} | Catatan: ${h.catatan || '-'}</div>
+                        <div class="text-xs font-bold text-slate-600 dark:text-slate-400">Status: ${h.status && h.status!=='-' ? h.status : 'Alhamdulillah Baik'}${h.progressStatus ? ` | Status Setoran: ${h.progressStatus}` : ''}${window.cleanReportCatatan(h.catatan) ? ` | Catatan: ${window.cleanReportCatatan(h.catatan)}` : ''}</div>
                         <div class="text-[11px] text-slate-400 font-semibold">${h.timestamp || '-'}</div>
                     </div>
                     <button type="button" onclick="window.deleteCardHistoryItem('${santriName}', '${categoryKey}', ${idx})" class="px-3.5 py-1.5 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 rounded-xl font-black text-xs hover:bg-rose-200 transition shrink-0">Hapus</button>
@@ -1759,25 +1783,25 @@
             const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
             const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
             const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
+            const bacaanCat = window.cleanReportCatatan(rawBacC);
 
             const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
             const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
             const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
+            const hafalanCat = window.cleanReportCatatan(rawHafC);
 
             const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
             const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
             const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
-            const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
+            const murojaahCat = window.cleanReportCatatan(rawMurC);
 
             const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
             const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
-            const tugasCat = (rawTugC && rawTugC !== '-' && rawTugC !== 'undefined' && rawTugC !== 'null') ? window.cleanReportDetail(rawTugC) : '';
+            const tugasCat = window.cleanReportCatatan(rawTugC);
 
             const isValidText = (txt) => {
                 if (!txt) return false;
@@ -1919,25 +1943,25 @@
             const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
             const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
             const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
+            const bacaanCat = window.cleanReportCatatan(rawBacC);
 
             const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
             const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
             const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
+            const hafalanCat = window.cleanReportCatatan(rawHafC);
 
             const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
             const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
             const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
-            const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
+            const murojaahCat = window.cleanReportCatatan(rawMurC);
 
             const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
             const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
-            const tugasCat = (rawTugC && rawTugC !== '-' && rawTugC !== 'undefined' && rawTugC !== 'null') ? window.cleanReportDetail(rawTugC) : '';
+            const tugasCat = window.cleanReportCatatan(rawTugC);
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
@@ -2404,25 +2428,25 @@
             const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
             const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
             const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanCat = (rawBacC && rawBacC !== '-' && rawBacC !== 'undefined' && rawBacC !== 'null') ? window.cleanReportDetail(rawBacC) : '';
+            const bacaanCat = window.cleanReportCatatan(rawBacC);
 
             const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
             const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
             const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
             const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
             const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanCat = (rawHafC && rawHafC !== '-' && rawHafC !== 'undefined' && rawHafC !== 'null') ? window.cleanReportDetail(rawHafC) : '';
+            const hafalanCat = window.cleanReportCatatan(rawHafC);
 
             const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
             const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
             const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
             const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
             const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
-            const murojaahCat = (rawMurC && rawMurC !== '-' && rawMurC !== 'undefined' && rawMurC !== 'null') ? window.cleanReportDetail(rawMurC) : '';
+            const murojaahCat = window.cleanReportCatatan(rawMurC);
 
             const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
             const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
-            const tugasCat = (rawTugC && rawTugC !== '-' && rawTugC !== 'undefined' && rawTugC !== 'null') ? window.cleanReportDetail(rawTugC) : '';
+            const tugasCat = window.cleanReportCatatan(rawTugC);
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
