@@ -41,6 +41,16 @@
             z-index: 30;
             isolation: isolate;
         }
+
+        @media (max-width: 1023px) {
+            #inlineWaReportPanel { order: 2; width: 100%; }
+            #santriGridContainer { order: 1; width: 100%; }
+            #inlineWaReportPanel textarea { min-height: 360px !important; }
+            #inlineLiveReportBar { position: sticky; top: 8px; z-index: 35; }
+        }
+        @media (min-width: 1024px) {
+            #inlineWaReportPanel textarea { min-height: 520px !important; }
+        }
         #santriGridContainer {
             scroll-margin-top: var(--app-header-height);
         }
@@ -1984,11 +1994,26 @@
         window.toggleInlineLiveReport = function() {
             const panel = document.getElementById('inlineWaReportPanel');
             if (!panel) return;
-            panel.classList.toggle('hidden');
-            const isOpen = !panel.classList.contains('hidden');
-            localStorage.setItem('rq_inline_live_report_open', isOpen ? '1' : '0');
-            const btn = document.getElementById('inlineLiveReportToggleBtn');
-            if (btn) btn.innerHTML = isOpen ? '<i class=\"fa-solid fa-chevron-up\"></i> Tutup' : '<i class=\"fa-solid fa-chevron-down\"></i> Buka';
+
+            const willOpen = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !willOpen);
+            localStorage.setItem('rq_inline_live_report_open', willOpen ? '1' : '0');
+
+            const iconText = willOpen
+                ? '<i class="fa-solid fa-chevron-up"></i> Tutup'
+                : '<i class="fa-solid fa-chevron-down"></i> Buka';
+
+            const topBtn = document.getElementById('inlineLiveReportToggleBtnTop');
+            const insideBtn = document.getElementById('inlineLiveReportToggleBtn');
+            if (topBtn) topBtn.innerHTML = iconText;
+            if (insideBtn) insideBtn.innerHTML = iconText;
+
+            const status = document.getElementById('inlineLiveReportBarStatus');
+            if (status) {
+                status.textContent = willOpen
+                    ? (window.inlineLiveReportType === 'kelas' ? 'Laporan Kelas sedang terbuka.' : 'WA Personal sedang terbuka.')
+                    : 'Jendela laporan ditutup — area input kembali melebar.';
+            }
         };
 
         window.switchInlineLiveReport = function(type) {
@@ -2003,6 +2028,11 @@
             [btnWa, btnKelas].forEach(btn => { if (btn) btn.classList.remove('bg-emerald-600','text-white','shadow-sm','font-black'); });
             const active = window.inlineLiveReportType === 'wa' ? btnWa : btnKelas;
             if (active) active.classList.add('bg-emerald-600','text-white','shadow-sm','font-black');
+            const status = document.getElementById('inlineLiveReportBarStatus');
+            if (status) status.textContent = window.inlineLiveReportType === 'kelas'
+                ? 'Mode Laporan Kelas aktif.'
+                : 'Mode WA Personal aktif.';
+
             if (window.inlineLiveReportType === 'kelas') {
                 const src = document.getElementById('reportClassSelect');
                 const dst = document.getElementById('reportClassSelectInline');
@@ -2051,11 +2081,27 @@
             window.inlineLiveReportType = localStorage.getItem('rq_inline_live_report_type') || 'wa';
             const open = localStorage.getItem('rq_inline_live_report_open');
             const panel = document.getElementById('inlineWaReportPanel');
+
             if (panel && open === '0') panel.classList.add('hidden');
             window.switchInlineLiveReport(window.inlineLiveReportType);
             window.applyLiveReportFontSize();
-            const btn = document.getElementById('inlineLiveReportToggleBtn');
-            if (btn) btn.innerHTML = (open === '0') ? '<i class=\"fa-solid fa-chevron-down\"></i> Buka' : '<i class=\"fa-solid fa-chevron-up\"></i> Tutup';
+
+            const isOpen = !panel || !panel.classList.contains('hidden');
+            const iconText = isOpen
+                ? '<i class="fa-solid fa-chevron-up"></i> Tutup'
+                : '<i class="fa-solid fa-chevron-down"></i> Buka';
+
+            const topBtn = document.getElementById('inlineLiveReportToggleBtnTop');
+            const insideBtn = document.getElementById('inlineLiveReportToggleBtn');
+            if (topBtn) topBtn.innerHTML = iconText;
+            if (insideBtn) insideBtn.innerHTML = iconText;
+
+            const status = document.getElementById('inlineLiveReportBarStatus');
+            if (status) {
+                status.textContent = isOpen
+                    ? (window.inlineLiveReportType === 'kelas' ? 'Laporan Kelas sedang terbuka.' : 'WA Personal sedang terbuka.')
+                    : 'Jendela laporan ditutup — area input kembali melebar.';
+            }
         };
 
         window.refreshWaReport = async function() {
@@ -3534,12 +3580,37 @@
                 </div>
             </div>
 
-            <div id="santriKotakContainerWrapper" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+            
+            <!-- BAR LIVE LAPORAN: tetap terlihat walaupun jendela laporan ditutup -->
+            <div id="inlineLiveReportBar" class="bg-white dark:bg-slate-800 p-3 sm:p-3.5 rounded-2xl shadow-sm border border-emerald-200 dark:border-emerald-900/60">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">Live Laporan WA</span>
+                                <span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-black">LIVE</span>
+                            </div>
+                            <div id="inlineLiveReportBarStatus" class="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold truncate">
+                                Pilih jendela laporan di samping input.
+                            </div>
+                        </div>
+                    </div>
+                    <button id="inlineLiveReportToggleBtnTop" onclick="window.toggleInlineLiveReport()" type="button"
+                        class="shrink-0 min-w-[82px] px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-black shadow-sm active:scale-95 transition">
+                        <i class="fa-solid fa-chevron-up"></i> Buka
+                    </button>
+                </div>
+            </div>
+
+<div id="santriKotakContainerWrapper" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
                 <h4 class="text-xs sm:text-sm font-black text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">Daftar Nama Santri (Klik untuk Melompat ke Input):</h4>
                 <div id="santriKotakContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-56 overflow-y-auto custom-scrollbar p-1"></div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_390px] gap-4 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                 <div id="santriGridContainer" class="space-y-4 min-w-0"></div>
 
                 <!-- LIVE LAPORAN: satu jendela, bisa buka/tutup + pilih Personal/Kelas -->
@@ -3575,7 +3646,7 @@
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeMateriWaInlineCheckbox" checked onchange="const x=document.getElementById('includeMateriWaCheckbox'); if(x) x.checked=this.checked; window.generateWaReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Belajar</label>
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeTambahanWaInlineCheckbox" checked onchange="const x=document.getElementById('includeTambahanWaCheckbox'); if(x) x.checked=this.checked; window.generateWaReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Tambahan</label>
                         </div>
-                        <div><div class="flex items-center justify-between gap-2"><div><label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Pesan WhatsApp</label><span class="block text-[9px] text-slate-500 dark:text-slate-400 font-bold">Ukuran teks bisa diperbesar / diperkecil</span></div><span id="inlineWaFontSizeLabel" class="text-[10px] font-black text-emerald-600 shrink-0">14 px</span></div><div class="flex items-center gap-2 mt-2"><button type="button" onclick="window.changeLiveReportFontSize(-1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perkecil teks">A−</button><button type="button" onclick="window.resetLiveReportFontSize()" class="flex-1 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-[10px] active:scale-95">Reset 14 px</button><button type="button" onclick="window.changeLiveReportFontSize(1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perbesar teks">A+</button></div><textarea id="waMessagePreviewInline" rows="14" oninput="const x=document.getElementById('waMessagePreview'); if(x) x.value=this.value" class="w-full mt-2 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono leading-relaxed custom-scrollbar resize-y" style="font-size:14px; min-height:340px;"></textarea></div>
+                        <div><div class="flex items-center justify-between gap-2"><div><label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Pesan WhatsApp</label><span class="block text-[9px] text-slate-500 dark:text-slate-400 font-bold">Ukuran teks bisa diperbesar / diperkecil</span></div><span id="inlineWaFontSizeLabel" class="text-[10px] font-black text-emerald-600 shrink-0">14 px</span></div><div class="flex items-center gap-2 mt-2"><button type="button" onclick="window.changeLiveReportFontSize(-1)" class="w-12 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perkecil teks" title="Perkecil ukuran teks">A−</button><button type="button" onclick="window.resetLiveReportFontSize()" class="flex-1 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-[10px] active:scale-95">Reset 14 px</button><button type="button" onclick="window.changeLiveReportFontSize(1)" class="w-12 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 font-black text-lg active:scale-95" aria-label="Perbesar teks">A+</button></div><textarea id="waMessagePreviewInline" rows="14" oninput="const x=document.getElementById('waMessagePreview'); if(x) x.value=this.value" class="w-full mt-2 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono leading-relaxed custom-scrollbar resize-y" style="font-size:14px; line-height:1.65; min-height:380px;"></textarea></div>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="window.copyWaReportText()" class="px-3 py-2.5 bg-slate-200 dark:bg-slate-700 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-regular fa-copy"></i> Salin</button>
                             <button onclick="window.sendWaReportDirect()" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] shadow-md active:scale-95"><i class="fa-brands fa-whatsapp"></i> Kirim WA</button>
@@ -3594,7 +3665,7 @@
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeMateriClassInlineCheckbox" checked onchange="const x=document.getElementById('includeMateriClassCheckbox'); if(x) x.checked=this.checked; window.generateClassReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Belajar</label>
                             <label class="flex items-center gap-2 text-[10px] font-extrabold text-slate-700 dark:text-slate-300"><input type="checkbox" id="includeTambahanClassInlineCheckbox" checked onchange="const x=document.getElementById('includeTambahanClassCheckbox'); if(x) x.checked=this.checked; window.generateClassReport();" class="w-4 h-4 text-emerald-600 rounded"> Materi Tambahan</label>
                         </div>
-                        <div><div class="flex items-center justify-between gap-2"><div><label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Laporan Kelas</label><span class="block text-[9px] text-slate-500 dark:text-slate-400 font-bold">Ukuran teks bisa diperbesar / diperkecil</span></div><span id="inlineClassFontSizeLabel" class="text-[10px] font-black text-emerald-600 shrink-0">14 px</span></div><div class="flex items-center gap-2 mt-2"><button type="button" onclick="window.changeLiveReportFontSize(-1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perkecil teks">A−</button><button type="button" onclick="window.resetLiveReportFontSize()" class="flex-1 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-[10px] active:scale-95">Reset 14 px</button><button type="button" onclick="window.changeLiveReportFontSize(1)" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perbesar teks">A+</button></div><textarea id="classReportMessagePreviewInline" rows="14" oninput="const x=document.getElementById('classReportMessagePreview'); if(x) x.value=this.value" class="w-full mt-2 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono leading-relaxed custom-scrollbar resize-y" style="font-size:14px; min-height:340px;"></textarea></div>
+                        <div><div class="flex items-center justify-between gap-2"><div><label class="font-black text-[11px] text-slate-700 dark:text-slate-200">Preview Laporan Kelas</label><span class="block text-[9px] text-slate-500 dark:text-slate-400 font-bold">Ukuran teks bisa diperbesar / diperkecil</span></div><span id="inlineClassFontSizeLabel" class="text-[10px] font-black text-emerald-600 shrink-0">14 px</span></div><div class="flex items-center gap-2 mt-2"><button type="button" onclick="window.changeLiveReportFontSize(-1)" class="w-12 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-lg active:scale-95" aria-label="Perkecil teks" title="Perkecil ukuran teks">A−</button><button type="button" onclick="window.resetLiveReportFontSize()" class="flex-1 h-11 rounded-xl bg-slate-100 dark:bg-slate-700 border font-black text-[10px] active:scale-95">Reset 14 px</button><button type="button" onclick="window.changeLiveReportFontSize(1)" class="w-12 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 font-black text-lg active:scale-95" aria-label="Perbesar teks">A+</button></div><textarea id="classReportMessagePreviewInline" rows="14" oninput="const x=document.getElementById('classReportMessagePreview'); if(x) x.value=this.value" class="w-full mt-2 p-4 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono leading-relaxed custom-scrollbar resize-y" style="font-size:14px; line-height:1.65; min-height:380px;"></textarea></div>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="window.copyClassReportText()" class="px-3 py-2.5 bg-slate-200 dark:bg-slate-700 rounded-xl font-black text-[10px] active:scale-95"><i class="fa-regular fa-copy"></i> Salin</button>
                             <button onclick="window.sendClassReportDirect()" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] shadow-md active:scale-95"><i class="fa-brands fa-whatsapp"></i> Kirim WA Kelas</button>
