@@ -60,20 +60,35 @@
             scroll-margin-top: var(--app-header-height);
         }
     
-        /* Bar Live Laporan saat jendela ditutup: tampilan netral/biasa. */
+        /* Bar Live Laporan: netral, terang, dan nyaman dilihat.
+           Sengaja tidak mengikuti dark-mode OS agar tidak berubah menjadi hitam. */
         #inlineLiveReportBar {
-            border: 1px solid rgb(226 232 240);
-            background: rgb(255 255 255);
-            box-shadow: 0 1px 4px rgba(15,23,42,.04);
+            border: 1px solid rgb(226 232 240) !important;
+            background: rgb(248 250 252) !important;
+            box-shadow: 0 2px 8px rgba(15,23,42,.06);
+            color: rgb(30 41 59);
         }
         #inlineLiveReportBar button {
             white-space: nowrap;
-            background: rgb(241 245 249);
-            color: rgb(30 41 59);
-            border: 1px solid rgb(203 213 225);
+            background: rgb(255 255 255) !important;
+            color: rgb(51 65 85) !important;
+            border: 1px solid rgb(203 213 225) !important;
+            box-shadow: 0 1px 2px rgba(15,23,42,.04);
         }
         #inlineLiveReportBar button:hover {
-            background: rgb(226 232 240);
+            background: rgb(241 245 249) !important;
+            border-color: rgb(148 163 184) !important;
+        }
+        #inlineLiveReportBar > div > div:first-child > div:first-child {
+            background: rgb(226 232 240) !important;
+            color: rgb(71 85 105) !important;
+        }
+        #inlineLiveReportBar .text-emerald-900,
+        #inlineLiveReportBar .text-emerald-200 {
+            color: rgb(15 118 110) !important;
+        }
+        #inlineLiveReportBarStatus {
+            color: rgb(100 116 139) !important;
         }
         @media (max-width: 1023px) {
             #inlineLiveReportBar {
@@ -81,19 +96,22 @@
                 top: 8px;
                 z-index: 50;
             }
-        }
-        @media (prefers-color-scheme: dark) {
+            #inlineWaReportPanel {
+                width: 100%;
+                margin-top: 0;
+                scroll-margin-top: calc(var(--app-header-height) + 12px);
+            }
+            #inlineWaReportPanel .grid {
+                width: 100%;
+            }
+            #inlineLiveReportBarStatus {
+                display: none;
+            }
             #inlineLiveReportBar {
-                background: rgb(30 41 59);
-                border-color: rgb(71 85 105);
+                min-height: 56px;
             }
-            #inlineLiveReportBar button {
-                background: rgb(51 65 85);
-                color: rgb(226 232 240);
-                border-color: rgb(100 116 139);
-            }
-            #inlineLiveReportBar button:hover {
-                background: rgb(71 85 105);
+            #inlineLiveReportToggleBtnTop {
+                min-height: 38px;
             }
         }
 
@@ -2230,6 +2248,15 @@
                         : 'WA Personal sedang terbuka.')
                     : 'Laporan ditutup — klik Buka untuk menampilkan kembali.';
             }
+
+            // Di HP, panel berada di bawah daftar nama. Setelah dibuka,
+            // arahkan tampilan ke jendela Live agar benar-benar terlihat.
+            if (willOpen && window.innerWidth < 1024) {
+                setTimeout(() => {
+                    const livePanel = document.getElementById('inlineWaReportPanel');
+                    if (livePanel) livePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 80);
+            }
         };
 
         window.refreshWaReport = async function() {
@@ -3602,6 +3629,9 @@
         // Inisialisasi Sticky Active Santri setelah seluruh struktur halaman tersedia.
         document.addEventListener('DOMContentLoaded', () => {
             window.initSantriStickyHeader();
+            // Pastikan status awal Live Laporan dan tombol Buka/Tutup
+            // selalu sinkron, termasuk di HP.
+            window.initInlineLiveReport();
 
             // Load awal + sinkron otomatis lintas laptop setiap 5 detik.
             window.fetchAllDataFromCloud(true);
@@ -3710,23 +3740,23 @@
 
             
             <!-- BAR LIVE LAPORAN: tetap terlihat walaupun jendela laporan ditutup -->
-            <div id="inlineLiveReportBar" class="bg-white dark:bg-slate-800 p-3 sm:p-3.5 rounded-2xl shadow-sm border border-emerald-200 dark:border-emerald-900/60">
+            <div id="inlineLiveReportBar" class="p-3 sm:p-3.5 rounded-2xl">
                 <div class="flex items-center justify-between gap-3">
                     <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-file-lines"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-2">
-                                <span class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">Live Laporan WA</span>
+                                <span class="font-black text-xs sm:text-sm">Live Laporan WA</span>
                                 <span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-black">LIVE</span>
                             </div>
-                            <div id="inlineLiveReportBarStatus" class="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold truncate">
+                            <div id="inlineLiveReportBarStatus" class="text-[9px] sm:text-[10px] font-bold truncate">
                             </div>
                         </div>
                     </div>
                     <button id="inlineLiveReportToggleBtnTop" onclick="window.toggleInlineLiveReport()" type="button"
-                        class="shrink-0 min-w-[82px] px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-black shadow-sm active:scale-95 transition">
+                        class="shrink-0 min-w-[82px] px-3.5 py-2.5 rounded-xl text-[10px] sm:text-xs font-black active:scale-95 transition">
                         <i class="fa-solid fa-chevron-up"></i> Buka
                     </button>
                 </div>
