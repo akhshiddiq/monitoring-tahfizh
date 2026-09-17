@@ -624,6 +624,10 @@
                     window._laporanGrupWaCloud = Array.isArray(cloudData.laporan_grup_wa)
                         ? cloudData.laporan_grup_wa
                         : [];
+                    // Sumber stabil Laporan WA Personal dari Google Sheet.
+                    window._laporanWaPersonalCloud = Array.isArray(cloudData.laporan_wa_personal)
+                        ? cloudData.laporan_wa_personal
+                        : [];
 
                     const fingerprint = JSON.stringify({
                         b: cloudData.input_bacaan || [],
@@ -631,6 +635,7 @@
                         m: cloudData.input_murojaah_dikelas || [],
                         t: cloudData.input_tugas || [],
                         lg: cloudData.laporan_grup_wa || [],
+                        lp: cloudData.laporan_wa_personal || [],
                         mu: cloudData.materi || [],
                         mt: cloudData.materi_tambahan || [],
                         r: cloudData.riwayat_input || []
@@ -2019,44 +2024,44 @@
             if (phoneInput) phoneInput.value = targetPhone;
             if (inlinePhoneInput) inlinePhoneInput.value = targetPhone;
 
+            const personalRows = Array.isArray(window._laporanWaPersonalCloud) ? window._laporanWaPersonalCloud : [];
+            const targetKeyId = String(s.id || '').trim().toLowerCase();
+            const targetKeyName = String(s.name || '').trim().toLowerCase();
+            const personal = personalRows.find(r => String(r?.id || '').trim().toLowerCase() === targetKeyId) ||
+                personalRows.find(r => String(r?.name || '').trim().toLowerCase() === targetKeyName && String(r?.class || '').trim() === String(s.class || '').trim()) || null;
+
+            // Fallback ke histori lokal hanya jika backend personal belum tersedia.
             const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
             const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
             const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
             const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-
-            const lastBacObj = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastHafObj = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastMurObj = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-            const lastTugObj = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+            const latestLocalByName = (history) => (history || []).filter(item => String(item?.name || '').trim().toLowerCase() === targetKeyName).sort((a,b) => Number(b?.rawTime || 0) - Number(a?.rawTime || 0))[0] || null;
+            const lastBacObj = latestLocalByName(bacaanHistoryList);
+            const lastHafObj = latestLocalByName(hafalanHistoryList);
+            const lastMurObj = latestLocalByName(murojaahHistoryList);
+            const lastTugObj = latestLocalByName(tugasHistoryList);
 
             const liveBac = window.extractSlotEntries('bac', s.name);
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = window.cleanReportDetail((liveBac && liveBac !== '-') ? liveBac : (lastBacObj ? lastBacObj.detail : (s.lastBacaan !== '-' ? s.lastBacaan : '')));
-            const rawBacStat = lastBacObj ? lastBacObj.status : (s.cloudBacStat || '');
-            const bacaanStat = (rawBacStat && rawBacStat !== '-' && rawBacStat !== 'undefined') ? rawBacStat : '';
-            const bacaanProgressStatus = (lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
-            const rawBacC = lastBacObj ? lastBacObj.catatan : (s.cloudBacCat || '');
-            const bacaanCat = window.cleanReportCatatan(rawBacC);
+            const bacaanVal = window.cleanReportDetail(personal?.bacaan || ((liveBac && liveBac !== '-') ? liveBac : (lastBacObj?.detail || (s.lastBacaan !== '-' ? s.lastBacaan : ''))));
+            const bacaanStat = String(personal?.bacaanNilai || lastBacObj?.status || s.cloudBacStat || '').trim();
+            const bacaanProgressStatus = String(personal?.bacaanStatus || lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
+            const bacaanCat = window.cleanReportCatatan(personal?.bacaanKeterangan || lastBacObj?.catatan || s.cloudBacCat || '');
 
-            const hafalanVal = window.cleanReportDetail((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj ? lastHafObj.detail : (s.lastHafalan !== '-' ? s.lastHafalan : '')));
-            const rawHafStat = lastHafObj ? lastHafObj.status : (s.cloudHafStat || '');
-            const hafalanStat = (rawHafStat && rawHafStat !== '-' && rawHafStat !== 'undefined') ? rawHafStat : '';
-            const hafalanProgressStatus = (lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
-            const rawHafC = lastHafObj ? lastHafObj.catatan : (s.cloudHafCat || '');
-            const hafalanCat = window.cleanReportCatatan(rawHafC);
+            const hafalanVal = window.cleanReportDetail(personal?.hafalan || ((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj?.detail || (s.lastHafalan !== '-' ? s.lastHafalan : ''))));
+            const hafalanStat = String(personal?.hafalanNilai || lastHafObj?.status || s.cloudHafStat || '').trim();
+            const hafalanProgressStatus = String(personal?.hafalanStatus || lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
+            const hafalanCat = window.cleanReportCatatan(personal?.hafalanKeterangan || lastHafObj?.catatan || s.cloudHafCat || '');
 
-            const murojaahVal = window.cleanReportDetail((liveMur && liveMur !== '-') ? liveMur : (lastMurObj ? lastMurObj.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : '')));
-            const rawMurStat = lastMurObj ? lastMurObj.status : (s.cloudMurStat || '');
-            const murojaahStat = (rawMurStat && rawMurStat !== '-' && rawMurStat !== 'undefined') ? rawMurStat : '';
-            const murojaahProgressStatus = (lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
-            const rawMurC = lastMurObj ? lastMurObj.catatan : (s.cloudMurCat || '');
-            const murojaahCat = window.cleanReportCatatan(rawMurC);
+            const murojaahVal = window.cleanReportDetail(personal?.murojaah || ((liveMur && liveMur !== '-') ? liveMur : (lastMurObj?.detail || (s.lastMurojaah !== '-' ? s.lastMurojaah : ''))));
+            const murojaahStat = String(personal?.murojaahNilai || lastMurObj?.status || s.cloudMurStat || '').trim();
+            const murojaahProgressStatus = String(personal?.murojaahStatus || lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
+            const murojaahCat = window.cleanReportCatatan(personal?.murojaahKeterangan || lastMurObj?.catatan || s.cloudMurCat || '');
 
-            const tugasVal = window.cleanReportDetail(lastTugObj ? lastTugObj.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
-            const rawTugC = lastTugObj ? lastTugObj.catatan : (s.cloudTugCat || '');
-            const tugasCat = window.cleanReportCatatan(rawTugC);
+            const tugasVal = window.cleanReportDetail(personal?.tugas || lastTugObj?.detail || (s.lastTugas !== '-' ? s.lastTugas : ''));
+            const tugasCat = window.cleanReportCatatan(personal?.tugasKeterangan || lastTugObj?.catatan || s.cloudTugCat || '');
 
             const isValidText = (txt) => {
                 if (!txt) return false;
