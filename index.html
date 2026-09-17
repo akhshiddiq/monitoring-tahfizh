@@ -113,6 +113,15 @@
                 min-height: 38px;
             }
         }
+        /* HP: Live Laporan WA di menu Input disembunyikan.
+           Menu Laporan tetap menjadi tempat melihat laporan di HP.
+           Fungsi JavaScript dan fitur Live Laporan tetap dipertahankan. */
+        @media (max-width: 767px) {
+            #inlineLiveReportBar,
+            #inlineWaReportPanel {
+                display: none !important;
+            }
+        }
 
 </style>
     <script>
@@ -609,11 +618,19 @@
                     ['input_bacaan', 'input_hafalan', 'input_murojaah_dikelas', 'input_tugas'].forEach(key => {
                         if (Array.isArray(cloudData[key])) cloudData[key].sort(sortByTimestamp);
                     });
+                    // Rekap khusus Laporan Grup WA dari Google Sheet.
+                    // Sumber ini menjadi prioritas untuk laporan Grup WA agar
+                    // hasilnya sama di semua laptop/HP dan selalu memakai input terakhir.
+                    window._laporanGrupWaCloud = Array.isArray(cloudData.laporan_grup_wa)
+                        ? cloudData.laporan_grup_wa
+                        : [];
+
                     const fingerprint = JSON.stringify({
                         b: cloudData.input_bacaan || [],
                         h: cloudData.input_hafalan || [],
                         m: cloudData.input_murojaah_dikelas || [],
                         t: cloudData.input_tugas || [],
+                        lg: cloudData.laporan_grup_wa || [],
                         mu: cloudData.materi || [],
                         mt: cloudData.materi_tambahan || [],
                         r: cloudData.riwayat_input || []
@@ -2305,10 +2322,36 @@
             const latestMateri = includeMateriClass ? reportMateri.utama : null;
             const latestTambahan = includeTambahanClass ? reportMateri.tambahan : null;
 
+            // Untuk Laporan Grup WA, gunakan snapshot dari Google Sheet sebagai
+            // sumber utama. Snapshot sudah menyimpan input TERAKHIR per kategori
+            // (Bacaan, Hafalan, Muroja'ah, Tugas) dan tidak menyimpan Nilai/Keterangan.
+            const laporanGrupWa = Array.isArray(window._laporanGrupWaCloud)
+                ? window._laporanGrupWaCloud
+                : [];
+            const laporanById = {};
+            const laporanByNameClass = {};
+            laporanGrupWa.forEach(item => {
+                const id = String(item?.id || '').trim().toLowerCase();
+                const name = String(item?.name || '').trim().toLowerCase();
+                const cls = String(item?.class || '').trim().toLowerCase();
+                if (id) laporanById[id] = item;
+                if (name) laporanByNameClass[name + '|' + cls] = item;
+            });
+
+            // Fallback hanya untuk kompatibilitas apabila backend lama belum
+            // mengirim laporan_grup_wa. Setelah backend baru aktif, bagian ini
+            // tidak menjadi sumber utama.
             const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
             const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
             const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
             const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
+
+            const latestLocalByName = (history, name) => {
+                const target = String(name || '').trim().toLowerCase();
+                return (history || [])
+                    .filter(item => String(item?.name || '').trim().toLowerCase() === target)
+                    .sort((a, b) => Number(b?.rawTime || 0) - Number(a?.rawTime || 0))[0] || null;
+            };
 
             const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
 
@@ -2318,15 +2361,32 @@
 
             let activeSantriCount = 0;
             list.forEach((s) => {
-                const sBac = bacaanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-                const sHaf = hafalanHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-                const sMur = murojaahHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
-                const sTug = tugasHistoryList.find(item => (item.name || '').toLowerCase() === s.name.toLowerCase());
+                const sId = String(s?.id || '').trim().toLowerCase();
+                const sName = String(s?.name || '').trim().toLowerCase();
+                const sClass = String(s?.class || className).trim().toLowerCase();
+                const cloudReport = (sId && laporanById[sId])
+                    || laporanByNameClass[sName + '|' + sClass]
+                    || null;
 
-                const bacaanVal = window.cleanReportDetail(sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''));
-                const hafalanVal = window.cleanReportDetail(sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''));
-                const murojaahVal = window.cleanReportDetail(sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''));
-                const tugasVal = window.cleanReportDetail(sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : ''));
+                const sBac = latestLocalByName(bacaanHistoryList, s.name);
+                const sHaf = latestLocalByName(hafalanHistoryList, s.name);
+                const sMur = latestLocalByName(murojaahHistoryList, s.name);
+                const sTug = latestLocalByName(tugasHistoryList, s.name);
+
+                // Prioritas: Google Sheet snapshot. Fallback: cache lama.
+                // Hanya empat field ini yang dibaca; Nilai/Keterangan tidak ikut.
+                const bacaanVal = window.cleanReportDetail(
+                    cloudReport?.bacaan || (sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''))
+                );
+                const hafalanVal = window.cleanReportDetail(
+                    cloudReport?.hafalan || (sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''))
+                );
+                const murojaahVal = window.cleanReportDetail(
+                    cloudReport?.murojaah || (sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''))
+                );
+                const tugasVal = window.cleanReportDetail(
+                    cloudReport?.tugas || (sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : ''))
+                );
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
                 if (hasAnySetoran) {
