@@ -58,6 +58,44 @@
         #santriGridContainer {
             scroll-margin-top: var(--app-header-height);
         }
+        #santriKotakContainerWrapper {
+            align-self: start;
+        }
+        @media (min-width: 1024px) {
+            #santriKotakContainerWrapper,
+            #inlineWaReportPanel {
+                position: sticky;
+                top: calc(var(--app-header-height) + 16px);
+            }
+        }
+        @media (max-width: 1023px) {
+            /* Di HP panel santri mengikuti alur halaman dan berada di bagian atas, tidak sticky. */
+            #santriKotakContainerWrapper {
+                position: static;
+                top: auto;
+            }
+            #santriKotakContainer {
+                max-height: 280px;
+            }
+        }
+
+        /* Pencarian nama cepat dibuat lebih lembut tanpa mengubah fungsi pencarian. */
+        #santriQuickSearch {
+            border-width: 1px !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+        }
+        #santriQuickSearch:focus {
+            border-color: rgb(16 185 129) !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.10);
+        }
+        #santriQuickSearchClear {
+            opacity: .72;
+            transition: opacity .15s ease, transform .15s ease, background-color .15s ease;
+        }
+        #santriQuickSearchClear:hover {
+            opacity: 1;
+        }
     
         /* Bar Live Laporan: netral, terang, dan nyaman dilihat.
            Sengaja tidak mengikuti dark-mode OS agar tidak berubah menjadi hitam. */
@@ -92,7 +130,7 @@
         @media (max-width: 1023px) {
             #inlineLiveReportBar {
                 position: sticky;
-                top: 8px;
+                top: calc(var(--app-header-height) + 8px);
                 z-index: 50;
             }
             #inlineWaReportPanel {
@@ -401,7 +439,84 @@
 
         window.filterByClass = function(v) { 
             window.selectedClass = v; 
+            const sidebarClass = document.getElementById('santriSidebarClassFilter');
+            if (sidebarClass) sidebarClass.value = v;
+            const nameBox = document.getElementById('santriKotakContainer');
+            if (nameBox) nameBox.classList.remove('hidden');
             window.renderSantriCardsAndTable(); 
+        };
+
+        // Pencarian nama cepat: mencari ke seluruh kelas tanpa harus memilih kelas terlebih dahulu.
+        window.quickSearchSantri = function(value) {
+            const input = document.getElementById('santriQuickSearch');
+            const clearBtn = document.getElementById('santriQuickSearchClear');
+            const box = document.getElementById('santriKotakContainer');
+            if (!box) return;
+
+            const q = String(value || '').trim().toLowerCase();
+            if (clearBtn) clearBtn.classList.toggle('hidden', !q);
+
+            if (!q) {
+                box.innerHTML = '';
+                box.classList.add('hidden');
+                window.renderSantriCardsAndTable();
+                return;
+            }
+
+            const matches = (window.santriList || []).filter(s =>
+                String(s.name || '').toLowerCase().includes(q)
+            );
+
+            box.classList.remove('hidden');
+            if (!matches.length) {
+                box.innerHTML = `<div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500 text-center">Nama santri tidak ditemukan.</div>`;
+                return;
+            }
+
+            box.innerHTML = matches.map(s => {
+                const className = s.class || 'Tanpa Kelas';
+                return `
+                    <button type="button" onclick='window.quickSelectSantri(${JSON.stringify(s.name)})' class="w-full p-2.5 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/60 border-2 border-sky-200 dark:border-sky-800 rounded-xl font-bold text-[10px] text-sky-950 dark:text-sky-200 text-left transition">
+                        <span class="block leading-snug break-words">${s.name}</span>
+                        <span class="block mt-0.5 text-[9px] font-black text-slate-500 dark:text-slate-400">${className}</span>
+                    </button>
+                `;
+            }).join('');
+        };
+
+        window.clearQuickSearchSantri = function() {
+            const input = document.getElementById('santriQuickSearch');
+            if (input) input.value = '';
+            const clearBtn = document.getElementById('santriQuickSearchClear');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            const box = document.getElementById('santriKotakContainer');
+            if (box) {
+                box.innerHTML = '';
+                box.classList.add('hidden');
+            }
+            window.renderSantriCardsAndTable();
+        };
+
+        window.quickSelectSantri = function(santriName) {
+            const student = (window.santriList || []).find(s => String(s.name || '').toLowerCase() === String(santriName || '').toLowerCase());
+            if (!student) return;
+
+            // Pastikan kartu santri dirender dari kelas yang benar sebelum di-scroll.
+            window.selectedClass = student.class || 'ALL';
+            const sidebarClass = document.getElementById('santriSidebarClassFilter');
+            if (sidebarClass) sidebarClass.value = window.selectedClass;
+            const mainClass = document.getElementById('classFilterSelect');
+            if (mainClass) mainClass.value = window.selectedClass;
+
+            const input = document.getElementById('santriQuickSearch');
+            if (input) input.value = student.name;
+            const clearBtn = document.getElementById('santriQuickSearchClear');
+            if (clearBtn) clearBtn.classList.remove('hidden');
+            const box = document.getElementById('santriKotakContainer');
+            if (box) box.classList.remove('hidden');
+
+            window.renderSantriCardsAndTable();
+            window.selectAndScrollToSantri(student.name);
         };
 
         window.scrollToSantri = function(santriName) {
@@ -2104,8 +2219,7 @@
             const includeTambahanWa = document.getElementById('includeTambahanWaCheckbox')?.checked ?? true;
             bagianSetoran = window.appendReportMateriSection(bagianSetoran, s.class, includeMateriWa, includeTambahanWa);
 
-            const currentDateStr = window.formatIndonesianDate(new Date().toISOString().split('T')[0]);
-            const reportHeader = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n📅 *Tanggal:* ${currentDateStr}\n______________\n\n`;
+            const reportHeader = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n______________\n\n`;
             const reportFooter = `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
 
             // Pesan untuk menu Laporan utama (materi tetap ada sesuai checkbox).
@@ -3640,16 +3754,43 @@
                 </div>
             </div>
 
-<div id="santriKotakContainerWrapper" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
-                <h4 class="text-xs sm:text-sm font-black text-emerald-800 dark:text-emerald-300 uppercase tracking-wide">Daftar Nama Santri (Klik untuk Melompat ke Input):</h4>
-                <div id="santriKotakContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-56 overflow-y-auto custom-scrollbar p-1"></div>
-            </div>
+<div class="grid grid-cols-1 lg:grid-cols-[190px_minmax(0,1fr)_420px] xl:grid-cols-[200px_460px_minmax(0,1fr)] gap-4 items-start">
+                <!-- PANEL NAMA SANTRI: dipindahkan ke kiri dan sticky. Fungsi lama tetap memakai ID yang sama. -->
+                <aside id="santriKotakContainerWrapper" class="lg:sticky bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3 z-30">
+                    <div class="space-y-1">
+                        <h4 class="text-xs sm:text-sm font-black text-emerald-800 dark:text-emerald-300">Pilih Santri</h4>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Cari nama langsung atau pilih kelas terlebih dahulu.</p>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label for="santriQuickSearch" class="block text-[10px] font-black text-slate-600 dark:text-slate-300">Pencarian Nama Cepat</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            <input id="santriQuickSearch" type="text" autocomplete="off" oninput="window.quickSearchSantri(this.value)" placeholder="Cari nama semua kelas..." class="w-full p-3 pl-9 pr-9 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs outline-none focus:border-emerald-500 min-h-[44px]">
+                        <button id="santriQuickSearchClear" type="button" onclick="window.clearQuickSearchSantri()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 text-xs font-black" aria-label="Hapus pencarian">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <select id="santriSidebarClassFilter" onchange="window.filterByClass(this.value)" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-xs outline-none cursor-pointer min-h-[44px]">
+                        <option value="Abdurrahman" selected>Abdurrahman</option>
+                        <option value="Abu Ubaidah">Abu Ubaidah</option>
+                        <option value="Zubair">Zubair</option>
+                        <option value="Ali">Ali</option>
+                        <option value="Utsman">Utsman</option>
+                        <option value="Abu Bakar">Abu Bakar</option>
+                        <option value="Bilal">Bilal</option>
+                        <option value="Hamzah">Hamzah</option>
+                        <option value="Fatimah">Fatimah</option>
+                        <option value="Umar">Umar</option>
+                        <option value="ALL">Semua Kelas</option>
+                    </select>
+                    <div id="santriKotakContainer" class="hidden grid grid-cols-1 gap-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar p-1"></div>
+                </aside>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                 <div id="santriGridContainer" class="space-y-4 min-w-0"></div>
 
                 <!-- LIVE LAPORAN: satu jendela, bisa buka/tutup + pilih Personal/Kelas -->
-                <aside id="inlineWaReportPanel" class="order-first lg:order-last lg:sticky lg:top-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-emerald-200 dark:border-emerald-900/60 overflow-hidden">
+                <aside id="inlineWaReportPanel" class="lg:sticky bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-emerald-200 dark:border-emerald-900/60 overflow-hidden">
                     <div class="px-3 py-2.5 sm:px-3.5 sm:py-3 border-b bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-900/60">
                         <div class="flex items-center gap-2">
                             <div class="flex items-center gap-2 min-w-0 text-emerald-800 dark:text-emerald-300 shrink-0">
