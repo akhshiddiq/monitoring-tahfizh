@@ -4491,47 +4491,115 @@
 
     async function syncSheetBacaanToFirebase(rows) {
         if (!firebaseDb || !Array.isArray(rows) || !rows.length) return;
+
+        // Simpan fingerprint per dokumen agar perubahan 1 baris di Google Sheet
+        // tidak menulis ulang seluruh koleksi Firebase. Ini penting agar listener
+        // realtime tidak menerima ratusan/ribuan perubahan yang sebenarnya sama.
+        if (!window.__firebaseBacaanRowFingerprints) {
+            window.__firebaseBacaanRowFingerprints = Object.create(null);
+        }
+
         let batch = writeBatch(firebaseDb);
-        let count = 0;
         let batchCount = 0;
+        let pendingIds = [];
+
+        const commitPending = async () => {
+            if (!batchCount) return;
+            await batch.commit();
+            for (const id of pendingIds) {
+                // Tandai hanya setelah commit berhasil, supaya kegagalan jaringan
+                // tidak membuat baris dianggap sudah tersinkron.
+                const data = window.__firebaseBacaanPendingFingerprints?.[id];
+                if (data) window.__firebaseBacaanRowFingerprints[id] = data;
+            }
+            batch = writeBatch(firebaseDb);
+            batchCount = 0;
+            pendingIds = [];
+        };
+
+        if (!window.__firebaseBacaanPendingFingerprints) {
+            window.__firebaseBacaanPendingFingerprints = Object.create(null);
+        }
+
         for (const row of rows) {
             const data = sheetRowToFirebase(row);
             if (!data) continue;
+
+            const fingerprint = JSON.stringify({
+                timestamp: data.timestamp || '',
+                tanggal: data.tanggal || '',
+                id: data.id || '',
+                name: data.name || '',
+                class: data.class || '',
+                teacher: data.teacher || '',
+                detail: data.detail || '',
+                status: data.status || '',
+                catatan: data.catatan || '',
+                slots: Array.isArray(data.slots) ? data.slots : []
+            });
+
+            if (window.__firebaseBacaanRowFingerprints[data.firebaseId] === fingerprint) {
+                continue;
+            }
+
             const ref = doc(firebaseDb, 'bacaan', data.firebaseId);
             batch.set(ref, {
                 ...data,
-                source: 'google-sheet',
-                syncedAt: serverTimestamp()
+                source: 'google-sheet'
             }, { merge: true });
-            count++;
+            window.__firebaseBacaanPendingFingerprints[data.firebaseId] = fingerprint;
+            pendingIds.push(data.firebaseId);
             batchCount++;
-            if (batchCount >= 450) {
-                await batch.commit();
-                batch = writeBatch(firebaseDb);
-                batchCount = 0;
-            }
+
+            if (batchCount >= 450) await commitPending();
         }
-        if (batchCount) await batch.commit();
+
+        await commitPending();
     }
 
-    function applyFirebaseBacaanToCurrentUI(data) {
-        if (!data || !data.name) return;
+    function applyFirebaseBacaanToCurrentUI(data, skipRender = false) {
+        if (!data || !data.name) return false;
         const name = data.name;
         const firebaseTime = new Date(data.timestamp || 0).getTime();
         const student = (window.santriList || []).find(s => s.name === name);
-        if (!student) return;
+        if (!student) return false;
 
         const currentTime = Number(student.lastBacaanRawTime || 0);
-        if (firebaseTime && currentTime && firebaseTime < currentTime) return;
+        if (firebaseTime && currentTime && firebaseTime < currentTime) return false;
 
         const slots = Array.isArray(data.slots) ? data.slots : [];
+        const incomingDetail = firebaseDocToHistory(data).detail;
+        const incomingDate = data.tanggal || '';
+        const incomingStatus = data.status || '';
+        const incomingProgressStatus = data.progressStatus || '';
+        const incomingCatatan = data.catatan || '';
+        const oldState = JSON.stringify({
+            slots: Array.isArray(student.cloudBacSlots) ? student.cloudBacSlots : [],
+            detail: student.lastBacaan || '',
+            date: student.lastBacaanDate || '',
+            time: Number(student.lastBacaanRawTime || 0),
+            status: student.cloudBacStat || '',
+            progressStatus: student.cloudBacProgressStatus || '',
+            catatan: student.cloudBacCat || ''
+        });
+        const newState = JSON.stringify({
+            slots,
+            detail: incomingDetail,
+            date: incomingDate,
+            time: firebaseTime || currentTime || 0,
+            status: incomingStatus,
+            progressStatus: incomingProgressStatus,
+            catatan: incomingCatatan
+        });
+        if (oldState === newState) return false;
+
         student.cloudBacSlots = slots;
-        student.lastBacaan = firebaseDocToHistory(data).detail;
-        student.lastBacaanDate = data.tanggal || '';
+        student.lastBacaan = incomingDetail;
+        student.lastBacaanDate = incomingDate;
         student.lastBacaanRawTime = firebaseTime || Date.now();
-        student.cloudBacStat = data.status || '';
-        student.cloudBacProgressStatus = data.progressStatus || '';
-        student.cloudBacCat = data.catatan || '';
+        student.cloudBacStat = incomingStatus;
+        student.cloudBacProgressStatus = incomingProgressStatus;
+        student.cloudBacCat = incomingCatatan;
 
         try {
             const history = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
@@ -4545,9 +4613,10 @@
             console.warn('Riwayat Firebase Bacaan tidak dapat diperbarui:', e);
         }
 
-        if (typeof window.renderSantriCardsAndTable === 'function') {
+        if (!skipRender && typeof window.renderSantriCardsAndTable === 'function') {
             window.renderSantriCardsAndTable();
         }
+        return true;
     }
 
     async function saveBacaanToFirebase(payload) {
@@ -4580,12 +4649,11 @@
                 window.__firebaseSyncToCloudWrapped = true;
                 window.syncToCloud = async function(payload) {
                     if (payload?.type === 'bacaan') {
-                        try {
-                            await saveBacaanToFirebase(payload);
-                            console.info('[Firebase Bacaan] Tersimpan:', payload.name);
-                        } catch (firebaseError) {
-                            console.error('[Firebase Bacaan] Gagal menyimpan:', firebaseError);
-                        }
+                        // Jangan menahan alur Google Sheet hanya karena jaringan Firebase lambat.
+                        // Firebase berjalan paralel; alur lama tetap langsung dijalankan.
+                        saveBacaanToFirebase(payload)
+                            .then(() => console.info('[Firebase Bacaan] Tersimpan:', payload.name))
+                            .catch((firebaseError) => console.error('[Firebase Bacaan] Gagal menyimpan:', firebaseError));
                     }
                     // PENTING: alur Google Sheet / Apps Script lama tetap dijalankan.
                     return originalSyncToCloud(payload);
@@ -4603,7 +4671,19 @@
                         const rows = Array.isArray(window.__lastCloudInputBacaan)
                             ? window.__lastCloudInputBacaan
                             : null;
-                        if (rows) await syncSheetBacaanToFirebase(rows);
+                        // Polling Google Sheet tetap berjalan, tetapi Firebase hanya menulis
+                        // ulang jika isi input_bacaan memang berubah. Ini mencegah ribuan write
+                        // Firestore setiap 5 detik yang dapat membuat UI terasa macet.
+                        if (rows) {
+                            const fingerprint = JSON.stringify(rows);
+                            if (fingerprint !== window.__firebaseBacaanSheetFingerprint) {
+                                window.__firebaseBacaanSheetFingerprint = fingerprint;
+                                // Jangan menunggu proses Firebase. Fungsi sinkronisasi
+                                // Google Sheet harus tetap cepat dan tombol/UI tetap responsif.
+                                syncSheetBacaanToFirebase(rows)
+                                    .catch(syncError => console.error('[Firebase Bacaan] Sinkron Sheet → Firebase gagal:', syncError));
+                            }
+                        }
                     } catch (syncError) {
                         console.error('[Firebase Bacaan] Sinkron Sheet → Firebase gagal:', syncError);
                     }
@@ -4612,20 +4692,44 @@
             }
 
             // Snapshot realtime: perubahan Bacaan dari perangkat lain langsung diterapkan ke UI.
+            let firebaseBacaanRenderTimer = null;
+            let firebaseBacaanNeedsRender = false;
+            const scheduleFirebaseBacaanRender = () => {
+                firebaseBacaanNeedsRender = true;
+                if (firebaseBacaanRenderTimer) return;
+                firebaseBacaanRenderTimer = setTimeout(() => {
+                    firebaseBacaanRenderTimer = null;
+                    if (firebaseBacaanNeedsRender && typeof window.renderSantriCardsAndTable === 'function') {
+                        firebaseBacaanNeedsRender = false;
+                        window.renderSantriCardsAndTable();
+                    }
+                }, 100);
+            };
+
             onSnapshot(collection(firebaseDb, 'bacaan'), (snapshot) => {
+                let changed = false;
                 snapshot.docChanges().forEach(change => {
                     if (change.type === 'added' || change.type === 'modified') {
                         const data = change.doc.data();
-                        applyFirebaseBacaanToCurrentUI(data);
+                        if (applyFirebaseBacaanToCurrentUI(data, true)) {
+                            changed = true;
+                        }
                     }
                 });
+                // Banyak dokumen dapat berubah sekaligus saat sinkronisasi awal.
+                // Render UI cukup sekali, bukan sekali per dokumen.
+                if (changed) scheduleFirebaseBacaanRender();
             }, (error) => {
                 console.error('[Firebase Bacaan] Realtime listener gagal:', error);
             });
 
             // Ambil data Sheet sekali setelah Firebase siap agar data lama juga masuk Firebase.
             if (typeof originalFetchAllDataFromCloud === 'function') {
-                await originalFetchAllDataFromCloud(false);
+                // Tidak menahan proses inisialisasi Firebase sampai sinkronisasi Sheet selesai.
+                // Sinkronisasi awal tetap dijalankan, tetapi UI tidak ikut terkunci.
+                originalFetchAllDataFromCloud(false).catch(e =>
+                    console.error('[Firebase Bacaan] Sinkron awal gagal:', e)
+                );
             }
         } catch (error) {
             console.error('[Firebase Bacaan] Inisialisasi gagal:', error);
@@ -4645,12 +4749,14 @@
                 const url = String(args?.[0] || '');
                 if (url.includes('script.google.com/macros')) {
                     const clone = response.clone();
-                    try {
-                        const data = await clone.json();
+                    // Jangan await clone.json(): sebelumnya setiap fetch Google Script
+                    // ikut tertahan sampai seluruh JSON selesai diproses. Ini bisa membuat
+                    // tombol terasa tidak bisa ditekan saat data besar.
+                    clone.json().then(data => {
                         if (data && Array.isArray(data.input_bacaan)) {
                             window.__lastCloudInputBacaan = data.input_bacaan;
                         }
-                    } catch (e) {}
+                    }).catch(() => {});
                 }
             } catch (e) {}
             return response;
