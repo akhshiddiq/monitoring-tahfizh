@@ -752,6 +752,12 @@
             try {
                 const res = await fetch(url);
                 const cloudData = await res.json();
+                // Titipkan input_bacaan langsung dari jalur Google Sheet lama.
+                // Ini menggantikan hook window.fetch global agar Firebase tidak
+                // mengintersep semua koneksi website.
+                window.__lastCloudInputBacaan = Array.isArray(cloudData?.input_bacaan)
+                    ? cloudData.input_bacaan
+                    : [];
 
                 if (cloudData) {
                     // Urutkan berdasarkan waktu server/Sheet. Baris paling akhir adalah Save terbaru.
@@ -4557,6 +4563,21 @@
         await commitPending();
     }
 
+    // Simpan snapshot Firebase yang datang sebelum daftar santri selesai dimuat.
+    window._firebaseBacaanPending = window._firebaseBacaanPending || {};
+
+    function flushFirebaseBacaanPending() {
+        const pending = window._firebaseBacaanPending || {};
+        let changed = false;
+        Object.keys(pending).forEach(name => {
+            const data = pending[name];
+            if (!data) return;
+            if (applyFirebaseBacaanToCurrentUI(data, true)) changed = true;
+            delete pending[name];
+        });
+        return changed;
+    }
+
     function applyFirebaseBacaanToCurrentUI(data, skipRender = false) {
         if (!data || !data.name) return false;
         const name = data.name;
@@ -4667,6 +4688,14 @@
                 window.__firebaseFetchWrapped = true;
                 window.fetchAllDataFromCloud = async function(forceRender = false) {
                     const result = await originalFetchAllDataFromCloud(forceRender);
+                    // Terapkan snapshot Firebase yang mungkin datang sebelum daftar santri siap.
+                    try {
+                        if (flushFirebaseBacaanPending() && typeof window.renderSantriCardsAndTable === 'function') {
+                            window.renderSantriCardsAndTable();
+                        }
+                    } catch (pendingError) {
+                        console.warn('[Firebase Bacaan] Flush pending gagal:', pendingError);
+                    }
                     try {
                         const rows = Array.isArray(window.__lastCloudInputBacaan)
                             ? window.__lastCloudInputBacaan
@@ -4710,12 +4739,17 @@
                 let changed = false;
                 snapshot.docChanges().forEach(change => {
                     if (change.type === 'added' || change.type === 'modified') {
-                        const data = change.doc.data();
-                        if (applyFirebaseBacaanToCurrentUI(data, true)) {
+                        const data = { ...change.doc.data(), firebaseId: change.doc.id };
+                        const studentReady = (window.santriList || []).some(s => s.name === data.name);
+                        if (!studentReady) {
+                            // Jangan buang snapshot pertama hanya karena daftar santri belum siap.
+                            window._firebaseBacaanPending[data.name] = data;
+                        } else if (applyFirebaseBacaanToCurrentUI(data, true)) {
                             changed = true;
                         }
                     }
                 });
+                if (flushFirebaseBacaanPending()) changed = true;
                 // Banyak dokumen dapat berubah sekaligus saat sinkronisasi awal.
                 // Render UI cukup sekali, bukan sekali per dokumen.
                 if (changed) scheduleFirebaseBacaanRender();
@@ -4739,29 +4773,8 @@
         }
     }
 
-    // Hook kecil agar wrapper fetch mengetahui data input_bacaan tanpa mengubah fungsi lama.
-    const originalFetch = window.fetch;
-    if (typeof originalFetch === 'function' && !window.__firebaseFetchJsonTap) {
-        window.__firebaseFetchJsonTap = true;
-        window.fetch = async function(...args) {
-            const response = await originalFetch.apply(this, args);
-            try {
-                const url = String(args?.[0] || '');
-                if (url.includes('script.google.com/macros')) {
-                    const clone = response.clone();
-                    // Jangan await clone.json(): sebelumnya setiap fetch Google Script
-                    // ikut tertahan sampai seluruh JSON selesai diproses. Ini bisa membuat
-                    // tombol terasa tidak bisa ditekan saat data besar.
-                    clone.json().then(data => {
-                        if (data && Array.isArray(data.input_bacaan)) {
-                            window.__lastCloudInputBacaan = data.input_bacaan;
-                        }
-                    }).catch(() => {});
-                }
-            } catch (e) {}
-            return response;
-        };
-    }
+    // Tidak memasang hook window.fetch global. Semua koneksi lain tetap berjalan
+    // melalui fungsi asli aplikasi agar tidak mengganggu tombol, menu, atau request lain.
 
     window.firebaseReadyPromise = initFirebaseBacaan();
 </script>
