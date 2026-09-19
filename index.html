@@ -322,7 +322,33 @@
 
         window.cleanReportDetail = function(detailStr) {
             if (!detailStr) return '-';
-            return String(detailStr).replace(/\s*\(bertambah\s+\d+\s+(ayat|halaman)\)/gi, '').trim();
+            let value = String(detailStr);
+
+            // Laporan WA Personal tidak menampilkan tanggal/timestamp pada
+            // Bacaan, Hafalan, dan Muroja'ah. Data tanggal tetap tersimpan
+            // di Google Sheet dan histori; yang dibersihkan hanya teks laporan.
+            value = value
+                .replace(/\s*\(bertambah\s+\d+\s+(ayat|halaman)\)/gi, '')
+                .replace(/\s*\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s*/gi, ' ')
+                .replace(/\s*\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z)?\s*/gi, ' ')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+
+            return value || '-';
+        };
+
+        // Membersihkan tanggal/timestamp dari TEKS LAPORAN WA saja.
+        // Tidak menghapus tanggal dari data, histori, atau Google Sheet.
+        // Format baris laporan tetap dipertahankan agar tidak mengacak tampilan.
+        window.cleanWaReportSection = function(reportText) {
+            if (!reportText) return '';
+            return String(reportText)
+                .replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\b/gi, '')
+                .replace(/\b\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z)?\b/gi, '')
+                .replace(/^[ \t]*[-•]?[ \t]*Tanggal[ \t]*:[ \t]*\d{1,2}[-\/ ]\d{1,2}[-\/ ]\d{2,4}[ \t]*\r?\n?/gim, '')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
         };
 
         // Catatan hanya boleh tampil di WA Personal jika benar-benar ada isi.
@@ -2212,6 +2238,10 @@
                 bagianSetoran += `_______________\n\n`;
             }
 
+            // Bersihkan tanggal/timestamp hanya dari bagian setoran WA Personal.
+            // Materi di laporan utama tetap utuh dan tidak disentuh.
+            bagianSetoran = window.cleanWaReportSection(bagianSetoran);
+
             // Laporan utama tetap mengikuti pengaturan Materi di menu Laporan.
             // Live Laporan WA sengaja TIDAK menampilkan Materi Belajar maupun Materi Tambahan.
             const bagianSetoranLive = bagianSetoran;
@@ -2387,6 +2417,9 @@
 
             // Di HP, panel berada di bawah daftar nama. Setelah dibuka,
             // arahkan tampilan ke jendela Live agar benar-benar terlihat.
+            // Gunakan status tombol yang baru dihitung, tanpa referensi variabel
+            // yang belum didefinisikan agar inisialisasi tidak error.
+            const willOpen = isOpen;
             if (willOpen && window.innerWidth < 1024) {
                 setTimeout(() => {
                     const livePanel = document.getElementById('inlineWaReportPanel');
