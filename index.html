@@ -4377,5 +4377,288 @@
   });
 })();
 </script>
+
+
+<!-- =========================================================
+     FIREBASE REALTIME LAYER — BACAAN
+     ADDITIVE ONLY: alur Google Sheet / Apps Script lama tetap dipanggil.
+     Project: monitoring-tahfizh
+========================================================= -->
+<script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+    import {
+        getFirestore,
+        collection,
+        doc,
+        setDoc,
+        onSnapshot,
+        writeBatch,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDPbk7neCM3Xtb0UcuQ8HVJVeYErmvMYM8",
+        authDomain: "monitoring-tahfizh.firebaseapp.com",
+        projectId: "monitoring-tahfizh",
+        storageBucket: "monitoring-tahfizh.firebasestorage.app",
+        messagingSenderId: "998424731566",
+        appId: "1:998424731566:web:47c268e200c6aa655ff23f",
+        measurementId: "G-JKPB2K9F8R"
+    };
+
+    let firebaseApp;
+    let firebaseAuth;
+    let firebaseDb;
+
+    window.firebaseReady = false;
+    window.firebaseBacaanReady = false;
+    window.firebaseReadyPromise = null;
+
+    function stableBacaanId(data) {
+        const timestamp = String(data?.timestamp || data?.serverTimestamp || '').trim();
+        const id = String(data?.id || '').trim();
+        const name = String(data?.name || '').trim();
+        const tanggal = String(data?.tanggal || '').trim();
+        const base = [timestamp, id, name, tanggal].join('|');
+        let hash = 0;
+        for (let i = 0; i < base.length; i++) {
+            hash = ((hash << 5) - hash) + base.charCodeAt(i);
+            hash |= 0;
+        }
+        return 'bac_' + Math.abs(hash).toString(36) + '_' + btoa(unescape(encodeURIComponent(base))).replace(/[^a-zA-Z0-9]/g, '').slice(0, 24);
+    }
+
+    function sheetRowToFirebase(row) {
+        if (!Array.isArray(row) || !row[3]) return null;
+        const slots = [1, 2, 3].map((slot) => {
+            const base = slot === 1 ? 6 : slot === 2 ? 9 : 12;
+            const cell = String(row[base] || '-');
+            const parts = cell.split('|');
+            const item = parts[0] || '-';
+            const mode = parts[1] || (item.toLowerCase().includes('iqro') ? 'iqro' : 'quran');
+            return {
+                item,
+                start: row[base + 1] || '-',
+                end: row[base + 2] || '-',
+                mode,
+                status: row[18] === 'Lanjut' || row[18] === 'Ulangi' ? row[18] : (row[17] === 'Lanjut' || row[17] === 'Ulangi' ? row[17] : '')
+            };
+        });
+
+        const payload = {
+            type: 'bacaan',
+            timestamp: row[0] || '',
+            tanggal: row[1] || '',
+            id: row[2] || '',
+            name: row[3] || '',
+            class: row[4] || '',
+            teacher: row[5] || '',
+            detail: [row[6], row[9], row[12]].filter(v => v && v !== '-').join(', ') || '-',
+            status: row[15] || '',
+            catatan: row[16] || '',
+            slots
+        };
+        payload.firebaseId = stableBacaanId(payload);
+        return payload;
+    }
+
+    function firebaseDocToHistory(data) {
+        const slots = Array.isArray(data?.slots) ? data.slots : [];
+        const detail = slots.map(sl => {
+            if (!sl || !sl.item || sl.item === '-') return '';
+            const isIqro = sl.mode === 'iqro' || String(sl.item).toLowerCase().includes('iqro');
+            const start = sl.start && sl.start !== '-' ? String(sl.start) : '';
+            const end = sl.end && sl.end !== '-' ? String(sl.end) : '';
+            const range = isIqro ? `Hlm ${start}${end && end !== start ? '-' + end : ''}` : `${start}${end && end !== start ? '-' + end : ''}`;
+            return `${sl.item} ${range}`.trim();
+        }).filter(Boolean).join(', ') || data.detail || '-';
+
+        return {
+            timestamp: data.timestamp ? window.formatTimestampCustom(data.timestamp) : '-',
+            tanggal: data.tanggal || new Date().toISOString().split('T')[0],
+            rawTime: new Date(data.timestamp || 0).getTime(),
+            name: data.name || '',
+            detail,
+            status: data.status || '-',
+            progressStatus: data.progressStatus || '',
+            catatan: data.catatan || '',
+            type: 'bacaan',
+            groupId: data.groupId || '',
+            firebaseId: data.firebaseId || ''
+        };
+    }
+
+    async function syncSheetBacaanToFirebase(rows) {
+        if (!firebaseDb || !Array.isArray(rows) || !rows.length) return;
+        let batch = writeBatch(firebaseDb);
+        let count = 0;
+        let batchCount = 0;
+        for (const row of rows) {
+            const data = sheetRowToFirebase(row);
+            if (!data) continue;
+            const ref = doc(firebaseDb, 'bacaan', data.firebaseId);
+            batch.set(ref, {
+                ...data,
+                source: 'google-sheet',
+                syncedAt: serverTimestamp()
+            }, { merge: true });
+            count++;
+            batchCount++;
+            if (batchCount >= 450) {
+                await batch.commit();
+                batch = writeBatch(firebaseDb);
+                batchCount = 0;
+            }
+        }
+        if (batchCount) await batch.commit();
+    }
+
+    function applyFirebaseBacaanToCurrentUI(data) {
+        if (!data || !data.name) return;
+        const name = data.name;
+        const firebaseTime = new Date(data.timestamp || 0).getTime();
+        const student = (window.santriList || []).find(s => s.name === name);
+        if (!student) return;
+
+        const currentTime = Number(student.lastBacaanRawTime || 0);
+        if (firebaseTime && currentTime && firebaseTime < currentTime) return;
+
+        const slots = Array.isArray(data.slots) ? data.slots : [];
+        student.cloudBacSlots = slots;
+        student.lastBacaan = firebaseDocToHistory(data).detail;
+        student.lastBacaanDate = data.tanggal || '';
+        student.lastBacaanRawTime = firebaseTime || Date.now();
+        student.cloudBacStat = data.status || '';
+        student.cloudBacProgressStatus = data.progressStatus || '';
+        student.cloudBacCat = data.catatan || '';
+
+        try {
+            const history = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
+            const item = firebaseDocToHistory(data);
+            const idx = history.findIndex(x => x.firebaseId === item.firebaseId);
+            if (idx >= 0) history[idx] = item;
+            else history.unshift(item);
+            history.sort((a, b) => Number(b.rawTime || 0) - Number(a.rawTime || 0));
+            localStorage.setItem('rq_history_bacaan', JSON.stringify(history));
+        } catch (e) {
+            console.warn('Riwayat Firebase Bacaan tidak dapat diperbarui:', e);
+        }
+
+        if (typeof window.renderSantriCardsAndTable === 'function') {
+            window.renderSantriCardsAndTable();
+        }
+    }
+
+    async function saveBacaanToFirebase(payload) {
+        if (!firebaseDb) throw new Error('Firebase Firestore belum siap.');
+        const firebaseId = stableBacaanId(payload);
+        const ref = doc(firebaseDb, 'bacaan', firebaseId);
+        await setDoc(ref, {
+            ...payload,
+            firebaseId,
+            source: 'website',
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        return firebaseId;
+    }
+
+    async function initFirebaseBacaan() {
+        try {
+            firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+            firebaseAuth = getAuth(firebaseApp);
+            firebaseDb = getFirestore(firebaseApp);
+
+            await signInAnonymously(firebaseAuth);
+            window.firebaseReady = true;
+            window.firebaseBacaanReady = true;
+            console.info('[Firebase Bacaan] Terhubung:', firebaseConfig.projectId);
+
+            // Simpan Bacaan ke Firebase lalu tetap jalankan alur Google Sheet lama.
+            const originalSyncToCloud = window.syncToCloud;
+            if (typeof originalSyncToCloud === 'function' && !window.__firebaseSyncToCloudWrapped) {
+                window.__firebaseSyncToCloudWrapped = true;
+                window.syncToCloud = async function(payload) {
+                    if (payload?.type === 'bacaan') {
+                        try {
+                            await saveBacaanToFirebase(payload);
+                            console.info('[Firebase Bacaan] Tersimpan:', payload.name);
+                        } catch (firebaseError) {
+                            console.error('[Firebase Bacaan] Gagal menyimpan:', firebaseError);
+                        }
+                    }
+                    // PENTING: alur Google Sheet / Apps Script lama tetap dijalankan.
+                    return originalSyncToCloud(payload);
+                };
+            }
+
+            // Saat Google Sheet dimuat, salin input_bacaan ke Firebase.
+            // Ini additive; fungsi lama tetap menjadi sumber data utama aplikasi.
+            const originalFetchAllDataFromCloud = window.fetchAllDataFromCloud;
+            if (typeof originalFetchAllDataFromCloud === 'function' && !window.__firebaseFetchWrapped) {
+                window.__firebaseFetchWrapped = true;
+                window.fetchAllDataFromCloud = async function(forceRender = false) {
+                    const result = await originalFetchAllDataFromCloud(forceRender);
+                    try {
+                        const rows = Array.isArray(window.__lastCloudInputBacaan)
+                            ? window.__lastCloudInputBacaan
+                            : null;
+                        if (rows) await syncSheetBacaanToFirebase(rows);
+                    } catch (syncError) {
+                        console.error('[Firebase Bacaan] Sinkron Sheet → Firebase gagal:', syncError);
+                    }
+                    return result;
+                };
+            }
+
+            // Snapshot realtime: perubahan Bacaan dari perangkat lain langsung diterapkan ke UI.
+            onSnapshot(collection(firebaseDb, 'bacaan'), (snapshot) => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added' || change.type === 'modified') {
+                        const data = change.doc.data();
+                        applyFirebaseBacaanToCurrentUI(data);
+                    }
+                });
+            }, (error) => {
+                console.error('[Firebase Bacaan] Realtime listener gagal:', error);
+            });
+
+            // Ambil data Sheet sekali setelah Firebase siap agar data lama juga masuk Firebase.
+            if (typeof originalFetchAllDataFromCloud === 'function') {
+                await originalFetchAllDataFromCloud(false);
+            }
+        } catch (error) {
+            console.error('[Firebase Bacaan] Inisialisasi gagal:', error);
+            window.firebaseReady = false;
+            window.firebaseBacaanReady = false;
+            // Tidak menghentikan Google Sheet / Apps Script.
+        }
+    }
+
+    // Hook kecil agar wrapper fetch mengetahui data input_bacaan tanpa mengubah fungsi lama.
+    const originalFetch = window.fetch;
+    if (typeof originalFetch === 'function' && !window.__firebaseFetchJsonTap) {
+        window.__firebaseFetchJsonTap = true;
+        window.fetch = async function(...args) {
+            const response = await originalFetch.apply(this, args);
+            try {
+                const url = String(args?.[0] || '');
+                if (url.includes('script.google.com/macros')) {
+                    const clone = response.clone();
+                    try {
+                        const data = await clone.json();
+                        if (data && Array.isArray(data.input_bacaan)) {
+                            window.__lastCloudInputBacaan = data.input_bacaan;
+                        }
+                    } catch (e) {}
+                }
+            } catch (e) {}
+            return response;
+        };
+    }
+
+    window.firebaseReadyPromise = initFirebaseBacaan();
+</script>
+
 </body>
 </html>
