@@ -4446,12 +4446,141 @@
         materi: 'rq_materi_utama',
         materi_tambahan: 'rq_materi_tambahan'
     };
+    // Snapshot laporan WA juga dicerminkan ke Firebase.
+    // Google Sheet/Apps Script tetap dipertahankan sebagai jalur lama/fallback.
+    const FIREBASE_REPORT_COLLECTIONS = ['laporan_wa_personal', 'laporan_grup_wa'];
+    const REPORT_KEYS = {
+        laporan_wa_personal: '_laporanWaPersonalCloud',
+        laporan_grup_wa: '_laporanGrupWaCloud'
+    };
+    const REPORT_LOCAL_KEYS = {
+        laporan_wa_personal: 'rq_laporan_wa_personal',
+        laporan_grup_wa: 'rq_laporan_grup_wa'
+    };
     const CLOUD_TO_CATEGORY = {
         bacaan: 'bacaan',
         hafalan: 'hafalan',
         murojaah: 'murojaah',
         tugas: 'tugas'
     };
+
+    function stableReportId(collectionName, item) {
+        const base = [
+            collectionName,
+            item?.id || '',
+            item?.name || '',
+            item?.class || '',
+            item?.kelas || ''
+        ].map(v => String(v ?? '').trim()).join('|');
+        let hash = 0;
+        for (let i = 0; i < base.length; i++) {
+            hash = ((hash << 5) - hash) + base.charCodeAt(i);
+            hash |= 0;
+        }
+        return `r_${Math.abs(hash)}_${base.length}`;
+    }
+
+    function normalizeReportRow(collectionName, item) {
+        if (!item || typeof item !== 'object') return null;
+        const data = {
+            ...item,
+            reportType: collectionName === 'laporan_grup_wa' ? 'grup' : 'personal',
+            collection: collectionName,
+            source: 'google-sheet-mirror',
+            updatedAt: Date.now()
+        };
+        data.firebaseId = item.firebaseId || stableReportId(collectionName, item);
+        return data;
+    }
+
+    // Mirror laporan dibuat per-baris, bukan menulis ulang seluruh laporan setiap refresh.
+    // Ini penting agar proses Firebase tidak membuat UI terasa tidak bisa ditekan.
+    const reportFingerprints = Object.create(null);
+    const reportRowFingerprints = Object.create(null);
+    let reportSyncTimer = null;
+    let reportSyncInFlight = false;
+    let reportSyncRequested = false;
+
+    function getReportRowFingerprint(data) {
+        const clean = { ...data };
+        delete clean.updatedAt;
+        delete clean.firebaseId;
+        return JSON.stringify(clean);
+    }
+
+    async function syncReportCollectionToFirebase(collectionName, rows) {
+        if (!firebaseDb || !Array.isArray(rows) || !rows.length) return;
+        const normalized = rows.map(row => normalizeReportRow(collectionName, row)).filter(Boolean);
+        if (!normalized.length) return;
+
+        if (!reportRowFingerprints[collectionName]) {
+            reportRowFingerprints[collectionName] = Object.create(null);
+        }
+
+        let batch = writeBatch(firebaseDb);
+        let count = 0;
+        let changed = 0;
+
+        for (const data of normalized) {
+            const id = String(data.firebaseId || '');
+            if (!id) continue;
+            const fp = getReportRowFingerprint(data);
+            if (reportRowFingerprints[collectionName][id] === fp) continue;
+
+            batch.set(doc(firebaseDb, collectionName, id), data, { merge: true });
+            reportRowFingerprints[collectionName][id] = fp;
+            count++;
+            changed++;
+
+            if (count >= 450) {
+                await batch.commit();
+                batch = writeBatch(firebaseDb);
+                count = 0;
+                // Beri browser kesempatan memproses klik/input sebelum batch berikutnya.
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+        }
+
+        if (count) await batch.commit();
+        reportFingerprints[collectionName] = JSON.stringify(normalized.map(getReportRowFingerprint));
+        if (changed) console.info(`[Firebase ${collectionName}] ${changed} baris laporan disinkronkan.`);
+    }
+
+    async function syncReportsToFirebase() {
+        if (!firebaseDb) return;
+        if (reportSyncInFlight) {
+            reportSyncRequested = true;
+            return;
+        }
+        reportSyncInFlight = true;
+        try {
+            do {
+                reportSyncRequested = false;
+                for (const collectionName of FIREBASE_REPORT_COLLECTIONS) {
+                    const key = REPORT_KEYS[collectionName];
+                    const rows = Array.isArray(window[key]) ? window[key] : [];
+                    await syncReportCollectionToFirebase(collectionName, rows);
+                }
+            } while (reportSyncRequested);
+        } finally {
+            reportSyncInFlight = false;
+        }
+    }
+
+    function scheduleReportFirebaseSync(delay = 1500) {
+        clearTimeout(reportSyncTimer);
+        reportSyncTimer = setTimeout(() => {
+            syncReportsToFirebase().catch(error =>
+                console.warn('[Firebase laporan WA] Mirror gagal:', error)
+            );
+        }, delay);
+    }
+
+    // Laporan WA sengaja TIDAK memakai listener yang mengganti state UI.
+    // Jalur lama (Google Sheet) tetap menjadi sumber tampilan; Firebase hanya mirror.
+    // Ini mencegah listener realtime menimpa laporan yang sedang dibuka pengguna.
+
+    window.syncReportsToFirebase = syncReportsToFirebase;
 
     function stableMaterialId(data) {
         const base = [
@@ -4895,6 +5024,8 @@
             // Perubahan dari perangkat lain masuk realtime untuk semua 4 jenis setoran.
             FIREBASE_CATEGORIES.forEach(setupCategoryListener);
             FIREBASE_MATERIAL_COLLECTIONS.forEach(setupMaterialListener);
+            // Laporan WA TIDAK dijadikan listener yang menimpa state tampilan.
+            // UI tetap memakai jalur Google Sheet yang sudah stabil; Firebase hanya mirror/sinkronisasi.
 
             // Setelah Google Sheet selesai dimuat, mirror riwayat dan materi yang sudah ada ke Firebase.
             // Fingerprint mencegah data yang sama ditulis berulang-ulang.
@@ -4911,6 +5042,10 @@
                     syncMaterialsToFirebase().catch(e => {
                         console.warn('[Firebase Materi] Mirror setelah fetch gagal:', e);
                     });
+                    // Mirror Laporan WA dilakukan di background dan tidak mengubah
+                    // state/tampilan laporan yang sudah ada. Fingerprint mencegah
+                    // penulisan ulang bila isi laporan tidak berubah.
+                    scheduleReportFirebaseSync(1200);
                     return result;
                 };
             }
@@ -4919,6 +5054,7 @@
             setTimeout(() => {
                 mirrorLocalHistoriesToFirebase().catch(() => {});
                 syncMaterialsToFirebase().catch(() => {});
+                scheduleReportFirebaseSync(2500);
             }, 800);
         } catch (error) {
             console.error('[Firebase Setoran] Inisialisasi gagal:', error);
