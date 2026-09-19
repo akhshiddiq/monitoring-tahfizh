@@ -4694,6 +4694,12 @@
     }
 
     window.firebaseReadyPromise = initFirebaseBacaan();
+        } catch (error) {
+            console.error('Inisialisasi Firebase Bacaan gagal:', error);
+            window.firebaseReady = false;
+            window.firebaseBacaanReady = false;
+        }
+    }
 </script>
 
 </body>
