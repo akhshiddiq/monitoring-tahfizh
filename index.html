@@ -4693,13 +4693,16 @@
         console.warn('Wrapper Firebase Bacaan tidak terpasang:', e);
     }
 
-    window.firebaseReadyPromise = initFirebaseBacaan();
         } catch (error) {
             console.error('Inisialisasi Firebase Bacaan gagal:', error);
             window.firebaseReady = false;
             window.firebaseBacaanReady = false;
         }
     }
+
+    // Jalankan inisialisasi Firebase setelah semua fungsi lama tersedia.
+    // Ini additive dan tidak mengubah alur Google Sheet / Apps Script.
+    window.firebaseReadyPromise = initFirebaseBacaan();
 </script>
 
 </body>
