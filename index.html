@@ -4435,9 +4435,16 @@
     });
 
     function stableBacaanId(row) {
+        // Group ID menjadi kunci utama jika tersedia.
+        // Ini membuat Save dari website dan baris Google Sheet menunjuk
+        // ke dokumen Firebase yang SAMA, sehingga tidak terjadi duplikasi.
+        const groupId = String(row?.[17] || '').trim();
+        if (groupId) return groupId.replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120);
+
+        // Data Bacaan lama yang belum memiliki Group ID tetap bisa dimigrasikan.
         const raw = [
             row?.[0] || '', row?.[1] || '', row?.[2] || '', row?.[3] || '',
-            row?.[4] || '', row?.[5] || '', row?.[17] || ''
+            row?.[4] || '', row?.[5] || ''
         ].map(v => String(v)).join('||');
         let hash = 2166136261;
         for (let i = 0; i < raw.length; i++) {
@@ -4445,6 +4452,19 @@
             hash = Math.imul(hash, 16777619);
         }
         return 'sheet_' + (hash >>> 0).toString(16);
+    }
+
+    function makeBacaanGroupId(payload) {
+        const raw = [
+            payload?.timestamp || '', payload?.tanggal || '', payload?.id || '',
+            payload?.name || '', payload?.class || '', payload?.teacher || ''
+        ].map(v => String(v)).join('||');
+        let hash = 2166136261;
+        for (let i = 0; i < raw.length; i++) {
+            hash ^= raw.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return 'bac_' + (hash >>> 0).toString(16);
     }
 
     function parseSheetSlot(row, base) {
@@ -4507,7 +4527,6 @@
         if (!window.firebaseReady || !Array.isArray(rows)) return;
         const fingerprint = JSON.stringify(rows);
         if (fingerprint === window._firebaseBacaanSheetFingerprint) return;
-        window._firebaseBacaanSheetFingerprint = fingerprint;
 
         const validRows = rows.filter(row => row && row[3]);
         if (!validRows.length) return;
@@ -4522,6 +4541,9 @@
             });
             await batch.commit();
         }
+
+        // Tandai fingerprint hanya setelah seluruh batch berhasil.
+        window._firebaseBacaanSheetFingerprint = fingerprint;
     }
 
     function applyFirebaseBacaanToCurrentUI(items) {
@@ -4571,6 +4593,46 @@
             await signInAnonymously(firebaseAuth);
             window.firebaseUser = firebaseAuth.currentUser;
             window.firebaseReady = true;
+
+            // WEBSITE → FIREBASE: hanya kategori Bacaan yang ditambahkan.
+            // Fungsi syncToCloud lama tetap dipanggil sehingga Google Sheet,
+            // laporan WA, dan seluruh alur lama tetap berjalan seperti sebelumnya.
+            const originalSyncToCloud = window.syncToCloud;
+            if (typeof originalSyncToCloud === 'function' && !originalSyncToCloud.__firebaseBacaanWrapped) {
+                const wrappedSyncToCloud = async function(payload) {
+                    const data = payload && typeof payload === 'object' ? { ...payload } : payload;
+
+                    if (data && data.type === 'bacaan') {
+                        data.groupId = String(data.groupId || makeBacaanGroupId(data));
+
+                        const firebaseData = {
+                            ...data,
+                            recordId: data.groupId,
+                            source: 'website',
+                            syncStatus: 'pending',
+                            updatedBy: window.firebaseUser?.uid || 'anonymous',
+                            updatedAt: new Date().toISOString()
+                        };
+
+                        try {
+                            await setDoc(doc(firebaseDb, 'bacaan', data.groupId), firebaseData, { merge: true });
+                            firebaseData.syncStatus = 'synced';
+                            await setDoc(doc(firebaseDb, 'bacaan', data.groupId), {
+                                syncStatus: 'synced',
+                                updatedAt: new Date().toISOString()
+                            }, { merge: true });
+                        } catch (firebaseError) {
+                            console.error('Website → Firebase Bacaan gagal:', firebaseError);
+                            // Jangan menghentikan Google Sheet lama jika Firebase gagal.
+                        }
+                    }
+
+                    // Jalur lama tetap dijalankan. Tidak dihapus dan tidak diganti.
+                    return originalSyncToCloud.call(this, data);
+                };
+                wrappedSyncToCloud.__firebaseBacaanWrapped = true;
+                window.syncToCloud = wrappedSyncToCloud;
+            }
 
             onSnapshot(collection(firebaseDb, 'bacaan'), snapshot => {
                 const items = snapshot.docs.map(d => ({ recordId: d.id, ...d.data() }));
