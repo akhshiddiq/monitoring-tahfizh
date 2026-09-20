@@ -745,6 +745,103 @@
         };
 
         // ============================================================
+        // INDIKATOR SINKRON PER FORM INPUT
+        // READ = data sedang/berhasil diambil dari Google Sheet.
+        // WRITE = data sedang/berhasil dikirim/disimpan melalui backend.
+        // State disimpan agar tidak hilang ketika kartu Input dirender ulang.
+        // ============================================================
+        window.inputSyncState = window.inputSyncState || {};
+
+        window.getInputSyncState = function(category, name) {
+            const key = `${category}::${name}`;
+            return window.inputSyncState[key] || {
+                read: { status: 'idle', message: 'Menunggu', progress: 0 },
+                write: { status: 'idle', message: 'Menunggu', progress: 0 }
+            };
+        };
+
+        window.syncInputKey = function(value) {
+            return encodeURIComponent(String(value || ''));
+        };
+
+        window.setInputSyncStatus = function(category, statusType, status, message, name = null, progress = null) {
+            const categories = ['bacaan', 'hafalan', 'murojaah', 'tugas'];
+            const targets = name ? [String(name)] : Array.from(new Set((window.santriList || []).map(s => String(s?.name || '').trim()).filter(Boolean)));
+            const targetCategories = categories.includes(category) ? [category] : categories;
+            const fallbackProgress = status === 'success' ? 100 : status === 'error' ? 0 : status === 'active' ? 34 : 0;
+            const finalProgress = Number.isFinite(Number(progress)) ? Math.max(0, Math.min(100, Number(progress))) : fallbackProgress;
+
+            targetCategories.forEach(cat => {
+                targets.forEach(studentName => {
+                    const key = `${cat}::${studentName}`;
+                    if (!window.inputSyncState[key]) {
+                        window.inputSyncState[key] = {
+                            read: { status: 'idle', message: 'Menunggu', progress: 0 },
+                            write: { status: 'idle', message: 'Menunggu', progress: 0 }
+                        };
+                    }
+                    window.inputSyncState[key][statusType] = { status, message, progress: finalProgress };
+
+                    const safe = window.syncInputKey(studentName);
+                    const chip = document.getElementById(`sync_input_${statusType}_${cat}_${safe}`);
+                    const icon = document.getElementById(`sync_icon_${statusType}_${cat}_${safe}`);
+                    const text = document.getElementById(`sync_text_${statusType}_${cat}_${safe}`);
+                    const pct = document.getElementById(`sync_pct_${statusType}_${cat}_${safe}`);
+                    if (!chip || !icon || !text || !pct) return;
+
+                    chip.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-black border transition-all duration-200';
+                    icon.className = status === 'active'
+                        ? (statusType === 'read' ? 'fa-solid fa-rotate fa-spin' : 'fa-solid fa-cloud-arrow-up fa-bounce')
+                        : status === 'success'
+                            ? 'fa-solid fa-circle-check'
+                            : status === 'error'
+                                ? 'fa-solid fa-circle-xmark'
+                                : 'fa-solid fa-circle-dot';
+
+                    if (status === 'active') {
+                        chip.classList.add('bg-amber-100','dark:bg-amber-950','text-amber-800','dark:text-amber-300','border-amber-300','dark:border-amber-700','animate-pulse');
+                    } else if (status === 'success') {
+                        chip.classList.add('bg-emerald-100','dark:bg-emerald-950','text-emerald-800','dark:text-emerald-300','border-emerald-300','dark:border-emerald-700');
+                    } else if (status === 'error') {
+                        chip.classList.add('bg-rose-100','dark:bg-rose-950','text-rose-800','dark:text-rose-300','border-rose-300','dark:border-rose-700');
+                    } else {
+                        chip.classList.add('bg-slate-100','dark:bg-slate-900','text-slate-500','dark:text-slate-400','border-slate-200','dark:border-slate-700');
+                    }
+                    pct.textContent = `${Math.round(finalProgress)}%`;
+                    text.textContent = message || (status === 'success' ? (statusType === 'read' ? 'READ berhasil' : 'WRITE selesai') : status === 'active' ? (statusType === 'read' ? 'READ...' : 'WRITE...') : 'Menunggu');
+                });
+            });
+        };
+
+        window.getInputSyncBadgeHtml = function(category, name) {
+            const state = window.getInputSyncState(category, name);
+            const safe = window.syncInputKey(name);
+            const read = state.read || { status: 'idle', message: 'Menunggu', progress: 0 };
+            const write = state.write || { status: 'idle', message: 'Menunggu', progress: 0 };
+            const chipClass = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-black border';
+            const readClass = read.status === 'success'
+                ? ' bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                : read.status === 'active'
+                    ? ' bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700 animate-pulse'
+                    : read.status === 'error'
+                        ? ' bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700'
+                        : ' bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
+            const writeClass = write.status === 'success'
+                ? ' bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                : write.status === 'active'
+                    ? ' bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700 animate-pulse'
+                    : write.status === 'error'
+                        ? ' bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700'
+                        : ' bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
+            const readIcon = read.status === 'active' ? 'fa-solid fa-rotate fa-spin' : read.status === 'success' ? 'fa-solid fa-circle-check' : read.status === 'error' ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle-dot';
+            const writeIcon = write.status === 'active' ? 'fa-solid fa-cloud-arrow-up fa-bounce' : write.status === 'success' ? 'fa-solid fa-circle-check' : write.status === 'error' ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle-dot';
+            return `<div class="flex items-center gap-1.5 flex-wrap" title="Status sinkronisasi Google Sheet">
+                <span id="sync_input_read_${category}_${safe}" class="${chipClass}${readClass}"><i id="sync_icon_read_${category}_${safe}" class="${readIcon}"></i><span>READ</span><strong id="sync_pct_read_${category}_${safe}" class="min-w-[28px] text-right">${Math.round(Number(read.progress) || 0)}%</strong><span id="sync_text_read_${category}_${safe}">${read.message || 'Menunggu'}</span></span>
+                <span id="sync_input_write_${category}_${safe}" class="${chipClass}${writeClass}"><i id="sync_icon_write_${category}_${safe}" class="${writeIcon}"></i><span>WRITE</span><strong id="sync_pct_write_${category}_${safe}" class="min-w-[28px] text-right">${Math.round(Number(write.progress) || 0)}%</strong><span id="sync_text_write_${category}_${safe}">${write.message || 'Menunggu'}</span></span>
+            </div>`;
+        };
+
+        // ============================================================
         // ALUR SINKRON — indikator visual tahapan WRITE / READ.
         // Hanya mengubah tampilan indikator; mekanisme data lama tetap dipakai.
         // Angka menunjukkan tahapan proses, bukan ukuran byte yang terkirim.
@@ -801,7 +898,6 @@
             }, interval);
         };
 
-        // Tes visual Alur Sinkron. Hanya menggerakkan indikator; TIDAK menyimpan data.
         window.testSyncFlow = function(direction) {
             window.stopSyncFlowAnimation(direction);
             window.updateSyncFlow(direction, 0, direction === 'write' ? 'Memulai tes WRITE...' : 'Memulai tes READ...');
@@ -816,10 +912,13 @@
         // Sinkronisasi cloud: setelah Save, perangkat lain akan mengambil versi terakhir dari Google Sheet.
         window.syncToCloud = async function(payload) {
             window.setSyncIndicator('pending');
+            const syncCategory = payload && ['bacaan','hafalan','murojaah','tugas'].includes(payload.type) ? payload.type : null;
+            if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'active', 'WRITE...', payload.name || null, 10);
             window.updateSyncFlow('write', 10, 'Website / browser: menyiapkan data');
             const url = window.getGsUrl();
             try {
                 window.updateSyncFlow('write', 34, 'Google Apps Script: menerima transfer');
+                if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'active', 'WRITE...', payload.name || null, 34);
                 window.animateSyncFlowUntil('write', 34, 65);
                 await fetch(url, {
                     method: 'POST',
@@ -829,13 +928,16 @@
                 });
                 window.stopSyncFlowAnimation('write');
                 window.updateSyncFlow('write', 70, 'Google Sheet: proses penyimpanan');
+                if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'active', 'WRITE...', payload.name || null, 70);
                 window.setSyncIndicator('success');
+                if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'success', 'WRITE selesai', payload.name || null, 100);
                 window.updateSyncFlow('write', 100, 'WRITE selesai');
                 setTimeout(() => window.fetchAllDataFromCloud(true), 250);
             } catch (err) {
                 window.stopSyncFlowAnimation('write');
                 console.error("Cloud sync error:", err);
                 window.setSyncIndicator('error');
+                if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'error', 'WRITE gagal', payload && payload.name ? payload.name : null, 0);
                 window.updateSyncFlow('write', 0, 'WRITE gagal');
             }
         };
@@ -878,17 +980,21 @@
             if (window._cloudPollingBusy) return;
             window._cloudPollingBusy = true;
             window.setSyncIndicator('pending');
+            window.setInputSyncStatus(null, 'read', 'active', 'READ...', null, 10);
             window.updateSyncFlow('read', 10, 'Google Sheet: meminta data terbaru');
             const url = window.getGsUrl();
             try {
                 window.updateSyncFlow('read', 34, 'Google Apps Script: mengambil data');
+                window.setInputSyncStatus(null, 'read', 'active', 'READ...', null, 34);
                 window.animateSyncFlowUntil('read', 34, 65);
                 const res = await fetch(url);
                 window.stopSyncFlowAnimation('read');
                 window.updateSyncFlow('read', 70, 'Website / browser: menerima data');
+                window.setInputSyncStatus(null, 'read', 'active', 'READ...', null, 70);
                 const cloudData = await res.json();
 
                 if (cloudData) {
+                    window.setInputSyncStatus(null, 'read', 'success', 'READ berhasil', null, 100);
                     // Urutkan berdasarkan waktu server/Sheet. Baris paling akhir adalah Save terbaru.
                     const sortByTimestamp = (a, b) => new Date(a?.[0] || 0).getTime() - new Date(b?.[0] || 0).getTime();
                     ['input_bacaan', 'input_hafalan', 'input_murojaah_dikelas', 'input_tugas'].forEach(key => {
@@ -1153,6 +1259,7 @@
             } catch (err) {
                 window.stopSyncFlowAnimation('read');
                 window.setSyncIndicator('error');
+                window.setInputSyncStatus(null, 'read', 'error', 'READ gagal', null, 0);
                 window.updateSyncFlow('read', 0, 'READ gagal');
                 const cached = localStorage.getItem('rq_santri_master');
                 if (cached) {
@@ -1802,6 +1909,7 @@
                                         </span>
                                         ${badgeBac}
                                         <span id="save_badge_bacaan_${s.name}" class="text-xs font-black text-emerald-600 hidden">Alhamdulillah sudah di input</span>
+                                        ${window.getInputSyncBadgeHtml('bacaan', s.name)}
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <a href="https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=852117400#gid=852117400" target="_blank" class="px-3.5 py-2 bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs">
@@ -1870,6 +1978,7 @@
                                         </span>
                                         ${badgeHaf}
                                         <span id="save_badge_hafalan_${s.name}" class="text-xs font-black text-rose-600 hidden">Alhamdulillah sudah di input</span>
+                                        ${window.getInputSyncBadgeHtml('hafalan', s.name)}
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <a href="https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=26717689#gid=26717689" target="_blank" class="px-3.5 py-2 bg-rose-100 dark:bg-rose-950 hover:bg-rose-200 text-rose-800 dark:text-rose-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs">
@@ -1938,6 +2047,7 @@
                                         </span>
                                         ${badgeMur}
                                         <span id="save_badge_murojaah_${s.name}" class="text-xs font-black text-purple-600 hidden">Alhamdulillah sudah di input</span>
+                                        ${window.getInputSyncBadgeHtml('murojaah', s.name)}
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <a href="https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=461137054#gid=461137054" target="_blank" class="px-3.5 py-2 bg-sky-100 dark:bg-sky-950 hover:bg-sky-200 text-sky-800 dark:text-sky-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs">
@@ -2005,6 +2115,7 @@
                                         </span>
                                         ${badgeTug}
                                         <span id="save_badge_tugas_${s.name}" class="text-xs font-black text-amber-700 hidden">Alhamdulillah sudah di input</span>
+                                        ${window.getInputSyncBadgeHtml('tugas', s.name)}
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <a href="https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=316920389#gid=316920389" target="_blank" class="px-3.5 py-2 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-800 dark:text-amber-300 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 transition shadow-xs">
@@ -2050,6 +2161,17 @@
             if (typeof window.syncLiveReportToVisibleSantri === 'function') {
                 setTimeout(window.syncLiveReportToVisibleSantri, 80);
             }
+            // Pulihkan indikator READ/WRITE yang tersimpan setelah kartu dirender ulang.
+            setTimeout(() => {
+                Object.keys(window.inputSyncState || {}).forEach(key => {
+                    const parts = key.split('::');
+                    const category = parts.shift();
+                    const name = parts.join('::');
+                    const state = window.inputSyncState[key];
+                    if (state?.read) window.setInputSyncStatus(category, 'read', state.read.status, state.read.message, name, state.read.progress);
+                    if (state?.write) window.setInputSyncStatus(category, 'write', state.write.status, state.write.message, name, state.write.progress);
+                });
+            }, 0);
         };
 
         window.extractSlotEntries = function(category, santriName) {
