@@ -269,6 +269,25 @@
         window.reportWaClassFilter = 'Abdurrahman';
         window.localFormCache = {};
 
+        // Normalisasi data santri agar frontend selalu mengikuti struktur
+        // yang dikirim backend Google Apps Script: id, name, class, teacher, phone.
+        // Tidak menghapus field tambahan seperti gender bila masih tersedia di frontend.
+        window.normalizeSantriMaster = function(list) {
+            if (!Array.isArray(list)) return [];
+            return list
+                .map(s => ({
+                    ...s,
+                    id: String(s?.id ?? '').trim(),
+                    name: String(s?.name ?? '').trim(),
+                    class: String(s?.class ?? s?.kelas ?? '').trim(),
+                    teacher: String(s?.teacher ?? s?.guru ?? '').trim(),
+                    phone: String(s?.phone ?? '').trim()
+                }))
+                .filter(s => s.name);
+        };
+
+        window.santriList = window.normalizeSantriMaster(window.santriList);
+
         window.surahList = [
             { no: 1, name: "Al-Fatihah", ayat: 7 }, { no: 2, name: "Al-Baqarah", ayat: 286 }, { no: 3, name: "Ali 'Imran", ayat: 200 },
             { no: 4, name: "An-Nisa'", ayat: 176 }, { no: 5, name: "Al-Ma'idah", ayat: 120 }, { no: 6, name: "Al-An'am", ayat: 165 },
@@ -466,8 +485,10 @@
             setTimeout(() => t.remove(), 2500);
         };
 
-        window.filterByClass = function(v) { 
-            window.selectedClass = v; 
+        window.filterByClass = function(v) {
+            // Kelas adalah filter daftar nama; form tetap hanya untuk santri yang diklik.
+            window.santriList = window.normalizeSantriMaster(window.santriList);
+            window.selectedClass = String(v || 'ALL').trim() || 'ALL';
             const sidebarClass = document.getElementById('santriSidebarClassFilter');
             if (sidebarClass) sidebarClass.value = v;
             const mainClass = document.getElementById('classFilterSelect');
@@ -898,9 +919,9 @@
                     const cloudChanged = forceRender || fingerprint !== window._cloudFingerprint;
                     window._cloudFingerprint = fingerprint;
                     window._riwayatInputCloud = Array.isArray(cloudData.riwayat_input) ? cloudData.riwayat_input : [];
-                    if (cloudData.santri && cloudData.santri.length > 0) {
-                        window.santriList = cloudData.santri;
-                        localStorage.setItem('rq_santri_master', JSON.stringify(cloudData.santri));
+                    if (Array.isArray(cloudData.santri) && cloudData.santri.length > 0) {
+                        window.santriList = window.normalizeSantriMaster(cloudData.santri);
+                        localStorage.setItem('rq_santri_master', JSON.stringify(window.santriList));
                     }
 
                     const parseCloudSlots = (row) => {
@@ -1135,8 +1156,12 @@
                 window.updateSyncFlow('read', 0, 'READ gagal');
                 const cached = localStorage.getItem('rq_santri_master');
                 if (cached) {
-                    window.santriList = JSON.parse(cached);
-                    window.renderSantriCardsAndTable();
+                    try {
+                        window.santriList = window.normalizeSantriMaster(JSON.parse(cached));
+                        window.renderSantriCardsAndTable();
+                    } catch (cacheErr) {
+                        console.warn('Cache santri tidak dapat dibaca:', cacheErr);
+                    }
                 }
             } finally {
                 window._cloudPollingBusy = false;
@@ -1585,10 +1610,16 @@
             const grid = document.getElementById('santriGridContainer');
             if (!kotakContainer || !grid) return;
 
+            // Selalu pakai master santri yang terakhir diterima dari backend.
+            // Jika backend belum selesai diambil, gunakan master yang tertanam di HTML.
+            window.santriList = window.normalizeSantriMaster(window.santriList);
+            const master = window.santriList;
             const selectedName = String(window.selectedInputSantriName || '').trim().toLowerCase();
-            const classFiltered = window.santriList.filter(s =>
-                window.selectedClass === 'ALL' || s.class === window.selectedClass
-            );
+            const selectedClass = String(window.selectedClass || 'ALL').trim();
+            const classFiltered = master.filter(s => {
+                const studentClass = String(s.class || '').trim();
+                return selectedClass === 'ALL' || studentClass.toLowerCase() === selectedClass.toLowerCase();
+            });
             const filtered = selectedName
                 ? classFiltered.filter(s => String(s.name || '').trim().toLowerCase() === selectedName)
                 : [];
@@ -3850,6 +3881,11 @@
             window.updateSyncFlow('write', 0, 'Menunggu');
             window.updateSyncFlow('read', 0, 'Menunggu');
 
+            // Render master santri lokal terlebih dahulu agar daftar nama langsung
+            // muncul saat kelas dipilih, tanpa menunggu GET Google Apps Script.
+            window.santriList = window.normalizeSantriMaster(window.santriList);
+            window.renderSantriCardsAndTable();
+
             // Load awal + sinkron otomatis lintas laptop setiap 5 detik.
             window.fetchAllDataFromCloud(true);
             window._cloudSyncInterval = setInterval(() => {
@@ -4010,7 +4046,7 @@
                         <option value="Umar">Umar</option>
                         <option value="ALL">Semua Kelas</option>
                     </select>
-                    <div id="santriKotakContainer" class="hidden grid grid-cols-1 gap-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar p-1"></div>
+                    <div id="santriKotakContainer" class="grid grid-cols-1 gap-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar p-1"></div>
                 </aside>
 
                 <div id="santriGridContainer" class="space-y-4 min-w-0"></div>
