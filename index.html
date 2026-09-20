@@ -436,7 +436,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'kartu', 'laporan', 'riwayat', 'export'].forEach(t => {
+            ['setoran', 'materi', 'kartu', 'laporan', 'riwayat', 'alur-sinkron', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
@@ -473,8 +473,12 @@
             const mainClass = document.getElementById('classFilterSelect');
             if (mainClass) mainClass.value = v;
 
-            // Ganti kelas hanya mengatur daftar pencarian. Form tidak boleh
-            // langsung menampilkan seluruh santri dalam kelas tersebut.
+            // Ganti kelas hanya mengatur DAFTAR PILIHAN nama.
+            // Form tidak boleh langsung menampilkan seluruh santri dalam kelas tersebut.
+            const searchInput = document.getElementById('santriQuickSearch');
+            if (searchInput) searchInput.value = '';
+            const clearBtn = document.getElementById('santriQuickSearchClear');
+            if (clearBtn) clearBtn.classList.add('hidden');
             const selected = window.selectedInputSantriName;
             if (selected) {
                 const student = (window.santriList || []).find(s => String(s.name || '').toLowerCase() === String(selected).toLowerCase());
@@ -504,6 +508,7 @@
             }
 
             const matches = (window.santriList || []).filter(s =>
+                (window.selectedClass === 'ALL' || s.class === window.selectedClass) &&
                 String(s.name || '').toLowerCase().includes(q)
             );
 
@@ -718,24 +723,99 @@
             else dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-sm";
         };
 
+        // ============================================================
+        // ALUR SINKRON — indikator visual tahapan WRITE / READ.
+        // Hanya mengubah tampilan indikator; mekanisme data lama tetap dipakai.
+        // Angka menunjukkan tahapan proses, bukan ukuran byte yang terkirim.
+        // ============================================================
+        window.updateSyncFlow = function(direction, progress, message) {
+            const p = Math.max(0, Math.min(100, Number(progress) || 0));
+            const isWrite = direction === 'write';
+            const prefix = isWrite ? 'syncWrite' : 'syncRead';
+            const nodes = isWrite ? ['Web', 'Gs', 'Sheet'] : ['Sheet', 'Gs', 'Web'];
+
+            let values;
+            if (p <= 0) values = [0, 0, 0];
+            else if (p < 34) values = [p, 0, 0];
+            else if (p < 67) values = [100, p, 0];
+            else values = [100, 100, p];
+
+            nodes.forEach((node, index) => {
+                const pct = Math.round(values[index]);
+                const pctEl = document.getElementById(`${prefix}${node}Pct`);
+                const barEl = document.getElementById(`${prefix}${node}Bar`);
+                if (pctEl) pctEl.textContent = `${pct}%`;
+                if (barEl) barEl.style.width = `${pct}%`;
+            });
+
+            const statusEl = document.getElementById(isWrite ? 'syncWriteStatus' : 'syncReadStatus');
+            if (statusEl) {
+                statusEl.textContent = message || (p >= 100 ? 'Selesai' : 'Berjalan');
+                statusEl.className = p >= 100
+                    ? 'text-[10px] font-black text-emerald-600 dark:text-emerald-400'
+                    : p <= 0
+                        ? 'text-[10px] font-black text-rose-500'
+                        : 'text-[10px] font-black text-sky-600 dark:text-sky-400';
+            }
+        };
+
+        window.stopSyncFlowAnimation = function(direction) {
+            const key = direction === 'write' ? '_syncWriteTimer' : '_syncReadTimer';
+            if (window[key]) {
+                clearInterval(window[key]);
+                window[key] = null;
+            }
+        };
+
+        window.animateSyncFlowUntil = function(direction, start, end, step = 2, interval = 250) {
+            window.stopSyncFlowAnimation(direction);
+            const key = direction === 'write' ? '_syncWriteTimer' : '_syncReadTimer';
+            let p = Number(start) || 0;
+            const finish = Number(end) || p;
+            window.updateSyncFlow(direction, p, direction === 'write' ? 'Google Apps Script: mengirim data' : 'Google Apps Script: mengambil data');
+            window[key] = setInterval(() => {
+                if (p >= finish) return;
+                p = Math.min(finish, p + step);
+                window.updateSyncFlow(direction, p, direction === 'write' ? 'Google Apps Script: mengirim data' : 'Google Apps Script: mengambil data');
+            }, interval);
+        };
+
+        // Tes visual Alur Sinkron. Hanya menggerakkan indikator; TIDAK menyimpan data.
+        window.testSyncFlow = function(direction) {
+            window.stopSyncFlowAnimation(direction);
+            window.updateSyncFlow(direction, 0, direction === 'write' ? 'Memulai tes WRITE...' : 'Memulai tes READ...');
+            setTimeout(() => window.updateSyncFlow(direction, 10, direction === 'write' ? 'Website / browser: menyiapkan data' : 'Google Sheet: meminta data terbaru'), 150);
+            setTimeout(() => window.animateSyncFlowUntil(direction, 34, 92, 2, 90), 500);
+            setTimeout(() => {
+                window.stopSyncFlowAnimation(direction);
+                window.updateSyncFlow(direction, 100, direction === 'write' ? 'Tes WRITE selesai' : 'Tes READ selesai');
+            }, 3200);
+        };
+
         // Sinkronisasi cloud: setelah Save, perangkat lain akan mengambil versi terakhir dari Google Sheet.
         window.syncToCloud = async function(payload) {
             window.setSyncIndicator('pending');
+            window.updateSyncFlow('write', 10, 'Website / browser: menyiapkan data');
             const url = window.getGsUrl();
             try {
+                window.updateSyncFlow('write', 34, 'Google Apps Script: menerima transfer');
+                window.animateSyncFlowUntil('write', 34, 65);
                 await fetch(url, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
+                window.stopSyncFlowAnimation('write');
+                window.updateSyncFlow('write', 70, 'Google Sheet: proses penyimpanan');
                 window.setSyncIndicator('success');
-                // Ambil kembali data setelah server selesai menerima Save agar perangkat ini
-                // juga memakai data yang benar-benar tersimpan di Google Sheet.
+                window.updateSyncFlow('write', 100, 'WRITE selesai');
                 setTimeout(() => window.fetchAllDataFromCloud(true), 250);
             } catch (err) {
+                window.stopSyncFlowAnimation('write');
                 console.error("Cloud sync error:", err);
                 window.setSyncIndicator('error');
+                window.updateSyncFlow('write', 0, 'WRITE gagal');
             }
         };
 
@@ -777,9 +857,14 @@
             if (window._cloudPollingBusy) return;
             window._cloudPollingBusy = true;
             window.setSyncIndicator('pending');
+            window.updateSyncFlow('read', 10, 'Google Sheet: meminta data terbaru');
             const url = window.getGsUrl();
             try {
+                window.updateSyncFlow('read', 34, 'Google Apps Script: mengambil data');
+                window.animateSyncFlowUntil('read', 34, 65);
                 const res = await fetch(url);
+                window.stopSyncFlowAnimation('read');
+                window.updateSyncFlow('read', 70, 'Website / browser: menerima data');
                 const cloudData = await res.json();
 
                 if (cloudData) {
@@ -1042,9 +1127,12 @@
                         window.renderMateriList('tambahan');
                     }
                     window.setSyncIndicator('success');
+                    window.updateSyncFlow('read', 100, 'READ selesai');
                 }
             } catch (err) {
+                window.stopSyncFlowAnimation('read');
                 window.setSyncIndicator('error');
+                window.updateSyncFlow('read', 0, 'READ gagal');
                 const cached = localStorage.getItem('rq_santri_master');
                 if (cached) {
                     window.santriList = JSON.parse(cached);
@@ -1498,26 +1586,45 @@
             if (!kotakContainer || !grid) return;
 
             const selectedName = String(window.selectedInputSantriName || '').trim().toLowerCase();
+            const classFiltered = window.santriList.filter(s =>
+                window.selectedClass === 'ALL' || s.class === window.selectedClass
+            );
             const filtered = selectedName
-                ? window.santriList.filter(s => String(s.name || '').trim().toLowerCase() === selectedName)
+                ? classFiltered.filter(s => String(s.name || '').trim().toLowerCase() === selectedName)
                 : [];
 
-            // Sebelum ada nama yang diklik dari pencarian, area form sengaja kosong.
-            // Setelah dipilih, panel kiri hanya mempertahankan nama santri tersebut.
-            if (filtered.length) {
-                const selected = filtered[0];
-                const isFemale = selected.gender === 'P' || /(putri|aishah|fatimah|zahrah|khansa|nabilah|marsha|haura|riska|zarina|alesha|yumna|almira|calista|ufaira|alya|quinsha|anggun|jovita|rayya|reyna|yasmin|afiqa|dilara|lujayn|syahda|anindya|novia|rianti|sakura|elmira|hevanika|iffa|nurhalimah|salsabila|yura)/i.test(selected.name);
-                const cardBg = isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800';
-                kotakContainer.innerHTML = `
-                    <button type="button" onclick='window.selectAndScrollToSantri(${JSON.stringify(selected.name)})' class="w-full p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center min-h-[48px] ring-2 ring-emerald-400">
-                        <span class="leading-snug break-words">${selected.name}</span>
-                        <span class="mt-0.5 text-[9px] font-black opacity-70">${selected.class || 'Tanpa Kelas'}</span>
-                    </button>
-                `;
+            // PANEL KIRI = DAFTAR PILIHAN, BUKAN FORM.
+            // Saat kelas dipilih, nama-nama kelas tersebut tetap muncul sebagai pilihan.
+            // Form utama di kanan/tengah tetap KOSONG sampai satu nama benar-benar diklik.
+            // Setelah nama diklik, panel kiri hanya menampilkan santri yang dipilih.
+            const searchInput = document.getElementById('santriQuickSearch');
+            const searchQ = String(searchInput?.value || '').trim().toLowerCase();
+            let nameOptions;
+            if (selectedName && filtered.length) {
+                nameOptions = filtered;
+            } else {
+                nameOptions = classFiltered.filter(s =>
+                    !searchQ || String(s.name || '').toLowerCase().includes(searchQ)
+                );
+            }
+
+            if (nameOptions.length) {
+                kotakContainer.innerHTML = nameOptions.map(selected => {
+                    const isSelected = selectedName && String(selected.name || '').trim().toLowerCase() === selectedName;
+                    const isFemale = selected.gender === 'P' || /(putri|aishah|fatimah|zahrah|khansa|nabilah|marsha|haura|riska|zarina|alesha|yumna|almira|calista|ufaira|alya|quinsha|anggun|jovita|rayya|reyna|yasmin|afiqa|dilara|lujayn|syahda|anindya|novia|rianti|sakura|elmira|hevanika|iffa|nurhalimah|salsabila|yura)/i.test(selected.name);
+                    const cardBg = isSelected
+                        ? 'bg-emerald-600 text-white border-emerald-700 ring-2 ring-amber-400'
+                        : (isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800');
+                    return `
+                        <button type="button" onclick='window.quickSelectSantri(${JSON.stringify(selected.name)})' class="w-full p-2.5 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-[10px] flex flex-col items-center justify-center transition text-center min-h-[44px]">
+                            <span class="leading-snug break-words">${selected.name}</span>
+                            <span class="mt-0.5 text-[9px] font-black opacity-70">${selected.class || 'Tanpa Kelas'}</span>
+                        </button>`;
+                }).join('');
                 kotakContainer.classList.remove('hidden');
             } else {
-                kotakContainer.innerHTML = '';
-                kotakContainer.classList.add('hidden');
+                kotakContainer.innerHTML = `<div class="p-2.5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 text-[10px] font-bold text-slate-500 text-center">Nama santri tidak ditemukan.</div>`;
+                kotakContainer.classList.remove('hidden');
             }
 
             const now = new Date();
@@ -3740,6 +3847,8 @@
             // Pastikan status awal Live Laporan dan tombol Buka/Tutup
             // selalu sinkron, termasuk di HP.
             window.initInlineLiveReport();
+            window.updateSyncFlow('write', 0, 'Menunggu');
+            window.updateSyncFlow('read', 0, 'Menunggu');
 
             // Load awal + sinkron otomatis lintas laptop setiap 5 detik.
             window.fetchAllDataFromCloud(true);
@@ -3803,6 +3912,7 @@
                 <button onclick="window.switchTab('kartu')" id="btnTab-kartu" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Kartu</button>
                 <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
                 <button onclick="window.switchTab('riwayat')" id="btnTab-riwayat" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat Input</button>
+                <button onclick="window.switchTab('alur-sinkron')" id="btnTab-alur-sinkron" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Alur Sinkron</button>
                 
                 <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
@@ -4287,6 +4397,40 @@
         </section>
 
         <!-- SECTION: CLOUD & EXPORT -->
+        <!-- SECTION: ALUR SINKRON -->
+        <section id="section-alur-sinkron" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-5">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300 flex items-center gap-2"><i class="fa-solid fa-route"></i> Alur Sinkron</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1">Indikator bergerak mengikuti tahapan WRITE dan READ. Persentase adalah tahapan proses, bukan ukuran byte.</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="window.testSyncFlow('write')" class="px-3.5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-black flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up"></i> Tes WRITE</button>
+                        <button onclick="window.fetchAllDataFromCloud(true)" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Tes READ</button>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border-2 border-sky-200 dark:border-sky-800 bg-sky-50/70 dark:bg-sky-950/20 p-4 space-y-4">
+                    <div class="flex items-center justify-between gap-2"><h4 class="font-black text-sm text-sky-900 dark:text-sky-200">WRITE — Website / Browser → Google Apps Script → Google Sheet</h4><span id="syncWriteStatus" class="text-[10px] font-black text-slate-500">Menunggu</span></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-800"><div class="flex justify-between gap-2"><span class="text-xs font-black">Website / Browser</span><span id="syncWriteWebPct" class="text-[10px] font-black">0%</span></div><div class="h-2 mt-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="syncWriteWebBar" class="h-full w-0 bg-sky-500 transition-all duration-500"></div></div></div>
+                        <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-800"><div class="flex justify-between gap-2"><span class="text-xs font-black">Google Apps Script</span><span id="syncWriteGsPct" class="text-[10px] font-black">0%</span></div><div class="h-2 mt-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="syncWriteGsBar" class="h-full w-0 bg-sky-500 transition-all duration-500"></div></div></div>
+                        <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-800"><div class="flex justify-between gap-2"><span class="text-xs font-black">Google Sheet</span><span id="syncWriteSheetPct" class="text-[10px] font-black">0%</span></div><div class="h-2 mt-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="syncWriteSheetBar" class="h-full w-0 bg-emerald-500 transition-all duration-500"></div></div></div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/20 p-4 space-y-4">
+                    <div class="flex items-center justify-between gap-2"><h4 class="font-black text-sm text-emerald-900 dark:text-emerald-200">READ — Google Sheet → Google Apps Script → Website / Browser</h4><span id="syncReadStatus" class="text-[10px] font-black text-slate-500">Menunggu</span></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800"><div class="flex justify-between gap-2"><span class="text-xs font-black">Google Sheet</span><span id="syncReadSheetPct" class="text-[10px] font-black">0%</span></div><div class="h-2 mt-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="syncReadSheetBar" class="h-full w-0 bg-emerald-500 transition-all duration-500"></div></div></div>
+                        <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800"><div class="flex justify-between gap-2"><span class="text-xs font-black">Google Apps Script</span><span id="syncReadGsPct" class="text-[10px] font-black">0%</span></div><div class="h-2 mt-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="syncReadGsBar" class="h-full w-0 bg-emerald-500 transition-all duration-500"></div></div></div>
+                        <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800"><div class="flex justify-between gap-2"><span class="text-xs font-black">Website / Browser</span><span id="syncReadWebPct" class="text-[10px] font-black">0%</span></div><div class="h-2 mt-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div id="syncReadWebBar" class="h-full w-0 bg-emerald-500 transition-all duration-500"></div></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                 <div class="flex items-center justify-between flex-wrap gap-3">
