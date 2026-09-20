@@ -751,6 +751,27 @@
         // State disimpan agar tidak hilang ketika kartu Input dirender ulang.
         // ============================================================
         window.inputSyncState = window.inputSyncState || {};
+        // Sumber sinkronisasi yang ditampilkan pada kartu Input.
+        // Google Apps Script/Google Sheet tetap jalur utama; Firebase hanya tambahan.
+        window.firebaseTransportStatus = window.firebaseTransportStatus || 'offline';
+        window.getInputSyncSourceLabel = function(direction) {
+            const firebaseOk = window.firebaseTransportStatus === 'online';
+            if (direction === 'write') {
+                return firebaseOk ? 'Google Script + Firebase' : 'Google Script (Firebase tidak tersedia)';
+            }
+            return firebaseOk ? 'Google Script + Firebase realtime' : 'Google Script (Firebase tidak tersedia)';
+        };
+
+        window.refreshAllInputSyncSourceLabels = function() {
+            Object.keys(window.inputSyncState || {}).forEach(key => {
+                const parts = key.split('::');
+                const category = parts.shift();
+                const name = parts.join('::');
+                const state = window.inputSyncState[key];
+                if (state?.read) window.setInputSyncStatus(category, 'read', state.read.status, state.read.message, name, state.read.progress);
+                if (state?.write) window.setInputSyncStatus(category, 'write', state.write.status, state.write.message, name, state.write.progress);
+            });
+        };
 
         window.getInputSyncState = function(category, name) {
             const key = `${category}::${name}`;
@@ -808,7 +829,9 @@
                         chip.classList.add('bg-slate-100','dark:bg-slate-900','text-slate-500','dark:text-slate-400','border-slate-200','dark:border-slate-700');
                     }
                     pct.textContent = `${Math.round(finalProgress)}%`;
-                    text.textContent = message || (status === 'success' ? (statusType === 'read' ? 'READ berhasil' : 'WRITE selesai') : status === 'active' ? (statusType === 'read' ? 'READ...' : 'WRITE...') : 'Menunggu');
+                    const baseMessage = message || (status === 'success' ? (statusType === 'read' ? 'READ berhasil' : 'WRITE selesai') : status === 'active' ? (statusType === 'read' ? 'READ...' : 'WRITE...') : 'Menunggu');
+                    const sourceSuffix = status === 'success' ? ` • ${window.getInputSyncSourceLabel(statusType)}` : '';
+                    text.textContent = `${baseMessage}${sourceSuffix}`;
                 });
             });
         };
@@ -835,7 +858,7 @@
                         : ' bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
             const readIcon = read.status === 'active' ? 'fa-solid fa-rotate fa-spin' : read.status === 'success' ? 'fa-solid fa-circle-check' : read.status === 'error' ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle-dot';
             const writeIcon = write.status === 'active' ? 'fa-solid fa-cloud-arrow-up fa-bounce' : write.status === 'success' ? 'fa-solid fa-circle-check' : write.status === 'error' ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle-dot';
-            return `<div class="flex items-center gap-1.5 flex-wrap" title="Status sinkronisasi Google Sheet">
+            return `<div class="flex items-center gap-1.5 flex-wrap" title="Status sinkronisasi: Google Script/Google Sheet utama, Firebase tambahan">
                 <span id="sync_input_read_${category}_${safe}" class="${chipClass}${readClass}"><i id="sync_icon_read_${category}_${safe}" class="${readIcon}"></i><span>READ</span><strong id="sync_pct_read_${category}_${safe}" class="min-w-[28px] text-right">${Math.round(Number(read.progress) || 0)}%</strong><span id="sync_text_read_${category}_${safe}">${read.message || 'Menunggu'}</span></span>
                 <span id="sync_input_write_${category}_${safe}" class="${chipClass}${writeClass}"><i id="sync_icon_write_${category}_${safe}" class="${writeIcon}"></i><span>WRITE</span><strong id="sync_pct_write_${category}_${safe}" class="min-w-[28px] text-right">${Math.round(Number(write.progress) || 0)}%</strong><span id="sync_text_write_${category}_${safe}">${write.message || 'Menunggu'}</span></span>
             </div>`;
@@ -930,6 +953,8 @@
                 window.updateSyncFlow('write', 70, 'Google Sheet: proses penyimpanan');
                 if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'active', 'WRITE...', payload.name || null, 70);
                 window.setSyncIndicator('success');
+                // Google Script/Google Sheet adalah jalur utama. Firebase tidak menentukan
+                // keberhasilan WRITE; jika Firebase gagal, data tetap sudah dikirim ke GS.
                 if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'success', 'WRITE selesai', payload.name || null, 100);
                 window.updateSyncFlow('write', 100, 'WRITE selesai');
                 setTimeout(() => window.fetchAllDataFromCloud(true), 250);
@@ -5307,6 +5332,7 @@
             limit(FIREBASE_RECENT_LISTENER_LIMIT)
         );
         onSnapshot(recentQuery, (snapshot) => {
+            window.firebaseTransportStatus = 'online';
             let changed = false;
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added' || change.type === 'modified') {
@@ -5317,7 +5343,8 @@
             });
             if (changed) renderAfterFirebaseChange();
         }, (error) => {
-            console.error(`[Firebase ${category}] Realtime listener gagal:`, error);
+            window.firebaseTransportStatus = 'offline';
+            console.error(`[Firebase ${category}] Realtime listener gagal, Google Script tetap digunakan:`, error);
         });
     }
 
@@ -5506,7 +5533,11 @@
             await signInAnonymously(firebaseAuth);
             window.firebaseReady = true;
             window.firebaseBacaanReady = true;
+            window.firebaseTransportStatus = 'online';
             console.info('[Firebase Setoran] Terhubung:', firebaseConfig.projectId);
+            if (typeof window.refreshAllInputSyncSourceLabels === 'function') {
+                window.refreshAllInputSyncSourceLabels();
+            }
 
             // Setiap input baru langsung masuk Firebase, tetapi Google Sheet tetap dijalankan.
             const originalSyncToCloud = window.syncToCloud;
@@ -5516,8 +5547,22 @@
                     const category = CLOUD_TO_CATEGORY[payload?.type];
                     if (category) {
                         saveSetoranToFirebase(category, payload)
-                            .then(id => console.info(`[Firebase ${category}] Tersimpan:`, id))
-                            .catch(error => console.error(`[Firebase ${category}] Gagal menyimpan:`, error));
+                            .then(id => {
+                                window.firebaseTransportStatus = 'online';
+                                console.info(`[Firebase ${category}] Tersimpan:`, id);
+                                if (category && payload?.name) {
+                                    const st = window.getInputSyncState(category, payload.name);
+                                    if (st?.write?.status === 'success') window.setInputSyncStatus(category, 'write', 'success', 'WRITE selesai', payload.name, st.write.progress);
+                                }
+                            })
+                            .catch(error => {
+                                window.firebaseTransportStatus = 'offline';
+                                console.error(`[Firebase ${category}] Gagal menyimpan, lanjut Google Script:`, error);
+                                if (category && payload?.name) {
+                                    const st = window.getInputSyncState(category, payload.name);
+                                    if (st?.write?.status === 'success') window.setInputSyncStatus(category, 'write', 'success', 'WRITE selesai', payload.name, st.write.progress);
+                                }
+                            });
                     } else if (payload?.type === 'materi') {
                         saveMaterialToFirebase(payload)
                             .then(id => console.info(`[Firebase materi] Tersimpan:`, id))
@@ -5578,6 +5623,7 @@
             console.error('[Firebase Setoran] Inisialisasi gagal:', error);
             window.firebaseReady = false;
             window.firebaseBacaanReady = false;
+            window.firebaseTransportStatus = 'offline';
         }
     }
 
