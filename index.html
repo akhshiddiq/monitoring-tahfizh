@@ -261,6 +261,9 @@
         window.cardSectionToggleState = {};
         window.cardHistoryToggleState = {};
         window.selectedWaSantriName = null;
+        // Input hanya menampilkan santri yang benar-benar dipilih dari pencarian.
+        // Jangan tampilkan semua santri secara otomatis.
+        window.selectedInputSantriName = null;
         window.selectedKartuSantriName = null;
         window.kartuClassFilter = 'Abdurrahman';
         window.reportWaClassFilter = 'Abdurrahman';
@@ -433,7 +436,7 @@
             const target = document.getElementById(`section-${tabId}`);
             if (target) target.classList.remove('hidden');
             
-            ['setoran', 'materi', 'kartu', 'laporan', 'riwayat', 'alur-sinkron', 'export'].forEach(t => {
+            ['setoran', 'materi', 'kartu', 'laporan', 'riwayat', 'export'].forEach(t => {
                 const btn = document.getElementById(`btnTab-${t}`);
                 if (btn) {
                     btn.className = (t === tabId)
@@ -467,8 +470,18 @@
             window.selectedClass = v; 
             const sidebarClass = document.getElementById('santriSidebarClassFilter');
             if (sidebarClass) sidebarClass.value = v;
-            const nameBox = document.getElementById('santriKotakContainer');
-            if (nameBox) nameBox.classList.remove('hidden');
+            const mainClass = document.getElementById('classFilterSelect');
+            if (mainClass) mainClass.value = v;
+
+            // Ganti kelas hanya mengatur daftar pencarian. Form tidak boleh
+            // langsung menampilkan seluruh santri dalam kelas tersebut.
+            const selected = window.selectedInputSantriName;
+            if (selected) {
+                const student = (window.santriList || []).find(s => String(s.name || '').toLowerCase() === String(selected).toLowerCase());
+                if (v !== 'ALL' && student && student.class !== v) {
+                    window.selectedInputSantriName = null;
+                }
+            }
             window.renderSantriCardsAndTable(); 
         };
 
@@ -485,6 +498,7 @@
             if (!q) {
                 box.innerHTML = '';
                 box.classList.add('hidden');
+                window.selectedInputSantriName = null;
                 window.renderSantriCardsAndTable();
                 return;
             }
@@ -520,6 +534,7 @@
                 box.innerHTML = '';
                 box.classList.add('hidden');
             }
+            window.selectedInputSantriName = null;
             window.renderSantriCardsAndTable();
         };
 
@@ -541,6 +556,9 @@
             const box = document.getElementById('santriKotakContainer');
             if (box) box.classList.remove('hidden');
 
+            // Ini adalah titik pemilihan santri untuk menu Input.
+            // Setelah diklik, hanya santri ini yang dirender pada form.
+            window.selectedInputSantriName = student.name;
             window.renderSantriCardsAndTable();
             window.selectAndScrollToSantri(student.name);
         };
@@ -613,6 +631,12 @@
         // otomatis melompat ke kartu input santri tersebut.
         window.selectAndScrollToSantri = function(santriName) {
             if (!santriName) return;
+            const student = (window.santriList || []).find(s => String(s.name || '').toLowerCase() === String(santriName).toLowerCase());
+            if (!student) return;
+
+            // Pertahankan santri yang dipilih agar form Input tetap fokus pada
+            // satu santri saja, termasuk ketika navigasi berasal dari laporan.
+            window.selectedInputSantriName = student.name;
             if (typeof window.selectInlineWaSantri === 'function') {
                 window.selectInlineWaSantri(santriName, true);
             }
@@ -650,6 +674,11 @@
             if (classFilterSelect) {
                 classFilterSelect.value = s.class;
                 window.selectedClass = s.class;
+                window.selectedInputSantriName = s.name;
+                const searchInput = document.getElementById('santriQuickSearch');
+                if (searchInput) searchInput.value = s.name;
+                const clearBtn = document.getElementById('santriQuickSearchClear');
+                if (clearBtn) clearBtn.classList.remove('hidden');
                 window.renderSantriCardsAndTable();
             }
             setTimeout(() => {
@@ -692,24 +721,21 @@
         // Sinkronisasi cloud: setelah Save, perangkat lain akan mengambil versi terakhir dari Google Sheet.
         window.syncToCloud = async function(payload) {
             window.setSyncIndicator('pending');
-            window.updateSyncFlow('write', 10, 'Website / browser: menyiapkan data');
             const url = window.getGsUrl();
             try {
-                window.updateSyncFlow('write', 34, 'Google Apps Script: menerima transfer');
                 await fetch(url, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
-                window.updateSyncFlow('write', 70, 'Google Sheet: proses penyimpanan');
                 window.setSyncIndicator('success');
-                window.updateSyncFlow('write', 100, 'WRITE selesai');
+                // Ambil kembali data setelah server selesai menerima Save agar perangkat ini
+                // juga memakai data yang benar-benar tersimpan di Google Sheet.
                 setTimeout(() => window.fetchAllDataFromCloud(true), 250);
             } catch (err) {
                 console.error("Cloud sync error:", err);
                 window.setSyncIndicator('error');
-                window.updateSyncFlow('write', 0, 'WRITE gagal');
             }
         };
 
@@ -751,12 +777,9 @@
             if (window._cloudPollingBusy) return;
             window._cloudPollingBusy = true;
             window.setSyncIndicator('pending');
-            window.updateSyncFlow('read', 10, 'Google Sheet: meminta data terbaru');
             const url = window.getGsUrl();
             try {
-                window.updateSyncFlow('read', 34, 'Google Apps Script: mengambil data');
                 const res = await fetch(url);
-                window.updateSyncFlow('read', 70, 'Website / browser: menerima data');
                 const cloudData = await res.json();
 
                 if (cloudData) {
@@ -1019,11 +1042,9 @@
                         window.renderMateriList('tambahan');
                     }
                     window.setSyncIndicator('success');
-                    window.updateSyncFlow('read', 100, 'READ selesai');
                 }
             } catch (err) {
                 window.setSyncIndicator('error');
-                window.updateSyncFlow('read', 0, 'READ gagal');
                 const cached = localStorage.getItem('rq_santri_master');
                 if (cached) {
                     window.santriList = JSON.parse(cached);
@@ -1476,21 +1497,41 @@
             const grid = document.getElementById('santriGridContainer');
             if (!kotakContainer || !grid) return;
 
-            const filtered = window.santriList.filter(s => window.selectedClass === 'ALL' || s.class === window.selectedClass);
+            const selectedName = String(window.selectedInputSantriName || '').trim().toLowerCase();
+            const filtered = selectedName
+                ? window.santriList.filter(s => String(s.name || '').trim().toLowerCase() === selectedName)
+                : [];
 
-            kotakContainer.innerHTML = filtered.map(s => {
-                const isFemale = s.gender === 'P' || /(putri|aishah|fatimah|zahrah|khansa|nabilah|marsha|haura|riska|zarina|alesha|yumna|almira|calista|ufaira|alya|quinsha|anggun|jovita|rayya|reyna|yasmin|afiqa|dilara|lujayn|syahda|anindya|novia|rianti|sakura|elmira|hevanika|iffa|nurhalimah|salsabila|yura)/i.test(s.name);
+            // Sebelum ada nama yang diklik dari pencarian, area form sengaja kosong.
+            // Setelah dipilih, panel kiri hanya mempertahankan nama santri tersebut.
+            if (filtered.length) {
+                const selected = filtered[0];
+                const isFemale = selected.gender === 'P' || /(putri|aishah|fatimah|zahrah|khansa|nabilah|marsha|haura|riska|zarina|alesha|yumna|almira|calista|ufaira|alya|quinsha|anggun|jovita|rayya|reyna|yasmin|afiqa|dilara|lujayn|syahda|anindya|novia|rianti|sakura|elmira|hevanika|iffa|nurhalimah|salsabila|yura)/i.test(selected.name);
                 const cardBg = isFemale ? 'bg-pink-100 hover:bg-pink-200 border-pink-300 text-pink-950 dark:bg-pink-950/60 dark:text-pink-200 dark:border-pink-800' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-950 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800';
-
-                return `
-                    <button type="button" onclick='window.selectAndScrollToSantri(${JSON.stringify(s.name)})' class="p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center min-h-[48px]">
-                        <span class="leading-snug break-words">${s.name}</span>
+                kotakContainer.innerHTML = `
+                    <button type="button" onclick='window.selectAndScrollToSantri(${JSON.stringify(selected.name)})' class="w-full p-3 ${cardBg} border-2 rounded-xl shadow-xs font-bold text-xs flex flex-col items-center justify-center transition text-center min-h-[48px] ring-2 ring-emerald-400">
+                        <span class="leading-snug break-words">${selected.name}</span>
+                        <span class="mt-0.5 text-[9px] font-black opacity-70">${selected.class || 'Tanpa Kelas'}</span>
                     </button>
                 `;
-            }).join('');
+                kotakContainer.classList.remove('hidden');
+            } else {
+                kotakContainer.innerHTML = '';
+                kotakContainer.classList.add('hidden');
+            }
 
             const now = new Date();
             const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+            if (!filtered.length) {
+                grid.innerHTML = `
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
+                        <i class="fa-solid fa-magnifying-glass text-3xl text-slate-300 dark:text-slate-600"></i>
+                        <div class="mt-3 text-sm sm:text-base font-black text-slate-600 dark:text-slate-300">Pilih nama santri dari pencarian terlebih dahulu</div>
+                        <div class="mt-1 text-[10px] sm:text-xs font-bold text-slate-400">Form Bacaan, Hafalan, Muroja'ah, dan Tugas akan muncul setelah nama diklik.</div>
+                    </div>`;
+                return;
+            }
 
             grid.innerHTML = filtered.map((s, index) => {
                 const isTodayBac = s.lastBacaanDate === todayStr;
@@ -1578,6 +1619,40 @@
                             <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 p-3.5 rounded-2xl">
                                 <span>Tanggal: <input type="date" id="tgl_${s.name}" value="${todayStr}" oninput="window.selectInlineWaSantri('${s.name}', true)" onchange="window.selectInlineWaSantri('${s.name}', true)" class="p-2.5 bg-white dark:bg-slate-800 border-2 rounded-xl font-bold text-xs sm:text-sm min-h-[46px]"></span>
                                 <span class="text-emerald-700 dark:text-emerald-400 font-black">Form Input Setoran</span>
+                            </div>
+
+                            <!-- TABEL FORM: satu santri terpilih, empat jenis input -->
+                            <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
+                                <table class="w-full min-w-[760px] text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-100 dark:bg-slate-900">
+                                            <th class="p-3 text-left font-black text-emerald-800 dark:text-emerald-300">Bacaan</th>
+                                            <th class="p-3 text-left font-black text-rose-800 dark:text-rose-300">Hafalan</th>
+                                            <th class="p-3 text-left font-black text-purple-800 dark:text-purple-300">Muroja'ah</th>
+                                            <th class="p-3 text-left font-black text-amber-800 dark:text-amber-300">Tugas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="align-top bg-white dark:bg-slate-800">
+                                            <td class="p-3 border-t border-slate-200 dark:border-slate-700">
+                                                <div class="font-black ${isTodayBac ? 'text-emerald-600' : 'text-slate-500'}">${isTodayBac ? 'Sudah input hari ini' : 'Belum di input'}</div>
+                                                <button type="button" onclick='window.toggleCardSection(${JSON.stringify(s.name)}, "bacaan")' class="mt-2 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black">${isBacaanOpen ? 'Tutup Form' : 'Buka Form'}</button>
+                                            </td>
+                                            <td class="p-3 border-t border-slate-200 dark:border-slate-700">
+                                                <div class="font-black ${isTodayHaf ? 'text-rose-600' : 'text-slate-500'}">${isTodayHaf ? 'Sudah input hari ini' : 'Belum di input'}</div>
+                                                <button type="button" onclick='window.toggleCardSection(${JSON.stringify(s.name)}, "hafalan")' class="mt-2 px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black">${isHafalanOpen ? 'Tutup Form' : 'Buka Form'}</button>
+                                            </td>
+                                            <td class="p-3 border-t border-slate-200 dark:border-slate-700">
+                                                <div class="font-black ${isTodayMur ? 'text-purple-600' : 'text-slate-500'}">${isTodayMur ? 'Sudah input hari ini' : 'Belum di input'}</div>
+                                                <button type="button" onclick='window.toggleCardSection(${JSON.stringify(s.name)}, "murojaah")' class="mt-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black">${isMurojaahOpen ? 'Tutup Form' : 'Buka Form'}</button>
+                                            </td>
+                                            <td class="p-3 border-t border-slate-200 dark:border-slate-700">
+                                                <div class="font-black ${isTodayTug ? 'text-amber-600' : 'text-slate-500'}">${isTodayTug ? 'Sudah input hari ini' : 'Belum di input'}</div>
+                                                <button type="button" onclick='window.toggleCardSection(${JSON.stringify(s.name)}, "tugas")' class="mt-2 px-3 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-black">${isTugasOpen ? 'Tutup Form' : 'Buka Form'}</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
 
                             <!-- BACAAN -->
@@ -3728,7 +3803,7 @@
                 <button onclick="window.switchTab('kartu')" id="btnTab-kartu" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Kartu</button>
                 <button onclick="window.switchTab('laporan')" id="btnTab-laporan" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Laporan</button>
                 <button onclick="window.switchTab('riwayat')" id="btnTab-riwayat" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Riwayat Input</button>
-                <button onclick="window.switchTab('alur-sinkron')" id="btnTab-alur-sinkron" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Alur Sinkron</button>
+                
                 <button onclick="window.switchTab('export')" id="btnTab-export" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-emerald-100 hover:bg-emerald-700/65 transition-all shrink-0">Cloud & Reset</button>
             </div>
         </div>
@@ -4211,43 +4286,6 @@
             </div>
         </section>
 
-        <!-- SECTION: ALUR SINKRON -->
-        <section id="section-alur-sinkron" class="hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-5">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                    <div>
-                        <h3 class="font-black text-base sm:text-lg text-emerald-800 dark:text-emerald-300 flex items-center gap-2"><i class="fa-solid fa-route"></i> Alur Sinkron</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1">Progress menunjukkan tahapan transfer data saat proses berlangsung.</p>
-                    </div>
-                    <button onclick="window.fetchAllDataFromCloud(true)" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Tes READ</button>
-                </div>
-
-                <div class="rounded-2xl border-2 border-sky-200 dark:border-sky-800 bg-sky-50/70 dark:bg-sky-950/20 p-4 space-y-4">
-                    <div class="flex items-center justify-between gap-2"><h4 class="font-black text-sm text-sky-900 dark:text-sky-200">1. Website / browser → Google Sheet</h4><span id="syncWriteStatus" class="text-[10px] font-black text-slate-500">Menunggu</span></div>
-                    <div class="space-y-3">
-                        <div><div class="flex justify-between text-[10px] font-black mb-1"><span>Website / browser</span><span id="syncWriteWebPct">0%</span></div><div class="h-3 bg-white/80 dark:bg-slate-800 rounded-full overflow-hidden"><div id="syncWriteWebBar" class="h-full bg-sky-500 transition-all duration-300" style="width:0%"></div></div></div>
-                        <div class="text-center text-sky-500 text-xs">↓</div>
-                        <div><div class="flex justify-between text-[10px] font-black mb-1"><span>Google Apps Script</span><span id="syncWriteGsPct">0%</span></div><div class="h-3 bg-white/80 dark:bg-slate-800 rounded-full overflow-hidden"><div id="syncWriteGsBar" class="h-full bg-emerald-500 transition-all duration-300" style="width:0%"></div></div></div>
-                        <div class="text-center text-emerald-500 text-xs">↓</div>
-                        <div><div class="flex justify-between text-[10px] font-black mb-1"><span>Google Sheet</span><span id="syncWriteSheetPct">0%</span></div><div class="h-3 bg-white/80 dark:bg-slate-800 rounded-full overflow-hidden"><div id="syncWriteSheetBar" class="h-full bg-amber-500 transition-all duration-300" style="width:0%"></div></div></div>
-                    </div>
-                </div>
-
-                <div class="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/20 p-4 space-y-4">
-                    <div class="flex items-center justify-between gap-2"><h4 class="font-black text-sm text-emerald-900 dark:text-emerald-200">2. Google Sheet → Website / browser</h4><span id="syncReadStatus" class="text-[10px] font-black text-slate-500">Menunggu</span></div>
-                    <div class="space-y-3">
-                        <div><div class="flex justify-between text-[10px] font-black mb-1"><span>Google Sheet</span><span id="syncReadSheetPct">0%</span></div><div class="h-3 bg-white/80 dark:bg-slate-800 rounded-full overflow-hidden"><div id="syncReadSheetBar" class="h-full bg-amber-500 transition-all duration-300" style="width:0%"></div></div></div>
-                        <div class="text-center text-amber-500 text-xs">↓</div>
-                        <div><div class="flex justify-between text-[10px] font-black mb-1"><span>Google Apps Script</span><span id="syncReadGsPct">0%</span></div><div class="h-3 bg-white/80 dark:bg-slate-800 rounded-full overflow-hidden"><div id="syncReadGsBar" class="h-full bg-emerald-500 transition-all duration-300" style="width:0%"></div></div></div>
-                        <div class="text-center text-emerald-500 text-xs">↓</div>
-                        <div><div class="flex justify-between text-[10px] font-black mb-1"><span>Website / browser</span><span id="syncReadWebPct">0%</span></div><div class="h-3 bg-white/80 dark:bg-slate-800 rounded-full overflow-hidden"><div id="syncReadWebBar" class="h-full bg-sky-500 transition-all duration-300" style="width:0%"></div></div></div>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900 text-[10px] font-bold text-slate-500 dark:text-slate-400">Catatan: angka persentase menunjukkan <b>tahap proses</b>, bukan persentase ukuran data/byte yang terukur.</div>
-            </div>
-        </section>
-
         <!-- SECTION: CLOUD & EXPORT -->
         <section id="section-export" class="hidden space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
@@ -4422,5 +4460,330 @@
   });
 })();
 </script>
+
+<!-- =========================================================
+     FIREBASE REALTIME LAYER — TAHAP 1: BACAAN
+     ADDITIVE ONLY: kode lama Google Sheet / Apps Script tidak diubah.
+     Firebase mengikuti data Bacaan yang sudah tersimpan di Google Sheet.
+========================================================= -->
+<script type="module">
+    import { initializeApp, getApps, getApp }
+        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getAuth, signInAnonymously }
+        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+    import {
+        getFirestore,
+        collection,
+        doc,
+        setDoc,
+        onSnapshot,
+        writeBatch
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDPbk7neCM3Xtb0UcuQ8HVJeYErmvMYM8",
+        authDomain: "monitoring-tahfizh.firebaseapp.com",
+        projectId: "monitoring-tahfizh",
+        storageBucket: "monitoring-tahfizh.firebasestorage.app",
+        messagingSenderId: "998424731566",
+        appId: "1:998424731566:web:cdd1e76a33ffcb325ff23f",
+        measurementId: "G-71QPYHT14R"
+    };
+
+    const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const firebaseAuth = getAuth(firebaseApp);
+    const firebaseDb = getFirestore(firebaseApp);
+
+    window.firebaseApp = firebaseApp;
+    window.firebaseAuth = firebaseAuth;
+    window.firebaseDb = firebaseDb;
+    window.firebaseReady = false;
+    window.firebaseBacaanReady = false;
+    window._firebaseBacaanRows = [];
+    window._firebaseBacaanSheetFingerprint = '';
+
+    const waitForExistingCloudFunction = (fnName, timeoutMs = 15000) => new Promise((resolve, reject) => {
+        const started = Date.now();
+        const timer = setInterval(() => {
+            if (typeof window[fnName] === 'function') {
+                clearInterval(timer);
+                resolve(window[fnName]);
+                return;
+            }
+            if (Date.now() - started > timeoutMs) {
+                clearInterval(timer);
+                reject(new Error(fnName + ' belum tersedia.'));
+            }
+        }, 100);
+    });
+
+    function stableBacaanId(row) {
+        // Group ID menjadi kunci utama jika tersedia.
+        // Ini membuat Save dari website dan baris Google Sheet menunjuk
+        // ke dokumen Firebase yang SAMA, sehingga tidak terjadi duplikasi.
+        const groupId = String(row?.[17] || '').trim();
+        if (groupId) return groupId.replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120);
+
+        // Data Bacaan lama yang belum memiliki Group ID tetap bisa dimigrasikan.
+        const raw = [
+            row?.[0] || '', row?.[1] || '', row?.[2] || '', row?.[3] || '',
+            row?.[4] || '', row?.[5] || ''
+        ].map(v => String(v)).join('||');
+        let hash = 2166136261;
+        for (let i = 0; i < raw.length; i++) {
+            hash ^= raw.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return 'sheet_' + (hash >>> 0).toString(16);
+    }
+
+    function makeBacaanGroupId(payload) {
+        const raw = [
+            payload?.timestamp || '', payload?.tanggal || '', payload?.id || '',
+            payload?.name || '', payload?.class || '', payload?.teacher || ''
+        ].map(v => String(v)).join('||');
+        let hash = 2166136261;
+        for (let i = 0; i < raw.length; i++) {
+            hash ^= raw.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return 'bac_' + (hash >>> 0).toString(16);
+    }
+
+    function parseSheetSlot(row, base) {
+        const cell = String(row?.[base] || '-');
+        const parts = cell.split('|');
+        return {
+            item: parts[0] || '-',
+            mode: parts[1] || 'quran',
+            start: row?.[base + 1] || '-',
+            end: row?.[base + 2] || '-'
+        };
+    }
+
+    function sheetRowToFirebase(row) {
+        return {
+            recordId: stableBacaanId(row),
+            timestamp: row?.[0] || '',
+            tanggal: row?.[1] || '',
+            id: row?.[2] || '',
+            name: row?.[3] || '',
+            class: row?.[4] || '',
+            teacher: row?.[5] || '',
+            slots: [parseSheetSlot(row, 6), parseSheetSlot(row, 9), parseSheetSlot(row, 12)],
+            status: row?.[15] || '',
+            catatan: row?.[16] || '',
+            groupId: row?.[17] || '',
+            progressStatus: row?.[18] || '',
+            source: 'google_sheet',
+            syncedAt: new Date().toISOString()
+        };
+    }
+
+    function firebaseRowToHistory(item) {
+        const slots = Array.isArray(item.slots) ? item.slots : [];
+        const detail = slots.map(sl => {
+            if (!sl || !sl.item || sl.item === '-') return '';
+            const mode = String(sl.mode || '').toLowerCase();
+            const range = sl.start && sl.start !== '-'
+                ? (sl.end && sl.end !== '-' && sl.end !== sl.start ? `${sl.start}-${sl.end}` : String(sl.start))
+                : '';
+            return range ? `${sl.item} ${mode === 'iqro' ? 'Hlm ' : ''}${range}` : sl.item;
+        }).filter(Boolean).join(', ') || '-';
+
+        return {
+            timestamp: item.timestamp ? window.formatTimestampCustom(item.timestamp) : '-',
+            tanggal: item.tanggal || new Date().toISOString().split('T')[0],
+            rawTime: new Date(item.timestamp || 0).getTime(),
+            name: item.name || '',
+            detail,
+            status: item.status || '-',
+            progressStatus: item.progressStatus || '',
+            catatan: item.catatan || '',
+            type: 'bacaan',
+            groupId: item.groupId || '',
+            firebaseRecordId: item.recordId || ''
+        };
+    }
+
+    async function syncSheetBacaanToFirebase(rows) {
+        if (!window.firebaseReady || !Array.isArray(rows)) return;
+        const fingerprint = JSON.stringify(rows);
+        if (fingerprint === window._firebaseBacaanSheetFingerprint) return;
+
+        const validRows = rows.filter(row => row && row[3]);
+        if (!validRows.length) return;
+
+        // Firestore batch maksimum 500 operasi; gunakan 450 agar aman.
+        for (let start = 0; start < validRows.length; start += 450) {
+            const batch = writeBatch(firebaseDb);
+            const part = validRows.slice(start, start + 450);
+            part.forEach(row => {
+                const data = sheetRowToFirebase(row);
+                batch.set(doc(firebaseDb, 'bacaan', data.recordId), data, { merge: true });
+            });
+            await batch.commit();
+        }
+
+        // Tandai fingerprint hanya setelah seluruh batch berhasil.
+        window._firebaseBacaanSheetFingerprint = fingerprint;
+    }
+
+    function applyFirebaseBacaanToCurrentUI(items) {
+        const rows = items.map(firebaseRowToHistory)
+            .filter(x => x.name)
+            .sort((a, b) => Number(b.rawTime || 0) - Number(a.rawTime || 0));
+
+        window._firebaseBacaanRows = rows;
+        if (!rows.length) return;
+
+        // Firebase hanya mengambil alih kategori Bacaan.
+        // Kategori Hafalan/Murojaah/Tugas tetap memakai sistem lama.
+        try {
+            localStorage.setItem('rq_history_bacaan', JSON.stringify(rows));
+        } catch (e) {}
+
+        const latestByName = {};
+        items.forEach(item => {
+            const name = String(item?.name || '').trim();
+            if (!name) return;
+            const ts = new Date(item?.timestamp || 0).getTime();
+            const oldTs = new Date(latestByName[name]?.timestamp || 0).getTime();
+            if (!latestByName[name] || ts >= oldTs) latestByName[name] = item;
+        });
+
+        Object.values(latestByName).forEach(item => {
+            const s = (window.santriList || []).find(x =>
+                String(x?.id || '').trim() === String(item?.id || '').trim() && String(item?.id || '').trim() ||
+                String(x?.name || '').trim().toLowerCase() === String(item?.name || '').trim().toLowerCase()
+            );
+            if (!s) return;
+            s.cloudBacSlots = Array.isArray(item.slots) ? item.slots : [];
+            s.lastBacaan = rows.find(r => r.name === item.name)?.detail || '-';
+            s.lastBacaanDate = item.tanggal || '';
+            s.cloudBacStat = item.status || '';
+            s.cloudBacCat = item.catatan || '';
+            s.cloudBacProgressStatus = item.progressStatus || '';
+        });
+
+        if (typeof window.renderSantriCardsAndTable === 'function') {
+            window.renderSantriCardsAndTable();
+        }
+    }
+
+    async function initFirebaseBacaan() {
+        try {
+            await signInAnonymously(firebaseAuth);
+            window.firebaseUser = firebaseAuth.currentUser;
+            window.firebaseReady = true;
+
+            // WEBSITE → FIREBASE: hanya kategori Bacaan yang ditambahkan.
+            // Fungsi syncToCloud lama tetap dipanggil sehingga Google Sheet,
+            // laporan WA, dan seluruh alur lama tetap berjalan seperti sebelumnya.
+            const originalSyncToCloud = window.syncToCloud;
+            if (typeof originalSyncToCloud === 'function' && !originalSyncToCloud.__firebaseBacaanWrapped) {
+                const wrappedSyncToCloud = async function(payload) {
+                    const data = payload && typeof payload === 'object' ? { ...payload } : payload;
+
+                    if (data && data.type === 'bacaan') {
+                        data.groupId = String(data.groupId || makeBacaanGroupId(data));
+
+                        const firebaseData = {
+                            ...data,
+                            recordId: data.groupId,
+                            source: 'website',
+                            syncStatus: 'pending',
+                            updatedBy: window.firebaseUser?.uid || 'anonymous',
+                            updatedAt: new Date().toISOString()
+                        };
+
+                        try {
+                            await setDoc(doc(firebaseDb, 'bacaan', data.groupId), firebaseData, { merge: true });
+                            firebaseData.syncStatus = 'synced';
+                            await setDoc(doc(firebaseDb, 'bacaan', data.groupId), {
+                                syncStatus: 'synced',
+                                updatedAt: new Date().toISOString()
+                            }, { merge: true });
+                        } catch (firebaseError) {
+                            console.error('Website → Firebase Bacaan gagal:', firebaseError);
+                            // Jangan menghentikan Google Sheet lama jika Firebase gagal.
+                        }
+                    }
+
+                    // Jalur lama tetap dijalankan. Tidak dihapus dan tidak diganti.
+                    return originalSyncToCloud.call(this, data);
+                };
+                wrappedSyncToCloud.__firebaseBacaanWrapped = true;
+                window.syncToCloud = wrappedSyncToCloud;
+            }
+
+            onSnapshot(collection(firebaseDb, 'bacaan'), snapshot => {
+                const items = snapshot.docs.map(d => ({ recordId: d.id, ...d.data() }));
+                window.firebaseBacaanReady = true;
+                applyFirebaseBacaanToCurrentUI(items);
+            }, error => {
+                console.error('Firebase listener Bacaan gagal:', error);
+                window.firebaseBacaanReady = false;
+            });
+
+            // Tangkap hasil GET Google Sheet secara pasif. Fungsi lama tidak diubah.
+    const nativeFetch = window.fetch.bind(window);
+    window.__latestCloudDataForFirebaseBacaan = null;
+    window.__latestCloudDataForFirebaseBacaanPromise = Promise.resolve(null);
+
+    window.fetch = function(resource, options) {
+        const url = typeof resource === 'string' ? resource : (resource?.url || '');
+        const method = String(options?.method || resource?.method || 'GET').toUpperCase();
+        const isGsGet = method === 'GET' && /script\.google\.com\/macros\/s\//.test(String(url));
+
+        const requestPromise = nativeFetch(resource, options);
+        if (!isGsGet) return requestPromise;
+
+        const capturePromise = requestPromise.then(response => {
+            const clone = response.clone();
+            window.__latestCloudDataForFirebaseBacaanPromise = clone.json()
+                .then(data => {
+                    window.__latestCloudDataForFirebaseBacaan = data || null;
+                    return data || null;
+                })
+                .catch(() => null);
+            return response;
+        });
+        return capturePromise;
+    };
+
+    // Pasang wrapper hanya untuk menambahkan Sheet → Firebase setelah fungsi lama selesai.
+    // Tidak mengganti isi/fungsi Google Sheet yang sudah ada.
+    try {
+        const originalFetchData = window.fetchAllDataFromCloud;
+        if (typeof originalFetchData === 'function' && !originalFetchData.__firebaseBacaanWrapped) {
+            const wrappedFetch = async function(forceRender = false) {
+                const result = await originalFetchData.call(this, forceRender);
+                try {
+                    const cloudData = await window.__latestCloudDataForFirebaseBacaanPromise;
+                    if (cloudData && Array.isArray(cloudData.input_bacaan)) {
+                        await syncSheetBacaanToFirebase(cloudData.input_bacaan);
+                    }
+                } catch (e) {
+                    console.error('Sheet → Firebase Bacaan gagal:', e);
+                }
+                return result;
+            };
+            wrappedFetch.__firebaseBacaanWrapped = true;
+            window.fetchAllDataFromCloud = wrappedFetch;
+        }
+    } catch (e) {
+        console.warn('Wrapper Firebase Bacaan tidak terpasang:', e);
+    }
+
+    window.firebaseReadyPromise = initFirebaseBacaan();
+        } catch (error) {
+            console.error('Inisialisasi Firebase Bacaan gagal:', error);
+            window.firebaseReady = false;
+            window.firebaseBacaanReady = false;
+        }
+    }
+</script>
+
 </body>
 </html>
