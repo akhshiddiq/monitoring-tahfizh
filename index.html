@@ -1525,14 +1525,6 @@
             }
         };
 
-        window.syncLiveReportToSantri = function(santriName) {
-            const s = (window.santriList || []).find(x => x.name === santriName);
-            if (!s) return;
-            window.selectedWaSantriName = s.name;
-            window.reportWaClassFilter = s.class;
-            window.generateWaReport();
-        };
-
         window.getFormCache = function(key, defaultVal = '') {
             if (window.localFormCache[key] !== undefined) return window.localFormCache[key];
             return defaultVal;
@@ -2514,38 +2506,87 @@
             const personal = personalRows.find(r => String(r?.id || '').trim().toLowerCase() === targetKeyId) ||
                 personalRows.find(r => String(r?.name || '').trim().toLowerCase() === targetKeyName && String(r?.class || '').trim() === String(s.class || '').trim()) || null;
 
-            // Fallback ke histori lokal hanya jika backend personal belum tersedia.
+            // LIVE WA PERSONAL harus mengambil INPUT TERBARU per kategori.
+            // Snapshot laporan lama hanya dipakai jika memang lebih baru daripada histori input.
             const bacaanHistoryList = JSON.parse(localStorage.getItem('rq_history_bacaan') || '[]');
             const hafalanHistoryList = JSON.parse(localStorage.getItem('rq_history_hafalan') || '[]');
             const murojaahHistoryList = JSON.parse(localStorage.getItem('rq_history_murojaah') || '[]');
             const tugasHistoryList = JSON.parse(localStorage.getItem('rq_history_tugas') || '[]');
-            const latestLocalByName = (history) => (history || []).filter(item => String(item?.name || '').trim().toLowerCase() === targetKeyName).sort((a,b) => Number(b?.rawTime || 0) - Number(a?.rawTime || 0))[0] || null;
+            const latestLocalByName = (history) => (history || [])
+                .filter(item => String(item?.name || '').trim().toLowerCase() === targetKeyName)
+                .sort((a,b) => Number(b?.rawTime || 0) - Number(a?.rawTime || 0))[0] || null;
+
             const lastBacObj = latestLocalByName(bacaanHistoryList);
             const lastHafObj = latestLocalByName(hafalanHistoryList);
             const lastMurObj = latestLocalByName(murojaahHistoryList);
             const lastTugObj = latestLocalByName(tugasHistoryList);
 
+            const getPersonalTime = (row, category) => {
+                const raw = row?.[category + 'Timestamp'] || row?.[category + 'RawTime'] || row?.updatedAt || 0;
+                const n = Number(raw);
+                if (Number.isFinite(n) && n > 0) return n;
+                const parsed = Date.parse(String(raw || ''));
+                return Number.isFinite(parsed) ? parsed : 0;
+            };
+            const chooseLatest = (personalTime, localObj) => {
+                const localTime = Number(localObj?.rawTime || 0);
+                return personalTime > localTime ? 'personal' : (localObj ? 'local' : 'personal');
+            };
+
             const liveBac = window.extractSlotEntries('bac', s.name);
             const liveHaf = window.extractSlotEntries('haf', s.name);
             const liveMur = window.extractSlotEntries('mur', s.name);
 
-            const bacaanVal = window.cleanReportDetail(personal?.bacaan || ((liveBac && liveBac !== '-') ? liveBac : (lastBacObj?.detail || (s.lastBacaan !== '-' ? s.lastBacaan : ''))));
-            const bacaanStat = String(personal?.bacaanNilai || lastBacObj?.status || s.cloudBacStat || '').trim();
-            const bacaanProgressStatus = String(personal?.bacaanStatus || lastBacObj?.progressStatus || s.cloudBacProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('bac', s.name)) || '').trim();
-            const bacaanCat = window.cleanReportCatatan(personal?.bacaanKeterangan || lastBacObj?.catatan || s.cloudBacCat || '');
+            const bacSource = chooseLatest(getPersonalTime(personal, 'bacaan'), lastBacObj);
+            const hafSource = chooseLatest(getPersonalTime(personal, 'hafalan'), lastHafObj);
+            const murSource = chooseLatest(getPersonalTime(personal, 'murojaah'), lastMurObj);
+            const tugSource = chooseLatest(getPersonalTime(personal, 'tugas'), lastTugObj);
 
-            const hafalanVal = window.cleanReportDetail(personal?.hafalan || ((liveHaf && liveHaf !== '-') ? liveHaf : (lastHafObj?.detail || (s.lastHafalan !== '-' ? s.lastHafalan : ''))));
-            const hafalanStat = String(personal?.hafalanNilai || lastHafObj?.status || s.cloudHafStat || '').trim();
-            const hafalanProgressStatus = String(personal?.hafalanStatus || lastHafObj?.progressStatus || s.cloudHafProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('haf', s.name)) || '').trim();
-            const hafalanCat = window.cleanReportCatatan(personal?.hafalanKeterangan || lastHafObj?.catatan || s.cloudHafCat || '');
+            const bacaanVal = window.cleanReportDetail(
+                bacSource === 'personal' ? (personal?.bacaan || '') : (lastBacObj?.detail || '')
+            );
+            const bacaanStat = String(
+                bacSource === 'personal' ? (personal?.bacaanNilai || '') : (lastBacObj?.status || '')
+            ).trim();
+            const bacaanProgressStatus = String(
+                bacSource === 'personal' ? (personal?.bacaanStatus || '') : (lastBacObj?.progressStatus || '')
+            ).trim();
+            const bacaanCat = window.cleanReportCatatan(
+                bacSource === 'personal' ? (personal?.bacaanKeterangan || '') : (lastBacObj?.catatan || '')
+            );
 
-            const murojaahVal = window.cleanReportDetail(personal?.murojaah || ((liveMur && liveMur !== '-') ? liveMur : (lastMurObj?.detail || (s.lastMurojaah !== '-' ? s.lastMurojaah : ''))));
-            const murojaahStat = String(personal?.murojaahNilai || lastMurObj?.status || s.cloudMurStat || '').trim();
-            const murojaahProgressStatus = String(personal?.murojaahStatus || lastMurObj?.progressStatus || s.cloudMurProgressStatus || window.getProgressStatusFromSlots(window.extractSlotsStructured('mur', s.name)) || '').trim();
-            const murojaahCat = window.cleanReportCatatan(personal?.murojaahKeterangan || lastMurObj?.catatan || s.cloudMurCat || '');
+            const hafalanVal = window.cleanReportDetail(
+                hafSource === 'personal' ? (personal?.hafalan || '') : (lastHafObj?.detail || '')
+            );
+            const hafalanStat = String(
+                hafSource === 'personal' ? (personal?.hafalanNilai || '') : (lastHafObj?.status || '')
+            ).trim();
+            const hafalanProgressStatus = String(
+                hafSource === 'personal' ? (personal?.hafalanStatus || '') : (lastHafObj?.progressStatus || '')
+            ).trim();
+            const hafalanCat = window.cleanReportCatatan(
+                hafSource === 'personal' ? (personal?.hafalanKeterangan || '') : (lastHafObj?.catatan || '')
+            );
 
-            const tugasVal = window.cleanReportDetail(personal?.tugas || lastTugObj?.detail || (s.lastTugas !== '-' ? s.lastTugas : ''));
-            const tugasCat = window.cleanReportCatatan(personal?.tugasKeterangan || lastTugObj?.catatan || s.cloudTugCat || '');
+            const murojaahVal = window.cleanReportDetail(
+                murSource === 'personal' ? (personal?.murojaah || '') : (lastMurObj?.detail || '')
+            );
+            const murojaahStat = String(
+                murSource === 'personal' ? (personal?.murojaahNilai || '') : (lastMurObj?.status || '')
+            ).trim();
+            const murojaahProgressStatus = String(
+                murSource === 'personal' ? (personal?.murojaahStatus || '') : (lastMurObj?.progressStatus || '')
+            ).trim();
+            const murojaahCat = window.cleanReportCatatan(
+                murSource === 'personal' ? (personal?.murojaahKeterangan || '') : (lastMurObj?.catatan || '')
+            );
+
+            const tugasVal = window.cleanReportDetail(
+                tugSource === 'personal' ? (personal?.tugas || '') : (lastTugObj?.detail || '')
+            );
+            const tugasCat = window.cleanReportCatatan(
+                tugSource === 'personal' ? (personal?.tugasKeterangan || '') : (lastTugObj?.catatan || '')
+            );
 
             const isValidText = (txt) => {
                 if (!txt) return false;
@@ -2554,59 +2595,55 @@
             };
 
             let bagianSetoran = "";
+
+            // FORMAT WA PERSONAL — hanya untuk laporan personal/live.
+            // Jangan mengubah generateClassReport() / Laporan Grup WA.
+            // Struktur mengikuti format yang diminta: judul, identitas, 4 bagian setoran,
+            // separator ========, lalu penutup.
+            const separatorPersonal = "========\n";
+
             if (isValidText(bacaanVal)) {
-                bagianSetoran += `📖 *Bacaan:* ${bacaanVal}\n`;
-                if (isValidText(bacaanStat)) bagianSetoran += `   - Nilai: ${bacaanStat}\n`;
-                if (isValidText(bacaanProgressStatus)) bagianSetoran += `   - ${bacaanProgressStatus}\n`;
-                if (isValidText(bacaanCat)) bagianSetoran += `   - Catatan: ${bacaanCat}\n`;
-                bagianSetoran += `_________\n\n`;
+                bagianSetoran += `📖 *Bacaan:*\n`;
+                bagianSetoran += ` ${bacaanVal}\n`;
+                if (isValidText(bacaanStat)) bagianSetoran += `\n   - Nilai: ${bacaanStat}\n`;
+                if (isValidText(bacaanProgressStatus)) bagianSetoran += `\n   - ${bacaanProgressStatus}\n`;
+                if (isValidText(bacaanCat)) bagianSetoran += `\n   - Catatan: ${bacaanCat}\n`;
+                bagianSetoran += `\n${separatorPersonal}`;
             }
+
             if (isValidText(hafalanVal)) {
-                bagianSetoran += `⭐ *Hafalan Baru:* ${hafalanVal}\n`;
-                if (isValidText(hafalanStat)) bagianSetoran += `   - Nilai: ${hafalanStat}\n`;
-                if (isValidText(hafalanProgressStatus)) bagianSetoran += `   - ${hafalanProgressStatus}\n`;
-                if (isValidText(hafalanCat)) bagianSetoran += `   - Catatan: ${hafalanCat}\n`;
-                bagianSetoran += `__________\n\n`;
+                bagianSetoran += `⭐ *Hafalan Baru:*\n`;
+                bagianSetoran += ` ${hafalanVal}\n`;
+                if (isValidText(hafalanStat)) bagianSetoran += `\n   - Nilai: ${hafalanStat}\n`;
+                if (isValidText(hafalanProgressStatus)) bagianSetoran += `\n   - ${hafalanProgressStatus}\n`;
+                if (isValidText(hafalanCat)) bagianSetoran += `\n   - Catatan: ${hafalanCat}\n`;
+                bagianSetoran += `\n${separatorPersonal}`;
             }
+
             if (isValidText(murojaahVal)) {
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:* ${murojaahVal}\n`;
-                if (isValidText(murojaahStat)) bagianSetoran += `   - Nilai: ${murojaahStat}\n`;
-                if (isValidText(murojaahProgressStatus)) bagianSetoran += `   - ${murojaahProgressStatus}\n`;
-                if (isValidText(murojaahCat)) bagianSetoran += `   - Catatan: ${murojaahCat}\n`;
-                bagianSetoran += `__________\n\n`;
+                bagianSetoran += `🔄 *Muroja'ah di Kelas:*\n`;
+                bagianSetoran += ` ${murojaahVal}\n`;
+                if (isValidText(murojaahStat)) bagianSetoran += `\n   - Nilai: ${murojaahStat}\n`;
+                if (isValidText(murojaahProgressStatus)) bagianSetoran += `\n   - ${murojaahProgressStatus}\n`;
+                if (isValidText(murojaahCat)) bagianSetoran += `\n   - Catatan: ${murojaahCat}\n`;
+                bagianSetoran += `\n${separatorPersonal}`;
             }
+
             if (isValidText(tugasVal)) {
                 bagianSetoran += `📝 *Tugas:* ${tugasVal}\n`;
-                if (isValidText(tugasCat)) bagianSetoran += `   - Catatan: ${tugasCat}\n`;
-                bagianSetoran += `_______________\n\n`;
+                if (isValidText(tugasCat)) bagianSetoran += `\n   - Catatan: ${tugasCat}\n`;
+                bagianSetoran += `\n${separatorPersonal}`;
             }
 
-            // Bersihkan tanggal/timestamp hanya dari bagian setoran WA Personal.
-            // Materi di laporan utama tetap utuh dan tidak disentuh.
             bagianSetoran = window.cleanWaReportSection(bagianSetoran);
 
-            // Laporan utama tetap mengikuti pengaturan Materi di menu Laporan.
-            // Live Laporan WA sengaja TIDAK menampilkan Materi Belajar maupun Materi Tambahan.
-            const bagianSetoranLive = bagianSetoran;
-            const includeMateriWa = document.getElementById('includeMateriWaCheckbox')?.checked ?? true;
-            const includeTambahanWa = document.getElementById('includeTambahanWaCheckbox')?.checked ?? true;
-            bagianSetoran = window.appendReportMateriSection(bagianSetoran, s.class, includeMateriWa, includeTambahanWa);
-
-            const reportHeader = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n______________\n\n`;
+            const reportHeader = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n${separatorPersonal}`;
             const reportFooter = `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
 
-            // Pesan untuk menu Laporan utama (materi tetap ada sesuai checkbox).
-            let fullMsg = reportHeader;
-            if (bagianSetoran) fullMsg += `${bagianSetoran}`;
-            // Jika belum ada input/setoran, jangan tampilkan kalimat pengganti.
-            // Biarkan bagian setoran kosong sesuai permintaan.
-            fullMsg += reportFooter;
-
-            // Pesan Live WA (tanpa Materi/Materi Tambahan).
-            let liveFullMsg = reportHeader;
-            if (bagianSetoranLive) liveFullMsg += `${bagianSetoranLive}`;
-            // Jika belum ada input/setoran, jangan tampilkan kalimat pengganti.
-            liveFullMsg += reportFooter;
+            // Laporan WA Personal di menu dan Live memakai format yang sama.
+            // Materi/Materi Tambahan TIDAK dimasukkan ke WA Personal sesuai format baru.
+            const fullMsg = reportHeader + (bagianSetoran || '') + reportFooter;
+            const liveFullMsg = fullMsg;
 
             const previewEl = document.getElementById('waMessagePreview');
             const inlinePreviewEl = document.getElementById('waMessagePreviewInline');
@@ -2631,11 +2668,6 @@
                     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             }
-        };
-
-        window.refreshInlineWaReport = function() {
-            if (window.inlineLiveReportType === 'kelas') window.generateClassReport();
-            else if (window.selectedWaSantriName) window.generateWaReport();
         };
 
         window.toggleInlineLiveReport = function() {
