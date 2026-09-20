@@ -2594,55 +2594,49 @@
                 return trimmed !== '' && trimmed !== '-' && trimmed !== 'undefined' && trimmed !== 'null';
             };
 
-            let bagianSetoran = "";
-
             // FORMAT WA PERSONAL — hanya untuk laporan personal/live.
-            // Jangan mengubah generateClassReport() / Laporan Grup WA.
-            // Struktur mengikuti format yang diminta: judul, identitas, 4 bagian setoran,
-            // separator ========, lalu penutup.
-            const separatorPersonal = "========\n";
+            // JANGAN mengubah generateClassReport() / Laporan Grup WA.
+            // Struktur dibuat mengikuti contoh user: separator di awal dan antarbagian,
+            // tanpa separator setelah Tugas.
+            const personalSections = [];
 
             if (isValidText(bacaanVal)) {
-                bagianSetoran += `📖 *Bacaan:*\n`;
-                bagianSetoran += ` ${bacaanVal}\n`;
-                if (isValidText(bacaanStat)) bagianSetoran += `\n   - Nilai: ${bacaanStat}\n`;
-                if (isValidText(bacaanProgressStatus)) bagianSetoran += `\n   - ${bacaanProgressStatus}\n`;
-                if (isValidText(bacaanCat)) bagianSetoran += `\n   - Catatan: ${bacaanCat}\n`;
-                bagianSetoran += `\n${separatorPersonal}`;
+                let section = `📖 *Bacaan:*\n\n ${bacaanVal}`;
+                if (isValidText(bacaanStat)) section += `\n\n   - Nilai: ${bacaanStat}`;
+                if (isValidText(bacaanProgressStatus)) section += `\n\n   - ${bacaanProgressStatus}`;
+                if (isValidText(bacaanCat)) section += `\n\n   - Catatan: ${bacaanCat}`;
+                personalSections.push(section);
             }
 
             if (isValidText(hafalanVal)) {
-                bagianSetoran += `⭐ *Hafalan Baru:*\n`;
-                bagianSetoran += ` ${hafalanVal}\n`;
-                if (isValidText(hafalanStat)) bagianSetoran += `\n   - Nilai: ${hafalanStat}\n`;
-                if (isValidText(hafalanProgressStatus)) bagianSetoran += `\n   - ${hafalanProgressStatus}\n`;
-                if (isValidText(hafalanCat)) bagianSetoran += `\n   - Catatan: ${hafalanCat}\n`;
-                bagianSetoran += `\n${separatorPersonal}`;
+                let section = `⭐ *Hafalan Baru:*\n\n${hafalanVal}`;
+                if (isValidText(hafalanStat)) section += `\n\n   - Nilai: ${hafalanStat}`;
+                if (isValidText(hafalanProgressStatus)) section += `\n\n   - ${hafalanProgressStatus}`;
+                if (isValidText(hafalanCat)) section += `\n\n   - Catatan: ${hafalanCat}`;
+                personalSections.push(section);
             }
 
             if (isValidText(murojaahVal)) {
-                bagianSetoran += `🔄 *Muroja'ah di Kelas:*\n`;
-                bagianSetoran += ` ${murojaahVal}\n`;
-                if (isValidText(murojaahStat)) bagianSetoran += `\n   - Nilai: ${murojaahStat}\n`;
-                if (isValidText(murojaahProgressStatus)) bagianSetoran += `\n   - ${murojaahProgressStatus}\n`;
-                if (isValidText(murojaahCat)) bagianSetoran += `\n   - Catatan: ${murojaahCat}\n`;
-                bagianSetoran += `\n${separatorPersonal}`;
+                let section = `🔄 *Muroja'ah di Kelas:*\n\n${murojaahVal}`;
+                if (isValidText(murojaahStat)) section += `\n\n   - Nilai: ${murojaahStat}`;
+                if (isValidText(murojaahProgressStatus)) section += `\n\n   - ${murojaahProgressStatus}`;
+                if (isValidText(murojaahCat)) section += `\n\n   - Catatan: ${murojaahCat}`;
+                personalSections.push(section);
             }
 
             if (isValidText(tugasVal)) {
-                bagianSetoran += `📝 *Tugas:* ${tugasVal}\n`;
-                if (isValidText(tugasCat)) bagianSetoran += `\n   - Catatan: ${tugasCat}\n`;
-                bagianSetoran += `\n${separatorPersonal}`;
+                let section = `📝 *Tugas:* ${tugasVal}`;
+                if (isValidText(tugasCat)) section += `\n\n   - Catatan: ${tugasCat}`;
+                personalSections.push(section);
             }
 
-            bagianSetoran = window.cleanWaReportSection(bagianSetoran);
-
-            const reportHeader = `*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n____________________\n*Nama:* *${s.name}*\n*Kelas:* *${s.class}*\n✍️ *Pengajar:* ${s.teacher}\n${separatorPersonal}`;
+            const bagianSetoran = personalSections.join('\n\n========\n\n');
+            const reportHeader = `========\n\n*LAPORAN PRESTASI SANTRI*\n\n*Rumah Qur'an Al-Khansa*\n\n========\n\n*Nama:* *${s.name}*\n\n*Kelas:* *${s.class}*\n\n✍️ *Pengajar:* ${s.teacher}\n\n========`;
             const reportFooter = `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
 
             // Laporan WA Personal di menu dan Live memakai format yang sama.
             // Materi/Materi Tambahan TIDAK dimasukkan ke WA Personal sesuai format baru.
-            const fullMsg = reportHeader + (bagianSetoran || '') + reportFooter;
+            const fullMsg = reportHeader + (bagianSetoran ? `\n\n${bagianSetoran}` : '') + `\n\n${reportFooter}`;
             const liveFullMsg = fullMsg;
 
             const previewEl = document.getElementById('waMessagePreview');
