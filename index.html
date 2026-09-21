@@ -2553,9 +2553,13 @@
                 const parsed = Date.parse(String(raw || ''));
                 return Number.isFinite(parsed) ? parsed : 0;
             };
+            // GOOGLE SHEET menjadi sumber data utama untuk Laporan WA Personal.
+            // localStorage hanya dipakai sebagai fallback bila baris santri belum
+            // tersedia di snapshot laporan_wa_personal. Dengan demikian HP dan
+            // laptop tidak lagi memilih data berdasarkan cache lokal masing-masing.
             const chooseLatest = (personalTime, localObj) => {
-                const localTime = Number(localObj?.rawTime || 0);
-                return personalTime > localTime ? 'personal' : (localObj ? 'local' : 'personal');
+                if (personal) return 'personal';
+                return localObj ? 'local' : 'personal';
             };
 
             const liveBac = window.extractSlotEntries('bac', s.name);
@@ -2675,6 +2679,7 @@
             const inlinePreviewEl = document.getElementById('waMessagePreviewInline');
             if (previewEl) previewEl.value = fullMsg;
             if (inlinePreviewEl) inlinePreviewEl.value = liveFullMsg;
+            window.setReportSheetStatus('personal');
         };
 
         window.selectInlineWaSantri = function(santriName, keepScroll = false) {
@@ -2835,6 +2840,7 @@
             
             await window.fetchAllDataFromCloud();
             window.generateWaReport();
+            window.setReportSheetStatus('personal');
             
             if (btn) {
                 btn.innerHTML = `<i class="fa-solid fa-check"></i> Alhamdulillah`;
@@ -2928,17 +2934,20 @@
 
                 // Prioritas: Google Sheet snapshot. Fallback: cache lama.
                 // Hanya empat field ini yang dibaca; Nilai/Keterangan tidak ikut.
+                // Jika snapshot Google Sheet tersedia, gunakan NILAI DARI SHEET
+                // meskipun field-nya kosong. Fallback localStorage hanya ketika
+                // baris santri tersebut belum ada di laporan_grup_wa.
                 const bacaanVal = window.cleanReportDetail(
-                    cloudReport?.bacaan || (sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''))
+                    cloudReport ? cloudReport.bacaan : (sBac ? sBac.detail : (s.lastBacaan !== '-' ? s.lastBacaan : ''))
                 );
                 const hafalanVal = window.cleanReportDetail(
-                    cloudReport?.hafalan || (sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''))
+                    cloudReport ? cloudReport.hafalan : (sHaf ? sHaf.detail : (s.lastHafalan !== '-' ? s.lastHafalan : ''))
                 );
                 const murojaahVal = window.cleanReportDetail(
-                    cloudReport?.murojaah || (sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''))
+                    cloudReport ? cloudReport.murojaah : (sMur ? sMur.detail : (s.lastMurojaah !== '-' ? s.lastMurojaah : ''))
                 );
                 const tugasVal = window.cleanReportDetail(
-                    cloudReport?.tugas || (sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : ''))
+                    cloudReport ? cloudReport.tugas : (sTug ? sTug.detail : (s.lastTugas !== '-' ? s.lastTugas : ''))
                 );
 
                 let hasAnySetoran = (bacaanVal && bacaanVal !== '-') || (hafalanVal && hafalanVal !== '-') || (murojaahVal && murojaahVal !== '-') || (tugasVal && tugasVal !== '-');
@@ -2962,6 +2971,7 @@
             if (classPreview) classPreview.value = msg;
             const originalClassPreview = document.getElementById('classReportMessagePreview');
             if (originalClassPreview && originalClassPreview !== classPreview) originalClassPreview.value = msg;
+            window.setReportSheetStatus('group');
         };
 
         window.refreshClassReport = async function() {
@@ -2970,6 +2980,7 @@
 
             await window.fetchAllDataFromCloud();
             window.generateClassReport();
+            window.setReportSheetStatus('group');
 
             if (btn) {
                 btn.innerHTML = `<i class="fa-solid fa-check"></i> Alhamdulillah`;
@@ -3032,6 +3043,86 @@
             }
         };
 
+        // ============================================================
+        // STATUS KESESUAIAN LAPORAN DENGAN GOOGLE SHEET
+        // Hanya membaca snapshot laporan yang sudah dikirim oleh Google Sheet.
+        // Tidak mengubah data laporan, histori, Firebase, atau fitur input.
+        // ============================================================
+        window.getReportSheetRowForSantri = function(santri) {
+            if (!santri) return null;
+            const rows = Array.isArray(window._laporanWaPersonalCloud) ? window._laporanWaPersonalCloud : [];
+            const id = String(santri.id || '').trim().toLowerCase();
+            const name = String(santri.name || '').trim().toLowerCase();
+            const kelas = String(santri.class || '').trim().toLowerCase();
+            return rows.find(r => String(r?.id || '').trim().toLowerCase() === id && id)
+                || rows.find(r => String(r?.name || '').trim().toLowerCase() === name && String(r?.class || '').trim().toLowerCase() === kelas)
+                || null;
+        };
+
+        window.getGroupReportSheetRowForSantri = function(santri) {
+            if (!santri) return null;
+            const rows = Array.isArray(window._laporanGrupWaCloud) ? window._laporanGrupWaCloud : [];
+            const id = String(santri.id || '').trim().toLowerCase();
+            const name = String(santri.name || '').trim().toLowerCase();
+            const kelas = String(santri.class || '').trim().toLowerCase();
+            return rows.find(r => String(r?.id || '').trim().toLowerCase() === id && id)
+                || rows.find(r => String(r?.name || '').trim().toLowerCase() === name && String(r?.class || '').trim().toLowerCase() === kelas)
+                || null;
+        };
+
+        window.setReportSheetStatus = function(type) {
+            const isPersonal = type === 'personal';
+            const box = document.getElementById(isPersonal ? 'waSheetSyncStatus' : 'classSheetSyncStatus');
+            const bar = document.getElementById(isPersonal ? 'waSheetSyncProgress' : 'classSheetSyncProgress');
+            const text = document.getElementById(isPersonal ? 'waSheetSyncText' : 'classSheetSyncText');
+            const detail = document.getElementById(isPersonal ? 'waSheetSyncDetail' : 'classSheetSyncDetail');
+            if (!box || !bar || !text || !detail) return;
+
+            let percent = 0;
+            let title = 'Menunggu data Google Sheet...';
+            let detailText = 'Belum ada data laporan yang dimuat dari Google Sheet.';
+            let stateClass = 'border-slate-300 bg-slate-50 text-slate-600';
+            let barClass = 'bg-slate-400';
+
+            if (isPersonal) {
+                const selected = (window.santriList || []).find(s => s.name === window.selectedWaSantriName);
+                const row = window.getReportSheetRowForSantri(selected);
+                const hasSheet = Array.isArray(window._laporanWaPersonalCloud);
+                if (hasSheet && selected) {
+                    percent = row ? 100 : 0;
+                    title = row ? '100% — Sesuai Google Sheet' : '0% — Belum ditemukan di Google Sheet';
+                    detailText = row
+                        ? `Data ${selected.name} ditemukan pada laporan_wa_personal.`
+                        : `Data ${selected.name} belum ditemukan pada laporan_wa_personal.`;
+                    stateClass = row ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-amber-300 bg-amber-50 text-amber-800';
+                    barClass = row ? 'bg-emerald-500' : 'bg-amber-500';
+                }
+            } else {
+                const cls = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
+                const list = (window.santriList || []).filter(s => s.class === cls);
+                const rowsLoaded = Array.isArray(window._laporanGrupWaCloud);
+                const matched = list.filter(s => !!window.getGroupReportSheetRowForSantri(s)).length;
+                percent = list.length ? Math.round((matched / list.length) * 100) : (rowsLoaded ? 100 : 0);
+                if (rowsLoaded && list.length) {
+                    title = percent === 100 ? '100% — Sesuai Google Sheet' : `${percent}% — Belum 100%`;
+                    detailText = `${matched}/${list.length} santri kelas ${cls} ditemukan pada laporan_grup_wa.`;
+                    stateClass = percent === 100 ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-amber-300 bg-amber-50 text-amber-800';
+                    barClass = percent === 100 ? 'bg-emerald-500' : 'bg-amber-500';
+                }
+            }
+
+            box.className = `flex items-center gap-3 p-3 rounded-xl border ${stateClass}`;
+            bar.className = `h-2 rounded-full transition-all duration-500 ${barClass}`;
+            bar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+            text.textContent = title;
+            detail.textContent = detailText;
+        };
+
+        window.refreshReportSheetStatuses = function() {
+            window.setReportSheetStatus('personal');
+            window.setReportSheetStatus('group');
+        };
+
         window.switchLaporanSubTab = function(sub) {
             ['wa', 'kelas'].forEach(s => {
                 const tabEl = document.getElementById(`laporanTabContent-${s}`);
@@ -3060,6 +3151,7 @@
         window.filterWaClassReport = function(cls) {
             window.reportWaClassFilter = cls;
             window.renderWaCardGrid(cls);
+            window.setReportSheetStatus('personal');
         };
 
         window.renderWaCardGrid = function(cls) {
@@ -4451,7 +4543,7 @@
                     </div>
                     <div class="flex items-center gap-2 flex-wrap justify-start w-full">
                         <button onclick="window.switchLaporanSubTab('wa')" id="btnLaporanSub-wa" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-600 text-white shadow-md shrink-0 transition-all">WA Personal</button>
-                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Kelas</button>
+                        <button onclick="window.switchLaporanSubTab('kelas')" id="btnLaporanSub-kelas" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 transition-all">Laporan Grup WA</button>
                     </div>
                 </div>
 
@@ -4463,6 +4555,23 @@
                         <button id="waRefreshBtn" onclick="window.refreshWaReport()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-black shadow-xs flex items-center gap-1.5 transition active:scale-95">
                             <i class="fa-solid fa-rotate"></i> Refresh Data
                         </button>
+                    </div>
+                    <div id="waSheetSyncStatus" class="flex flex-col gap-2 p-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-600">
+                        <div class="flex items-center justify-between gap-3 flex-wrap">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <i class="fa-solid fa-database"></i>
+                                <div class="min-w-0">
+                                    <div id="waSheetSyncText" class="font-black text-xs sm:text-sm">Menunggu data Google Sheet...</div>
+                                    <div id="waSheetSyncDetail" class="text-[10px] sm:text-xs font-bold opacity-80 mt-0.5">Belum ada data laporan yang dimuat dari Google Sheet.</div>
+                                </div>
+                            </div>
+                            <a href="https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=952420861#gid=952420861" target="_blank" rel="noopener noreferrer" title="Buka Google Sheet Laporan WA Personal" class="shrink-0 px-3 py-2 bg-white dark:bg-slate-800 border rounded-xl font-black text-xs shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <i class="fa-solid fa-link"></i> Sheet
+                            </a>
+                        </div>
+                        <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div id="waSheetSyncProgress" class="h-2 rounded-full transition-all duration-500 bg-slate-400" style="width:0%"></div>
+                        </div>
                     </div>
 
                     <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border">
@@ -4523,6 +4632,23 @@
                         <button id="classRefreshBtn" onclick="window.refreshClassReport()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-black shadow-xs flex items-center gap-1.5 transition active:scale-95">
                             <i class="fa-solid fa-rotate"></i> Refresh Data
                         </button>
+                    </div>
+                    <div id="classSheetSyncStatus" class="flex flex-col gap-2 p-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-600">
+                        <div class="flex items-center justify-between gap-3 flex-wrap">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <i class="fa-solid fa-database"></i>
+                                <div class="min-w-0">
+                                    <div id="classSheetSyncText" class="font-black text-xs sm:text-sm">Menunggu data Google Sheet...</div>
+                                    <div id="classSheetSyncDetail" class="text-[10px] sm:text-xs font-bold opacity-80 mt-0.5">Belum ada data laporan yang dimuat dari Google Sheet.</div>
+                                </div>
+                            </div>
+                            <a href="https://docs.google.com/spreadsheets/d/1IOyHLFVH773lA6B8uOi8G0kPBk6eIjhCV03gD6CC0II/edit?gid=1571458770#gid=1571458770" target="_blank" rel="noopener noreferrer" title="Buka Google Sheet Laporan Grup WA" class="shrink-0 px-3 py-2 bg-white dark:bg-slate-800 border rounded-xl font-black text-xs shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <i class="fa-solid fa-link"></i> Sheet
+                            </a>
+                        </div>
+                        <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div id="classSheetSyncProgress" class="h-2 rounded-full transition-all duration-500 bg-slate-400" style="width:0%"></div>
+                        </div>
                     </div>
                     <div class="flex items-center justify-between flex-wrap gap-3">
                         <h4 class="font-black text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">Rekapitulasi Per Kelas & Materi Belajar</h4>
