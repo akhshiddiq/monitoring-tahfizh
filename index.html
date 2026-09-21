@@ -1036,6 +1036,10 @@
                         ? cloudData.laporan_wa_personal
                         : [];
 
+                    // Metadata checksum dari Google Apps Script.
+                    // Dipakai HANYA untuk memverifikasi Web ↔ Google Sheet.
+                    window._laporanWaSyncMeta = cloudData.laporan_sync || null;
+
                     const fingerprint = JSON.stringify({
                         b: cloudData.input_bacaan || [],
                         h: cloudData.input_hafalan || [],
@@ -1049,6 +1053,10 @@
                     });
                     const cloudChanged = forceRender || fingerprint !== window._cloudFingerprint;
                     window._cloudFingerprint = fingerprint;
+                    // Refresh indikator exact sync setelah data + checksum diterima.
+                    if (typeof window.refreshReportSheetStatuses === 'function') {
+                        setTimeout(() => window.refreshReportSheetStatuses(), 0);
+                    }
                     window._riwayatInputCloud = Array.isArray(cloudData.riwayat_input) ? cloudData.riwayat_input : [];
                     if (Array.isArray(cloudData.santri) && cloudData.santri.length > 0) {
                         window.santriList = window.normalizeSantriMaster(cloudData.santri);
@@ -3070,6 +3078,87 @@
                 || null;
         };
 
+        // ============================================================
+        // VERIFIKASI EXACT SYNC WEB ↔ GOOGLE SHEET — LAPORAN WA
+        // Algoritma harus identik dengan GAS agar 100% berarti checksum
+        // snapshot yang diterima browser sama dengan checksum dari Sheet.
+        // ============================================================
+        window.reportSyncValue = function(value) {
+            if (value === null || value === undefined) return '';
+            return String(value);
+        };
+
+        window.reportSyncHash = function(parts) {
+            const text = parts.map(window.reportSyncValue).join('\u001F');
+            let hash = 2166136261;
+            for (let i = 0; i < text.length; i++) {
+                hash ^= text.charCodeAt(i);
+                hash = Math.imul(hash, 16777619);
+            }
+            return (hash >>> 0).toString(16).padStart(8, '0');
+        };
+
+        window.reportPersonalRowHash = function(row) {
+            return window.reportSyncHash([
+                row?.id, row?.name, row?.class, row?.teacher, row?.tanggal,
+                row?.bacaan, row?.bacaanNilai, row?.bacaanStatus, row?.bacaanKeterangan, row?.bacaanTimestamp,
+                row?.hafalan, row?.hafalanNilai, row?.hafalanStatus, row?.hafalanKeterangan, row?.hafalanTimestamp,
+                row?.murojaah, row?.murojaahNilai, row?.murojaahStatus, row?.murojaahKeterangan, row?.murojaahTimestamp,
+                row?.tugas, row?.tugasKeterangan, row?.tugasTimestamp, row?.lastUpdated
+            ]);
+        };
+
+        window.reportGroupRowHash = function(row) {
+            return window.reportSyncHash([
+                row?.id, row?.name, row?.class, row?.teacher,
+                row?.bacaan, row?.bacaanTimestamp,
+                row?.hafalan, row?.hafalanTimestamp,
+                row?.murojaah, row?.murojaahTimestamp,
+                row?.tugas, row?.tugasTimestamp,
+                row?.lastUpdated
+            ]);
+        };
+
+        window.getPersonalReportSyncResult = function(row) {
+            const meta = window._laporanWaSyncMeta?.personal;
+            if (!meta || !row) return { checked: false, percent: 0 };
+            const key = String(row.id || row.name || '').trim().toLowerCase();
+            const serverHash = meta.rows?.[key] || '';
+            const clientHash = window.reportPersonalRowHash(row);
+            return {
+                checked: true,
+                match: !!serverHash && serverHash === clientHash,
+                serverHash,
+                clientHash
+            };
+        };
+
+        window.getGroupReportSyncResult = function(className) {
+            const meta = window._laporanWaSyncMeta?.group;
+            if (!meta) return { checked: false, percent: 0, matched: 0, total: 0 };
+            const key = String(className || '').trim().toLowerCase();
+            const serverClass = meta.classes?.[key];
+            const rows = (Array.isArray(window._laporanGrupWaCloud) ? window._laporanGrupWaCloud : [])
+                .filter(r => String(r?.class || '').trim().toLowerCase() === key)
+                .slice()
+                .sort((a, b) => {
+                    const ka = String(a?.id || a?.name || '').trim().toLowerCase();
+                    const kb = String(b?.id || b?.name || '').trim().toLowerCase();
+                    return ka.localeCompare(kb);
+                });
+            const clientHash = window.reportSyncHash(rows.map(window.reportGroupRowHash));
+            const total = rows.length;
+            const serverTotal = Number(serverClass?.rowCount || 0);
+            return {
+                checked: true,
+                match: !!serverClass && serverTotal === total && serverClass.hash === clientHash,
+                serverHash: serverClass?.hash || '',
+                clientHash,
+                matched: serverTotal === total && serverClass?.hash === clientHash ? total : 0,
+                total
+            };
+        };
+
         window.setReportSheetStatus = function(type) {
             const isPersonal = type === 'personal';
             const box = document.getElementById(isPersonal ? 'waSheetSyncStatus' : 'classSheetSyncStatus');
@@ -3079,35 +3168,56 @@
             if (!box || !bar || !text || !detail) return;
 
             let percent = 0;
-            let title = 'Menunggu data Google Sheet...';
-            let detailText = 'Belum ada data laporan yang dimuat dari Google Sheet.';
+            let title = 'Menunggu verifikasi Google Sheet...';
+            let detailText = 'Belum ada checksum laporan dari Google Apps Script.';
             let stateClass = 'border-slate-300 bg-slate-50 text-slate-600';
             let barClass = 'bg-slate-400';
 
             if (isPersonal) {
                 const selected = (window.santriList || []).find(s => s.name === window.selectedWaSantriName);
                 const row = window.getReportSheetRowForSantri(selected);
-                const hasSheet = Array.isArray(window._laporanWaPersonalCloud);
-                if (hasSheet && selected) {
-                    percent = row ? 100 : 0;
-                    title = row ? '100% — Sesuai Google Sheet' : '0% — Belum ditemukan di Google Sheet';
-                    detailText = row
-                        ? `Data ${selected.name} ditemukan pada laporan_wa_personal.`
-                        : `Data ${selected.name} belum ditemukan pada laporan_wa_personal.`;
-                    stateClass = row ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-amber-300 bg-amber-50 text-amber-800';
-                    barClass = row ? 'bg-emerald-500' : 'bg-amber-500';
+                const result = window.getPersonalReportSyncResult(row);
+
+                if (result.checked && row) {
+                    percent = result.match ? 100 : 0;
+                    title = result.match
+                        ? '100% — Data Web = Google Sheet'
+                        : '0% — Data Web berbeda dari Google Sheet';
+                    detailText = result.match
+                        ? `Checksum cocok untuk ${selected.name}. Data laporan personal identik dengan snapshot Google Sheet.`
+                        : `Checksum tidak cocok untuk ${selected.name}. Silakan Refresh Data dari Google Sheet.`;
+                    stateClass = result.match
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                        : 'border-rose-300 bg-rose-50 text-rose-800';
+                    barClass = result.match ? 'bg-emerald-500' : 'bg-rose-500';
+                } else if (Array.isArray(window._laporanWaPersonalCloud) && selected) {
+                    percent = 0;
+                    title = '0% — Data belum ditemukan di Google Sheet';
+                    detailText = `${selected.name} belum memiliki baris pada laporan_wa_personal.`;
+                    stateClass = 'border-amber-300 bg-amber-50 text-amber-800';
+                    barClass = 'bg-amber-500';
                 }
             } else {
                 const cls = document.getElementById('reportClassSelect')?.value || 'Abdurrahman';
-                const list = (window.santriList || []).filter(s => s.class === cls);
-                const rowsLoaded = Array.isArray(window._laporanGrupWaCloud);
-                const matched = list.filter(s => !!window.getGroupReportSheetRowForSantri(s)).length;
-                percent = list.length ? Math.round((matched / list.length) * 100) : (rowsLoaded ? 100 : 0);
-                if (rowsLoaded && list.length) {
-                    title = percent === 100 ? '100% — Sesuai Google Sheet' : `${percent}% — Belum 100%`;
-                    detailText = `${matched}/${list.length} santri kelas ${cls} ditemukan pada laporan_grup_wa.`;
-                    stateClass = percent === 100 ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-amber-300 bg-amber-50 text-amber-800';
-                    barClass = percent === 100 ? 'bg-emerald-500' : 'bg-amber-500';
+                const result = window.getGroupReportSyncResult(cls);
+                if (result.checked) {
+                    percent = result.match ? 100 : 0;
+                    title = result.match
+                        ? '100% — Data Web = Google Sheet'
+                        : '0% — Data Web berbeda dari Google Sheet';
+                    detailText = result.match
+                        ? `Checksum cocok untuk kelas ${cls}: ${result.total} santri dibandingkan.`
+                        : `Checksum kelas ${cls} tidak cocok. Silakan Refresh Data dari Google Sheet.`;
+                    stateClass = result.match
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                        : 'border-rose-300 bg-rose-50 text-rose-800';
+                    barClass = result.match ? 'bg-emerald-500' : 'bg-rose-500';
+                } else if (Array.isArray(window._laporanGrupWaCloud)) {
+                    percent = 0;
+                    title = '0% — Menunggu checksum Google Sheet';
+                    detailText = 'Data laporan Grup sudah dimuat, tetapi verifikasi belum tersedia.';
+                    stateClass = 'border-amber-300 bg-amber-50 text-amber-800';
+                    barClass = 'bg-amber-500';
                 }
             }
 
