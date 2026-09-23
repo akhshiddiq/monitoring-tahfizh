@@ -266,7 +266,7 @@
             { id: "IDSRQ088", name: "Muhammad Gibran Adyastha", class: "Abdurrahman", teacher: "Kak Sidik", phone: "+6285774042121", gender: "L" }
         ];
 
-        window.selectedClass = 'Abdurrahman';
+        window.selectedClass = 'ALL';
         window.itemSourceMode = {};
         window.itemSlotStatus = {};
         window.activeSlotState = {};
@@ -4378,9 +4378,10 @@
         <section id="section-setoran" class="space-y-4">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3.5">
                 <div class="w-full sm:w-auto flex items-center gap-2.5">
-                    <span class="text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Pilih Kelas:</span>
+                    <span class="text-xs sm:text-sm font-black text-slate-700 dark:text-slate-300">Pencarian Kelas:</span>
                     <select id="classFilterSelect" onchange="window.filterByClass(this.value)" class="bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-black rounded-xl px-3.5 py-2.5 outline-none cursor-pointer flex-1 sm:flex-none">
-                        <option value="Abdurrahman" selected>Abdurrahman</option>
+                        <option value="ALL" selected>Semua Kelas</option>
+                        <option value="Abdurrahman">Abdurrahman</option>
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
                         <option value="Zubair">Zubair</option>
                         <option value="Ali">Ali</option>
@@ -4390,7 +4391,6 @@
                         <option value="Hamzah">Hamzah</option>
                         <option value="Fatimah">Fatimah</option>
                         <option value="Umar">Umar</option>
-                        <option value="ALL">Semua Kelas</option>
                     </select>
                 </div>
                 <div class="flex items-center gap-2.5 w-full sm:w-auto justify-center sm:justify-end flex-wrap">
@@ -4448,7 +4448,8 @@
                         </div>
                     </div>
                     <select id="santriSidebarClassFilter" onchange="window.filterByClass(this.value)" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-xs outline-none cursor-pointer min-h-[44px]">
-                        <option value="Abdurrahman" selected>Abdurrahman</option>
+                        <option value="ALL" selected>Semua Kelas</option>
+                        <option value="Abdurrahman">Abdurrahman</option>
                         <option value="Abu Ubaidah">Abu Ubaidah</option>
                         <option value="Zubair">Zubair</option>
                         <option value="Ali">Ali</option>
@@ -4458,9 +4459,8 @@
                         <option value="Hamzah">Hamzah</option>
                         <option value="Fatimah">Fatimah</option>
                         <option value="Umar">Umar</option>
-                        <option value="ALL">Semua Kelas</option>
                     </select>
-                    <div id="santriKotakContainer" class="grid grid-cols-1 gap-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar p-1"></div>
+                    <div id="santriKotakContainer class="grid grid-cols-1 gap-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar p-1"></div>
                 </aside>
 
                 <div id="santriGridContainer" class="space-y-4 min-w-0"></div>
