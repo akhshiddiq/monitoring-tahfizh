@@ -663,51 +663,98 @@
 
         window._laporanSantriSelectedName = '';
 
+        // Mesin pencarian Laporan Pekan dibuat mandiri agar tidak bergantung
+        // pada pencarian/menu Input. Sumber tetap master santri yang sudah ada.
+        // ============================================================
+        // PENCARIAN SANTRI LAPORAN PEKAN
+        // Mengikuti pola mesin pencarian pada menu Input:
+        // input nama + tombol X + filter kelas + daftar hasil.
+        // ============================================================
+        window._laporanSantriSelectedName = '';
+        window._laporanSantriSearchQuery = '';
+
         window._laporanSantriGetCandidateList = function() {
             const classEl = document.getElementById('laporanSantriClassFilter');
-            const cls = classEl?.value || 'SEMUA KELAS';
-            return (window.santriList || [])
-                .filter(s => cls === 'SEMUA KELAS' || String(s.class || '').trim() === cls)
-                .sort((a,b) => String(a.name || '').localeCompare(String(b.name || '')));
+            const cls = String(classEl?.value || 'ALL').trim() || 'ALL';
+            let source = Array.isArray(window.santriList) ? window.santriList : [];
+            if (!source.length) {
+                try {
+                    const cached = JSON.parse(localStorage.getItem('rq_santri_master') || '[]');
+                    source = typeof window.normalizeSantriMaster === 'function'
+                        ? window.normalizeSantriMaster(cached)
+                        : cached;
+                } catch (_) { source = []; }
+            }
+            return source.map(s => ({
+                ...s,
+                name: String(s?.name ?? s?.nama ?? '').trim(),
+                class: String(s?.class ?? s?.kelas ?? '').trim(),
+                teacher: String(s?.teacher ?? s?.guru ?? '').trim()
+            })).filter(s => s.name)
+              .filter(s => cls === 'ALL' || s.class.toLowerCase() === cls.toLowerCase())
+              .sort((a,b) => a.name.localeCompare(b.name, 'id'));
+        };
+
+        window._laporanSantriRenderSearchResults = function(query) {
+            const box = document.getElementById('laporanSantriSearchResults');
+            if (!box) return [];
+            const q = String(query || '').trim().toLowerCase();
+            const candidates = window._laporanSantriGetCandidateList();
+            const matches = q ? candidates.filter(s => s.name.toLowerCase().includes(q)) : [];
+
+            if (!q) {
+                box.innerHTML = '';
+                box.classList.add('hidden');
+                return [];
+            }
+            box.classList.remove('hidden');
+            if (!candidates.length) {
+                box.innerHTML = '<div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500 text-center">Data santri belum tersedia. Silakan tekan Refresh Data.</div>';
+                return [];
+            }
+            if (!matches.length) {
+                box.innerHTML = '<div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500 text-center">Nama santri tidak ditemukan.</div>';
+                return [];
+            }
+
+            const esc = window._laporanSantriEscape;
+            box.innerHTML = matches.map(s => `
+                <button type="button" data-laporan-santri-name="${esc(s.name)}"
+                    class="laporan-santri-search-result w-full p-2.5 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/60 border-2 border-sky-200 dark:border-sky-800 rounded-xl font-bold text-[10px] text-sky-950 dark:text-sky-200 text-left transition mb-2 last:mb-0">
+                    <span class="block leading-snug break-words">${esc(s.name)}</span>
+                    <span class="block mt-0.5 text-[9px] font-black text-slate-500 dark:text-slate-400">${esc(s.class || 'Tanpa Kelas')}</span>
+                </button>`).join('');
+            return matches;
         };
 
         window.searchLaporanSantriPekan = function(value) {
-            const q = String(value || '').trim().toLowerCase();
-            const box = document.getElementById('laporanSantriSearchResults');
-            if (!box) return;
-            // Ketik langsung menampilkan hasil; tombol Cari/Enter juga menjalankan fungsi yang sama.
-            window._laporanSantriSearchQuery = q;
+            const q = String(value || '').trim();
+            window._laporanSantriSearchQuery = q.toLowerCase();
             if (!q) {
-                box.innerHTML = '<div class="p-3 text-[10px] font-bold text-slate-500 text-center">Ketik nama santri, lalu tekan Cari.</div>';
                 window._laporanSantriSelectedName = '';
                 const hidden = document.getElementById('laporanSantriNameFilter');
                 if (hidden) hidden.value = 'SEMUA SANTRI';
-                return;
             }
-            window.runLaporanSantriPekanSearch();
+            window._laporanSantriRenderSearchResults(q);
         };
 
         window.runLaporanSantriPekanSearch = function() {
             const input = document.getElementById('laporanSantriSearchInput');
-            const box = document.getElementById('laporanSantriSearchResults');
-            if (!input || !box) return;
-            const q = String(input.value || '').trim().toLowerCase();
-            const candidates = window._laporanSantriGetCandidateList();
-            const matches = q ? candidates.filter(s => String(s.name || '').toLowerCase().includes(q)).slice(0, 30) : candidates.slice(0, 30);
-            if (!matches.length) {
-                box.innerHTML = '<div class="p-3 text-[10px] font-bold text-slate-500 text-center">Santri tidak ditemukan pada kelas ini.</div>';
-                return;
-            }
-            const esc = window._laporanSantriEscape;
-            box.innerHTML = `<div class="px-3 py-2 text-[9px] font-black uppercase tracking-wide text-slate-400 bg-slate-100/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-700">Hasil Pencarian (${matches.length}${candidates.length > matches.length ? '+' : ''})</div>` + matches.map(s => `<button type="button" onclick='window.selectLaporanSantriPekan(${JSON.stringify(s.name)})' class="w-full text-left p-3 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-b last:border-b-0 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800"><div class="text-[11px] font-black text-slate-800 dark:text-slate-100">${esc(s.name)}</div><div class="text-[9px] font-bold text-slate-500 mt-0.5">${esc(s.class || '-')} · ${esc(s.teacher || '-')}</div></button>`).join('');
+            const q = String(input?.value || '').trim();
+            window._laporanSantriSearchQuery = q.toLowerCase();
+            window._laporanSantriRenderSearchResults(q);
         };
 
         window.selectLaporanSantriPekan = function(name) {
-            const student = (window.santriList || []).find(s => String(s.name || '') === String(name || ''));
+            const target = String(name || '').trim().toLowerCase();
+            const student = window._laporanSantriGetCandidateList().find(s => s.name.toLowerCase() === target);
             if (!student) return;
+
             window._laporanSantriSelectedName = student.name;
             const input = document.getElementById('laporanSantriSearchInput');
             if (input) input.value = student.name;
+            const clearBtn = document.getElementById('laporanSantriSearchClear');
+            if (clearBtn) clearBtn.classList.remove('hidden');
             const hidden = document.getElementById('laporanSantriNameFilter');
             if (hidden) hidden.value = student.name;
             const box = document.getElementById('laporanSantriSearchResults');
@@ -718,12 +765,14 @@
         window.clearLaporanSantriPekanSearch = function() {
             const input = document.getElementById('laporanSantriSearchInput');
             if (input) input.value = '';
+            const clearBtn = document.getElementById('laporanSantriSearchClear');
+            if (clearBtn) clearBtn.classList.add('hidden');
             window._laporanSantriSearchQuery = '';
             window._laporanSantriSelectedName = '';
             const hidden = document.getElementById('laporanSantriNameFilter');
             if (hidden) hidden.value = 'SEMUA SANTRI';
             const box = document.getElementById('laporanSantriSearchResults');
-            if (box) box.innerHTML = '<div class="p-3 text-[10px] font-bold text-slate-500 text-center">Ketik nama santri, lalu tekan Cari.</div>';
+            if (box) { box.innerHTML = ''; box.classList.add('hidden'); }
             window.renderLaporanSantriPekan();
         };
 
@@ -732,8 +781,10 @@
             window._laporanSantriSearchQuery = '';
             const input = document.getElementById('laporanSantriSearchInput');
             if (input) input.value = '';
+            const clearBtn = document.getElementById('laporanSantriSearchClear');
+            if (clearBtn) clearBtn.classList.add('hidden');
             const box = document.getElementById('laporanSantriSearchResults');
-            if (box) box.innerHTML = '<div class="p-3 text-[10px] font-bold text-slate-500 text-center">Ketik nama santri, lalu tekan Cari.</div>';
+            if (box) { box.innerHTML = ''; box.classList.add('hidden'); }
             const hidden = document.getElementById('laporanSantriNameFilter');
             if (hidden) hidden.value = 'SEMUA SANTRI';
             window.renderLaporanSantriPekan();
@@ -747,23 +798,18 @@
             if (!container || !classEl || !nameEl) return;
             const range = window._laporanSantriGetRange();
             const classes = [...new Set((window.santriList || []).map(s => String(s.class || '').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-            const oldClass = classEl.value;
-            classEl.innerHTML = '<option value="SEMUA KELAS">Semua Kelas</option>' + classes.map(c => `<option value="${window._laporanSantriEscape(c)}">${window._laporanSantriEscape(c)}</option>`).join('');
-            if (classes.includes(oldClass)) classEl.value = oldClass;
+            const oldClass = classEl.value || 'ALL';
+            classEl.innerHTML = '<option value="ALL">Semua Kelas</option>' + classes.map(c => `<option value="${window._laporanSantriEscape(c)}">${window._laporanSantriEscape(c)}</option>`).join('');
+            if (classes.includes(oldClass)) classEl.value = oldClass; else classEl.value = 'ALL';
 
-            const searchBox = document.getElementById('laporanSantriSearchResults');
-            if (searchBox && !searchBox.innerHTML.trim()) {
-                searchBox.innerHTML = '<div class=\"p-3 text-[10px] font-bold text-slate-500 text-center\">Ketik nama santri, lalu tekan Cari.</div>';
-            }
-
-            const selectedName = String(window._laporanSantriSelectedName || nameEl.value || '').trim();
+            const selectedName = String(window._laporanSantriSelectedName || '').trim();
             const candidates = window._laporanSantriGetCandidateList();
-            const student = selectedName ? candidates.find(s => String(s.name || '') === selectedName) : null;
+            const student = selectedName ? candidates.find(s => s.name.toLowerCase() === selectedName.toLowerCase()) : null;
             if (!student) {
                 nameEl.value = 'SEMUA SANTRI';
                 window._laporanSantriSelectedName = '';
                 if (info) info.innerHTML = `<i class="fa-solid fa-magnifying-glass mr-1"></i> Silakan cari dan pilih <b>1 santri</b> untuk melihat laporan personal. Daftar semua santri tidak ditampilkan sekaligus.`;
-                container.innerHTML = `<div class="p-8 rounded-2xl bg-white dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-700 text-center"><div class="text-3xl mb-2"><i class="fa-solid fa-user-magnifying-glass text-emerald-500"></i></div><div class="text-sm font-black text-slate-700 dark:text-slate-200">Cari Santri</div><div class="text-xs font-bold text-slate-500 mt-1">Ketik nama pada mesin pencarian di atas, lalu pilih santri yang ingin dilihat.</div></div>`;
+                container.innerHTML = `<div class="p-8 rounded-2xl bg-white dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-700 text-center"><div class="text-3xl mb-2"><i class="fa-solid fa-user-magnifying-glass text-emerald-500"></i></div><div class="text-sm font-black text-slate-700 dark:text-slate-200">Cari Santri</div><div class="text-xs font-bold text-slate-500 mt-1">Ketik nama pada mesin pencarian di samping, lalu pilih santri yang ingin dilihat.</div></div>`;
                 return;
             }
             nameEl.value = student.name;
@@ -774,9 +820,24 @@
         };
 
         document.addEventListener('click', function(e) {
+            const resultBtn = e.target.closest?.('.laporan-santri-search-result');
+            if (resultBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const name = resultBtn.getAttribute('data-laporan-santri-name') || '';
+                if (name) window.selectLaporanSantriPekan(name);
+                return;
+            }
             const box = document.getElementById('laporanSantriSearchResults');
             const input = document.getElementById('laporanSantriSearchInput');
-            if (box && input && !box.contains(e.target) && e.target !== input) box.classList.add('hidden');
+            const clearBtn = document.getElementById('laporanSantriSearchClear');
+            const searchBtn = document.getElementById('laporanSantriSearchButton');
+            if (!box || !input) return;
+            const insideResults = box.contains(e.target);
+            const isInput = e.target === input || input.contains?.(e.target);
+            const isClear = clearBtn && (e.target === clearBtn || clearBtn.contains(e.target));
+            const isSearchButton = searchBtn && (e.target === searchBtn || searchBtn.contains(e.target));
+            if (!insideResults && !isInput && !isClear && !isSearchButton) box.classList.add('hidden');
         });
 
         window.refreshLaporanSantriPekan = async function() {
@@ -5374,26 +5435,31 @@
                         <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1">Cari nama langsung atau pilih kelas terlebih dahulu.</p>
                     </div>
 
-                    <label for="laporanSantriSearchInput" class="block text-[10px] font-black text-slate-600 dark:text-slate-300 mb-1.5">Pencarian Nama Cepat</label>
-                    <div class="relative">
-                        <div class="flex gap-2">
-                            <div class="relative flex-1">
-                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                                <input type="search" id="laporanSantriSearchInput" autocomplete="off" placeholder="Cari nama santri..." oninput="window.searchLaporanSantriPekan(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();window.runLaporanSantriPekanSearch();}" class="w-full p-3 pl-9 pr-8 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950 min-h-[44px]">
-                                <button type="button" onclick="window.clearLaporanSantriPekanSearch()" class="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <button type="button" onclick="window.runLaporanSantriPekanSearch()" class="shrink-0 w-11 min-h-[44px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-sm active:scale-95 transition" title="Cari santri">
-                                <i class="fa-solid fa-search"></i>
+                    <div class="space-y-1.5">
+                        <label for="laporanSantriSearchInput" class="block text-[10px] font-black text-slate-600 dark:text-slate-300">Pencarian Nama Cepat</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            <input id="laporanSantriSearchInput" type="text" autocomplete="off" oninput="window.searchLaporanSantriPekan(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();window.runLaporanSantriPekanSearch();}" placeholder="Cari nama semua kelas..." class="w-full p-3 pl-9 pr-9 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs outline-none focus:border-emerald-500 min-h-[44px]">
+                            <button id="laporanSantriSearchClear" type="button" onclick="window.clearLaporanSantriPekanSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 text-xs font-black" aria-label="Hapus pencarian">
+                                <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
                     </div>
-
                     <label for="laporanSantriClassFilter" class="block text-[10px] font-black text-slate-600 dark:text-slate-300 mt-3 mb-1.5">Pilih Kelas</label>
-                    <select id="laporanSantriClassFilter" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-xs min-h-[44px] outline-none focus:border-emerald-500" onchange="window.updateLaporanSantriPekanStudents()">
-                        <option value="SEMUA KELAS">Semua Kelas</option>
+                    <select id="laporanSantriClassFilter" onchange="window.updateLaporanSantriPekanStudents()" class="w-full p-3 bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-xs outline-none cursor-pointer min-h-[44px]">
+                        <option value="ALL" selected>Semua Kelas</option>
+                        <option value="Abdurrahman">Abdurrahman</option>
+                        <option value="Abu Ubaidah">Abu Ubaidah</option>
+                        <option value="Zubair">Zubair</option>
+                        <option value="Ali">Ali</option>
+                        <option value="Utsman">Utsman</option>
+                        <option value="Abu Bakar">Abu Bakar</option>
+                        <option value="Bilal">Bilal</option>
+                        <option value="Hamzah">Hamzah</option>
+                        <option value="Fatimah">Fatimah</option>
+                        <option value="Umar">Umar</option>
                     </select>
-
-                    <div id="laporanSantriSearchResults" class="mt-3 max-h-[55vh] overflow-y-auto custom-scrollbar rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40"></div>
+                    <div id="laporanSantriSearchResults" class="grid grid-cols-1 gap-2 max-h-[calc(100vh-300px)] overflow-y-auto custom-scrollbar p-1"></div>
                     <select id="laporanSantriNameFilter" class="hidden"><option value="SEMUA SANTRI">Semua Santri</option></select>
                 </aside>
 
