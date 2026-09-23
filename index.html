@@ -1949,17 +1949,14 @@
             // Setelah nama diklik, panel kiri hanya menampilkan santri yang dipilih.
             const searchInput = document.getElementById('santriQuickSearch');
             const searchQ = String(searchInput?.value || '').trim().toLowerCase();
-            let nameOptions;
-            if (selectedName && filtered.length) {
-                // Setelah satu santri dipilih, form tetap fokus ke santri tersebut,
-                // tetapi daftar nama di panel pencarian tetap ditampilkan.
-                // Ini mencegah daftar nama hilang setelah klik satu santri.
-                nameOptions = classFiltered;
-            } else {
-                nameOptions = classFiltered.filter(s =>
-                    !searchQ || String(s.name || '').toLowerCase().includes(searchQ)
-                );
-            }
+            // Daftar nama pencarian berdiri sendiri dari santri aktif pada form.
+            // Jika pengguna mengetik pencarian baru, hasil pencarian selalu menjadi prioritas.
+            // Jika pencarian kosong, seluruh santri sesuai filter kelas tetap ditampilkan.
+            const nameOptions = searchQ
+                ? classFiltered.filter(s =>
+                    String(s.name || '').toLowerCase().includes(searchQ)
+                )
+                : classFiltered;
 
             if (nameOptions.length) {
                 kotakContainer.innerHTML = nameOptions.map(selected => {
