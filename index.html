@@ -2093,10 +2093,8 @@
             const value = String(select.value || '').trim();
             if (value) {
                 input.value = value;
-                // Setelah surat tersimpan, kolom tetap aktif agar operator
-                // dapat mengganti surat untuk membuat riwayat input berikutnya.
-                input.disabled = false;
-                input.classList.remove('opacity-60', 'cursor-not-allowed');
+                input.disabled = true;
+                input.classList.add('opacity-60', 'cursor-not-allowed');
                 window.closeSurahAutocomplete(`${category}_surah_search_${slot}_${santriName}`);
             } else {
                 input.value = '';
@@ -2171,7 +2169,8 @@
 
                             <select id="${category}_surah_${slot}_${santriName}"
                                 onchange="window.cacheFormInput(this, '${cacheKeySurah}'); window.syncExistingSurahSelect('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}');"
-                                class="w-full p-4 bg-white dark:bg-white text-black border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                                class="w-full p-4 bg-white dark:bg-white text-black border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]"
+                                ${defaultSurahVal ? 'disabled' : ''}>
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
@@ -2185,7 +2184,8 @@
                                     onfocus="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}')"
                                     oninput="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'); window.syncSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}', this.value)"
                                     onblur="setTimeout(() => window.validateSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'), 150)"
-                                    class="w-full p-4 bg-white dark:bg-white text-black placeholder-slate-400 border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                                    class="w-full p-4 bg-white dark:bg-white text-black placeholder-slate-400 border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px] ${defaultSurahVal ? 'opacity-60 cursor-not-allowed' : ''}"
+                                    ${defaultSurahVal ? 'disabled' : ''}>
                                 <div id="${category}_surah_search_${slot}_${santriName}_dropdown"
                                     class="hidden absolute left-0 right-0 top-full mt-1 z-[80] max-h-64 overflow-y-auto bg-white text-black border-2 border-slate-200 rounded-xl shadow-xl custom-scrollbar">
                                 </div>
@@ -3202,47 +3202,46 @@
 
             // FORMAT WA PERSONAL — hanya untuk laporan personal/live.
             // JANGAN mengubah generateClassReport() / Laporan Grup WA.
-            // Struktur dibuat mengikuti contoh user: separator di awal dan antarbagian,
-            // tanpa separator setelah Tugas.
+            // Format mengikuti format WA Personal yang diminta pengguna.
             const personalSections = [];
 
             if (isValidText(bacaanVal)) {
-                let section = `📖 *Bacaan:*\n ${waOneLine(bacaanVal)}`;
-                if (isValidText(bacaanStat)) section += `\n   - Nilai: ${waOneLine(bacaanStat)}`;
-                if (isValidText(bacaanProgressStatus)) section += `\n   - ${waOneLine(bacaanProgressStatus)}`;
-                if (isValidText(bacaanCat)) section += `\n   - Catatan: ${waOneLine(bacaanCat)}`;
+                let section = `📖 *Bacaan:*\n${waOneLine(bacaanVal)}`;
+                if (isValidText(bacaanStat)) section += `\n- Nilai: ${waOneLine(bacaanStat)}`;
+                if (isValidText(bacaanProgressStatus)) section += `\n- ${waOneLine(bacaanProgressStatus)}`;
+                if (isValidText(bacaanCat)) section += `\n- Catatan: ${waOneLine(bacaanCat)}`;
                 personalSections.push(section);
             }
 
             if (isValidText(hafalanVal)) {
                 let section = `⭐ *Hafalan Baru:*\n${waOneLine(hafalanVal)}`;
-                if (isValidText(hafalanStat)) section += `\n   - Nilai: ${waOneLine(hafalanStat)}`;
-                if (isValidText(hafalanProgressStatus)) section += `\n   - ${waOneLine(hafalanProgressStatus)}`;
-                if (isValidText(hafalanCat)) section += `\n   - Catatan: ${waOneLine(hafalanCat)}`;
+                if (isValidText(hafalanStat)) section += `\n- Nilai: ${waOneLine(hafalanStat)}`;
+                if (isValidText(hafalanProgressStatus)) section += `\n- ${waOneLine(hafalanProgressStatus)}`;
+                if (isValidText(hafalanCat)) section += `\n- Catatan: ${waOneLine(hafalanCat)}`;
                 personalSections.push(section);
             }
 
             if (isValidText(murojaahVal)) {
                 let section = `🔄 *Muroja'ah di Kelas:*\n${waOneLine(murojaahVal)}`;
-                if (isValidText(murojaahStat)) section += `\n   - Nilai: ${waOneLine(murojaahStat)}`;
-                if (isValidText(murojaahProgressStatus)) section += `\n   - ${waOneLine(murojaahProgressStatus)}`;
-                if (isValidText(murojaahCat)) section += `\n   - Catatan: ${waOneLine(murojaahCat)}`;
+                if (isValidText(murojaahStat)) section += `\n- Nilai: ${waOneLine(murojaahStat)}`;
+                if (isValidText(murojaahProgressStatus)) section += `\n- ${waOneLine(murojaahProgressStatus)}`;
+                if (isValidText(murojaahCat)) section += `\n- Catatan: ${waOneLine(murojaahCat)}`;
                 personalSections.push(section);
             }
 
             if (isValidText(tugasVal)) {
                 let section = `📝 *Tugas:* ${waOneLine(tugasVal)}`;
-                if (isValidText(tugasCat)) section += `\n   - Catatan: ${waOneLine(tugasCat)}`;
+                if (isValidText(tugasCat)) section += `\n- Catatan: ${waOneLine(tugasCat)}`;
                 personalSections.push(section);
             }
 
             const bagianSetoran = personalSections.join('\n========\n');
-            const reportHeader = `========\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n========\n*Nama:* *${waOneLine(s.name)}*\n*Kelas:* *${waOneLine(s.class)}*\n✍️ *Pengajar:* ${waOneLine(s.teacher)}\n========`;
-            const reportFooter = `Jazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an. Aamiin.`;
+            const reportHeader = `========\n*LAPORAN PRESTASI SANTRI*\n*Rumah Qur'an Al-Khansa*\n========\n🪪 *Nama:* *${waOneLine(s.name)}*\n🏛️ *Kelas:* *${waOneLine(s.class)}*\n✍️ *Pengajar:* ${waOneLine(s.teacher)}\n========`;
+            const reportFooter = `\n.\n🚀🚀🚀\n\nJazakumullah khairan katsiran atas perhatian dan bimbingan Ayah/Bunda di rumah. Semoga ananda senantiasa istiqomah menghafal Al-Qur'an dan Belajar Al Quran . Aamiin.`;
 
             // Laporan WA Personal di menu dan Live memakai format yang sama.
-            // Materi/Materi Tambahan TIDAK dimasukkan ke WA Personal sesuai format baru.
-            const fullMsg = reportHeader + (bagianSetoran ? `\n${bagianSetoran}` : '') + `\n${reportFooter}`;
+            // Materi/Materi Tambahan TIDAK dimasukkan ke WA Personal.
+            const fullMsg = reportHeader + (bagianSetoran ? `\n${bagianSetoran}` : '') + reportFooter;
             const liveFullMsg = fullMsg;
 
             const previewEl = document.getElementById('waMessagePreview');
