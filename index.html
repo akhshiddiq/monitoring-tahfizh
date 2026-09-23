@@ -509,9 +509,15 @@
 
         window._laporanSantriDateKey = function(value) {
             if (value == null || value === '') return '';
+            if (value instanceof Date && !isNaN(value.getTime())) {
+                return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+            }
             const raw = String(value).trim();
-            const iso = raw.match(/^(\d{4}-\d{2}-\d{2})/);
-            if (iso) return iso[1];
+            const iso = raw.match(/^(\d{4})[-](\d{2})[-](\d{2})/);
+            if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+            // Google Sheet kadang mengirim tanggal sebagai DD/MM/YYYY atau DD-MM-YYYY.
+            const dmy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            if (dmy) return `${dmy[3]}-${String(dmy[2]).padStart(2, '0')}-${String(dmy[1]).padStart(2, '0')}`;
             const d = new Date(value);
             if (isNaN(d.getTime())) return '';
             const y = d.getFullYear();
@@ -570,7 +576,7 @@
             const tambahan = get('rq_materi_tambahan');
             const matches = (arr) => (arr || []).filter(m => {
                 const cls = String(m?.kelas || '').trim();
-                const classOk = className === 'SEMUA KELAS' || cls === className || cls === 'SEMUA KELAS';
+                const classOk = className === 'SEMUA KELAS' || cls.toLowerCase() === String(className || '').trim().toLowerCase() || cls.toLowerCase() === 'semua kelas';
                 return classOk && window._laporanSantriInRange(m?.tanggal, start, end);
             });
             return { utama: matches(utama), tambahan: matches(tambahan) };
@@ -700,13 +706,8 @@
             if (!box) return [];
             const q = String(query || '').trim().toLowerCase();
             const candidates = window._laporanSantriGetCandidateList();
-            const matches = q ? candidates.filter(s => s.name.toLowerCase().includes(q)) : [];
+            const matches = q ? candidates.filter(s => s.name.toLowerCase().includes(q)) : candidates;
 
-            if (!q) {
-                box.innerHTML = '';
-                box.classList.add('hidden');
-                return [];
-            }
             box.classList.remove('hidden');
             if (!candidates.length) {
                 box.innerHTML = '<div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500 text-center">Data santri belum tersedia. Silakan tekan Refresh Data.</div>';
@@ -718,31 +719,40 @@
             }
 
             const esc = window._laporanSantriEscape;
-            box.innerHTML = matches.map(s => `
-                <button type="button" data-laporan-santri-name="${esc(s.name)}"
-                    class="laporan-santri-search-result w-full p-2.5 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/60 border-2 border-sky-200 dark:border-sky-800 rounded-xl font-bold text-[10px] text-sky-950 dark:text-sky-200 text-left transition mb-2 last:mb-0">
+            const selectedName = String(window._laporanSantriSelectedName || '').trim().toLowerCase();
+            box.innerHTML = matches.map(s => {
+                const selected = selectedName === s.name.toLowerCase();
+                const cls = selected
+                    ? 'bg-emerald-600 text-white border-emerald-700 ring-2 ring-amber-300'
+                    : 'bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/50 dark:hover:bg-sky-900/60 border-sky-300 dark:border-sky-800 text-sky-950 dark:text-sky-200';
+                return `<button type="button" data-laporan-santri-name="${esc(s.name)}" class="laporan-santri-search-result w-full p-2.5 ${cls} border-2 rounded-xl font-bold text-[10px] text-left transition mb-2 last:mb-0">
                     <span class="block leading-snug break-words">${esc(s.name)}</span>
-                    <span class="block mt-0.5 text-[9px] font-black text-slate-500 dark:text-slate-400">${esc(s.class || 'Tanpa Kelas')}</span>
-                </button>`).join('');
+                    <span class="block mt-0.5 text-[9px] font-black ${selected ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'}">${esc(s.class || 'Tanpa Kelas')}</span>
+                </button>`;
+            }).join('');
             return matches;
         };
 
         window.searchLaporanSantriPekan = function(value) {
             const q = String(value || '').trim();
-            window._laporanSantriSearchQuery = q.toLowerCase();
-            if (!q) {
+            const selected = String(window._laporanSantriSelectedName || '').trim();
+            // Saat operator mulai mengetik pencarian baru, laporan santri lama harus dilepas.
+            if (!q || q.toLowerCase() !== selected.toLowerCase()) {
                 window._laporanSantriSelectedName = '';
                 const hidden = document.getElementById('laporanSantriNameFilter');
                 if (hidden) hidden.value = 'SEMUA SANTRI';
             }
+            window._laporanSantriSearchQuery = q.toLowerCase();
+            const clearBtn = document.getElementById('laporanSantriSearchClear');
+            if (clearBtn) clearBtn.classList.toggle('hidden', !q);
             window._laporanSantriRenderSearchResults(q);
+            if (!window._laporanSantriSelectedName) window.renderLaporanSantriPekan();
         };
 
         window.runLaporanSantriPekanSearch = function() {
             const input = document.getElementById('laporanSantriSearchInput');
             const q = String(input?.value || '').trim();
-            window._laporanSantriSearchQuery = q.toLowerCase();
-            window._laporanSantriRenderSearchResults(q);
+            window.searchLaporanSantriPekan(q);
         };
 
         window.selectLaporanSantriPekan = function(name) {
@@ -1680,6 +1690,10 @@
                         window.renderSantriCardsAndTable();
                         window.renderMateriList('utama');
                         window.renderMateriList('tambahan');
+                        const laporanSantriSection = document.getElementById('section-laporan-santri');
+                        if (laporanSantriSection && !laporanSantriSection.classList.contains('hidden') && typeof window.renderLaporanSantriPekan === 'function') {
+                            window.renderLaporanSantriPekan();
+                        }
                     }
                     window.setSyncIndicator('success');
                     window.updateSyncFlow('read', 100, 'READ selesai');
