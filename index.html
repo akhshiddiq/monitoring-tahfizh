@@ -3921,7 +3921,7 @@
                     const safeNameJs = JSON.stringify(s.name);
 
                     return `
-                        <label class="relative flex items-center gap-3 text-left p-3 rounded-2xl border-2 cursor-pointer select-none font-bold text-xs sm:text-sm transition ${
+                        <label onclick="event.preventDefault(); window.toggleMassalSantriSelection(${safeNameJs}, '${modalType}')" class="relative flex items-center gap-3 text-left p-3 rounded-2xl border-2 cursor-pointer select-none font-bold text-xs sm:text-sm transition ${
                             isSelected
                                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-md'
                                 : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -3930,7 +3930,7 @@
                                 type="checkbox"
                                 class="massal-santri-checkbox w-5 h-5 shrink-0 accent-emerald-600 cursor-pointer"
                                 ${isSelected ? 'checked' : ''}
-                                onchange="window.toggleMassalSantriSelection(${safeNameJs}, '${modalType}')"
+                                onclick="event.preventDefault(); event.stopPropagation(); window.toggleMassalSantriSelection(${safeNameJs}, '${modalType}')"
                             >
                             <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
                                 isSelected
@@ -4044,6 +4044,54 @@
                 : btn.dataset.originalText;
         };
 
+        window.setMassalProcessStatus = function(modalType, state = 'idle') {
+            const id = modalType === 'murojaah'
+                ? 'massalMurojaahProcessStatus'
+                : 'massalTugasProcessStatus';
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            if (state === 'running') {
+                el.className = modalType === 'murojaah'
+                    ? 'inline-flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300'
+                    : 'inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300';
+                el.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-sm"></i>';
+                el.title = 'Sedang menyimpan...';
+            } else if (state === 'success') {
+                el.className = modalType === 'murojaah'
+                    ? 'inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                    : 'inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300';
+                el.innerHTML = '<i class="fa-solid fa-check text-sm"></i>';
+                el.title = 'Penyimpanan selesai';
+                setTimeout(() => {
+                    if (el) el.classList.add('hidden');
+                }, 2500);
+            } else if (state === 'error') {
+                el.className = 'inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300';
+                el.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-sm"></i>';
+                el.title = 'Penyimpanan gagal';
+            } else {
+                el.classList.add('hidden');
+            }
+        };
+
+        window.setMassalModalCloseButton = function(modalType, text = 'Tutup') {
+            const modalId = modalType === 'murojaah' ? 'murojaahMassalModal' : 'tugasMassalModal';
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            const btn = Array.from(modal.querySelectorAll('button')).find(b => {
+                const onclick = String(b.getAttribute('onclick') || '');
+                return onclick.includes(modalType === 'murojaah'
+                    ? 'closeMurojaahMassalModal'
+                    : 'closeTugasMassalModal');
+            });
+            if (!btn) return;
+            btn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${text}`;
+            btn.disabled = false;
+            btn.style.pointerEvents = '';
+            btn.classList.remove('opacity-60', 'cursor-not-allowed');
+        };
+
         window.saveMassalMurojaah = async function() {
             if (window._massalSaving.murojaah) return;
             const selectedNames = Array.from(window.getMassalSelectedSet('murojaah'));
@@ -4081,6 +4129,8 @@
 
             window._massalSaving.murojaah = true;
             window.setMassalSaveButton('murojaah', true);
+            window.setMassalModalCloseButton('murojaah', 'Tutup');
+            window.setMassalProcessStatus('murojaah', 'running');
             window.massalShowResult('murojaah', `⏳ Menyimpan Muroja'ah Bersama untuk ${selectedNames.length} santri...`, true);
             window.setSyncIndicator('pending');
 
@@ -4114,15 +4164,16 @@
                 window.setSyncIndicator('success');
 
                 window.massalShowResult('murojaah', `✅ SUDAH DI-INPUT — Muroja'ah Bersama berhasil disimpan untuk ${saved} santri.`, true);
+                window.setMassalProcessStatus('murojaah', 'success');
                 window.showToast(`✅ SUDAH DI-INPUT: Muroja'ah Bersama • ${saved} santri`, 'success');
 
                 setTimeout(() => {
-                    window.closeMurojaahMassalModal();
                     window.fetchAllDataFromCloud(true);
                 }, 900);
             } catch (err) {
                 console.error('Gagal simpan Murojaah Bersama:', err);
                 window.setSyncIndicator('error');
+                window.setMassalProcessStatus('murojaah', 'error');
                 window.massalShowResult('murojaah', `❌ Gagal menyimpan: ${err?.message || err}`, false);
                 window.showToast('❌ Muroja\'ah Bersama gagal disimpan.', 'error');
             } finally {
@@ -4155,6 +4206,8 @@
 
             window._massalSaving.tugas = true;
             window.setMassalSaveButton('tugas', true);
+            window.setMassalModalCloseButton('tugas', 'Tutup');
+            window.setMassalProcessStatus('tugas', 'running');
             window.massalShowResult('tugas', `⏳ Menyimpan Tugas Bersama untuk ${selectedNames.length} santri...`, true);
             window.setSyncIndicator('pending');
 
@@ -4186,15 +4239,16 @@
                 window.setSyncIndicator('success');
 
                 window.massalShowResult('tugas', `✅ SUDAH DI-INPUT — Tugas Bersama berhasil disimpan untuk ${saved} santri.`, true);
+                window.setMassalProcessStatus('tugas', 'success');
                 window.showToast(`✅ SUDAH DI-INPUT: Tugas Bersama • ${saved} santri`, 'success');
 
                 setTimeout(() => {
-                    window.closeTugasMassalModal();
                     window.fetchAllDataFromCloud(true);
                 }, 900);
             } catch (err) {
                 console.error('Gagal simpan Tugas Bersama:', err);
                 window.setSyncIndicator('error');
+                window.setMassalProcessStatus('tugas', 'error');
                 window.massalShowResult('tugas', `❌ Gagal menyimpan: ${err?.message || err}`, false);
                 window.showToast('❌ Tugas Bersama gagal disimpan.', 'error');
             } finally {
@@ -4545,12 +4599,22 @@
                     </select>
                 </div>
                 <div class="flex items-center gap-2.5 w-full sm:w-auto justify-center sm:justify-end flex-wrap">
-                    <button onclick="window.openMurojaahMassalModal()" class="flex items-center gap-1.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95">
-                        <i class="fa-solid fa-rotate"></i> Muroja'ah di Kelas (Sama)
-                    </button>
-                    <button onclick="window.openTugasMassalModal()" class="flex items-center gap-1.5 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95">
-                        <i class="fa-solid fa-list-check"></i> Tugas Bersama
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="window.openMurojaahMassalModal()" class="flex items-center gap-1.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95">
+                            <i class="fa-solid fa-rotate"></i> Muroja'ah di Kelas (Sama)
+                        </button>
+                        <span id="massalMurojaahProcessStatus" class="hidden items-center justify-center w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300" title="Proses Muroja'ah Bersama">
+                            <i class="fa-solid fa-spinner fa-spin text-sm"></i>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="window.openTugasMassalModal()" class="flex items-center gap-1.5 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95">
+                            <i class="fa-solid fa-list-check"></i> Tugas Bersama
+                        </button>
+                        <span id="massalTugasProcessStatus" class="hidden items-center justify-center w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300" title="Proses Tugas Bersama">
+                            <i class="fa-solid fa-spinner fa-spin text-sm"></i>
+                        </span>
+                    </div>
                     <button onclick="window.fetchAllDataFromCloud()" class="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95">
                         <i class="fa-solid fa-cloud-arrow-down"></i> Sinkron Cloud
                     </button>
