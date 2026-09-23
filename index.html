@@ -3921,7 +3921,7 @@
                     const safeNameJs = JSON.stringify(s.name);
 
                     return `
-                        <label onclick="event.preventDefault(); window.toggleMassalSantriSelection(${safeNameJs}, '${modalType}')" class="relative flex items-center gap-3 text-left p-3 rounded-2xl border-2 cursor-pointer select-none font-bold text-xs sm:text-sm transition ${
+                        <label class="relative flex items-center gap-3 text-left p-3 rounded-2xl border-2 cursor-pointer select-none font-bold text-xs sm:text-sm transition ${
                             isSelected
                                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-md'
                                 : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -3930,7 +3930,7 @@
                                 type="checkbox"
                                 class="massal-santri-checkbox w-5 h-5 shrink-0 accent-emerald-600 cursor-pointer"
                                 ${isSelected ? 'checked' : ''}
-                                onclick="event.preventDefault(); event.stopPropagation(); window.toggleMassalSantriSelection(${safeNameJs}, '${modalType}')"
+                                onchange="window.setMassalSantriSelection(this.checked, ${safeNameJs}, '${modalType}')"
                             >
                             <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
                                 isSelected
@@ -3950,6 +3950,21 @@
             window.updateMassalSelectedCount(modalType);
         };
 
+        window.setMassalSantriSelection = function(checked, santriName, modalType = 'murojaah') {
+            const selectedSet = window.getMassalSelectedSet(modalType);
+            const name = String(santriName || '').trim();
+            if (!name) return;
+
+            if (checked) {
+                selectedSet.add(name);
+            } else {
+                selectedSet.delete(name);
+            }
+
+            window.renderMassalSantriGrid(modalType);
+        };
+
+        // Dipertahankan untuk kompatibilitas dengan kode lama.
         window.toggleMassalSantriSelection = function(santriName, modalType = 'murojaah') {
             const selectedSet = window.getMassalSelectedSet(modalType);
             const name = String(santriName || '').trim();
