@@ -27,6 +27,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; }
+        /* Perbaikan tampilan pilihan Surat/Iqro pada mode gelap. Hanya warna native select/option, fungsi tidak diubah. */
+        select option { background-color: #ffffff; color: #0f172a; }
+        html.dark select { color: #e2e8f0; }
+        html.dark select option { background-color: #1e293b; color: #e2e8f0; }
         @media (min-width: 640px) { body { font-size: 13.5px; } }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 9999px; }
@@ -151,6 +155,14 @@
                 min-height: 38px;
             }
         }
+        /* Combobox Surat: nama surat tetap berasal dari window.surahList.
+           Bisa dicari dengan sebagian huruf dan daftar dapat digulir dengan mouse/touch. */
+        .surah-combo-dropdown { max-height: 260px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        .surah-combo-dropdown::-webkit-scrollbar { width: 6px; }
+        .surah-combo-dropdown::-webkit-scrollbar-thumb { background: rgba(100,116,139,.45); border-radius: 9999px; }
+        .surah-combo-input::placeholder { color: rgb(100 116 139); }
+        .dark .surah-combo-input::placeholder { color: rgb(148 163 184); }
+
         /* HP: Live Laporan WA di menu Input disembunyikan.
            Menu Laporan tetap menjadi tempat melihat laporan di HP.
            Fungsi JavaScript dan fitur Live Laporan tetap dipertahankan. */
@@ -1558,9 +1570,115 @@
             }
         };
 
-        window.getFormCache = function(key, defaultVal = '') {
-            if (window.localFormCache[key] !== undefined) return window.localFormCache[key];
-            return defaultVal;
+        window.surahComboEsc = function(value) {
+            return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        };
+
+        window.initSurahCombo = function() {
+            if (window._surahComboGlobalReady) return;
+            window._surahComboGlobalReady = true;
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.surah-combo-wrap')) {
+                    document.querySelectorAll('.surah-combo-dropdown').forEach(el => el.classList.add('hidden'));
+                }
+            });
+        };
+
+        window.renderSurahComboOptions = function(query = '', selectId = '') {
+            const q = String(query || '').trim().toLowerCase();
+            const list = Array.isArray(window.surahList) ? window.surahList : [];
+            const selected = document.getElementById(selectId)?.value || '';
+            const matches = list.filter(s => (`${s.no} ${s.name} ${s.ayat}`).toLowerCase().includes(q));
+            if (!matches.length) return '<div class="px-3 py-3 text-center text-xs font-bold text-slate-500 dark:text-slate-400">Surat tidak ditemukan</div>';
+            return matches.map(s => `
+                <button type="button" onclick='window.chooseSurahCombo(${window.surahComboEsc(JSON.stringify(selectId))}, ${window.surahComboEsc(JSON.stringify(s.name))})'
+                    class="w-full text-left px-3 py-2.5 rounded-xl transition ${selected === s.name ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'}">
+                    <span class="block text-xs font-black">${s.no}. ${window.surahComboEsc(s.name)}</span>
+                    <span class="block text-[10px] font-bold text-slate-500 dark:text-slate-400">${s.ayat} Ayat</span>
+                </button>`).join('');
+        };
+
+        window.openSurahCombo = function(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            if (!input || !dropdown) return;
+            window.initSurahCombo();
+            document.querySelectorAll('.surah-combo-dropdown').forEach(el => { if (el.id !== dropdownId) el.classList.add('hidden'); });
+            const selectId = input.dataset.selectId || (inputId === 'massalSurahSearch' ? 'massalSurahSelect' : inputId.replace('_search_', '_'));
+            input.dataset.selectId = selectId;
+            dropdown.innerHTML = window.renderSurahComboOptions('', selectId);
+            dropdown.classList.remove('hidden');
+        };
+
+        window.toggleSurahCombo = function(inputId, dropdownId, selectId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            if (!input || !dropdown) return;
+            input.dataset.selectId = selectId;
+            if (dropdown.classList.contains('hidden')) window.openSurahCombo(inputId, dropdownId);
+            else dropdown.classList.add('hidden');
+            input.focus();
+        };
+
+        window.filterSurahCombo = function(inputId, dropdownId, selectId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            const select = document.getElementById(selectId);
+            if (!input || !dropdown || !select) return;
+            input.dataset.selectId = selectId;
+            if (select.value) {
+                select.value = '';
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            dropdown.innerHTML = window.renderSurahComboOptions(input.value, selectId);
+            dropdown.classList.remove('hidden');
+        };
+
+        window.chooseSurahCombo = function(selectId, value) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            select.value = value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            const inputId = selectId === 'massalSurahSelect' ? 'massalSurahSearch' : selectId.replace('_surah_', '_surah_search_');
+            const dropdownId = selectId === 'massalSurahSelect' ? 'massalSurahDropdown' : selectId.replace('_surah_', '_surah_dropdown_');
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            if (input) { input.value = value; input.dataset.selectId = selectId; }
+            if (dropdown) dropdown.classList.add('hidden');
+        };
+
+        window.renderSurahCombo = function(category, slot, santriName, defaultVal, cacheKey) {
+            window.initSurahCombo();
+            const inputId = `${category}_surah_search_${slot}_${santriName}`;
+            const dropdownId = `${category}_surah_dropdown_${slot}_${santriName}`;
+            const selectId = `${category}_surah_${slot}_${santriName}`;
+            const displayVal = String(defaultVal || '');
+            return `
+                <div class="relative surah-combo-wrap">
+                    <div class="relative">
+                        <input type="text" id="${inputId}" value="${window.surahComboEsc(displayVal)}" autocomplete="off" placeholder="Ketik nama surat..."
+                            onfocus="window.openSurahCombo('${inputId}','${dropdownId}')" oninput="window.filterSurahCombo('${inputId}','${dropdownId}','${selectId}')"
+                            class="surah-combo-input w-full p-4 pr-12 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px] text-slate-800 dark:text-slate-200 outline-none focus:border-emerald-500">
+                        <button type="button" tabindex="-1" onclick="window.toggleSurahCombo('${inputId}','${dropdownId}','${selectId}')" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </button>
+                    </div>
+                    <div id="${dropdownId}" class="surah-combo-dropdown hidden absolute left-0 right-0 top-[calc(100%+6px)] z-[80] p-1.5 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl">${window.renderSurahComboOptions('', selectId)}</div>
+                    <select id="${selectId}" onchange="window.cacheFormInput(this, '${cacheKey}')" class="hidden" aria-hidden="true" tabindex="-1">
+                        <option value="">-- Pilih Surat --</option>
+                        ${window.surahList.map(s => `<option value="${window.surahComboEsc(s.name)}" ${displayVal === s.name ? 'selected' : ''}>${s.no}. ${window.surahComboEsc(s.name)} (${s.ayat} Ayat)</option>`).join('')}
+                    </select>
+                </div>`;
+        };
+
+        window.refreshMassalSurahCombo = function() {
+            const select = document.getElementById('massalSurahSelect');
+            const input = document.getElementById('massalSurahSearch');
+            const dropdown = document.getElementById('massalSurahDropdown');
+            if (!select || !input || !dropdown) return;
+            input.value = select.value || '';
+            input.dataset.selectId = 'massalSurahSelect';
+            dropdown.innerHTML = window.renderSurahComboOptions(input.value, 'massalSurahSelect');
         };
 
         window.renderTripleInputSlot = function(category, santriName, borderClass) {
@@ -1625,10 +1743,7 @@
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
-                                <option value="">-- Pilih Surat --</option>
-                                ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
-                            </select>
+                            ${window.renderSurahCombo(category, slot, santriName, defaultSurahVal, cacheKeySurah)}
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
@@ -3694,6 +3809,7 @@
                     const list = Array.isArray(window.surahList) ? window.surahList : [];
                     surahSel.innerHTML = '<option value="">-- Pilih Surat --</option>' +
                         list.map(s => `<option value="${window.massalEsc(s.name)}" data-max="${Number(s.ayat || 0)}">${s.no}. ${window.massalEsc(s.name)} (${s.ayat} Ayat)</option>`).join('');
+                    window.refreshMassalSurahCombo();
                 }
                 if (labelStart) labelStart.textContent = 'Ayat Mulai:';
                 if (labelEnd) labelEnd.textContent = 'Ayat Sampai:';
@@ -4980,7 +5096,14 @@
                     <select id="massalBacaanMode" onchange="window.populateMassalBacaanOptions()" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"><option value="quran">Al-Qur'an / Surat</option><option value="iqro">Iqro</option></select>
                 </div>
                 <div id="massalBacaanItemWrap">
-                    <select id="massalSurahSelect" class="w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"><option value="">-- Pilih Surat --</option></select>
+                    <div class="relative surah-combo-wrap">
+                        <div class="relative">
+                            <input type="text" id="massalSurahSearch" autocomplete="off" placeholder="Ketik nama surat..." onfocus="window.openSurahCombo('massalSurahSearch','massalSurahDropdown')" oninput="window.filterSurahCombo('massalSurahSearch','massalSurahDropdown','massalSurahSelect')" class="surah-combo-input w-full p-3.5 pr-12 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-xl font-black text-xs sm:text-sm min-h-[46px] text-slate-800 dark:text-slate-200 outline-none focus:border-emerald-500">
+                            <button type="button" tabindex="-1" onclick="window.toggleSurahCombo('massalSurahSearch','massalSurahDropdown','massalSurahSelect')" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300"><i class="fa-solid fa-chevron-down text-[10px]"></i></button>
+                        </div>
+                        <div id="massalSurahDropdown" class="surah-combo-dropdown hidden absolute left-0 right-0 top-[calc(100%+6px)] z-[80] p-1.5 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl"></div>
+                        <select id="massalSurahSelect" class="hidden" aria-hidden="true" tabindex="-1"><option value="">-- Pilih Surat --</option></select>
+                    </div>
                     <select id="massalIqroSelect" class="hidden w-full p-3.5 bg-white dark:bg-slate-900 border-2 rounded-xl font-black text-xs sm:text-sm min-h-[46px]"><option value="">-- Pilih Iqro --</option></select>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
