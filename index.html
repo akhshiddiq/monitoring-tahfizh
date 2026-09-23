@@ -583,12 +583,14 @@
             const student = (window.santriList || []).find(s => String(s.name || '').toLowerCase() === String(santriName || '').toLowerCase());
             if (!student) return;
 
-            // Pastikan kartu santri dirender dari kelas yang benar sebelum di-scroll.
-            window.selectedClass = student.class || 'ALL';
+            // Pertahankan filter kelas yang sedang dipakai pengguna.
+            // Jangan mengganti filter kelas hanya karena satu nama dipilih.
+            const currentClass = String(window.selectedClass || 'ALL').trim() || 'ALL';
+            window.selectedClass = currentClass;
             const sidebarClass = document.getElementById('santriSidebarClassFilter');
-            if (sidebarClass) sidebarClass.value = window.selectedClass;
+            if (sidebarClass) sidebarClass.value = currentClass;
             const mainClass = document.getElementById('classFilterSelect');
-            if (mainClass) mainClass.value = window.selectedClass;
+            if (mainClass) mainClass.value = currentClass;
 
             const input = document.getElementById('santriQuickSearch');
             if (input) input.value = student.name;
@@ -1591,6 +1593,137 @@
             return defaultVal;
         };
 
+        // ============================================================
+        // AUTOCOMPLETE NAMA SURAT — additive only.
+        // Input baru memakai daftar window.surahList yang sama dengan
+        // dropdown Nama Surat lama. Tidak membuat kolom/field Google Sheet.
+        // Nilai akhirnya tetap diarahkan ke field ${category}_surah_* yang lama.
+        // ============================================================
+        window.surahSearchEscape = function(value) {
+            return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        };
+
+        window.closeSurahAutocomplete = function(inputId) {
+            const box = document.getElementById(`${inputId}_dropdown`);
+            if (box) box.classList.add('hidden');
+        };
+
+        window.syncSurahSearchInput = function(category, slot, santriName, value) {
+            const inputId = `${category}_surah_search_${slot}_${santriName}`;
+            const selectId = `${category}_surah_${slot}_${santriName}`;
+            const cacheKey = `${santriName}_${category}_surah_${slot}`;
+            const input = document.getElementById(inputId);
+            const select = document.getElementById(selectId);
+            if (!input || !select) return;
+
+            const raw = String(value || '').trim();
+            const exact = (window.surahList || []).find(s =>
+                String(s?.name || '').trim() === raw
+            );
+
+            if (exact) {
+                input.value = exact.name;
+                select.value = exact.name;
+                select.disabled = true;
+                input.classList.remove('border-rose-400', 'bg-rose-50');
+                input.classList.add('border-emerald-400');
+                window.cacheFormInput({ value: exact.name }, cacheKey);
+                window.closeSurahAutocomplete(inputId);
+                return true;
+            }
+
+            if (!raw) {
+                select.disabled = false;
+                select.value = '';
+                input.classList.remove('border-rose-400', 'bg-rose-50', 'border-emerald-400');
+                window.cacheFormInput({ value: '' }, cacheKey);
+                window.cacheFormInput({ value: '' }, `${cacheKey}_search`);
+                window.closeSurahAutocomplete(inputId);
+                return true;
+            }
+
+            input.classList.add('border-rose-400', 'bg-rose-50');
+            input.classList.remove('border-emerald-400');
+            return false;
+        };
+
+        window.renderSurahAutocomplete = function(category, slot, santriName) {
+            const inputId = `${category}_surah_search_${slot}_${santriName}`;
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(`${inputId}_dropdown`);
+            if (!input || !box) return;
+
+            const query = String(input.value || '').trim().toLowerCase();
+            const list = Array.isArray(window.surahList) ? window.surahList : [];
+            const filtered = list.filter(s => !query || String(s?.name || '').toLowerCase().includes(query));
+
+            box.innerHTML = filtered.map(s => `
+                <button type="button"
+                    class="w-full text-left px-3.5 py-2.5 bg-white text-black hover:bg-slate-100 border-b border-slate-100 last:border-b-0 font-bold text-xs sm:text-sm"
+                    onclick="window.selectSurahAutocomplete('${category}', ${slot}, '${String(santriName).replace(/'/g, "\\'")}', '${String(s.name).replace(/'/g, "\\'")}')">
+                    ${s.no}. ${window.surahSearchEscape(s.name)} (${s.ayat} Ayat)
+                </button>
+            `).join('');
+
+            box.classList.toggle('hidden', filtered.length === 0);
+        };
+
+        window.selectSurahAutocomplete = function(category, slot, santriName, value) {
+            const inputId = `${category}_surah_search_${slot}_${santriName}`;
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.value = value;
+            window.syncSurahSearchInput(category, slot, santriName, value);
+        };
+
+        window.validateSurahSearchInput = function(category, slot, santriName) {
+            const input = document.getElementById(`${category}_surah_search_${slot}_${santriName}`);
+            const select = document.getElementById(`${category}_surah_${slot}_${santriName}`);
+            if (!input || !select) return;
+
+            const raw = String(input.value || '').trim();
+            if (!raw) {
+                window.syncSurahSearchInput(category, slot, santriName, '');
+                return;
+            }
+
+            const exact = (window.surahList || []).find(s =>
+                String(s?.name || '').trim() === raw
+            );
+
+            if (!exact) {
+                input.value = '';
+                select.value = '';
+                select.disabled = false;
+                input.classList.add('border-rose-400', 'bg-rose-50');
+                input.classList.remove('border-emerald-400');
+                window.cacheFormInput({ value: '' }, `${santriName}_${category}_surah_${slot}`);
+                window.showToast('Nama surat harus sama persis dengan pilihan yang tersedia.', 'error');
+                window.renderSurahAutocomplete(category, slot, santriName);
+                return;
+            }
+
+            window.syncSurahSearchInput(category, slot, santriName, exact.name);
+        };
+
+        window.syncExistingSurahSelect = function(category, slot, santriName) {
+            const select = document.getElementById(`${category}_surah_${slot}_${santriName}`);
+            const input = document.getElementById(`${category}_surah_search_${slot}_${santriName}`);
+            if (!select || !input) return;
+
+            const value = String(select.value || '').trim();
+            if (value) {
+                input.value = value;
+                input.disabled = true;
+                input.classList.add('opacity-60', 'cursor-not-allowed');
+                window.closeSurahAutocomplete(`${category}_surah_search_${slot}_${santriName}`);
+            } else {
+                input.value = '';
+                input.disabled = false;
+                input.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+        };
+
         window.renderTripleInputSlot = function(category, santriName, borderClass) {
             const slots = [1, 2, 3];
             const sObj = window.santriList.find(x => x.name === santriName);
@@ -1653,10 +1786,32 @@
                         </div>
 
                         <div id="field_quran_${category}_${slot}_${santriName}" class="${cachedMode === 'iqro' ? 'hidden' : ''}">
-                            <select id="${category}_surah_${slot}_${santriName}" onchange="window.cacheFormInput(this, '${cacheKeySurah}')" class="w-full p-4 bg-transparent border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
+                            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">Nama Surat:</label>
+
+                            <select id="${category}_surah_${slot}_${santriName}"
+                                onchange="window.cacheFormInput(this, '${cacheKeySurah}'); window.syncExistingSurahSelect('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}');"
+                                class="w-full p-4 bg-white dark:bg-white text-black border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]"
+                                ${defaultSurahVal ? 'disabled' : ''}>
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
+
+                            <div class="relative mt-2.5">
+                                <input type="text"
+                                    id="${category}_surah_search_${slot}_${santriName}"
+                                    value="${window.surahSearchEscape(defaultSurahVal)}"
+                                    placeholder="Ketik/cari nama surat..."
+                                    autocomplete="off"
+                                    onfocus="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}')"
+                                    oninput="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'); window.syncSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}', this.value)"
+                                    onblur="setTimeout(() => window.validateSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'), 150)"
+                                    class="w-full p-4 bg-white dark:bg-white text-black placeholder-slate-400 border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px] ${defaultSurahVal ? 'opacity-60 cursor-not-allowed' : ''}"
+                                    ${defaultSurahVal ? 'disabled' : ''}>
+                                <div id="${category}_surah_search_${slot}_${santriName}_dropdown"
+                                    class="hidden absolute left-0 right-0 top-full mt-1 z-[80] max-h-64 overflow-y-auto bg-white text-black border-2 border-slate-200 rounded-xl shadow-xl custom-scrollbar">
+                                </div>
+                            </div>
+                            <p class="mt-1.5 text-[10px] font-bold text-slate-500">Pencarian Nama Surat — harus sesuai pilihan.</p>
                         </div>
 
                         <div id="field_iqro_${category}_${slot}_${santriName}" class="${cachedMode === 'quran' ? 'hidden' : ''}">
@@ -1796,7 +1951,10 @@
             const searchQ = String(searchInput?.value || '').trim().toLowerCase();
             let nameOptions;
             if (selectedName && filtered.length) {
-                nameOptions = filtered;
+                // Setelah satu santri dipilih, form tetap fokus ke santri tersebut,
+                // tetapi daftar nama di panel pencarian tetap ditampilkan.
+                // Ini mencegah daftar nama hilang setelah klik satu santri.
+                nameOptions = classFiltered;
             } else {
                 nameOptions = classFiltered.filter(s =>
                     !searchQ || String(s.name || '').toLowerCase().includes(searchQ)
@@ -4460,7 +4618,7 @@
                         <option value="Fatimah">Fatimah</option>
                         <option value="Umar">Umar</option>
                     </select>
-                    <div id="santriKotakContainer class="grid grid-cols-1 gap-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar p-1"></div>
+                    <div id="santriKotakContainer" class="grid grid-cols-1 gap-2 max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar p-1"></div>
                 </aside>
 
                 <div id="santriGridContainer" class="space-y-4 min-w-0"></div>
