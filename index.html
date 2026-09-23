@@ -2501,8 +2501,7 @@
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'BACAAN', catatan: bacaanCatCombined, type: 'rekapan' });
                 }
 
-                window.cardSectionToggleState[`${name}_section_bacaan`] = false;
-                window.cardHistoryToggleState[`${name}_history_Bacaan`] = true;
+                                window.cardHistoryToggleState[`${name}_history_Bacaan`] = true;
                 const badge = document.getElementById(`save_badge_bacaan_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
@@ -2549,8 +2548,7 @@
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'HAFALAN', catatan: hafalanCatCombined, type: 'rekapan' });
                 }
 
-                window.cardSectionToggleState[`${name}_section_hafalan`] = false;
-                window.cardHistoryToggleState[`${name}_history_Hafalan`] = true;
+                                window.cardHistoryToggleState[`${name}_history_Hafalan`] = true;
                 const badge = document.getElementById(`save_badge_hafalan_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
@@ -2597,8 +2595,7 @@
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: "MUROJA'AH DI KELAS", catatan: murojaahCatCombined, type: 'rekapan' });
                 }
 
-                window.cardSectionToggleState[`${name}_section_murojaah`] = false;
-                window.cardHistoryToggleState[`${name}_history_Murojaah`] = true;
+                                window.cardHistoryToggleState[`${name}_history_Murojaah`] = true;
                 const badge = document.getElementById(`save_badge_murojaah_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
@@ -2635,8 +2632,7 @@
                     rekapanList.unshift({ timestamp: formattedTimeStr, tanggal: tanggalVal, rawTime: nowObj.getTime(), id: s.id, name: s.name, category: 'TUGAS', catatan: tugasCat, type: 'rekapan' });
                 }
 
-                window.cardSectionToggleState[`${name}_section_tugas`] = false;
-                window.cardHistoryToggleState[`${name}_history_Tugas`] = true;
+                                window.cardHistoryToggleState[`${name}_history_Tugas`] = true;
                 const badge = document.getElementById(`save_badge_tugas_${name}`);
                 if (badge) { badge.classList.remove('hidden'); setTimeout(() => badge.classList.add('hidden'), 3000); }
                 window.showToast("💾 Alhamdulillah sudah di input", "success");
