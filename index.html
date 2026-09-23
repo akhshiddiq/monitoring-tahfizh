@@ -2093,8 +2093,10 @@
             const value = String(select.value || '').trim();
             if (value) {
                 input.value = value;
-                input.disabled = true;
-                input.classList.add('opacity-60', 'cursor-not-allowed');
+                // Setelah surat tersimpan, kolom tetap aktif agar operator
+                // dapat mengganti surat untuk membuat riwayat input berikutnya.
+                input.disabled = false;
+                input.classList.remove('opacity-60', 'cursor-not-allowed');
                 window.closeSurahAutocomplete(`${category}_surah_search_${slot}_${santriName}`);
             } else {
                 input.value = '';
@@ -2169,8 +2171,7 @@
 
                             <select id="${category}_surah_${slot}_${santriName}"
                                 onchange="window.cacheFormInput(this, '${cacheKeySurah}'); window.syncExistingSurahSelect('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}');"
-                                class="w-full p-4 bg-white dark:bg-white text-black border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]"
-                                ${defaultSurahVal ? 'disabled' : ''}>
+                                class="w-full p-4 bg-white dark:bg-white text-black border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
@@ -2184,8 +2185,7 @@
                                     onfocus="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}')"
                                     oninput="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'); window.syncSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}', this.value)"
                                     onblur="setTimeout(() => window.validateSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'), 150)"
-                                    class="w-full p-4 bg-white dark:bg-white text-black placeholder-slate-400 border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px] ${defaultSurahVal ? 'opacity-60 cursor-not-allowed' : ''}"
-                                    ${defaultSurahVal ? 'disabled' : ''}>
+                                    class="w-full p-4 bg-white dark:bg-white text-black placeholder-slate-400 border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <div id="${category}_surah_search_${slot}_${santriName}_dropdown"
                                     class="hidden absolute left-0 right-0 top-full mt-1 z-[80] max-h-64 overflow-y-auto bg-white text-black border-2 border-slate-200 rounded-xl shadow-xl custom-scrollbar">
                                 </div>
