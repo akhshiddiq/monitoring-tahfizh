@@ -2012,7 +2012,8 @@
             }
 
             if (!raw) {
-                select.disabled = false;
+                // Dropdown atas tetap terkunci; edit dilakukan melalui kolom bawah.
+                select.disabled = true;
                 select.value = '';
                 input.classList.remove('border-rose-400', 'bg-rose-50', 'border-emerald-400');
                 window.cacheFormInput({ value: '' }, cacheKey);
@@ -2073,7 +2074,7 @@
             if (!exact) {
                 input.value = '';
                 select.value = '';
-                select.disabled = false;
+                select.disabled = true;
                 input.classList.add('border-rose-400', 'bg-rose-50');
                 input.classList.remove('border-emerald-400');
                 window.cacheFormInput({ value: '' }, `${santriName}_${category}_surah_${slot}`);
@@ -2093,13 +2094,17 @@
             const value = String(select.value || '').trim();
             if (value) {
                 input.value = value;
-                input.disabled = true;
-                input.classList.add('opacity-60', 'cursor-not-allowed');
+                // Kolom pencarian di bawah tetap bisa diedit setelah data tersimpan.
+                // Dropdown di atas tetap terkunci agar tidak menjadi jalur edit kedua.
+                input.disabled = false;
+                input.classList.remove('opacity-60', 'cursor-not-allowed');
+                select.disabled = true;
                 window.closeSurahAutocomplete(`${category}_surah_search_${slot}_${santriName}`);
             } else {
                 input.value = '';
                 input.disabled = false;
                 input.classList.remove('opacity-60', 'cursor-not-allowed');
+                select.disabled = true;
             }
         };
 
@@ -2170,7 +2175,7 @@
                             <select id="${category}_surah_${slot}_${santriName}"
                                 onchange="window.cacheFormInput(this, '${cacheKeySurah}'); window.syncExistingSurahSelect('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}');"
                                 class="w-full p-4 bg-white dark:bg-white text-black border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]"
-                                ${defaultSurahVal ? 'disabled' : ''}>
+                                disabled>
                                 <option value="">-- Pilih Surat --</option>
                                 ${window.surahList.map(s => `<option value="${s.name}" ${defaultSurahVal === s.name ? 'selected' : ''}>${s.no}. ${s.name} (${s.ayat} Ayat)</option>`).join('')}
                             </select>
@@ -2184,8 +2189,7 @@
                                     onfocus="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}')"
                                     oninput="window.renderSurahAutocomplete('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'); window.syncSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}', this.value)"
                                     onblur="setTimeout(() => window.validateSurahSearchInput('${category}', ${slot}, '${santriName.replace(/'/g, "\'")}'), 150)"
-                                    class="w-full p-4 bg-white dark:bg-white text-black placeholder-slate-400 border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px] ${defaultSurahVal ? 'opacity-60 cursor-not-allowed' : ''}"
-                                    ${defaultSurahVal ? 'disabled' : ''}>
+                                    class="w-full p-4 bg-white dark:bg-white text-black placeholder-slate-400 border-2 border-slate-300 dark:border-slate-700 rounded-2xl font-black text-sm min-h-[56px]">
                                 <div id="${category}_surah_search_${slot}_${santriName}_dropdown"
                                     class="hidden absolute left-0 right-0 top-full mt-1 z-[80] max-h-64 overflow-y-auto bg-white text-black border-2 border-slate-200 rounded-xl shadow-xl custom-scrollbar">
                                 </div>
