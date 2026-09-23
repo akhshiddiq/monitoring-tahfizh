@@ -79,6 +79,18 @@
             }
         }
 
+        /* Tampilan dropdown nama surat: VISUAL SAJA, tanpa mengubah JS/data/fungsi. */
+        select[id*="_surah_"] option,
+        #massalSurahSelect option {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+        select[id*="_surah_"] option:checked,
+        #massalSurahSelect option:checked {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+
         /* Pencarian nama cepat dibuat lebih lembut tanpa mengubah fungsi pencarian. */
         #santriQuickSearch {
             border-width: 1px !important;
