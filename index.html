@@ -330,13 +330,16 @@
         ];
 
         window.getGsUrl = function() {
-            return localStorage.getItem('rq_gs_url') || 'https://script.google.com/macros/s/AKfycbyjKiIMh3shzdvkI9wOz8mzbjWoX6YANtpRm_jgwd5BlGZo-xZKNWgQlllH1_4ho4Jl/exec';
+            // Endpoint Google Apps Script sengaja KOSONG sebagai default.
+            // Menggunakan key baru agar URL lama yang tersimpan di browser
+            // tidak otomatis muncul kembali. Pengguna dapat mengisi manual.
+            return localStorage.getItem('rq_gs_url_manual') || '';
         };
 
         window.saveCustomGsUrl = function() {
             const input = document.getElementById('customGsUrlInput');
             if (input && input.value.trim()) {
-                localStorage.setItem('rq_gs_url', input.value.trim());
+                localStorage.setItem('rq_gs_url_manual', input.value.trim());
                 window.showToast("URL Endpoint GS berhasil diperbarui!", "success");
                 window.fetchAllDataFromCloud();
             }
@@ -584,14 +587,9 @@
 
             // Ini adalah titik pemilihan santri untuk menu Input.
             // Setelah diklik, hanya santri ini yang dirender pada form.
-            window.selectedInputSantriName = String(student.name).trim();
-
-            // Render langsung berdasarkan nama yang dipilih. Alur Save, ID field,
-            // cache form, dan Google Apps Script tidak disentuh.
+            window.selectedInputSantriName = student.name;
             window.renderSantriCardsAndTable();
-
-            // Pastikan kartu form benar-benar sudah ada sebelum melakukan scroll.
-            setTimeout(() => window.scrollToSantri(student.name), 50);
+            window.selectAndScrollToSantri(student.name);
         };
 
         window.scrollToSantri = function(santriName) {
@@ -939,11 +937,18 @@
 
         // Sinkronisasi cloud: setelah Save, perangkat lain akan mengambil versi terakhir dari Google Sheet.
         window.syncToCloud = async function(payload) {
+            const url = window.getGsUrl();
+            if (!url) {
+                window.setSyncIndicator('pending');
+                window.updateSyncFlow('write', 0, 'Menunggu URL Google Apps Script');
+                const syncCategory = payload && ['bacaan','hafalan','murojaah','tugas'].includes(payload.type) ? payload.type : null;
+                if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'idle', 'URL GS belum diisi', payload.name || null, 0);
+                return;
+            }
             window.setSyncIndicator('pending');
             const syncCategory = payload && ['bacaan','hafalan','murojaah','tugas'].includes(payload.type) ? payload.type : null;
             if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'active', 'WRITE...', payload.name || null, 10);
             window.updateSyncFlow('write', 10, 'Website / browser: menyiapkan data');
-            const url = window.getGsUrl();
             try {
                 window.updateSyncFlow('write', 34, 'Google Apps Script: menerima transfer');
                 if (syncCategory) window.setInputSyncStatus(syncCategory, 'write', 'active', 'WRITE...', payload.name || null, 34);
@@ -1007,12 +1012,18 @@
         };
 
         window.fetchAllDataFromCloud = async function(forceRender = false) {
+            const url = window.getGsUrl();
+            if (!url) {
+                window.setSyncIndicator('pending');
+                window.setInputSyncStatus(null, 'read', 'idle', 'URL GS belum diisi', null, 0);
+                window.updateSyncFlow('read', 0, 'Menunggu URL Google Apps Script');
+                return;
+            }
             if (window._cloudPollingBusy) return;
             window._cloudPollingBusy = true;
             window.setSyncIndicator('pending');
             window.setInputSyncStatus(null, 'read', 'active', 'READ...', null, 10);
             window.updateSyncFlow('read', 10, 'Google Sheet: meminta data terbaru');
-            const url = window.getGsUrl();
             try {
                 window.updateSyncFlow('read', 34, 'Google Apps Script: mengambil data');
                 window.setInputSyncStatus(null, 'read', 'active', 'READ...', null, 34);
@@ -1757,13 +1768,13 @@
                 const studentClass = String(s.class || '').trim();
                 return selectedClass === 'ALL' || studentClass.toLowerCase() === selectedClass.toLowerCase();
             });
-            // Jika satu santri sudah dipilih, FORM HARUS mengikuti nama tersebut
-            // secara langsung. Jangan batasi lagi dengan filter kelas karena nilai
-            // kelas dari master bisa berubah/berbeda format (mis. spasi/case)
-            // dan itu dapat membuat form tidak muncul setelah nama diklik.
-            const filtered = selectedName
-                ? master.filter(s => String(s.name || '').trim().toLowerCase() === selectedName)
-                : [];
+            // Jika satu santri sudah dipilih, FORM HARUS mengikuti santri
+            // tersebut langsung berdasarkan nama. Jangan biarkan filter kelas
+            // mengosongkan form akibat perbedaan format/normalisasi kelas.
+            const selectedStudent = selectedName
+                ? master.find(s => String(s.name || '').trim().toLowerCase() === selectedName)
+                : null;
+            const filtered = selectedStudent ? [selectedStudent] : [];
 
             // PANEL KIRI = DAFTAR PILIHAN, BUKAN FORM.
             // Saat kelas dipilih, nama-nama kelas tersebut tetap muncul sebagai pilihan.
@@ -4937,7 +4948,7 @@
                     </div>
                     <div class="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1.5">
                         <span class="text-xs font-bold text-slate-500 uppercase">Google Apps Script Web App URL (Endpoint)</span>
-                        <input type="text" id="customGsUrlInput" class="w-full p-3.5 bg-slate-50 dark:bg-slate-800 border-2 rounded-xl font-mono text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:ring-2 focus:ring-emerald-500 min-h-[46px]" value="https://script.google.com/macros/s/AKfycbyjKiIMh3shzdvkI9wOz8mzbjWoX6YANtpRm_jgwd5BlGZo-xZKNWgQlllH1_4ho4Jl/exec">
+                        <input type="text" id="customGsUrlInput" class="w-full p-3.5 bg-slate-50 dark:bg-slate-800 border-2 rounded-xl font-mono text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400 outline-none focus:ring-2 focus:ring-emerald-500 min-h-[46px]" value="">
                         <button onclick="window.saveCustomGsUrl()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-black transition mt-1.5 active:scale-95">Simpan URL Endpoint GS Baru</button>
                     </div>
                 </div>
