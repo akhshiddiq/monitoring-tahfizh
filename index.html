@@ -2945,7 +2945,9 @@
                 const murojaahStat = document.getElementById(`mur_stat_${name}`)?.value || '';
                 const murType = document.getElementById(`mur_cat_type_${name}`)?.value || '';
                 const murDesc = document.getElementById(`mur_cat_desc_${name}`)?.value.trim() || '';
-                const murojaahCatCombined = murType ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`) : murType;
+                const murojaahCatCombined = murType
+                    ? (murDesc ? `[${murType}] ${murDesc}` : `[${murType}]`)
+                    : murDesc;
                 const structuredSlotsMur = window.extractSlotsStructured('mur', name);
                 const murojaahProgressStatus = window.getProgressStatusFromSlots(structuredSlotsMur);
 
@@ -3424,16 +3426,50 @@
             window.showToast("Data laporan WA diperbarui dari Google Sheet!", "success");
         };
 
-        window.copyWaReportText = function() {
+        window.copyTextRobust = async function(text, successMessage) {
+            const value = String(text ?? '');
+            if (!value) {
+                window.showToast("Tidak ada teks untuk disalin.", "error");
+                return false;
+            }
+
+            // Utamakan Clipboard API pada browser modern/HTTPS.
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(value);
+                    window.showToast(successMessage, "success");
+                    return true;
+                }
+            } catch (_) {}
+
+            // Fallback untuk browser/perangkat yang tidak menyediakan Clipboard API.
+            try {
+                const helper = document.createElement('textarea');
+                helper.value = value;
+                helper.setAttribute('readonly', '');
+                helper.style.position = 'fixed';
+                helper.style.left = '-9999px';
+                helper.style.top = '0';
+                document.body.appendChild(helper);
+                helper.focus();
+                helper.select();
+                helper.setSelectionRange(0, helper.value.length);
+                const copied = document.execCommand('copy');
+                helper.remove();
+                if (copied) {
+                    window.showToast(successMessage, "success");
+                    return true;
+                }
+            } catch (_) {}
+
+            window.showToast("Gagal menyalin teks. Silakan pilih dan salin manual.", "error");
+            return false;
+        };
+
+        window.copyWaReportText = async function() {
             const textarea = document.getElementById('waMessagePreviewInline') || document.getElementById('waMessagePreview');
             if (!textarea) return;
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                window.showToast("Laporan WA Personal disalin!", "success");
-            } catch (err) {
-                window.showToast("Gagal menyalin teks.", "error");
-            }
+            await window.copyTextRobust(textarea.value || textarea.textContent || '', "Laporan WA Personal disalin!");
         };
 
         window.sendWaReportDirect = function() {
@@ -3564,16 +3600,10 @@
             window.showToast("Data laporan kelas diperbarui dari Google Sheet!", "success");
         };
 
-        window.copyClassReportText = function() {
+        window.copyClassReportText = async function() {
             const textarea = document.getElementById('classReportMessagePreview');
             if (!textarea) return;
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                window.showToast("Laporan kelas disalin!", "success");
-            } catch (err) {
-                window.showToast("Gagal menyalin teks.", "error");
-            }
+            await window.copyTextRobust(textarea.value || textarea.textContent || '', "Laporan WA Grup disalin!");
         };
 
         window.sendClassReportDirect = function() {
